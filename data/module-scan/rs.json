@@ -1,0 +1,5323 @@
+{
+  "admin": "rs",
+  "username": "rs.admin",
+  "loginOk": true,
+  "modules": [
+    {
+      "slug": "registration",
+      "name": "Ambulatory CarePendaftaran pasien, check-in, MRN",
+      "href": "/en/registration",
+      "screens": [
+        {
+          "label": "registration (hub)",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/registration",
+            "shot": "screenshots-scan\\rs-registration-hub.png",
+            "path": "/en/registration",
+            "headings": [
+              "Ambulatory Care",
+              "Workflow"
+            ],
+            "links": [
+              {
+                "text": "Home",
+                "href": "/en"
+              },
+              {
+                "text": "Apps",
+                "href": "/en/apps"
+              },
+              {
+                "text": "New Registration",
+                "href": "/en/registration/patients"
+              },
+              {
+                "text": "Registration",
+                "href": "/en/registration/patients"
+              },
+              {
+                "text": "Appointments",
+                "href": "/en/registration/appointments"
+              },
+              {
+                "text": "Arrival",
+                "href": "/en/registration/department-queue"
+              }
+            ],
+            "tables": [],
+            "empty": null,
+            "redirectedToLogin": false
+          }
+        },
+        {
+          "label": "registration-patients",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/registration/patients",
+            "shot": "screenshots-scan\\rs-registration-patients.png",
+            "path": "/en/registration/patients",
+            "headings": [
+              "Registered Patients"
+            ],
+            "links": [
+              {
+                "text": "Home",
+                "href": "/en"
+              },
+              {
+                "text": "Ambulatory Care",
+                "href": "/en/registration"
+              }
+            ],
+            "tables": [
+              {
+                "rows": 10,
+                "headers": [
+                  "MRN",
+                  "Full name",
+                  "Flags",
+                  "Visit",
+                  "Valid until",
+                  "Date of birth",
+                  "registration.patients.colRegistered",
+                  "Actions"
+                ],
+                "sample": "RM-BR02-0120Rafi Nugroho—Outpatient—1974-12-11 · 51 years2026-10-10Print barcode"
+              }
+            ],
+            "empty": null,
+            "redirectedToLogin": false
+          }
+        },
+        {
+          "label": "registration-appointments",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/registration/appointments",
+            "shot": "screenshots-scan\\rs-registration-appointments.png",
+            "path": "/en/registration/appointments",
+            "headings": [
+              "Appointments"
+            ],
+            "links": [
+              {
+                "text": "Registration",
+                "href": "/en/registration"
+              }
+            ],
+            "tables": [
+              {
+                "rows": 1,
+                "headers": [
+                  "",
+                  "Patient",
+                  "MRN",
+                  "When",
+                  "Block",
+                  "Department",
+                  "Consultant",
+                  "Type",
+                  "Status",
+                  "Token"
+                ],
+                "sample": "Budi SantosoRM-BR01-0002Oct 12, 2026, 10:00 AM10:00 AM–10:20 AMDokter Umumdr. Fitri Handayani, Sp.PDSeries—Waiting"
+              }
+            ],
+            "empty": null,
+            "redirectedToLogin": false
+          }
+        },
+        {
+          "label": "registration-department-queue",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/registration/department-queue",
+            "shot": "screenshots-scan\\rs-registration-department-queue.png",
+            "path": "/en/registration/department-queue",
+            "headings": [
+              "Arrival"
+            ],
+            "links": [
+              {
+                "text": "Home",
+                "href": "/en"
+              },
+              {
+                "text": "Ambulatory Care",
+                "href": "/en/registration"
+              }
+            ],
+            "tables": [
+              {
+                "rows": 1,
+                "headers": [
+                  "No.",
+                  "Patient",
+                  "MRN",
+                  "Department",
+                  "MLC",
+                  "Status",
+                  ""
+                ],
+                "sample": "No arrivals today."
+              }
+            ],
+            "empty": "No arrivals today.",
+            "redirectedToLogin": false
+          }
+        }
+      ]
+    },
+    {
+      "slug": "appointment",
+      "name": "AppointmentJadwal, reschedule, blok konsultan",
+      "href": "/en/appointment",
+      "screens": [
+        {
+          "label": "appointment (hub)",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/appointment",
+            "shot": "screenshots-scan\\rs-appointment-hub.png",
+            "path": "/en/appointment",
+            "headings": [
+              "Appointment",
+              "Workflow"
+            ],
+            "links": [
+              {
+                "text": "Home",
+                "href": "/en"
+              },
+              {
+                "text": "Apps",
+                "href": "/en/apps"
+              },
+              {
+                "text": "Appointments",
+                "href": "/en/appointment/schedule"
+              }
+            ],
+            "tables": [],
+            "empty": null,
+            "redirectedToLogin": false
+          }
+        },
+        {
+          "label": "appointment-schedule",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/appointment/schedule",
+            "shot": "screenshots-scan\\rs-appointment-schedule.png",
+            "path": "/en/appointment/schedule",
+            "headings": [
+              "Appointments"
+            ],
+            "links": [
+              {
+                "text": "Appointment",
+                "href": "/en/appointment"
+              }
+            ],
+            "tables": [
+              {
+                "rows": 1,
+                "headers": [
+                  "",
+                  "Patient",
+                  "MRN",
+                  "When",
+                  "Block",
+                  "Department",
+                  "Consultant",
+                  "Type",
+                  "Status",
+                  "Token"
+                ],
+                "sample": "Budi SantosoRM-BR01-0002Oct 12, 2026, 10:00 AM10:00 AM–10:20 AMDokter Umumdr. Fitri Handayani, Sp.PDSeries—Waiting"
+              }
+            ],
+            "empty": null,
+            "redirectedToLogin": false
+          }
+        }
+      ]
+    },
+    {
+      "slug": "clinical",
+      "name": "Patient CareSOAP, vitals, diagnosis",
+      "href": "/en/clinical",
+      "screens": [
+        {
+          "label": "clinical (hub)",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/clinical",
+            "shot": "screenshots-scan\\rs-clinical-hub.png",
+            "path": "/en/clinical",
+            "headings": [
+              "Patient Care",
+              "Workflow"
+            ],
+            "links": [
+              {
+                "text": "Home",
+                "href": "/en"
+              },
+              {
+                "text": "Apps",
+                "href": "/en/apps"
+              },
+              {
+                "text": "Open Consultation",
+                "href": "/en/clinical/consultation"
+              },
+              {
+                "text": "Consultation",
+                "href": "/en/clinical/consultation"
+              },
+              {
+                "text": "Follow-up",
+                "href": "/en/clinical/follow-ups"
+              },
+              {
+                "text": "Terminology",
+                "href": "/en/clinical/terminology"
+              }
+            ],
+            "tables": [],
+            "empty": null,
+            "redirectedToLogin": false
+          }
+        },
+        {
+          "label": "clinical-consultation",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/clinical/consultation",
+            "shot": "screenshots-scan\\rs-clinical-consultation.png",
+            "path": "/en/clinical/consultation",
+            "headings": [
+              "Consultation"
+            ],
+            "links": [
+              {
+                "text": "Home",
+                "href": "/en"
+              },
+              {
+                "text": "Patient Care",
+                "href": "/en/clinical"
+              }
+            ],
+            "tables": [],
+            "empty": null,
+            "redirectedToLogin": false
+          }
+        },
+        {
+          "label": "clinical-follow-ups",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/clinical/follow-ups",
+            "shot": "screenshots-scan\\rs-clinical-follow-ups.png",
+            "path": "/en/clinical/follow-ups",
+            "headings": [
+              "Follow-up"
+            ],
+            "links": [
+              {
+                "text": "Patient Care",
+                "href": "/en/clinical"
+              }
+            ],
+            "tables": [
+              {
+                "rows": 4,
+                "headers": [
+                  "When",
+                  "Patient",
+                  "Mode",
+                  "Note"
+                ],
+                "sample": "2026-09-22 10:00RM-HO-0001 · Siti AminahNoteRM-HO-0001 Siti Aminah — Hipertensi primer"
+              }
+            ],
+            "empty": null,
+            "redirectedToLogin": false
+          }
+        },
+        {
+          "label": "clinical-terminology",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/clinical/terminology",
+            "shot": "screenshots-scan\\rs-clinical-terminology.png",
+            "path": "/en/clinical/terminology",
+            "headings": [
+              "Terminology",
+              "Matches",
+              "Coding queue"
+            ],
+            "links": [
+              {
+                "text": "Patient Care",
+                "href": "/en/clinical"
+              }
+            ],
+            "tables": [],
+            "empty": "No stay is waiting for a final code.",
+            "redirectedToLogin": false
+          }
+        }
+      ]
+    },
+    {
+      "slug": "adt",
+      "name": "InpatientAdmission, transfer, discharge",
+      "href": "/en/adt",
+      "screens": [
+        {
+          "label": "adt (hub)",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/adt",
+            "shot": "screenshots-scan\\rs-adt-hub.png",
+            "path": "/en/adt",
+            "headings": [
+              "Inpatient",
+              "Workflow"
+            ],
+            "links": [
+              {
+                "text": "Home",
+                "href": "/en"
+              },
+              {
+                "text": "Open admissions",
+                "href": "/en/adt/admissions"
+              },
+              {
+                "text": "Admit",
+                "href": "/en/adt/admissions"
+              },
+              {
+                "text": "Bed management",
+                "href": "/en/adt/beds"
+              },
+              {
+                "text": "Requests",
+                "href": "/en/adt/requests"
+              },
+              {
+                "text": "Ward",
+                "href": "/en/adt/ward"
+              },
+              {
+                "text": "Discharge",
+                "href": "/en/adt/discharges"
+              }
+            ],
+            "tables": [],
+            "empty": null,
+            "redirectedToLogin": false
+          }
+        },
+        {
+          "label": "adt-admissions",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/adt/admissions",
+            "shot": "screenshots-scan\\rs-adt-admissions.png",
+            "path": "/en/adt/admissions",
+            "headings": [
+              "Admissions"
+            ],
+            "links": [
+              {
+                "text": "Home",
+                "href": "/en"
+              },
+              {
+                "text": "Inpatient",
+                "href": "/en/adt"
+              }
+            ],
+            "tables": [
+              {
+                "rows": 10,
+                "headers": [
+                  "Patient",
+                  "Bed",
+                  "Admitted",
+                  "Status",
+                  "Actions"
+                ],
+                "sample": "Agus WijayaADM-042—Sep 17, 2026, 09:00 AMNo bedDischarge"
+              }
+            ],
+            "empty": "No bed",
+            "redirectedToLogin": false
+          }
+        },
+        {
+          "label": "adt-beds",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/adt/beds",
+            "shot": "screenshots-scan\\rs-adt-beds.png",
+            "path": "/en/adt/beds",
+            "headings": [
+              "Bed management"
+            ],
+            "links": [
+              {
+                "text": "Home",
+                "href": "/en"
+              },
+              {
+                "text": "Inpatient",
+                "href": "/en/adt"
+              }
+            ],
+            "tables": [
+              {
+                "rows": 10,
+                "headers": [
+                  "Bed no",
+                  "Patient",
+                  "Admission no",
+                  "Description",
+                  "Availability",
+                  "Status",
+                  "Actions"
+                ],
+                "sample": "ANG1——Kamar Anggrek 1 Kelas 1AvailableActiveEdit"
+              }
+            ],
+            "empty": "No bed types yet.CodeNameActive",
+            "redirectedToLogin": false
+          }
+        },
+        {
+          "label": "adt-requests",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/adt/requests",
+            "shot": "screenshots-scan\\rs-adt-requests.png",
+            "path": "/en/adt/requests",
+            "headings": [
+              "Admission requests",
+              "Admission types",
+              "New request"
+            ],
+            "links": [
+              {
+                "text": "Home",
+                "href": "/en"
+              },
+              {
+                "text": "Inpatient",
+                "href": "/en/adt"
+              }
+            ],
+            "tables": [],
+            "empty": null,
+            "redirectedToLogin": false
+          }
+        },
+        {
+          "label": "adt-ward",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/adt/ward",
+            "shot": "screenshots-scan\\rs-adt-ward.png",
+            "path": "/en/adt/ward",
+            "headings": [
+              "Ward care",
+              "Dose record"
+            ],
+            "links": [
+              {
+                "text": "Home",
+                "href": "/en"
+              },
+              {
+                "text": "Inpatient",
+                "href": "/en/adt"
+              }
+            ],
+            "tables": [],
+            "empty": "No doses yet.",
+            "redirectedToLogin": false
+          }
+        },
+        {
+          "label": "adt-discharges",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/adt/discharges",
+            "shot": "screenshots-scan\\rs-adt-discharges.png",
+            "path": "/en/adt/discharges",
+            "headings": [
+              "Discharges"
+            ],
+            "links": [
+              {
+                "text": "Home",
+                "href": "/en"
+              },
+              {
+                "text": "Inpatient",
+                "href": "/en/adt"
+              }
+            ],
+            "tables": [
+              {
+                "rows": 10,
+                "headers": [
+                  "Discharge no",
+                  "Admitted",
+                  "Discharged",
+                  "Length of stay"
+                ],
+                "sample": "DC-045Sep 23, 2026, 09:00 AMSep 26, 2026, 11:00 AM3 days"
+              }
+            ],
+            "empty": null,
+            "redirectedToLogin": false
+          }
+        }
+      ]
+    },
+    {
+      "slug": "pharmacy",
+      "name": "PharmacyDispense, OTC, retur",
+      "href": "/en/pharmacy",
+      "screens": [
+        {
+          "label": "pharmacy (hub)",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/pharmacy",
+            "shot": "screenshots-scan\\rs-pharmacy-hub.png",
+            "path": "/en/pharmacy",
+            "headings": [
+              "Pharmacy",
+              "Pharmacy"
+            ],
+            "links": [
+              {
+                "text": "Home",
+                "href": "/en"
+              },
+              {
+                "text": "Apps",
+                "href": "/en/apps"
+              },
+              {
+                "text": "Dispense",
+                "href": "/en/pharmacy/dispense"
+              },
+              {
+                "text": "Orders",
+                "href": "/en/pharmacy/orders"
+              },
+              {
+                "text": "Dispense",
+                "href": "/en/pharmacy/dispense"
+              },
+              {
+                "text": "Issue Lines",
+                "href": "/en/pharmacy/issue-lines"
+              }
+            ],
+            "tables": [],
+            "empty": null,
+            "redirectedToLogin": false
+          }
+        },
+        {
+          "label": "pharmacy-dispense",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/pharmacy/dispense",
+            "shot": "screenshots-scan\\rs-pharmacy-dispense.png",
+            "path": "/en/pharmacy/dispense",
+            "headings": [
+              "Dispense"
+            ],
+            "links": [
+              {
+                "text": "Home",
+                "href": "/en"
+              },
+              {
+                "text": "Pharmacy",
+                "href": "/en/pharmacy"
+              },
+              {
+                "text": "Register on the patient form",
+                "href": "/en/registration/patients?next=/pharmacy/dispense"
+              }
+            ],
+            "tables": [],
+            "empty": "No medical record selected.",
+            "redirectedToLogin": false
+          }
+        },
+        {
+          "label": "pharmacy-orders",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/pharmacy/orders",
+            "shot": "screenshots-scan\\rs-pharmacy-orders.png",
+            "path": "/en/pharmacy/orders",
+            "headings": [
+              "Orders"
+            ],
+            "links": [
+              {
+                "text": "Home",
+                "href": "/en"
+              },
+              {
+                "text": "Pharmacy",
+                "href": "/en/pharmacy"
+              },
+              {
+                "text": "All",
+                "href": "/en/pharmacy/orders"
+              },
+              {
+                "text": "Outpatient",
+                "href": "/en/pharmacy/orders?visit_class=outpatient"
+              },
+              {
+                "text": "Inpatient",
+                "href": "/en/pharmacy/orders?visit_class=inpatient"
+              },
+              {
+                "text": "Siti Aminah",
+                "href": "/en/pharmacy/dispense?order=9cf2dfdf-8773-5593-850c-046af18dbb08"
+              },
+              {
+                "text": "Ahmad Fauzi",
+                "href": "/en/pharmacy/dispense?order=8d87a7b1-2370-5d24-bf76-e0fc917fb0c8"
+              },
+              {
+                "text": "Budi Santoso",
+                "href": "/en/pharmacy/dispense?order=64f91ab3-ef44-58f3-95ac-4fcd4d2a3c19"
+              },
+              {
+                "text": "Dewi Lestari",
+                "href": "/en/pharmacy/dispense?order=07233c2b-d5e8-589b-8ba9-acdcb40cd091"
+              }
+            ],
+            "tables": [
+              {
+                "rows": 4,
+                "headers": [
+                  "Patient",
+                  "Drug",
+                  "Visit",
+                  "Remaining"
+                ],
+                "sample": "Siti AminahParacetamol 500 mg tabletOutpatient10 / 10"
+              }
+            ],
+            "empty": null,
+            "redirectedToLogin": false
+          }
+        },
+        {
+          "label": "pharmacy-issue-lines",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/pharmacy/issue-lines",
+            "shot": "screenshots-scan\\rs-pharmacy-issue-lines.png",
+            "path": "/en/pharmacy/issue-lines",
+            "headings": [
+              "Issue Lines",
+              "Which lines may be returned"
+            ],
+            "links": [
+              {
+                "text": "Home",
+                "href": "/en"
+              },
+              {
+                "text": "Pharmacy",
+                "href": "/en/pharmacy"
+              }
+            ],
+            "tables": [
+              {
+                "rows": 5,
+                "headers": [
+                  "Item",
+                  "Requested",
+                  "Issued",
+                  "Issued",
+                  "Verified",
+                  "Returned",
+                  "Return",
+                  "Remarks"
+                ],
+                "sample": "Amoxicillin 500 mg kapsul00NoNo0—Budi Santoso"
+              }
+            ],
+            "empty": null,
+            "redirectedToLogin": false
+          }
+        }
+      ]
+    },
+    {
+      "slug": "bloodbank",
+      "name": "Transfusion MedicineDonor, crossmatch, issue",
+      "href": "/en/bloodbank",
+      "screens": [
+        {
+          "label": "bloodbank (hub)",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/bloodbank",
+            "shot": "screenshots-scan\\rs-bloodbank-hub.png",
+            "path": "/en/bloodbank",
+            "headings": [
+              "Transfusion Medicine",
+              "Workflow"
+            ],
+            "links": [
+              {
+                "text": "Home",
+                "href": "/en"
+              },
+              {
+                "text": "New request",
+                "href": "/en/bloodbank/requisitions"
+              },
+              {
+                "text": "Blood request",
+                "href": "/en/bloodbank/requisitions"
+              },
+              {
+                "text": "Donors",
+                "href": "/en/bloodbank/donors"
+              },
+              {
+                "text": "Stock",
+                "href": "/en/bloodbank/stock"
+              },
+              {
+                "text": "Quality control",
+                "href": "/en/bloodbank/qc"
+              }
+            ],
+            "tables": [],
+            "empty": null,
+            "redirectedToLogin": false
+          }
+        },
+        {
+          "label": "bloodbank-requisitions",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/bloodbank/requisitions",
+            "shot": "screenshots-scan\\rs-bloodbank-requisitions.png",
+            "path": "/en/bloodbank/requisitions",
+            "headings": [
+              "Blood request"
+            ],
+            "links": [
+              {
+                "text": "Home",
+                "href": "/en"
+              },
+              {
+                "text": "Transfusion Medicine",
+                "href": "/en/bloodbank"
+              }
+            ],
+            "tables": [
+              {
+                "rows": 1,
+                "headers": [
+                  "Request no.",
+                  "Patient",
+                  "Department",
+                  "Status"
+                ],
+                "sample": "No requests yet."
+              }
+            ],
+            "empty": "No requests yet.",
+            "redirectedToLogin": false
+          }
+        },
+        {
+          "label": "bloodbank-donors",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/bloodbank/donors",
+            "shot": "screenshots-scan\\rs-bloodbank-donors.png",
+            "path": "/en/bloodbank/donors",
+            "headings": [
+              "This page couldn't load"
+            ],
+            "links": [],
+            "tables": [],
+            "empty": null,
+            "redirectedToLogin": false
+          }
+        },
+        {
+          "label": "bloodbank-stock",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/bloodbank/stock",
+            "shot": "screenshots-scan\\rs-bloodbank-stock.png",
+            "path": "/en/bloodbank/stock",
+            "headings": [
+              "Stock"
+            ],
+            "links": [
+              {
+                "text": "Home",
+                "href": "/en"
+              },
+              {
+                "text": "Transfusion Medicine",
+                "href": "/en/bloodbank"
+              }
+            ],
+            "tables": [
+              {
+                "rows": 2,
+                "headers": [
+                  "Bag no",
+                  "Status",
+                  "Expiry",
+                  "Quantity",
+                  "Phenotype",
+                  "Component",
+                  "Actions"
+                ],
+                "sample": "BAG-1001——1—GroupSerologySeparate"
+              }
+            ],
+            "empty": null,
+            "redirectedToLogin": false
+          }
+        },
+        {
+          "label": "bloodbank-qc",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/bloodbank/qc",
+            "shot": "screenshots-scan\\rs-bloodbank-qc.png",
+            "path": "/en/bloodbank/qc",
+            "headings": [
+              "Quality control"
+            ],
+            "links": [
+              {
+                "text": "Home",
+                "href": "/en"
+              },
+              {
+                "text": "Transfusion Medicine",
+                "href": "/en/bloodbank"
+              }
+            ],
+            "tables": [],
+            "empty": "No documents yet.",
+            "redirectedToLogin": false
+          }
+        }
+      ]
+    },
+    {
+      "slug": "inventory",
+      "name": "InventoryStok, GRN, mutasi",
+      "href": "/en/inventory",
+      "screens": [
+        {
+          "label": "inventory (hub)",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/inventory",
+            "shot": "screenshots-scan\\rs-inventory-hub.png",
+            "path": "/en/inventory",
+            "headings": [
+              "Inventory",
+              "Inventory"
+            ],
+            "links": [
+              {
+                "text": "Home",
+                "href": "/en"
+              },
+              {
+                "text": "Apps",
+                "href": "/en/apps"
+              },
+              {
+                "text": "Item Master",
+                "href": "/en/inventory/items"
+              },
+              {
+                "text": "Item Master",
+                "href": "/en/inventory/items"
+              },
+              {
+                "text": "Stock Requests",
+                "href": "/en/inventory/stock-requests"
+              },
+              {
+                "text": "Stores",
+                "href": "/en/inventory/stores"
+              },
+              {
+                "text": "Stock book",
+                "href": "/en/inventory/ledger"
+              }
+            ],
+            "tables": [],
+            "empty": null,
+            "redirectedToLogin": false
+          }
+        },
+        {
+          "label": "inventory-items",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/inventory/items",
+            "shot": "screenshots-scan\\rs-inventory-items.png",
+            "path": "/en/inventory/items",
+            "headings": [
+              "Item Master"
+            ],
+            "links": [
+              {
+                "text": "Home",
+                "href": "/en"
+              },
+              {
+                "text": "Inventory",
+                "href": "/en/inventory"
+              }
+            ],
+            "tables": [
+              {
+                "rows": 19,
+                "headers": [
+                  "Code",
+                  "Name",
+                  "Batch",
+                  "Serialized",
+                  "Status",
+                  "Actions"
+                ],
+                "sample": "AML5Amlodipine 5 mgBatch—Active"
+              }
+            ],
+            "empty": null,
+            "redirectedToLogin": false
+          }
+        },
+        {
+          "label": "inventory-stock-requests",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/inventory/stock-requests",
+            "shot": "screenshots-scan\\rs-inventory-stock-requests.png",
+            "path": "/en/inventory/stock-requests",
+            "headings": [
+              "Stock Requests"
+            ],
+            "links": [
+              {
+                "text": "Home",
+                "href": "/en"
+              },
+              {
+                "text": "Inventory",
+                "href": "/en/inventory"
+              }
+            ],
+            "tables": [
+              {
+                "rows": 3,
+                "headers": [
+                  "Doc #",
+                  "Date",
+                  "Department",
+                  "Type",
+                  "Approval",
+                  "Document",
+                  "Actions"
+                ],
+                "sample": "IND-0012026-09-15—RoutinePendingOpenApprove"
+              }
+            ],
+            "empty": null,
+            "redirectedToLogin": false
+          }
+        },
+        {
+          "label": "inventory-stores",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/inventory/stores",
+            "shot": "screenshots-scan\\rs-inventory-stores.png",
+            "path": "/en/inventory/stores",
+            "headings": [
+              "Stores"
+            ],
+            "links": [
+              {
+                "text": "Home",
+                "href": "/en"
+              },
+              {
+                "text": "Inventory",
+                "href": "/en/inventory"
+              }
+            ],
+            "tables": [
+              {
+                "rows": 17,
+                "headers": [
+                  "Code",
+                  "Name",
+                  "Branch",
+                  "Description",
+                  "Dispense for",
+                  "Status"
+                ],
+                "sample": "FE07-00-20CSSUPodomoroextractOutpatient, InpatientActive"
+              }
+            ],
+            "empty": null,
+            "redirectedToLogin": false
+          }
+        },
+        {
+          "label": "inventory-ledger",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/inventory/ledger",
+            "shot": "screenshots-scan\\rs-inventory-ledger.png",
+            "path": "/en/inventory/ledger",
+            "headings": [
+              "Stock book"
+            ],
+            "links": [
+              {
+                "text": "Inventory",
+                "href": "/en/inventory"
+              }
+            ],
+            "tables": [],
+            "empty": null,
+            "redirectedToLogin": false
+          }
+        }
+      ]
+    },
+    {
+      "slug": "ot",
+      "name": "Operation TheaterJadwal & konsumsi OT",
+      "href": "/en/ot",
+      "screens": [
+        {
+          "label": "ot (hub)",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/ot",
+            "shot": "screenshots-scan\\rs-ot-hub.png",
+            "path": "/en/ot",
+            "headings": [
+              "Operation Theater",
+              "Workflow"
+            ],
+            "links": [
+              {
+                "text": "Home",
+                "href": "/en"
+              },
+              {
+                "text": "Apps",
+                "href": "/en/apps"
+              },
+              {
+                "text": "Open requests",
+                "href": "/en/ot/requests"
+              },
+              {
+                "text": "Requests",
+                "href": "/en/ot/requests"
+              },
+              {
+                "text": "Case",
+                "href": "/en/ot/case"
+              }
+            ],
+            "tables": [],
+            "empty": null,
+            "redirectedToLogin": false
+          }
+        },
+        {
+          "label": "ot-requests",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/ot/requests",
+            "shot": "screenshots-scan\\rs-ot-requests.png",
+            "path": "/en/ot/requests",
+            "headings": [
+              "OT requests"
+            ],
+            "links": [
+              {
+                "text": "Home",
+                "href": "/en"
+              },
+              {
+                "text": "OT",
+                "href": "/en/ot"
+              }
+            ],
+            "tables": [
+              {
+                "rows": 7,
+                "headers": [
+                  "Request no",
+                  "Procedures",
+                  "Status",
+                  "Blocked",
+                  "List prepared",
+                  "Actions"
+                ],
+                "sample": "OT-BOOKvalidated——ScheduleConsumeValidateDeferResumeCancel requestPre-anesthesiaStartIn progressCompleteRecord dossierPlace on calendar"
+              }
+            ],
+            "empty": null,
+            "redirectedToLogin": false
+          }
+        },
+        {
+          "label": "ot-case",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/ot/case",
+            "shot": "screenshots-scan\\rs-ot-case.png",
+            "path": "/en/ot/case",
+            "headings": [
+              "Surgical case"
+            ],
+            "links": [
+              {
+                "text": "OT",
+                "href": "/en/ot"
+              }
+            ],
+            "tables": [],
+            "empty": null,
+            "redirectedToLogin": false
+          }
+        }
+      ]
+    },
+    {
+      "slug": "procurement",
+      "name": "ProcurementPR, PO, tender",
+      "href": "/en/procurement",
+      "screens": [
+        {
+          "label": "procurement (hub)",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/procurement",
+            "shot": "screenshots-scan\\rs-procurement-hub.png",
+            "path": "/en/procurement",
+            "headings": [
+              "Procurement"
+            ],
+            "links": [
+              {
+                "text": "KlikMed",
+                "href": "/en"
+              },
+              {
+                "text": "Home",
+                "href": "/en"
+              },
+              {
+                "text": "Dashboard",
+                "href": "/en/dashboard"
+              },
+              {
+                "text": "Preferences",
+                "href": "/en/preferences"
+              },
+              {
+                "text": "Apps",
+                "href": "/en/apps"
+              },
+              {
+                "text": "Reports",
+                "href": "/en/reporting"
+              },
+              {
+                "text": "Profile",
+                "href": "/en/me"
+              },
+              {
+                "text": "Preferences",
+                "href": "/en/preferences"
+              },
+              {
+                "text": "Home",
+                "href": "/en"
+              },
+              {
+                "text": "Dashboard",
+                "href": "/en/dashboard"
+              },
+              {
+                "text": "Preferences",
+                "href": "/en/preferences"
+              },
+              {
+                "text": "Apps",
+                "href": "/en/apps"
+              },
+              {
+                "text": "Reports",
+                "href": "/en/reporting"
+              },
+              {
+                "text": "Purchase orders",
+                "href": "/en/procurement/purchase-orders"
+              },
+              {
+                "text": "Suppliers",
+                "href": "/en/procurement/suppliers"
+              },
+              {
+                "text": "Purchase requests",
+                "href": "/en/procurement/requests"
+              },
+              {
+                "text": "Receipts",
+                "href": "/en/procurement/receipts"
+              },
+              {
+                "text": "Reorder",
+                "href": "/en/procurement/reorder"
+              },
+              {
+                "text": "Purchase ordersOpen purchase orders",
+                "href": "/en/procurement/purchase-orders"
+              }
+            ],
+            "tables": [],
+            "empty": null,
+            "redirectedToLogin": false
+          }
+        },
+        {
+          "label": "procurement-purchase-orders",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/procurement/purchase-orders",
+            "shot": "screenshots-scan\\rs-procurement-purchase-orders.png",
+            "path": "/en/procurement/purchase-orders",
+            "headings": [
+              "Purchase orders"
+            ],
+            "links": [
+              {
+                "text": "KlikMed",
+                "href": "/en"
+              },
+              {
+                "text": "Home",
+                "href": "/en"
+              },
+              {
+                "text": "Dashboard",
+                "href": "/en/dashboard"
+              },
+              {
+                "text": "Preferences",
+                "href": "/en/preferences"
+              },
+              {
+                "text": "Apps",
+                "href": "/en/apps"
+              },
+              {
+                "text": "Reports",
+                "href": "/en/reporting"
+              },
+              {
+                "text": "Profile",
+                "href": "/en/me"
+              },
+              {
+                "text": "Preferences",
+                "href": "/en/preferences"
+              },
+              {
+                "text": "Home",
+                "href": "/en"
+              },
+              {
+                "text": "Dashboard",
+                "href": "/en/dashboard"
+              },
+              {
+                "text": "Preferences",
+                "href": "/en/preferences"
+              },
+              {
+                "text": "Apps",
+                "href": "/en/apps"
+              },
+              {
+                "text": "Reports",
+                "href": "/en/reporting"
+              },
+              {
+                "text": "Purchase orders",
+                "href": "/en/procurement/purchase-orders"
+              },
+              {
+                "text": "Suppliers",
+                "href": "/en/procurement/suppliers"
+              },
+              {
+                "text": "Purchase requests",
+                "href": "/en/procurement/requests"
+              },
+              {
+                "text": "Receipts",
+                "href": "/en/procurement/receipts"
+              },
+              {
+                "text": "Reorder",
+                "href": "/en/procurement/reorder"
+              },
+              {
+                "text": "Procurement",
+                "href": "/en/procurement"
+              }
+            ],
+            "tables": [
+              {
+                "rows": 3,
+                "headers": [
+                  "Doc no",
+                  "Date",
+                  "Vendor",
+                  "Dept",
+                  "Amount",
+                  "Balance",
+                  "Approval",
+                  "Actions"
+                ],
+                "sample": "PO-001-A2026-09-12IDR 0,00IDR 0,00—Open"
+              }
+            ],
+            "empty": null,
+            "redirectedToLogin": false
+          }
+        },
+        {
+          "label": "procurement-suppliers",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/procurement/suppliers",
+            "shot": "screenshots-scan\\rs-procurement-suppliers.png",
+            "path": "/en/procurement/suppliers",
+            "headings": [
+              "Suppliers and requests"
+            ],
+            "links": [],
+            "tables": [],
+            "empty": null,
+            "redirectedToLogin": false
+          }
+        },
+        {
+          "label": "procurement-requests",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/procurement/requests",
+            "shot": "screenshots-scan\\rs-procurement-requests.png",
+            "path": "/en/procurement/requests",
+            "headings": [
+              "Purchase orders"
+            ],
+            "links": [],
+            "tables": [],
+            "empty": null,
+            "redirectedToLogin": false
+          }
+        },
+        {
+          "label": "procurement-receipts",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/procurement/receipts",
+            "shot": "screenshots-scan\\rs-procurement-receipts.png",
+            "path": "/en/procurement/receipts",
+            "headings": [
+              "Receipts and returns"
+            ],
+            "links": [],
+            "tables": [],
+            "empty": null,
+            "redirectedToLogin": false
+          }
+        },
+        {
+          "label": "procurement-reorder",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/procurement/reorder",
+            "shot": "screenshots-scan\\rs-procurement-reorder.png",
+            "path": "/en/procurement/reorder",
+            "headings": [
+              "Reorder"
+            ],
+            "links": [],
+            "tables": [],
+            "empty": null,
+            "redirectedToLogin": false
+          }
+        }
+      ]
+    },
+    {
+      "slug": "hr",
+      "name": "HRKaryawan & cuti",
+      "href": "/en/hr",
+      "screens": [
+        {
+          "label": "hr (hub)",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/hr",
+            "shot": "screenshots-scan\\rs-hr-hub.png",
+            "path": "/en/hr",
+            "headings": [
+              "HR",
+              "Workforce"
+            ],
+            "links": [
+              {
+                "text": "Home",
+                "href": "/en"
+              },
+              {
+                "text": "Apps",
+                "href": "/en/apps"
+              },
+              {
+                "text": "Employees",
+                "href": "/en/hr/employees"
+              },
+              {
+                "text": "Leave applications",
+                "href": "/en/hr/leave-applications"
+              },
+              {
+                "text": "Duty roster",
+                "href": "/en/roster"
+              }
+            ],
+            "tables": [],
+            "empty": null,
+            "redirectedToLogin": false
+          }
+        },
+        {
+          "label": "hr-employees",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/hr/employees",
+            "shot": "screenshots-scan\\rs-hr-employees.png",
+            "path": "/en/hr/employees",
+            "headings": [
+              "Employees"
+            ],
+            "links": [
+              {
+                "text": "KlikMed",
+                "href": "/en"
+              },
+              {
+                "text": "Home",
+                "href": "/en"
+              },
+              {
+                "text": "Dashboard",
+                "href": "/en/dashboard"
+              },
+              {
+                "text": "Preferences",
+                "href": "/en/preferences"
+              },
+              {
+                "text": "Apps",
+                "href": "/en/apps"
+              },
+              {
+                "text": "Reports",
+                "href": "/en/reporting"
+              },
+              {
+                "text": "Profile",
+                "href": "/en/me"
+              },
+              {
+                "text": "Preferences",
+                "href": "/en/preferences"
+              },
+              {
+                "text": "Home",
+                "href": "/en"
+              },
+              {
+                "text": "Dashboard",
+                "href": "/en/dashboard"
+              },
+              {
+                "text": "Preferences",
+                "href": "/en/preferences"
+              },
+              {
+                "text": "Apps",
+                "href": "/en/apps"
+              },
+              {
+                "text": "Reports",
+                "href": "/en/reporting"
+              },
+              {
+                "text": "Employees",
+                "href": "/en/hr/employees"
+              },
+              {
+                "text": "Leave applications",
+                "href": "/en/hr/leave-applications"
+              },
+              {
+                "text": "Profile",
+                "href": "/en/hr/desk"
+              },
+              {
+                "text": "Leave year",
+                "href": "/en/hr/desk/leave"
+              },
+              {
+                "text": "Attendance",
+                "href": "/en/hr/desk/attendance"
+              },
+              {
+                "text": "Doctor fee",
+                "href": "/en/hr/desk/fee"
+              },
+              {
+                "text": "HR",
+                "href": "/en/hr"
+              }
+            ],
+            "tables": [
+              {
+                "rows": 10,
+                "headers": [
+                  "Employee no.",
+                  "Name",
+                  "Edit"
+                ],
+                "sample": "EMP-ANDIdr. Andi Saputra, Sp.RadEdit"
+              }
+            ],
+            "empty": null,
+            "redirectedToLogin": false
+          }
+        },
+        {
+          "label": "hr-leave-applications",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/hr/leave-applications",
+            "shot": "screenshots-scan\\rs-hr-leave-applications.png",
+            "path": "/en/hr/leave-applications",
+            "headings": [
+              "Leave applications"
+            ],
+            "links": [
+              {
+                "text": "KlikMed",
+                "href": "/en"
+              },
+              {
+                "text": "Home",
+                "href": "/en"
+              },
+              {
+                "text": "Dashboard",
+                "href": "/en/dashboard"
+              },
+              {
+                "text": "Preferences",
+                "href": "/en/preferences"
+              },
+              {
+                "text": "Apps",
+                "href": "/en/apps"
+              },
+              {
+                "text": "Reports",
+                "href": "/en/reporting"
+              },
+              {
+                "text": "Profile",
+                "href": "/en/me"
+              },
+              {
+                "text": "Preferences",
+                "href": "/en/preferences"
+              },
+              {
+                "text": "Home",
+                "href": "/en"
+              },
+              {
+                "text": "Dashboard",
+                "href": "/en/dashboard"
+              },
+              {
+                "text": "Preferences",
+                "href": "/en/preferences"
+              },
+              {
+                "text": "Apps",
+                "href": "/en/apps"
+              },
+              {
+                "text": "Reports",
+                "href": "/en/reporting"
+              },
+              {
+                "text": "Employees",
+                "href": "/en/hr/employees"
+              },
+              {
+                "text": "Leave applications",
+                "href": "/en/hr/leave-applications"
+              },
+              {
+                "text": "Profile",
+                "href": "/en/hr/desk"
+              },
+              {
+                "text": "Leave year",
+                "href": "/en/hr/desk/leave"
+              },
+              {
+                "text": "Attendance",
+                "href": "/en/hr/desk/attendance"
+              },
+              {
+                "text": "Doctor fee",
+                "href": "/en/hr/desk/fee"
+              },
+              {
+                "text": "HR",
+                "href": "/en/hr"
+              }
+            ],
+            "tables": [
+              {
+                "rows": 3,
+                "headers": [
+                  "Type",
+                  "From",
+                  "To",
+                  "Days",
+                  "Slot",
+                  "Status",
+                  "Reason",
+                  "Actions"
+                ],
+                "sample": "—2026-09-012026-09-021—PENDINGcuti pendingApproveReject"
+              }
+            ],
+            "empty": null,
+            "redirectedToLogin": false
+          }
+        }
+      ]
+    },
+    {
+      "slug": "laboratory",
+      "name": "LaboratorySampel, hasil, sertifikasi",
+      "href": "/en/laboratory",
+      "screens": [
+        {
+          "label": "laboratory (hub)",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/laboratory",
+            "shot": "screenshots-scan\\rs-laboratory-hub.png",
+            "path": "/en/laboratory",
+            "headings": [
+              "Laboratory",
+              "Workflow"
+            ],
+            "links": [
+              {
+                "text": "Home",
+                "href": "/en"
+              },
+              {
+                "text": "Apps",
+                "href": "/en/apps"
+              },
+              {
+                "text": "Open worklist",
+                "href": "/en/laboratory/orders"
+              },
+              {
+                "text": "Serviceorder",
+                "href": "/en/laboratory/orders"
+              },
+              {
+                "text": "Sample",
+                "href": "/en/laboratory/orders"
+              },
+              {
+                "text": "Accept Sample",
+                "href": "/en/laboratory/orders"
+              },
+              {
+                "text": "Capture Result",
+                "href": "/en/laboratory/orders"
+              },
+              {
+                "text": "BMHP",
+                "href": "/en/laboratory/bmhp"
+              }
+            ],
+            "tables": [],
+            "empty": null,
+            "redirectedToLogin": false
+          }
+        },
+        {
+          "label": "laboratory-orders",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/laboratory/orders",
+            "shot": "screenshots-scan\\rs-laboratory-orders.png",
+            "path": "/en/laboratory/orders",
+            "headings": [
+              "Lab order worklist"
+            ],
+            "links": [
+              {
+                "text": "Home",
+                "href": "/en"
+              },
+              {
+                "text": "Laboratory",
+                "href": "/en/laboratory"
+              }
+            ],
+            "tables": [
+              {
+                "rows": 10,
+                "headers": [
+                  "Sample ID",
+                  "Result type",
+                  "Status",
+                  "Result",
+                  "Result range",
+                  "Result status",
+                  "Remarks",
+                  "Actions"
+                ],
+                "sample": "—Ordered———Siti Aminah, 42 th — Gula darah puasaGeneratedResult statusCapture resultHandover"
+              }
+            ],
+            "empty": null,
+            "redirectedToLogin": false
+          }
+        },
+        {
+          "label": "laboratory-bmhp",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/laboratory/bmhp",
+            "shot": "screenshots-scan\\rs-laboratory-bmhp.png",
+            "path": "/en/laboratory/bmhp",
+            "headings": [
+              "BMHP"
+            ],
+            "links": [
+              {
+                "text": "Laboratory",
+                "href": "/en/laboratory"
+              }
+            ],
+            "tables": [],
+            "empty": null,
+            "redirectedToLogin": false
+          }
+        }
+      ]
+    },
+    {
+      "slug": "radiology",
+      "name": "RISOrder & jadwal modality",
+      "href": "/en/radiology",
+      "screens": [
+        {
+          "label": "radiology (hub)",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/radiology",
+            "shot": "screenshots-scan\\rs-radiology-hub.png",
+            "path": "/en/radiology",
+            "headings": [
+              "Radiology (RIS)",
+              "Workflow"
+            ],
+            "links": [
+              {
+                "text": "Home",
+                "href": "/en"
+              },
+              {
+                "text": "Apps",
+                "href": "/en/apps"
+              },
+              {
+                "text": "Open orders",
+                "href": "/en/radiology/orders"
+              },
+              {
+                "text": "Orders",
+                "href": "/en/radiology/orders"
+              }
+            ],
+            "tables": [],
+            "empty": null,
+            "redirectedToLogin": false
+          }
+        },
+        {
+          "label": "radiology-orders",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/radiology/orders",
+            "shot": "screenshots-scan\\rs-radiology-orders.png",
+            "path": "/en/radiology/orders",
+            "headings": [
+              "Orders"
+            ],
+            "links": [
+              {
+                "text": "Home",
+                "href": "/en"
+              },
+              {
+                "text": "Radiology",
+                "href": "/en/radiology"
+              }
+            ],
+            "tables": [
+              {
+                "rows": 10,
+                "headers": [
+                  "Order ref",
+                  "Study",
+                  "Study date",
+                  "Accession",
+                  "Reported by",
+                  "Links"
+                ],
+                "sample": "RIS-0000Siti Aminah, 42 th — Thorax PA———ImageReport"
+              }
+            ],
+            "empty": null,
+            "redirectedToLogin": false
+          }
+        }
+      ]
+    },
+    {
+      "slug": "diet",
+      "name": "DietaryDiet pasien rawat inap",
+      "href": "/en/diet",
+      "screens": [
+        {
+          "label": "diet (hub)",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/diet",
+            "shot": "screenshots-scan\\rs-diet-hub.png",
+            "path": "/en/diet",
+            "headings": [
+              "Dietary",
+              "Workflow"
+            ],
+            "links": [
+              {
+                "text": "Home",
+                "href": "/en"
+              },
+              {
+                "text": "Apps",
+                "href": "/en/apps"
+              },
+              {
+                "text": "Open requests",
+                "href": "/en/diet/requests"
+              },
+              {
+                "text": "Requests",
+                "href": "/en/diet/requests"
+              },
+              {
+                "text": "TPN",
+                "href": "/en/diet/tpn"
+              }
+            ],
+            "tables": [],
+            "empty": null,
+            "redirectedToLogin": false
+          }
+        },
+        {
+          "label": "diet-requests",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/diet/requests",
+            "shot": "screenshots-scan\\rs-diet-requests.png",
+            "path": "/en/diet/requests",
+            "headings": [
+              "Diet requests"
+            ],
+            "links": [
+              {
+                "text": "Home",
+                "href": "/en"
+              },
+              {
+                "text": "Diet",
+                "href": "/en/diet"
+              }
+            ],
+            "tables": [
+              {
+                "rows": 1,
+                "headers": [
+                  "Doc no",
+                  "Doc date",
+                  "Request date",
+                  "Lines",
+                  "Status"
+                ],
+                "sample": "GIZ-0012026-09-222026-09-221 line(s)Active"
+              }
+            ],
+            "empty": null,
+            "redirectedToLogin": false
+          }
+        },
+        {
+          "label": "diet-tpn",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/diet/tpn",
+            "shot": "screenshots-scan\\rs-diet-tpn.png",
+            "path": "/en/diet/tpn",
+            "headings": [
+              "Total parenteral nutrition",
+              "Compounding workbench"
+            ],
+            "links": [],
+            "tables": [
+              {
+                "rows": 1,
+                "headers": [
+                  "Patient",
+                  "BMI",
+                  "Protein",
+                  "Dextrose",
+                  "Lipid",
+                  "Volume"
+                ],
+                "sample": "No TPN prescriptions yet."
+              }
+            ],
+            "empty": "No TPN prescriptions yet.",
+            "redirectedToLogin": false
+          }
+        }
+      ]
+    },
+    {
+      "slug": "billing",
+      "name": "Hospital AccountsInvoice, deposit, kasir",
+      "href": "/en/billing",
+      "screens": [
+        {
+          "label": "billing (hub)",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/billing",
+            "shot": "screenshots-scan\\rs-billing-hub.png",
+            "path": "/en/billing",
+            "headings": [
+              "Hospital Accounts",
+              "Collections"
+            ],
+            "links": [
+              {
+                "text": "Home",
+                "href": "/en"
+              },
+              {
+                "text": "Apps",
+                "href": "/en/apps"
+              },
+              {
+                "text": "Fast Cashier",
+                "href": "/en/billing/cashier"
+              },
+              {
+                "text": "Fast Cashier",
+                "href": "/en/billing/cashier"
+              },
+              {
+                "text": "Insurance / BPJS",
+                "href": "/en/billing/cashier"
+              }
+            ],
+            "tables": [],
+            "empty": null,
+            "redirectedToLogin": false
+          }
+        },
+        {
+          "label": "billing-cashier",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/billing/cashier",
+            "shot": "screenshots-scan\\rs-billing-cashier.png",
+            "path": "/en/billing/cashier",
+            "headings": [
+              "Fast Cashier",
+              "1. Charge lookup",
+              "2. Payment",
+              "3. Receipt",
+              "Dispense discounts",
+              "Item price",
+              "Estimate",
+              "Counter settings"
+            ],
+            "links": [
+              {
+                "text": "KlikMed",
+                "href": "/en"
+              },
+              {
+                "text": "Home",
+                "href": "/en"
+              },
+              {
+                "text": "Dashboard",
+                "href": "/en/dashboard"
+              },
+              {
+                "text": "Preferences",
+                "href": "/en/preferences"
+              },
+              {
+                "text": "Apps",
+                "href": "/en/apps"
+              },
+              {
+                "text": "Reports",
+                "href": "/en/reporting"
+              },
+              {
+                "text": "Profile",
+                "href": "/en/me"
+              },
+              {
+                "text": "Preferences",
+                "href": "/en/preferences"
+              },
+              {
+                "text": "Home",
+                "href": "/en"
+              },
+              {
+                "text": "Dashboard",
+                "href": "/en/dashboard"
+              },
+              {
+                "text": "Preferences",
+                "href": "/en/preferences"
+              },
+              {
+                "text": "Apps",
+                "href": "/en/apps"
+              },
+              {
+                "text": "Reports",
+                "href": "/en/reporting"
+              },
+              {
+                "text": "Fast Cashier",
+                "href": "/en/billing/cashier"
+              },
+              {
+                "text": "Tarif",
+                "href": "/en/billing/tariffs"
+              },
+              {
+                "text": "Rencana",
+                "href": "/en/billing/plans"
+              },
+              {
+                "text": "Buku pasien",
+                "href": "/en/billing/ledger"
+              }
+            ],
+            "tables": [],
+            "empty": null,
+            "redirectedToLogin": false
+          }
+        }
+      ]
+    },
+    {
+      "slug": "emergency",
+      "name": "EmergencyTriage & bay IGD",
+      "href": "/en/emergency",
+      "screens": [
+        {
+          "label": "emergency (hub)",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/emergency",
+            "shot": "screenshots-scan\\rs-emergency-hub.png",
+            "path": "/en/emergency",
+            "headings": [
+              "Emergency",
+              "Accident & Emergency"
+            ],
+            "links": [
+              {
+                "text": "Home",
+                "href": "/en"
+              },
+              {
+                "text": "Apps",
+                "href": "/en/apps"
+              },
+              {
+                "text": "Registration",
+                "href": "/en/emergency/registration?type=7"
+              },
+              {
+                "text": "Emergency Patients",
+                "href": "/en/emergency/patients"
+              },
+              {
+                "text": "Triage",
+                "href": "/en/emergency/layout"
+              }
+            ],
+            "tables": [],
+            "empty": null,
+            "redirectedToLogin": false
+          }
+        },
+        {
+          "label": "emergency-registration?type=7",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/emergency/registration?type=7",
+            "shot": "screenshots-scan\\rs-emergency-registration-type-7.png",
+            "path": "/en/emergency/registration?type=7",
+            "headings": [
+              "Accident/Emergency Registration"
+            ],
+            "links": [
+              {
+                "text": "Emergency",
+                "href": "/en/emergency"
+              }
+            ],
+            "tables": [],
+            "empty": null,
+            "redirectedToLogin": false
+          }
+        },
+        {
+          "label": "emergency-patients",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/emergency/patients",
+            "shot": "screenshots-scan\\rs-emergency-patients.png",
+            "path": "/en/emergency/patients",
+            "headings": [
+              "Emergency Patients"
+            ],
+            "links": [
+              {
+                "text": "Emergency",
+                "href": "/en/emergency"
+              }
+            ],
+            "tables": [
+              {
+                "rows": 4,
+                "headers": [
+                  "Patient",
+                  "Visit date",
+                  "Created by",
+                  "Triage",
+                  "Action"
+                ],
+                "sample": "Rina Wulandari RM-BR02-00092026-10-04 21:10—Kuning IGDOverdueOutcome"
+              }
+            ],
+            "empty": null,
+            "redirectedToLogin": false
+          }
+        },
+        {
+          "label": "emergency-layout",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/emergency/layout",
+            "shot": "screenshots-scan\\rs-emergency-layout.png",
+            "path": "/en/emergency/layout",
+            "headings": [
+              "Emergency Layout",
+              "Unplaced"
+            ],
+            "links": [
+              {
+                "text": "Emergency",
+                "href": "/en/emergency"
+              },
+              {
+                "text": "Orders",
+                "href": "/en/clinical"
+              },
+              {
+                "text": "Registration",
+                "href": "/en/emergency/patients"
+              }
+            ],
+            "tables": [],
+            "empty": "No beds are plotted on this canvas.",
+            "redirectedToLogin": false
+          }
+        }
+      ]
+    },
+    {
+      "slug": "mrd",
+      "name": "MRDBerkas & peminjaman RM",
+      "href": "/en/mrd",
+      "screens": [
+        {
+          "label": "mrd (hub)",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/mrd",
+            "shot": "screenshots-scan\\rs-mrd-hub.png",
+            "path": "/en/mrd",
+            "headings": [
+              "MRD",
+              "Workflow"
+            ],
+            "links": [
+              {
+                "text": "Home",
+                "href": "/en"
+              },
+              {
+                "text": "Apps",
+                "href": "/en/apps"
+              },
+              {
+                "text": "File Requests",
+                "href": "/en/mrd/requests"
+              },
+              {
+                "text": "File Requests",
+                "href": "/en/mrd/requests"
+              },
+              {
+                "text": "Patient Records",
+                "href": "/en/mrd/records"
+              },
+              {
+                "text": "Missing diagnosis codes",
+                "href": "/en/mrd/coding"
+              },
+              {
+                "text": "Visits without a document",
+                "href": "/en/mrd/outpatient"
+              }
+            ],
+            "tables": [],
+            "empty": null,
+            "redirectedToLogin": false
+          }
+        },
+        {
+          "label": "mrd-requests",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/mrd/requests",
+            "shot": "screenshots-scan\\rs-mrd-requests.png",
+            "path": "/en/mrd/requests",
+            "headings": [
+              "Patient File Requests"
+            ],
+            "links": [
+              {
+                "text": "Home",
+                "href": "/en"
+              },
+              {
+                "text": "MRD",
+                "href": "/en/mrd"
+              }
+            ],
+            "tables": [
+              {
+                "rows": 1,
+                "headers": [
+                  "Doc no.",
+                  "Doc date",
+                  "Purpose",
+                  "Type",
+                  "Active"
+                ],
+                "sample": "MRQ-0012026-09-21Pinjam rawat jalanPRAJ · Pinjam rawat jalanYes"
+              }
+            ],
+            "empty": null,
+            "redirectedToLogin": false
+          }
+        },
+        {
+          "label": "mrd-records",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/mrd/records",
+            "shot": "screenshots-scan\\rs-mrd-records.png",
+            "path": "/en/mrd/records",
+            "headings": [
+              "Patient Records"
+            ],
+            "links": [
+              {
+                "text": "Home",
+                "href": "/en"
+              },
+              {
+                "text": "MRD",
+                "href": "/en/mrd"
+              }
+            ],
+            "tables": [
+              {
+                "rows": 4,
+                "headers": [
+                  "Doc no.",
+                  "Doc date",
+                  "Patient",
+                  "Status",
+                  "Actions"
+                ],
+                "sample": "MRD-RM-HO-00042026-09-21Ahmad FauziRM-HO-0004IssuedMovementOpen reviewReturn"
+              }
+            ],
+            "empty": "No movement yet.",
+            "redirectedToLogin": false
+          }
+        },
+        {
+          "label": "mrd-coding",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/mrd/coding",
+            "shot": "screenshots-scan\\rs-mrd-coding.png",
+            "path": "/en/mrd/coding",
+            "headings": [
+              "Discharged stays missing a diagnosis code"
+            ],
+            "links": [
+              {
+                "text": "MRD",
+                "href": "/en/mrd"
+              }
+            ],
+            "tables": [
+              {
+                "rows": 37,
+                "headers": [
+                  "Discharge",
+                  "Discharged",
+                  "Diagnosis code",
+                  ""
+                ],
+                "sample": "DC-0452026-09-26 04:00PendingRecord code"
+              }
+            ],
+            "empty": null,
+            "redirectedToLogin": false
+          }
+        },
+        {
+          "label": "mrd-outpatient",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/mrd/outpatient",
+            "shot": "screenshots-scan\\rs-mrd-outpatient.png",
+            "path": "/en/mrd/outpatient",
+            "headings": [
+              "Outpatient visits without a document"
+            ],
+            "links": [
+              {
+                "text": "MRD",
+                "href": "/en/mrd"
+              }
+            ],
+            "tables": [
+              {
+                "rows": 2,
+                "headers": [
+                  "Visit",
+                  "Patient",
+                  "Arrived",
+                  "Pending"
+                ],
+                "sample": "A-001RM-HO-0001 · Siti Aminah2026-10-10 17:20Pending"
+              }
+            ],
+            "empty": null,
+            "redirectedToLogin": false
+          }
+        }
+      ]
+    },
+    {
+      "slug": "payroll",
+      "name": "PayrollGaji & payslip",
+      "href": "/en/payroll",
+      "screens": [
+        {
+          "label": "payroll (hub)",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/payroll",
+            "shot": "screenshots-scan\\rs-payroll-hub.png",
+            "path": "/en/payroll",
+            "headings": [
+              "Payroll",
+              "Runs"
+            ],
+            "links": [
+              {
+                "text": "Home",
+                "href": "/en"
+              },
+              {
+                "text": "Apps",
+                "href": "/en/apps"
+              },
+              {
+                "text": "Batches",
+                "href": "/en/payroll/batches"
+              }
+            ],
+            "tables": [],
+            "empty": null,
+            "redirectedToLogin": false
+          }
+        },
+        {
+          "label": "payroll-batches",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/payroll/batches",
+            "shot": "screenshots-scan\\rs-payroll-batches.png",
+            "path": "/en/payroll/batches",
+            "headings": [
+              "Payroll batches"
+            ],
+            "links": [
+              {
+                "text": "KlikMed",
+                "href": "/en"
+              },
+              {
+                "text": "Home",
+                "href": "/en"
+              },
+              {
+                "text": "Dashboard",
+                "href": "/en/dashboard"
+              },
+              {
+                "text": "Preferences",
+                "href": "/en/preferences"
+              },
+              {
+                "text": "Apps",
+                "href": "/en/apps"
+              },
+              {
+                "text": "Reports",
+                "href": "/en/reporting"
+              },
+              {
+                "text": "Profile",
+                "href": "/en/me"
+              },
+              {
+                "text": "Preferences",
+                "href": "/en/preferences"
+              },
+              {
+                "text": "Home",
+                "href": "/en"
+              },
+              {
+                "text": "Dashboard",
+                "href": "/en/dashboard"
+              },
+              {
+                "text": "Preferences",
+                "href": "/en/preferences"
+              },
+              {
+                "text": "Apps",
+                "href": "/en/apps"
+              },
+              {
+                "text": "Reports",
+                "href": "/en/reporting"
+              },
+              {
+                "text": "Batches",
+                "href": "/en/payroll/batches"
+              },
+              {
+                "text": "Year",
+                "href": "/en/payroll/desk"
+              },
+              {
+                "text": "Payroll record",
+                "href": "/en/payroll/desk/pay"
+              },
+              {
+                "text": "Tax",
+                "href": "/en/payroll/desk/tax"
+              },
+              {
+                "text": "Calculate",
+                "href": "/en/payroll/desk/run"
+              },
+              {
+                "text": "Payslip",
+                "href": "/en/payroll/desk/slip"
+              },
+              {
+                "text": "Reimburse",
+                "href": "/en/payroll/desk/reimburse"
+              },
+              {
+                "text": "Payroll",
+                "href": "/en/payroll"
+              }
+            ],
+            "tables": [
+              {
+                "rows": 1,
+                "headers": [
+                  "Batch no",
+                  "Status",
+                  "List index",
+                  "Id"
+                ],
+                "sample": "No payroll batches yet."
+              }
+            ],
+            "empty": "No payroll batches yet.",
+            "redirectedToLogin": false
+          }
+        }
+      ]
+    },
+    {
+      "slug": "finance",
+      "name": "FinanceVoucher & GL",
+      "href": "/en/finance",
+      "screens": [
+        {
+          "label": "finance (hub)",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/finance",
+            "shot": "screenshots-scan\\rs-finance-hub.png",
+            "path": "/en/finance",
+            "headings": [
+              "Finance",
+              "Masters",
+              "Ledgers"
+            ],
+            "links": [
+              {
+                "text": "Home",
+                "href": "/en"
+              },
+              {
+                "text": "Apps",
+                "href": "/en/apps"
+              },
+              {
+                "text": "Financial years",
+                "href": "/en/finance/financial-years"
+              },
+              {
+                "text": "Chart of accounts",
+                "href": "/en/finance/accounts"
+              },
+              {
+                "text": "Branch configuration",
+                "href": "/en/finance/configuration"
+              },
+              {
+                "text": "Currencies",
+                "href": "/en/finance/currencies"
+              },
+              {
+                "text": "Cost centres",
+                "href": "/en/finance/cost-centres"
+              },
+              {
+                "text": "Account maps",
+                "href": "/en/finance/account-maps"
+              },
+              {
+                "text": "Budget posting rules",
+                "href": "/en/finance/posting-rules"
+              },
+              {
+                "text": "Vouchers",
+                "href": "/en/finance/vouchers"
+              },
+              {
+                "text": "Journals",
+                "href": "/en/finance/journals"
+              },
+              {
+                "text": "ERP staging",
+                "href": "/en/finance/erp-invoice-staging"
+              }
+            ],
+            "tables": [],
+            "empty": null,
+            "redirectedToLogin": false
+          }
+        },
+        {
+          "label": "finance-financial-years",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/finance/financial-years",
+            "shot": "screenshots-scan\\rs-finance-financial-years.png",
+            "path": "/en/finance/financial-years",
+            "headings": [
+              "Financial years"
+            ],
+            "links": [
+              {
+                "text": "Home",
+                "href": "/en"
+              },
+              {
+                "text": "Finance",
+                "href": "/en/finance"
+              }
+            ],
+            "tables": [
+              {
+                "rows": 2,
+                "headers": [
+                  "Code",
+                  "Description",
+                  "Start",
+                  "End",
+                  "Period type",
+                  "Periods",
+                  "Status",
+                  "Actions"
+                ],
+                "sample": "2026Tahun buku 20262026-01-012026-12-31Monthly0OpenPeriodsLock"
+              }
+            ],
+            "empty": null,
+            "redirectedToLogin": false
+          }
+        },
+        {
+          "label": "finance-accounts",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/finance/accounts",
+            "shot": "screenshots-scan\\rs-finance-accounts.png",
+            "path": "/en/finance/accounts",
+            "headings": [
+              "Chart of accounts"
+            ],
+            "links": [
+              {
+                "text": "Home",
+                "href": "/en"
+              },
+              {
+                "text": "Finance",
+                "href": "/en/finance"
+              }
+            ],
+            "tables": [
+              {
+                "rows": 2,
+                "headers": [
+                  "Code",
+                  "Name",
+                  "Kind",
+                  "Type",
+                  "Branch",
+                  "Status",
+                  "Actions"
+                ],
+                "sample": "1101KasCashLeafHOActiveEdit"
+              }
+            ],
+            "empty": null,
+            "redirectedToLogin": false
+          }
+        },
+        {
+          "label": "finance-configuration",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/finance/configuration",
+            "shot": "screenshots-scan\\rs-finance-configuration.png",
+            "path": "/en/finance/configuration",
+            "headings": [
+              "Finance configuration",
+              "Control accounts",
+              "Users allowed to transact",
+              "Imprest eligibility"
+            ],
+            "links": [
+              {
+                "text": "Home",
+                "href": "/en"
+              },
+              {
+                "text": "Finance",
+                "href": "/en/finance"
+              }
+            ],
+            "tables": [],
+            "empty": null,
+            "redirectedToLogin": false
+          }
+        },
+        {
+          "label": "finance-currencies",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/finance/currencies",
+            "shot": "screenshots-scan\\rs-finance-currencies.png",
+            "path": "/en/finance/currencies",
+            "headings": [
+              "Currencies"
+            ],
+            "links": [
+              {
+                "text": "Finance",
+                "href": "/en/finance"
+              }
+            ],
+            "tables": [
+              {
+                "rows": 2,
+                "headers": [
+                  "Code",
+                  "Name",
+                  "Symbol",
+                  "Lowest denomination",
+                  "Base"
+                ],
+                "sample": "IDRRupiahRp1.00Yes"
+              }
+            ],
+            "empty": null,
+            "redirectedToLogin": false
+          }
+        },
+        {
+          "label": "finance-cost-centres",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/finance/cost-centres",
+            "shot": "screenshots-scan\\rs-finance-cost-centres.png",
+            "path": "/en/finance/cost-centres",
+            "headings": [
+              "Cost centres",
+              "Categories",
+              "Cost centres",
+              "Pre-allocation"
+            ],
+            "links": [
+              {
+                "text": "Finance",
+                "href": "/en/finance"
+              }
+            ],
+            "tables": [],
+            "empty": null,
+            "redirectedToLogin": false
+          }
+        },
+        {
+          "label": "finance-account-maps",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/finance/account-maps",
+            "shot": "screenshots-scan\\rs-finance-account-maps.png",
+            "path": "/en/finance/account-maps",
+            "headings": [
+              "Account maps",
+              "Tax code",
+              "Salary component",
+              "Imprest transaction type"
+            ],
+            "links": [
+              {
+                "text": "Finance",
+                "href": "/en/finance"
+              }
+            ],
+            "tables": [],
+            "empty": null,
+            "redirectedToLogin": false
+          }
+        },
+        {
+          "label": "finance-posting-rules",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/finance/posting-rules",
+            "shot": "screenshots-scan\\rs-finance-posting-rules.png",
+            "path": "/en/finance/posting-rules",
+            "headings": [
+              "Budget posting rules"
+            ],
+            "links": [
+              {
+                "text": "Home",
+                "href": "/en"
+              },
+              {
+                "text": "Finance",
+                "href": "/en/finance"
+              }
+            ],
+            "tables": [
+              {
+                "rows": 4,
+                "headers": [
+                  "Posting",
+                  "Debit account",
+                  "Credit account",
+                  "Status",
+                  "Actions"
+                ],
+                "sample": "Allocation — capitalBelanja Modal headsChoose an accountChoose an accountNot setSave"
+              }
+            ],
+            "empty": null,
+            "redirectedToLogin": false
+          }
+        },
+        {
+          "label": "finance-vouchers",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/finance/vouchers",
+            "shot": "screenshots-scan\\rs-finance-vouchers.png",
+            "path": "/en/finance/vouchers",
+            "headings": [
+              "Vouchers"
+            ],
+            "links": [
+              {
+                "text": "KlikMed",
+                "href": "/en"
+              },
+              {
+                "text": "Home",
+                "href": "/en"
+              },
+              {
+                "text": "Dashboard",
+                "href": "/en/dashboard"
+              },
+              {
+                "text": "Preferences",
+                "href": "/en/preferences"
+              },
+              {
+                "text": "Apps",
+                "href": "/en/apps"
+              },
+              {
+                "text": "Reports",
+                "href": "/en/reporting"
+              },
+              {
+                "text": "Profile",
+                "href": "/en/me"
+              },
+              {
+                "text": "Preferences",
+                "href": "/en/preferences"
+              },
+              {
+                "text": "Home",
+                "href": "/en"
+              },
+              {
+                "text": "Dashboard",
+                "href": "/en/dashboard"
+              },
+              {
+                "text": "Preferences",
+                "href": "/en/preferences"
+              },
+              {
+                "text": "Apps",
+                "href": "/en/apps"
+              },
+              {
+                "text": "Reports",
+                "href": "/en/reporting"
+              },
+              {
+                "text": "Financial years",
+                "href": "/en/finance/financial-years"
+              },
+              {
+                "text": "Chart of accounts",
+                "href": "/en/finance/accounts"
+              },
+              {
+                "text": "Configuration",
+                "href": "/en/finance/configuration"
+              },
+              {
+                "text": "Currencies",
+                "href": "/en/finance/currencies"
+              },
+              {
+                "text": "Cost centres",
+                "href": "/en/finance/cost-centres"
+              },
+              {
+                "text": "Account maps",
+                "href": "/en/finance/account-maps"
+              },
+              {
+                "text": "Budget posting rules",
+                "href": "/en/finance/posting-rules"
+              },
+              {
+                "text": "Vouchers",
+                "href": "/en/finance/vouchers"
+              },
+              {
+                "text": "Journals",
+                "href": "/en/finance/journals"
+              },
+              {
+                "text": "Bank receipt",
+                "href": "/en/finance/documents/bank-receipt"
+              },
+              {
+                "text": "Cash receipt",
+                "href": "/en/finance/documents/cash-receipt"
+              },
+              {
+                "text": "Contra",
+                "href": "/en/finance/documents/contra"
+              },
+              {
+                "text": "Debit memo",
+                "href": "/en/finance/documents/debit-memo"
+              },
+              {
+                "text": "Purchase",
+                "href": "/en/finance/documents/purchase"
+              },
+              {
+                "text": "Sales",
+                "href": "/en/finance/documents/sales"
+              },
+              {
+                "text": "Credit memo",
+                "href": "/en/finance/documents/credit-memo"
+              },
+              {
+                "text": "Opening balance",
+                "href": "/en/finance/documents/opening-balance"
+              },
+              {
+                "text": "Payments",
+                "href": "/en/finance/payments"
+              },
+              {
+                "text": "Bill adjustment",
+                "href": "/en/finance/bill-adjustments"
+              },
+              {
+                "text": "Patient collections",
+                "href": "/en/finance/collections"
+              },
+              {
+                "text": "Tariff mapping",
+                "href": "/en/finance/tariff-maps"
+              },
+              {
+                "text": "Trial balance",
+                "href": "/en/finance/trial-balance"
+              },
+              {
+                "text": "ERP staging",
+                "href": "/en/finance/erp-invoice-staging"
+              },
+              {
+                "text": "Bank reconciliation",
+                "href": "/en/finance/reconciliation"
+              },
+              {
+                "text": "Imprest",
+                "href": "/en/finance/imprest"
+              },
+              {
+                "text": "Payment requests",
+                "href": "/en/finance/payment-requests"
+              },
+              {
+                "text": "Security receipts",
+                "href": "/en/finance/security-receipts"
+              },
+              {
+                "text": "Security accounting",
+                "href": "/en/finance/security-accounting"
+              },
+              {
+                "text": "Disposal requests",
+                "href": "/en/finance/security-disposal-requests"
+              },
+              {
+                "text": "Security disposal",
+                "href": "/en/finance/security-disposal"
+              },
+              {
+                "text": "Bank guarantees",
+                "href": "/en/finance/bank-guarantees"
+              },
+              {
+                "text": "Encashment requests",
+                "href": "/en/finance/bank-guarantee-settlement-requests"
+              },
+              {
+                "text": "Guarantee settlements",
+                "href": "/en/finance/bank-guarantee-settlements"
+              },
+              {
+                "text": "Letters of credit",
+                "href": "/en/finance/letters-of-credit"
+              },
+              {
+                "text": "Agreements",
+                "href": "/en/finance/legal-agreements"
+              },
+              {
+                "text": "Loans",
+                "href": "/en/finance/loans"
+              },
+              {
+                "text": "Rough sheets",
+                "href": "/en/finance/rough-sheets"
+              },
+              {
+                "text": "Fair sheets",
+                "href": "/en/finance/fair-sheets"
+              },
+              {
+                "text": "Audit sheets",
+                "href": "/en/finance/audit-sheets"
+              },
+              {
+                "text": "Year end",
+                "href": "/en/finance/year-end"
+              },
+              {
+                "text": "Finance",
+                "href": "/en/finance"
+              }
+            ],
+            "tables": [
+              {
+                "rows": 10,
+                "headers": [
+                  "Doc no",
+                  "Date",
+                  "Type",
+                  "Party",
+                  "Amount",
+                  "Status",
+                  "Actions"
+                ],
+                "sample": "FIN-T122026-10-05PayrollkasirIDR 1.000,00OpenOpen"
+              }
+            ],
+            "empty": null,
+            "redirectedToLogin": false
+          }
+        },
+        {
+          "label": "finance-journals",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/finance/journals",
+            "shot": "screenshots-scan\\rs-finance-journals.png",
+            "path": "/en/finance/journals",
+            "headings": [
+              "Journals"
+            ],
+            "links": [
+              {
+                "text": "Home",
+                "href": "/en"
+              },
+              {
+                "text": "Finance",
+                "href": "/en/finance"
+              }
+            ],
+            "tables": [
+              {
+                "rows": 1,
+                "headers": [
+                  "Number",
+                  "Date",
+                  "Narration",
+                  "Amount",
+                  "Approval",
+                  "Document",
+                  "Actions"
+                ],
+                "sample": "No journals yet."
+              }
+            ],
+            "empty": "No journals yet.",
+            "redirectedToLogin": false
+          }
+        },
+        {
+          "label": "finance-erp-invoice-staging",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/finance/erp-invoice-staging",
+            "shot": "screenshots-scan\\rs-finance-erp-invoice-staging.png",
+            "path": "/en/finance/erp-invoice-staging",
+            "headings": [
+              "ERP invoice staging"
+            ],
+            "links": [
+              {
+                "text": "Finance",
+                "href": "/en/finance"
+              }
+            ],
+            "tables": [
+              {
+                "rows": 1,
+                "headers": [
+                  "Invoice",
+                  "Date",
+                  "Patient",
+                  "MRN",
+                  "Net",
+                  "Patient",
+                  "Sponsor",
+                  "Posted"
+                ],
+                "sample": "VVIP-MELATI-12026-09-20Siti Aminah—2.500.000,002.500.000,00—Pending"
+              }
+            ],
+            "empty": null,
+            "redirectedToLogin": false
+          }
+        }
+      ]
+    },
+    {
+      "slug": "budget",
+      "name": "BudgetPagu, alokasi, sanksi",
+      "href": "/en/budget",
+      "screens": [
+        {
+          "label": "budget (hub)",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/budget",
+            "shot": "screenshots-scan\\rs-budget-hub.png",
+            "path": "/en/budget",
+            "headings": [
+              "Budget",
+              "Masters",
+              "Transactions",
+              "Budget position"
+            ],
+            "links": [
+              {
+                "text": "Home",
+                "href": "/en"
+              },
+              {
+                "text": "Budget books",
+                "href": "/en/budget/books"
+              },
+              {
+                "text": "Budget heads",
+                "href": "/en/budget/heads"
+              },
+              {
+                "text": "Budget chart",
+                "href": "/en/budget/chart"
+              },
+              {
+                "text": "Utilisation types",
+                "href": "/en/budget/util-types"
+              },
+              {
+                "text": "Projects",
+                "href": "/en/budget/projects"
+              },
+              {
+                "text": "Sanction checklist",
+                "href": "/en/budget/sanction-checklists"
+              },
+              {
+                "text": "Budget circulars",
+                "href": "/en/budget/circulars"
+              },
+              {
+                "text": "Internal budgets",
+                "href": "/en/budget/internal-budgets"
+              },
+              {
+                "text": "Budget requests",
+                "href": "/en/budget/requests"
+              },
+              {
+                "text": "Budget allocation",
+                "href": "/en/budget/allocations"
+              },
+              {
+                "text": "Fund release",
+                "href": "/en/budget/fund-releases"
+              },
+              {
+                "text": "Fund withdrawal",
+                "href": "/en/budget/fund-withdrawals"
+              },
+              {
+                "text": "Sanction proposals",
+                "href": "/en/budget/sanctions"
+              },
+              {
+                "text": "Budget transfer",
+                "href": "/en/budget/transfers"
+              },
+              {
+                "text": "Budget utilisation",
+                "href": "/en/budget/utilisations"
+              }
+            ],
+            "tables": [
+              {
+                "rows": 1,
+                "headers": [
+                  "Budget head",
+                  "Department / branch",
+                  "Allocation authority",
+                  "Allocated",
+                  "Transferred in",
+                  "Transferred out",
+                  "Reserved",
+                  "Utilised",
+                  "Balance",
+                  "History"
+                ],
+                "sample": "OBAT · 2026B14-OPS · Belanja obatFarmasi · DIPA-2026DIPA1,000,00000001,000,000History"
+              }
+            ],
+            "empty": null,
+            "redirectedToLogin": false
+          }
+        },
+        {
+          "label": "budget-books",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/budget/books",
+            "shot": "screenshots-scan\\rs-budget-books.png",
+            "path": "/en/budget/books",
+            "headings": [
+              "Budget books"
+            ],
+            "links": [
+              {
+                "text": "Home",
+                "href": "/en"
+              },
+              {
+                "text": "Budget",
+                "href": "/en/budget"
+              }
+            ],
+            "tables": [
+              {
+                "rows": 3,
+                "headers": [
+                  "Code",
+                  "Book name",
+                  "Sponsor / scheme",
+                  "Status",
+                  "Actions"
+                ],
+                "sample": "B14-CAPBuku modalRSActiveEdit"
+              }
+            ],
+            "empty": null,
+            "redirectedToLogin": false
+          }
+        },
+        {
+          "label": "budget-heads",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/budget/heads",
+            "shot": "screenshots-scan\\rs-budget-heads.png",
+            "path": "/en/budget/heads",
+            "headings": [
+              "Budget heads"
+            ],
+            "links": [
+              {
+                "text": "Home",
+                "href": "/en"
+              },
+              {
+                "text": "Budget",
+                "href": "/en/budget"
+              }
+            ],
+            "tables": [
+              {
+                "rows": 2,
+                "headers": [
+                  "Code",
+                  "Name",
+                  "Spending type",
+                  "Financial year",
+                  "Status",
+                  "Actions"
+                ],
+                "sample": "ALKESBelanja alkesCapital (Belanja Modal)2026ActiveEdit"
+              }
+            ],
+            "empty": null,
+            "redirectedToLogin": false
+          }
+        },
+        {
+          "label": "budget-chart",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/budget/chart",
+            "shot": "screenshots-scan\\rs-budget-chart.png",
+            "path": "/en/budget/chart",
+            "headings": [
+              "Budget chart"
+            ],
+            "links": [
+              {
+                "text": "Home",
+                "href": "/en"
+              },
+              {
+                "text": "Budget",
+                "href": "/en/budget"
+              }
+            ],
+            "tables": [
+              {
+                "rows": 1,
+                "headers": [
+                  "Head",
+                  "Kind",
+                  "Year",
+                  "Projects",
+                  "Status",
+                  "Actions"
+                ],
+                "sample": "No head in this book's chart yet."
+              }
+            ],
+            "empty": "No head in this book's chart yet.",
+            "redirectedToLogin": false
+          }
+        },
+        {
+          "label": "budget-util-types",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/budget/util-types",
+            "shot": "screenshots-scan\\rs-budget-util-types.png",
+            "path": "/en/budget/util-types",
+            "headings": [
+              "Utilisation types"
+            ],
+            "links": [
+              {
+                "text": "Home",
+                "href": "/en"
+              },
+              {
+                "text": "Budget",
+                "href": "/en/budget"
+              }
+            ],
+            "tables": [
+              {
+                "rows": 1,
+                "headers": [
+                  "Code",
+                  "Description",
+                  "Tax codes",
+                  "Status",
+                  "Actions"
+                ],
+                "sample": "OBATBelanja obatNo taxActiveEdit"
+              }
+            ],
+            "empty": "No tax",
+            "redirectedToLogin": false
+          }
+        },
+        {
+          "label": "budget-projects",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/budget/projects",
+            "shot": "screenshots-scan\\rs-budget-projects.png",
+            "path": "/en/budget/projects",
+            "headings": [
+              "Projects"
+            ],
+            "links": [
+              {
+                "text": "Home",
+                "href": "/en"
+              },
+              {
+                "text": "Budget",
+                "href": "/en/budget"
+              }
+            ],
+            "tables": [
+              {
+                "rows": 1,
+                "headers": [
+                  "Name",
+                  "Type",
+                  "Period",
+                  "Employee",
+                  "Budget books",
+                  "Status",
+                  "Actions"
+                ],
+                "sample": "Pengadaan USGIntramural2026-08-01 – 2026-12-31—ActiveEdit"
+              }
+            ],
+            "empty": null,
+            "redirectedToLogin": false
+          }
+        },
+        {
+          "label": "budget-sanction-checklists",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/budget/sanction-checklists",
+            "shot": "screenshots-scan\\rs-budget-sanction-checklists.png",
+            "path": "/en/budget/sanction-checklists",
+            "headings": [
+              "Sanction checklist"
+            ],
+            "links": [
+              {
+                "text": "Home",
+                "href": "/en"
+              },
+              {
+                "text": "Budget",
+                "href": "/en/budget"
+              }
+            ],
+            "tables": [
+              {
+                "rows": 1,
+                "headers": [
+                  "Book",
+                  "Order",
+                  "Question",
+                  "Status",
+                  "Actions"
+                ],
+                "sample": "No question yet."
+              }
+            ],
+            "empty": "No question yet.",
+            "redirectedToLogin": false
+          }
+        },
+        {
+          "label": "budget-circulars",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/budget/circulars",
+            "shot": "screenshots-scan\\rs-budget-circulars.png",
+            "path": "/en/budget/circulars",
+            "headings": [
+              "Budget circulars"
+            ],
+            "links": [
+              {
+                "text": "Home",
+                "href": "/en"
+              },
+              {
+                "text": "Budget",
+                "href": "/en/budget"
+              },
+              {
+                "text": "Download CSV",
+                "href": "/api/budget/export/circulars?locale=en"
+              }
+            ],
+            "tables": [
+              {
+                "rows": 4,
+                "headers": [
+                  "No.",
+                  "Date",
+                  "Budget book",
+                  "Year",
+                  "Due date",
+                  "Issued by",
+                  "Departments",
+                  "Status",
+                  "Actions"
+                ],
+                "sample": "CIR-DRAFT2026-08-03B14-DRAFTBuku draft20262026-08-22Agus WijayaFarmasiDraftEditSendCancel"
+              }
+            ],
+            "empty": null,
+            "redirectedToLogin": false
+          }
+        },
+        {
+          "label": "budget-internal-budgets",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/budget/internal-budgets",
+            "shot": "screenshots-scan\\rs-budget-internal-budgets.png",
+            "path": "/en/budget/internal-budgets",
+            "headings": [
+              "Internal budgets"
+            ],
+            "links": [
+              {
+                "text": "Home",
+                "href": "/en"
+              },
+              {
+                "text": "Budget",
+                "href": "/en/budget"
+              },
+              {
+                "text": "Download CSV",
+                "href": "/api/budget/export/internal-budgets?locale=en"
+              }
+            ],
+            "tables": [
+              {
+                "rows": 4,
+                "headers": [
+                  "No.",
+                  "Date",
+                  "Circular",
+                  "Department",
+                  "Book / year",
+                  "Heads",
+                  "Total request",
+                  "Status",
+                  "Actions"
+                ],
+                "sample": "IB-REJECTED2026-08-16CIR-APPdue 2026-08-20FarmasiB14-OPS202601,000,000RejectedViewCancel"
+              }
+            ],
+            "empty": null,
+            "redirectedToLogin": false
+          }
+        },
+        {
+          "label": "budget-requests",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/budget/requests",
+            "shot": "screenshots-scan\\rs-budget-requests.png",
+            "path": "/en/budget/requests",
+            "headings": [
+              "Budget requests"
+            ],
+            "links": [
+              {
+                "text": "Home",
+                "href": "/en"
+              },
+              {
+                "text": "Budget",
+                "href": "/en/budget"
+              },
+              {
+                "text": "Download CSV",
+                "href": "/api/budget/export/requests?locale=en"
+              }
+            ],
+            "tables": [
+              {
+                "rows": 7,
+                "headers": [
+                  "No.",
+                  "Date",
+                  "Circular",
+                  "Book / year",
+                  "Consolidation",
+                  "Requested",
+                  "Consolidated",
+                  "Status",
+                  "Actions"
+                ],
+                "sample": "BRQ-62026-08-25CIR-APPB14-OPS20260 head(s) · 0 department(s)1,000,0000DraftEditSendCancel"
+              }
+            ],
+            "empty": null,
+            "redirectedToLogin": false
+          }
+        },
+        {
+          "label": "budget-allocations",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/budget/allocations",
+            "shot": "screenshots-scan\\rs-budget-allocations.png",
+            "path": "/en/budget/allocations",
+            "headings": [
+              "Budget allocation"
+            ],
+            "links": [
+              {
+                "text": "Home",
+                "href": "/en"
+              },
+              {
+                "text": "Budget",
+                "href": "/en/budget"
+              },
+              {
+                "text": "Download CSV",
+                "href": "/api/budget/export/allocations?locale=en"
+              }
+            ],
+            "tables": [
+              {
+                "rows": 1,
+                "headers": [
+                  "Request",
+                  "Book / year",
+                  "Consolidated",
+                  "Allocated",
+                  "Authority",
+                  "Allocation",
+                  "Journal",
+                  "Actions"
+                ],
+                "sample": "No approved budget request yet."
+              }
+            ],
+            "empty": "No approved budget request yet.",
+            "redirectedToLogin": false
+          }
+        }
+      ]
+    },
+    {
+      "slug": "cssd",
+      "name": "CSSDSet steril, siklus, distribusi",
+      "href": "/en/cssd",
+      "screens": [
+        {
+          "label": "cssd (hub)",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/cssd",
+            "shot": "screenshots-scan\\rs-cssd-hub.png",
+            "path": "/en/cssd",
+            "headings": [
+              "CSSD",
+              "Masters",
+              "Transactions"
+            ],
+            "links": [
+              {
+                "text": "Home",
+                "href": "/en"
+              },
+              {
+                "text": "Autoclave",
+                "href": "/en/cssd/autoclaves"
+              },
+              {
+                "text": "Cycle Type",
+                "href": "/en/cssd/cycle-types"
+              },
+              {
+                "text": "Packing Type",
+                "href": "/en/cssd/packing-types"
+              },
+              {
+                "text": "Indicator Type",
+                "href": "/en/cssd/indicator-types"
+              },
+              {
+                "text": "Test Name",
+                "href": "/en/cssd/test-names"
+              },
+              {
+                "text": "Result Type",
+                "href": "/en/cssd/result-types"
+              },
+              {
+                "text": "Set",
+                "href": "/en/cssd/sets"
+              },
+              {
+                "text": "Sterile Request",
+                "href": "/en/cssd/requests"
+              },
+              {
+                "text": "Unsterile Receipt",
+                "href": "/en/cssd/receipts"
+              },
+              {
+                "text": "Sterilization Cycle",
+                "href": "/en/cssd/cycles"
+              },
+              {
+                "text": "Bowie Dick",
+                "href": "/en/cssd/bowie-tests"
+              },
+              {
+                "text": "Sterile Issue",
+                "href": "/en/cssd/issues"
+              },
+              {
+                "text": "Sterile Receipt",
+                "href": "/en/cssd/sterile-receipts"
+              },
+              {
+                "text": "Pack Trace",
+                "href": "/en/cssd/trace"
+              }
+            ],
+            "tables": [],
+            "empty": null,
+            "redirectedToLogin": false
+          }
+        },
+        {
+          "label": "cssd-autoclaves",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/cssd/autoclaves",
+            "shot": "screenshots-scan\\rs-cssd-autoclaves.png",
+            "path": "/en/cssd/autoclaves",
+            "headings": [
+              "Autoclave"
+            ],
+            "links": [
+              {
+                "text": "Home",
+                "href": "/en"
+              },
+              {
+                "text": "CSSD",
+                "href": "/en/cssd"
+              },
+              {
+                "text": "CSV",
+                "href": "/api/cssd/export/autoclave?locale=en"
+              }
+            ],
+            "tables": [
+              {
+                "rows": 1,
+                "headers": [
+                  "Number",
+                  "Name",
+                  "Description",
+                  "Status",
+                  "Action"
+                ],
+                "sample": "A1Autoklaf 1 CSSDActiveEdit"
+              }
+            ],
+            "empty": null,
+            "redirectedToLogin": false
+          }
+        },
+        {
+          "label": "cssd-cycle-types",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/cssd/cycle-types",
+            "shot": "screenshots-scan\\rs-cssd-cycle-types.png",
+            "path": "/en/cssd/cycle-types",
+            "headings": [
+              "Cycle Type"
+            ],
+            "links": [
+              {
+                "text": "Home",
+                "href": "/en"
+              },
+              {
+                "text": "CSSD",
+                "href": "/en/cssd"
+              },
+              {
+                "text": "CSV",
+                "href": "/api/cssd/export/cycle?locale=en"
+              }
+            ],
+            "tables": [
+              {
+                "rows": 2,
+                "headers": [
+                  "Code",
+                  "Name",
+                  "Status",
+                  "Action"
+                ],
+                "sample": "B13-UAPuap 134ActiveEdit"
+              }
+            ],
+            "empty": null,
+            "redirectedToLogin": false
+          }
+        },
+        {
+          "label": "cssd-packing-types",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/cssd/packing-types",
+            "shot": "screenshots-scan\\rs-cssd-packing-types.png",
+            "path": "/en/cssd/packing-types",
+            "headings": [
+              "Packing Type"
+            ],
+            "links": [
+              {
+                "text": "Home",
+                "href": "/en"
+              },
+              {
+                "text": "CSSD",
+                "href": "/en/cssd"
+              },
+              {
+                "text": "CSV",
+                "href": "/api/cssd/export/packing?locale=en"
+              }
+            ],
+            "tables": [
+              {
+                "rows": 2,
+                "headers": [
+                  "Code",
+                  "Name",
+                  "Status",
+                  "Action"
+                ],
+                "sample": "B13-LINENpacking linenActiveEdit"
+              }
+            ],
+            "empty": null,
+            "redirectedToLogin": false
+          }
+        },
+        {
+          "label": "cssd-indicator-types",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/cssd/indicator-types",
+            "shot": "screenshots-scan\\rs-cssd-indicator-types.png",
+            "path": "/en/cssd/indicator-types",
+            "headings": [
+              "Indicator Type"
+            ],
+            "links": [
+              {
+                "text": "Home",
+                "href": "/en"
+              },
+              {
+                "text": "CSSD",
+                "href": "/en/cssd"
+              },
+              {
+                "text": "CSV",
+                "href": "/api/cssd/export/indicator?locale=en"
+              }
+            ],
+            "tables": [
+              {
+                "rows": 2,
+                "headers": [
+                  "Code",
+                  "Name",
+                  "Status",
+                  "Action"
+                ],
+                "sample": "B13-K5indikator kelas 5ActiveEdit"
+              }
+            ],
+            "empty": null,
+            "redirectedToLogin": false
+          }
+        },
+        {
+          "label": "cssd-test-names",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/cssd/test-names",
+            "shot": "screenshots-scan\\rs-cssd-test-names.png",
+            "path": "/en/cssd/test-names",
+            "headings": [
+              "Test Name"
+            ],
+            "links": [
+              {
+                "text": "Home",
+                "href": "/en"
+              },
+              {
+                "text": "CSSD",
+                "href": "/en/cssd"
+              },
+              {
+                "text": "CSV",
+                "href": "/api/cssd/export/test?locale=en"
+              }
+            ],
+            "tables": [
+              {
+                "rows": 1,
+                "headers": [
+                  "Code",
+                  "Name",
+                  "Indicator Type",
+                  "Status",
+                  "Action"
+                ],
+                "sample": "B13-BDBowie-DickB13-K5 · indikator kelas 5ActiveEdit"
+              }
+            ],
+            "empty": null,
+            "redirectedToLogin": false
+          }
+        },
+        {
+          "label": "cssd-result-types",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/cssd/result-types",
+            "shot": "screenshots-scan\\rs-cssd-result-types.png",
+            "path": "/en/cssd/result-types",
+            "headings": [
+              "Result Type"
+            ],
+            "links": [
+              {
+                "text": "Home",
+                "href": "/en"
+              },
+              {
+                "text": "CSSD",
+                "href": "/en/cssd"
+              },
+              {
+                "text": "CSV",
+                "href": "/api/cssd/export/result?locale=en"
+              }
+            ],
+            "tables": [
+              {
+                "rows": 2,
+                "headers": [
+                  "Code",
+                  "Name",
+                  "Test Name",
+                  "Status",
+                  "Action"
+                ],
+                "sample": "B13-FAILgagalB13-BD · Bowie-DickActiveEdit"
+              }
+            ],
+            "empty": null,
+            "redirectedToLogin": false
+          }
+        },
+        {
+          "label": "cssd-sets",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/cssd/sets",
+            "shot": "screenshots-scan\\rs-cssd-sets.png",
+            "path": "/en/cssd/sets",
+            "headings": [
+              "Set"
+            ],
+            "links": [
+              {
+                "text": "Home",
+                "href": "/en"
+              },
+              {
+                "text": "CSSD",
+                "href": "/en/cssd"
+              },
+              {
+                "text": "CSV",
+                "href": "/api/cssd/export/set?locale=en"
+              }
+            ],
+            "tables": [
+              {
+                "rows": 1,
+                "headers": [
+                  "Code",
+                  "Name",
+                  "Status",
+                  "Action"
+                ],
+                "sample": "SET-OKSet operasi minorActiveEdit"
+              }
+            ],
+            "empty": null,
+            "redirectedToLogin": false
+          }
+        },
+        {
+          "label": "cssd-requests",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/cssd/requests",
+            "shot": "screenshots-scan\\rs-cssd-requests.png",
+            "path": "/en/cssd/requests",
+            "headings": [
+              "Sterile Request"
+            ],
+            "links": [
+              {
+                "text": "Home",
+                "href": "/en"
+              },
+              {
+                "text": "CSSD",
+                "href": "/en/cssd"
+              },
+              {
+                "text": "CSV",
+                "href": "/api/cssd/export/request?locale=en"
+              },
+              {
+                "text": "New",
+                "href": "/en/cssd/requests/new"
+              },
+              {
+                "text": "Open",
+                "href": "/en/cssd/requests/55a163a5-0b2a-56ec-90c5-8a50bc13c628"
+              }
+            ],
+            "tables": [
+              {
+                "rows": 1,
+                "headers": [
+                  "Document No.",
+                  "Date",
+                  "Requesting Store",
+                  "Requested By",
+                  "Document Status",
+                  "Approval Status",
+                  "Action"
+                ],
+                "sample": "CSSD-REQ-0012026-10-01Gudang Linen BersihOK 1PendingApprovedOpen"
+              }
+            ],
+            "empty": null,
+            "redirectedToLogin": false
+          }
+        },
+        {
+          "label": "cssd-receipts",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/cssd/receipts",
+            "shot": "screenshots-scan\\rs-cssd-receipts.png",
+            "path": "/en/cssd/receipts",
+            "headings": [
+              "Unsterile Receipt"
+            ],
+            "links": [
+              {
+                "text": "Home",
+                "href": "/en"
+              },
+              {
+                "text": "CSSD",
+                "href": "/en/cssd"
+              },
+              {
+                "text": "CSV",
+                "href": "/api/cssd/export/receipt?locale=en"
+              },
+              {
+                "text": "New",
+                "href": "/en/cssd/receipts/new"
+              },
+              {
+                "text": "Open",
+                "href": "/en/cssd/receipts/98ec5ee9-8933-5b36-8fd5-4a02738936f5"
+              },
+              {
+                "text": "Open",
+                "href": "/en/cssd/receipts/4dce521a-10c0-512e-8a40-e5bc534e6a6b"
+              }
+            ],
+            "tables": [
+              {
+                "rows": 2,
+                "headers": [
+                  "Document No.",
+                  "Date",
+                  "Sterile Request",
+                  "CSSD Store",
+                  "Document Status",
+                  "Approval Status",
+                  "Action"
+                ],
+                "sample": "CSSD-UR-OK2026-10-02CSSD-REQ-001Gudang SterilClosedApprovedOpen"
+              }
+            ],
+            "empty": null,
+            "redirectedToLogin": false
+          }
+        },
+        {
+          "label": "cssd-cycles",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/cssd/cycles",
+            "shot": "screenshots-scan\\rs-cssd-cycles.png",
+            "path": "/en/cssd/cycles",
+            "headings": [
+              "Sterilization Cycle"
+            ],
+            "links": [
+              {
+                "text": "Home",
+                "href": "/en"
+              },
+              {
+                "text": "CSSD",
+                "href": "/en/cssd"
+              },
+              {
+                "text": "CSV",
+                "href": "/api/cssd/export/load?locale=en"
+              },
+              {
+                "text": "New",
+                "href": "/en/cssd/cycles/new"
+              },
+              {
+                "text": "Open",
+                "href": "/en/cssd/cycles/4a2d2869-66a0-554d-97ee-d16b241b2db3"
+              },
+              {
+                "text": "Open",
+                "href": "/en/cssd/cycles/93c12e20-1cda-583f-8623-7ee2c7b9c55f"
+              }
+            ],
+            "tables": [
+              {
+                "rows": 2,
+                "headers": [
+                  "Load No.",
+                  "Cycle",
+                  "Date",
+                  "Autoclave",
+                  "Batch",
+                  "Approval",
+                  "Action"
+                ],
+                "sample": "LOAD-00122026-10-03Autoklaf 1 CSSDCYC2ApprovedOpen"
+              }
+            ],
+            "empty": null,
+            "redirectedToLogin": false
+          }
+        }
+      ]
+    },
+    {
+      "slug": "services",
+      "name": "ServicesJasa internal, tanpa stok",
+      "href": "/en/services",
+      "screens": [
+        {
+          "label": "services (hub)",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/services",
+            "shot": "screenshots-scan\\rs-services-hub.png",
+            "path": "/en/services",
+            "headings": [
+              "Services"
+            ],
+            "links": [
+              {
+                "text": "Home",
+                "href": "/en"
+              },
+              {
+                "text": "Apps",
+                "href": "/en/apps"
+              },
+              {
+                "text": "Service category",
+                "href": "/en/services/categories"
+              },
+              {
+                "text": "Service item",
+                "href": "/en/services/items"
+              },
+              {
+                "text": "Service request",
+                "href": "/en/services/requests"
+              },
+              {
+                "text": "Service purchase request",
+                "href": "/en/services/purchase-requests"
+              },
+              {
+                "text": "Service purchase order",
+                "href": "/en/services/orders"
+              },
+              {
+                "text": "Service receipt",
+                "href": "/en/services/receipts"
+              },
+              {
+                "text": "Vendor bill",
+                "href": "/en/services/bills"
+              }
+            ],
+            "tables": [],
+            "empty": null,
+            "redirectedToLogin": false
+          }
+        },
+        {
+          "label": "services-categories",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/services/categories",
+            "shot": "screenshots-scan\\rs-services-categories.png",
+            "path": "/en/services/categories",
+            "headings": [
+              "Service category"
+            ],
+            "links": [],
+            "tables": [
+              {
+                "rows": 2,
+                "headers": [
+                  "Status",
+                  "Detail",
+                  "Code",
+                  ""
+                ],
+                "sample": "activeIPS IPSRSc3810dd7-6d05-52df-a482-116aca313fdd"
+              }
+            ],
+            "empty": null,
+            "redirectedToLogin": false
+          }
+        },
+        {
+          "label": "services-items",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/services/items",
+            "shot": "screenshots-scan\\rs-services-items.png",
+            "path": "/en/services/items",
+            "headings": [
+              "Service item"
+            ],
+            "links": [],
+            "tables": [
+              {
+                "rows": 1,
+                "headers": [
+                  "Status",
+                  "Detail",
+                  "Code",
+                  ""
+                ],
+                "sample": "HousekeepingSVC-KEB Jasa kebersihan ruangan / KBR91e02ccc-acfb-5d58-940b-5a475e669d9b"
+              }
+            ],
+            "empty": null,
+            "redirectedToLogin": false
+          }
+        },
+        {
+          "label": "services-requests",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/services/requests",
+            "shot": "screenshots-scan\\rs-services-requests.png",
+            "path": "/en/services/requests",
+            "headings": [
+              "Service request"
+            ],
+            "links": [],
+            "tables": [
+              {
+                "rows": 1,
+                "headers": [
+                  "Status",
+                  "Detail",
+                  "Code",
+                  ""
+                ],
+                "sample": "No rows yet."
+              }
+            ],
+            "empty": "No rows yet.",
+            "redirectedToLogin": false
+          }
+        },
+        {
+          "label": "services-purchase-requests",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/services/purchase-requests",
+            "shot": "screenshots-scan\\rs-services-purchase-requests.png",
+            "path": "/en/services/purchase-requests",
+            "headings": [
+              "Service purchase request"
+            ],
+            "links": [],
+            "tables": [
+              {
+                "rows": 1,
+                "headers": [
+                  "Status",
+                  "Detail",
+                  "Code",
+                  ""
+                ],
+                "sample": "No rows yet."
+              }
+            ],
+            "empty": "No rows yet.",
+            "redirectedToLogin": false
+          }
+        },
+        {
+          "label": "services-orders",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/services/orders",
+            "shot": "screenshots-scan\\rs-services-orders.png",
+            "path": "/en/services/orders",
+            "headings": [
+              "Service purchase order"
+            ],
+            "links": [],
+            "tables": [
+              {
+                "rows": 1,
+                "headers": [
+                  "Status",
+                  "Detail",
+                  "Code",
+                  ""
+                ],
+                "sample": "No rows yet."
+              }
+            ],
+            "empty": "No rows yet.",
+            "redirectedToLogin": false
+          }
+        },
+        {
+          "label": "services-receipts",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/services/receipts",
+            "shot": "screenshots-scan\\rs-services-receipts.png",
+            "path": "/en/services/receipts",
+            "headings": [
+              "Service receipt"
+            ],
+            "links": [],
+            "tables": [
+              {
+                "rows": 1,
+                "headers": [
+                  "Status",
+                  "Detail",
+                  "Code",
+                  ""
+                ],
+                "sample": "No rows yet."
+              }
+            ],
+            "empty": "No rows yet.",
+            "redirectedToLogin": false
+          }
+        },
+        {
+          "label": "services-bills",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/services/bills",
+            "shot": "screenshots-scan\\rs-services-bills.png",
+            "path": "/en/services/bills",
+            "headings": [
+              "Vendor bill"
+            ],
+            "links": [],
+            "tables": [
+              {
+                "rows": 1,
+                "headers": [
+                  "Status",
+                  "Detail",
+                  "Code",
+                  ""
+                ],
+                "sample": "No rows yet."
+              }
+            ],
+            "empty": "No rows yet.",
+            "redirectedToLogin": false
+          }
+        }
+      ]
+    },
+    {
+      "slug": "sourcing",
+      "name": "SourcingTender sampai perjanjian",
+      "href": "/en/sourcing",
+      "screens": [
+        {
+          "label": "sourcing (hub)",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/sourcing",
+            "shot": "screenshots-scan\\rs-sourcing-hub.png",
+            "path": "/en/sourcing",
+            "headings": [
+              "Sourcing"
+            ],
+            "links": [
+              {
+                "text": "Home",
+                "href": "/en"
+              },
+              {
+                "text": "Apps",
+                "href": "/en/apps"
+              },
+              {
+                "text": "Masters",
+                "href": "/en/sourcing/masters"
+              },
+              {
+                "text": "Tenders",
+                "href": "/en/sourcing/tenders"
+              },
+              {
+                "text": "Bids",
+                "href": "/en/sourcing/bids"
+              },
+              {
+                "text": "Agreements",
+                "href": "/en/sourcing/agreements"
+              },
+              {
+                "text": "Deposits",
+                "href": "/en/sourcing/money"
+              }
+            ],
+            "tables": [],
+            "empty": null,
+            "redirectedToLogin": false
+          }
+        },
+        {
+          "label": "sourcing-masters",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/sourcing/masters",
+            "shot": "screenshots-scan\\rs-sourcing-masters.png",
+            "path": "/en/sourcing/masters",
+            "headings": [
+              "Masters"
+            ],
+            "links": [],
+            "tables": [
+              {
+                "rows": 2,
+                "headers": [
+                  "Status",
+                  "Detail",
+                  "Code",
+                  ""
+                ],
+                "sample": "—ALKES Alkes8d53c2b7-3d94-59da-9dd9-d36c241bca9c"
+              }
+            ],
+            "empty": null,
+            "redirectedToLogin": false
+          }
+        },
+        {
+          "label": "sourcing-tenders",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/sourcing/tenders",
+            "shot": "screenshots-scan\\rs-sourcing-tenders.png",
+            "path": "/en/sourcing/tenders",
+            "headings": [
+              "Tenders"
+            ],
+            "links": [],
+            "tables": [
+              {
+                "rows": 1,
+                "headers": [
+                  "Status",
+                  "Detail",
+                  "Code",
+                  ""
+                ],
+                "sample": "No rows yet."
+              }
+            ],
+            "empty": "No rows yet.",
+            "redirectedToLogin": false
+          }
+        },
+        {
+          "label": "sourcing-bids",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/sourcing/bids",
+            "shot": "screenshots-scan\\rs-sourcing-bids.png",
+            "path": "/en/sourcing/bids",
+            "headings": [
+              "Bids"
+            ],
+            "links": [],
+            "tables": [
+              {
+                "rows": 1,
+                "headers": [
+                  "Status",
+                  "Detail",
+                  "Code",
+                  ""
+                ],
+                "sample": "No rows yet."
+              }
+            ],
+            "empty": "No rows yet.",
+            "redirectedToLogin": false
+          }
+        },
+        {
+          "label": "sourcing-agreements",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/sourcing/agreements",
+            "shot": "screenshots-scan\\rs-sourcing-agreements.png",
+            "path": "/en/sourcing/agreements",
+            "headings": [
+              "Agreements"
+            ],
+            "links": [],
+            "tables": [
+              {
+                "rows": 1,
+                "headers": [
+                  "Status",
+                  "Detail",
+                  "Code",
+                  ""
+                ],
+                "sample": "No rows yet."
+              }
+            ],
+            "empty": "No rows yet.",
+            "redirectedToLogin": false
+          }
+        },
+        {
+          "label": "sourcing-money",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/sourcing/money",
+            "shot": "screenshots-scan\\rs-sourcing-money.png",
+            "path": "/en/sourcing/money",
+            "headings": [
+              "Deposits"
+            ],
+            "links": [],
+            "tables": [
+              {
+                "rows": 1,
+                "headers": [
+                  "Status",
+                  "Detail",
+                  "Code",
+                  ""
+                ],
+                "sample": "No rows yet."
+              }
+            ],
+            "empty": "No rows yet.",
+            "redirectedToLogin": false
+          }
+        }
+      ]
+    },
+    {
+      "slug": "housekeeping",
+      "name": "HousekeepingLokasi, kontrak, catatan, tagihan",
+      "href": "/en/housekeeping",
+      "screens": [
+        {
+          "label": "housekeeping (hub)",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/housekeeping",
+            "shot": "screenshots-scan\\rs-housekeeping-hub.png",
+            "path": "/en/housekeeping",
+            "headings": [
+              "Housekeeping"
+            ],
+            "links": [
+              {
+                "text": "Home",
+                "href": "/en"
+              },
+              {
+                "text": "Apps",
+                "href": "/en/apps"
+              },
+              {
+                "text": "Locations",
+                "href": "/en/housekeeping/locations"
+              },
+              {
+                "text": "Contracts",
+                "href": "/en/housekeeping/contracts"
+              },
+              {
+                "text": "Daily logs",
+                "href": "/en/housekeeping/logs"
+              },
+              {
+                "text": "Bills",
+                "href": "/en/housekeeping/bills"
+              }
+            ],
+            "tables": [],
+            "empty": null,
+            "redirectedToLogin": false
+          }
+        },
+        {
+          "label": "housekeeping-locations",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/housekeeping/locations",
+            "shot": "screenshots-scan\\rs-housekeeping-locations.png",
+            "path": "/en/housekeeping/locations",
+            "headings": [
+              "Locations"
+            ],
+            "links": [],
+            "tables": [
+              {
+                "rows": 2,
+                "headers": [
+                  "Status",
+                  "Detail",
+                  "Code",
+                  ""
+                ],
+                "sample": "Sri WahyuniMLT1 Kamar Melati 1 VVIPad66c803-8cd1-5a35-8cac-67a5c8c0de0c"
+              }
+            ],
+            "empty": null,
+            "redirectedToLogin": false
+          }
+        },
+        {
+          "label": "housekeeping-contracts",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/housekeeping/contracts",
+            "shot": "screenshots-scan\\rs-housekeeping-contracts.png",
+            "path": "/en/housekeeping/contracts",
+            "headings": [
+              "Contracts"
+            ],
+            "links": [],
+            "tables": [
+              {
+                "rows": 1,
+                "headers": [
+                  "Status",
+                  "Detail",
+                  "Code",
+                  ""
+                ],
+                "sample": "No rows yet."
+              }
+            ],
+            "empty": "No rows yet.",
+            "redirectedToLogin": false
+          }
+        },
+        {
+          "label": "housekeeping-logs",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/housekeeping/logs",
+            "shot": "screenshots-scan\\rs-housekeeping-logs.png",
+            "path": "/en/housekeeping/logs",
+            "headings": [
+              "Daily logs"
+            ],
+            "links": [],
+            "tables": [
+              {
+                "rows": 1,
+                "headers": [
+                  "Status",
+                  "Detail",
+                  "Code",
+                  ""
+                ],
+                "sample": "No rows yet."
+              }
+            ],
+            "empty": "No rows yet.",
+            "redirectedToLogin": false
+          }
+        },
+        {
+          "label": "housekeeping-bills",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/housekeeping/bills",
+            "shot": "screenshots-scan\\rs-housekeeping-bills.png",
+            "path": "/en/housekeeping/bills",
+            "headings": [
+              "Bills"
+            ],
+            "links": [],
+            "tables": [
+              {
+                "rows": 1,
+                "headers": [
+                  "Status",
+                  "Detail",
+                  "Code",
+                  ""
+                ],
+                "sample": "No rows yet."
+              }
+            ],
+            "empty": "No rows yet.",
+            "redirectedToLogin": false
+          }
+        }
+      ]
+    },
+    {
+      "slug": "linen",
+      "name": "LinenToko, resep, sirkulasi",
+      "href": "/en/linen",
+      "screens": [
+        {
+          "label": "linen (hub)",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/linen",
+            "shot": "screenshots-scan\\rs-linen-hub.png",
+            "path": "/en/linen",
+            "headings": [
+              "Linen"
+            ],
+            "links": [
+              {
+                "text": "Home",
+                "href": "/en"
+              },
+              {
+                "text": "Apps",
+                "href": "/en/apps"
+              },
+              {
+                "text": "Stores and recipe",
+                "href": "/en/linen/stores"
+              },
+              {
+                "text": "Work orders",
+                "href": "/en/linen/orders"
+              },
+              {
+                "text": "Circulation",
+                "href": "/en/linen/moves"
+              }
+            ],
+            "tables": [],
+            "empty": null,
+            "redirectedToLogin": false
+          }
+        },
+        {
+          "label": "linen-stores",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/linen/stores",
+            "shot": "screenshots-scan\\rs-linen-stores.png",
+            "path": "/en/linen/stores",
+            "headings": [
+              "Stores and recipe"
+            ],
+            "links": [],
+            "tables": [
+              {
+                "rows": 1,
+                "headers": [
+                  "Status",
+                  "Detail",
+                  "Code",
+                  ""
+                ],
+                "sample": "No rows yet."
+              }
+            ],
+            "empty": "No rows yet.",
+            "redirectedToLogin": false
+          }
+        },
+        {
+          "label": "linen-orders",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/linen/orders",
+            "shot": "screenshots-scan\\rs-linen-orders.png",
+            "path": "/en/linen/orders",
+            "headings": [
+              "Work orders"
+            ],
+            "links": [],
+            "tables": [
+              {
+                "rows": 1,
+                "headers": [
+                  "Status",
+                  "Detail",
+                  "Code",
+                  ""
+                ],
+                "sample": "No rows yet."
+              }
+            ],
+            "empty": "No rows yet.",
+            "redirectedToLogin": false
+          }
+        },
+        {
+          "label": "linen-moves",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/linen/moves",
+            "shot": "screenshots-scan\\rs-linen-moves.png",
+            "path": "/en/linen/moves",
+            "headings": [
+              "Circulation"
+            ],
+            "links": [],
+            "tables": [
+              {
+                "rows": 1,
+                "headers": [
+                  "Status",
+                  "Detail",
+                  "Code",
+                  ""
+                ],
+                "sample": "No rows yet."
+              }
+            ],
+            "empty": "No rows yet.",
+            "redirectedToLogin": false
+          }
+        }
+      ]
+    },
+    {
+      "slug": "maintenance",
+      "name": "MaintenanceRencana, perintah kerja, AMC",
+      "href": "/en/maintenance",
+      "screens": [
+        {
+          "label": "maintenance (hub)",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/maintenance",
+            "shot": "screenshots-scan\\rs-maintenance-hub.png",
+            "path": "/en/maintenance",
+            "headings": [
+              "Maintenance"
+            ],
+            "links": [
+              {
+                "text": "Home",
+                "href": "/en"
+              },
+              {
+                "text": "Apps",
+                "href": "/en/apps"
+              },
+              {
+                "text": "Plans",
+                "href": "/en/maintenance/plans"
+              },
+              {
+                "text": "Work",
+                "href": "/en/maintenance/work"
+              },
+              {
+                "text": "AMC",
+                "href": "/en/maintenance/amc"
+              }
+            ],
+            "tables": [],
+            "empty": null,
+            "redirectedToLogin": false
+          }
+        },
+        {
+          "label": "maintenance-plans",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/maintenance/plans",
+            "shot": "screenshots-scan\\rs-maintenance-plans.png",
+            "path": "/en/maintenance/plans",
+            "headings": [
+              "Plans"
+            ],
+            "links": [],
+            "tables": [
+              {
+                "rows": 1,
+                "headers": [
+                  "Status",
+                  "Detail",
+                  "Code",
+                  ""
+                ],
+                "sample": "cardJC-AUTO Cek Autoklaf 1eb445c6c-1e89-5a57-b90a-e9db8f1c440c"
+              }
+            ],
+            "empty": null,
+            "redirectedToLogin": false
+          }
+        },
+        {
+          "label": "maintenance-work",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/maintenance/work",
+            "shot": "screenshots-scan\\rs-maintenance-work.png",
+            "path": "/en/maintenance/work",
+            "headings": [
+              "Work"
+            ],
+            "links": [],
+            "tables": [
+              {
+                "rows": 1,
+                "headers": [
+                  "Status",
+                  "Detail",
+                  "Code",
+                  ""
+                ],
+                "sample": "No rows yet."
+              }
+            ],
+            "empty": "No rows yet.",
+            "redirectedToLogin": false
+          }
+        },
+        {
+          "label": "maintenance-amc",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/maintenance/amc",
+            "shot": "screenshots-scan\\rs-maintenance-amc.png",
+            "path": "/en/maintenance/amc",
+            "headings": [
+              "AMC"
+            ],
+            "links": [],
+            "tables": [
+              {
+                "rows": 1,
+                "headers": [
+                  "Status",
+                  "Detail",
+                  "Code",
+                  ""
+                ],
+                "sample": "No rows yet."
+              }
+            ],
+            "empty": "No rows yet.",
+            "redirectedToLogin": false
+          }
+        }
+      ]
+    },
+    {
+      "slug": "fixed-assets",
+      "name": "Fixed assetsRegister, susut, penitipan",
+      "href": "/en/fixed-assets",
+      "screens": [
+        {
+          "label": "fixed-assets (hub)",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/fixed-assets",
+            "shot": "screenshots-scan\\rs-fixed-assets-hub.png",
+            "path": "/en/fixed-assets",
+            "headings": [
+              "Fixed assets"
+            ],
+            "links": [
+              {
+                "text": "Home",
+                "href": "/en"
+              },
+              {
+                "text": "Apps",
+                "href": "/en/apps"
+              },
+              {
+                "text": "Classification",
+                "href": "/en/fixed-assets/masters"
+              },
+              {
+                "text": "Register",
+                "href": "/en/fixed-assets/register"
+              },
+              {
+                "text": "Movement",
+                "href": "/en/fixed-assets/moves"
+              }
+            ],
+            "tables": [],
+            "empty": null,
+            "redirectedToLogin": false
+          }
+        },
+        {
+          "label": "fixed-assets-masters",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/fixed-assets/masters",
+            "shot": "screenshots-scan\\rs-fixed-assets-masters.png",
+            "path": "/en/fixed-assets/masters",
+            "headings": [
+              "Classification"
+            ],
+            "links": [],
+            "tables": [
+              {
+                "rows": 1,
+                "headers": [
+                  "Status",
+                  "Detail",
+                  "Code",
+                  ""
+                ],
+                "sample": "activePencitraan 1501f3fbb0f2-1d96-5a07-959a-801b1835484a"
+              }
+            ],
+            "empty": null,
+            "redirectedToLogin": false
+          }
+        },
+        {
+          "label": "fixed-assets-register",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/fixed-assets/register",
+            "shot": "screenshots-scan\\rs-fixed-assets-register.png",
+            "path": "/en/fixed-assets/register",
+            "headings": [
+              "Register"
+            ],
+            "links": [],
+            "tables": [
+              {
+                "rows": 1,
+                "headers": [
+                  "Code",
+                  "Status",
+                  "Holder",
+                  ""
+                ],
+                "sample": "No rows yet."
+              }
+            ],
+            "empty": "No rows yet.",
+            "redirectedToLogin": false
+          }
+        },
+        {
+          "label": "fixed-assets-moves",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/fixed-assets/moves",
+            "shot": "screenshots-scan\\rs-fixed-assets-moves.png",
+            "path": "/en/fixed-assets/moves",
+            "headings": [
+              "Movement"
+            ],
+            "links": [],
+            "tables": [
+              {
+                "rows": 1,
+                "headers": [
+                  "Code",
+                  "Status",
+                  "Holder",
+                  ""
+                ],
+                "sample": "No rows yet."
+              }
+            ],
+            "empty": "No rows yet.",
+            "redirectedToLogin": false
+          }
+        }
+      ]
+    }
+  ],
+  "moduleSlugs": [
+    {
+      "slug": "registration",
+      "name": "Ambulatory CarePendaftaran pasien, check-in, MRN",
+      "href": "/en/registration"
+    },
+    {
+      "slug": "appointment",
+      "name": "AppointmentJadwal, reschedule, blok konsultan",
+      "href": "/en/appointment"
+    },
+    {
+      "slug": "clinical",
+      "name": "Patient CareSOAP, vitals, diagnosis",
+      "href": "/en/clinical"
+    },
+    {
+      "slug": "adt",
+      "name": "InpatientAdmission, transfer, discharge",
+      "href": "/en/adt"
+    },
+    {
+      "slug": "pharmacy",
+      "name": "PharmacyDispense, OTC, retur",
+      "href": "/en/pharmacy"
+    },
+    {
+      "slug": "bloodbank",
+      "name": "Transfusion MedicineDonor, crossmatch, issue",
+      "href": "/en/bloodbank"
+    },
+    {
+      "slug": "inventory",
+      "name": "InventoryStok, GRN, mutasi",
+      "href": "/en/inventory"
+    },
+    {
+      "slug": "ot",
+      "name": "Operation TheaterJadwal & konsumsi OT",
+      "href": "/en/ot"
+    },
+    {
+      "slug": "procurement",
+      "name": "ProcurementPR, PO, tender",
+      "href": "/en/procurement"
+    },
+    {
+      "slug": "hr",
+      "name": "HRKaryawan & cuti",
+      "href": "/en/hr"
+    },
+    {
+      "slug": "laboratory",
+      "name": "LaboratorySampel, hasil, sertifikasi",
+      "href": "/en/laboratory"
+    },
+    {
+      "slug": "radiology",
+      "name": "RISOrder & jadwal modality",
+      "href": "/en/radiology"
+    },
+    {
+      "slug": "diet",
+      "name": "DietaryDiet pasien rawat inap",
+      "href": "/en/diet"
+    },
+    {
+      "slug": "billing",
+      "name": "Hospital AccountsInvoice, deposit, kasir",
+      "href": "/en/billing"
+    },
+    {
+      "slug": "emergency",
+      "name": "EmergencyTriage & bay IGD",
+      "href": "/en/emergency"
+    },
+    {
+      "slug": "mrd",
+      "name": "MRDBerkas & peminjaman RM",
+      "href": "/en/mrd"
+    },
+    {
+      "slug": "payroll",
+      "name": "PayrollGaji & payslip",
+      "href": "/en/payroll"
+    },
+    {
+      "slug": "finance",
+      "name": "FinanceVoucher & GL",
+      "href": "/en/finance"
+    },
+    {
+      "slug": "budget",
+      "name": "BudgetPagu, alokasi, sanksi",
+      "href": "/en/budget"
+    },
+    {
+      "slug": "cssd",
+      "name": "CSSDSet steril, siklus, distribusi",
+      "href": "/en/cssd"
+    },
+    {
+      "slug": "services",
+      "name": "ServicesJasa internal, tanpa stok",
+      "href": "/en/services"
+    },
+    {
+      "slug": "sourcing",
+      "name": "SourcingTender sampai perjanjian",
+      "href": "/en/sourcing"
+    },
+    {
+      "slug": "housekeeping",
+      "name": "HousekeepingLokasi, kontrak, catatan, tagihan",
+      "href": "/en/housekeeping"
+    },
+    {
+      "slug": "linen",
+      "name": "LinenToko, resep, sirkulasi",
+      "href": "/en/linen"
+    },
+    {
+      "slug": "maintenance",
+      "name": "MaintenanceRencana, perintah kerja, AMC",
+      "href": "/en/maintenance"
+    },
+    {
+      "slug": "fixed-assets",
+      "name": "Fixed assetsRegister, susut, penitipan",
+      "href": "/en/fixed-assets"
+    }
+  ]
+}

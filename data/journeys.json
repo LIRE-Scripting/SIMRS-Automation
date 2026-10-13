@@ -1,0 +1,1717 @@
+[
+  {
+    "id": "PHA-JRN-001",
+    "journey": "Pharmacist dispenses an outpatient prescription in full",
+    "path": "Happy path",
+    "priority": "P0",
+    "role": "Pharmacist",
+    "goal": "The patient leaves with the full prescription, stock and bill are correct.",
+    "preconditions": "OR-OP is pending. QA-PARA has BT-1 and BT-2 in ST-OP.",
+    "testData": "OR-OP, ST-OP",
+    "expectedEnd": "Issue Lines has a new first row: Paracetamol 500mg Tablet, Requested 10, Issued 10, Issued Yes, Verified Yes, Returned 0. Inventory, Item Master, QA-PARA, \"Stock on hand\": BT-1 is 0. Hospital Accounts has one open invoice RX-… for 13,875.00. Audit has one pharmacy entry dispense.confirm by the pharmacist.",
+    "steps": [
+      {
+        "step": 1,
+        "action": "Opens Apps, Pharmacy, Orders",
+        "expected": "Table with Patient, Drug, Visit, Remaining. A row for \"QA-PHA Pasien Satu\", Paracetamol 500mg Tablet, outpatient, 10"
+      },
+      {
+        "step": 2,
+        "action": "Selects Outpatient",
+        "expected": "Only outpatient orders. A Store field appears"
+      },
+      {
+        "step": 3,
+        "action": "Picks ST-OP in Store",
+        "expected": "ST-OP is selected"
+      },
+      {
+        "step": 4,
+        "action": "Clicks the patient name",
+        "expected": "Dispense wizard, step \"Select items\". Hint: \"QA-PHA Pasien Satu — Paracetamol 500mg Tablet. Issued quantity cannot exceed what is still ordered.\" One line is listed and has no Remove button"
+      },
+      {
+        "step": 5,
+        "action": "Clicks Next",
+        "expected": "\"Set quantities\": Requested 10, Issued 10"
+      },
+      {
+        "step": 6,
+        "action": "Clicks Next",
+        "expected": "\"Drug order alerts\": \"No drug interactions detected for this order.\""
+      },
+      {
+        "step": 7,
+        "action": "Clicks Next",
+        "expected": "\"Confirm\": branch BR-A, store ST-OP, summary line for the item"
+      },
+      {
+        "step": 8,
+        "action": "Clicks \"Confirm dispense\"",
+        "expected": "Button reads \"Submitting…\", then toast \"Dispense confirmed — issue lines saved.\" A label shows \"Issued 10 of 10\""
+      },
+      {
+        "step": 9,
+        "action": "Clicks Done",
+        "expected": "Back on Orders. The row for PT-1 is gone"
+      }
+    ]
+  },
+  {
+    "id": "PHA-JRN-002",
+    "journey": "Prescription collected in two visits",
+    "path": "Happy path",
+    "priority": "P0",
+    "role": "Pharmacist",
+    "goal": "Part of the order is issued today and the rest later, without ever exceeding what was ordered.",
+    "preconditions": "OR-OP pending, quantity 10.",
+    "testData": "OR-OP, issue 4 then 6",
+    "expectedEnd": "Issue Lines has two rows for the order (4 and 6). Stock dropped by 10 in total. Two RX-… invoices exist.",
+    "steps": [
+      {
+        "step": 1,
+        "action": "Opens OR-OP from Orders with ST-OP",
+        "expected": "Wizard with the order line"
+      },
+      {
+        "step": 2,
+        "action": "On \"Set quantities\" changes Issued to 4 and goes on to Confirm",
+        "expected": "Summary shows 4 of 10"
+      },
+      {
+        "step": 3,
+        "action": "Clicks \"Confirm dispense\", then Done",
+        "expected": "Confirmed toast. Back on Orders"
+      },
+      {
+        "step": 4,
+        "action": "Looks at the Orders row for PT-1",
+        "expected": "Row is still listed with Remaining 6"
+      },
+      {
+        "step": 5,
+        "action": "Opens the row again",
+        "expected": "Line is prefilled Requested 6, Issued 6"
+      },
+      {
+        "step": 6,
+        "action": "Confirms",
+        "expected": "Confirmed toast"
+      },
+      {
+        "step": 7,
+        "action": "Returns to Orders",
+        "expected": "Row for PT-1 is gone"
+      }
+    ]
+  },
+  {
+    "id": "PHA-JRN-003",
+    "journey": "Restricted drug waits for the doctor's authorisation",
+    "path": "Happy path",
+    "priority": "P0",
+    "role": "Doctor, Pharmacist",
+    "goal": "A restricted drug reaches the pharmacy queue only after it is authorised.",
+    "preconditions": "OR-RX written in Patient Care for a restricted drug, not authorised.",
+    "testData": "OR-RX",
+    "expectedEnd": "One issue line for the restricted drug, created after the authorisation time.",
+    "steps": [
+      {
+        "step": 1,
+        "action": "Pharmacist opens Pharmacy, Orders",
+        "expected": "OR-RX is not in the list"
+      },
+      {
+        "step": 2,
+        "action": "Doctor opens Patient Care and authorises the order",
+        "expected": "Order shows as authorised"
+      },
+      {
+        "step": 3,
+        "action": "Pharmacist reloads Orders",
+        "expected": "OR-RX is listed"
+      },
+      {
+        "step": 4,
+        "action": "Pharmacist opens it and dispenses",
+        "expected": "Confirmed toast"
+      }
+    ]
+  },
+  {
+    "id": "PHA-JRN-004",
+    "journey": "Generic substitution on a prescription",
+    "path": "Happy path",
+    "priority": "P1",
+    "role": "Pharmacist",
+    "goal": "The substitution is visible on the record.",
+    "preconditions": "OR-OP pending.",
+    "testData": "OR-OP, Generic ticked",
+    "expectedEnd": "The remark is the same Indonesian text in English and Indonesian screens. The screen records the tick only; it does not ask which generic was given or who approved it.",
+    "steps": [
+      {
+        "step": 1,
+        "action": "Opens OR-OP and goes to \"Set quantities\"",
+        "expected": "Column \"Generic\" with a tick box"
+      },
+      {
+        "step": 2,
+        "action": "Ticks Generic and goes to Confirm",
+        "expected": "Summary line ends with \"· Generic\""
+      },
+      {
+        "step": 3,
+        "action": "Confirms",
+        "expected": "Label shows \"· Generic\""
+      },
+      {
+        "step": 4,
+        "action": "Opens Issue Lines",
+        "expected": "Remarks on the new row: \"Diganti obat generik atas persetujuan dokter\""
+      }
+    ]
+  },
+  {
+    "id": "PHA-JRN-005",
+    "journey": "Ward supply: nurse groups orders, pharmacist dispenses, ward receives",
+    "path": "Happy path",
+    "priority": "P0",
+    "role": "Nurse, Pharmacist",
+    "goal": "Inpatient orders move from the ward to the pharmacy and back as one delivery.",
+    "preconditions": "PT-3 admitted in BR-A. OR-IP pending. QA-PARA in stock in ST-IP.",
+    "testData": "OR-IP, ST-IP",
+    "expectedEnd": "Issue line for 6 from ST-IP. Stock in ST-IP down by 6. Invoice priced with the inpatient rule.",
+    "steps": [
+      {
+        "step": 1,
+        "action": "Nurse opens Inpatient, Admissions, Ward supply",
+        "expected": "Three cards. Text \"Choose a store, then tick the orders to group.\""
+      },
+      {
+        "step": 2,
+        "action": "Picks ST-IP, ticks OR-IP under \"Pending inpatient orders\", clicks \"Group for this store\"",
+        "expected": "Toast \"Orders grouped for the pharmacy queue.\" The group is listed as Open"
+      },
+      {
+        "step": 3,
+        "action": "Pharmacist opens Pharmacy, Orders, selects Inpatient",
+        "expected": "Inpatient orders and a \"Ward group\" field"
+      },
+      {
+        "step": 4,
+        "action": "Picks the group in \"Ward group\"",
+        "expected": "Only the grouped orders are listed. Store switches to ST-IP"
+      },
+      {
+        "step": 5,
+        "action": "Opens OR-IP and confirms the dispense",
+        "expected": "Confirmed toast. Label \"Issued 6 of 6\""
+      },
+      {
+        "step": 6,
+        "action": "Nurse returns to Ward supply and clicks Receive on the group",
+        "expected": "Toast \"Ward receipt recorded.\" or, for a BPJS patient, \"Ward receipt recorded. BPJS task 7 sent.\" Group status Received"
+      },
+      {
+        "step": 7,
+        "action": "Pharmacist reopens Orders, Inpatient, \"Ward group\"",
+        "expected": "The received group is no longer offered"
+      }
+    ]
+  },
+  {
+    "id": "PHA-JRN-006",
+    "journey": "Ward refuses a delivery",
+    "path": "Happy path",
+    "priority": "P1",
+    "role": "Nurse, Pharmacist",
+    "goal": "A refused delivery comes back to pharmacy stock without a separate return entry.",
+    "preconditions": "A ward group whose order was dispensed (PHA-JRN-005 up to step 5).",
+    "testData": "the group",
+    "expectedEnd": "Stock in ST-IP is back to its level before the dispense. The exact rule for partly received groups is to be confirmed in the Inpatient module pass.",
+    "steps": [
+      {
+        "step": 1,
+        "action": "Nurse opens Ward supply and clicks Refuse on the group",
+        "expected": "Toast \"Delivery refused. The pharmacy return is posted.\" Group status Refused"
+      },
+      {
+        "step": 2,
+        "action": "Pharmacist opens Pharmacy, Issue Lines",
+        "expected": "The line for OR-IP shows Returned equal to Issued. The Return control shows \"—\""
+      }
+    ]
+  },
+  {
+    "id": "PHA-JRN-007",
+    "journey": "Counter sale to a registered patient",
+    "path": "Happy path",
+    "priority": "P0",
+    "role": "Pharmacist",
+    "goal": "A patient without a doctor's order buys a medicine at the counter.",
+    "preconditions": "PT-1 registered, not admitted. QA-PARA in stock in ST-OP.",
+    "testData": "PT-1, QA-PARA × 2, ST-OP",
+    "expectedEnd": "One issue line for 2. BT-1 is down by 2. Invoice RX-… for 2,775.00 (2 × 1,250.00 plus 11% tax) labelled with PT-1's name.",
+    "steps": [
+      {
+        "step": 1,
+        "action": "Opens Pharmacy, Dispense",
+        "expected": "\"Select items\". \"No medical record selected.\" Next is disabled"
+      },
+      {
+        "step": 2,
+        "action": "Types \"QA-PHA Pasien Satu\" in \"Search medical record\" and clicks the search button",
+        "expected": "PT-1 with its MRN is offered"
+      },
+      {
+        "step": 3,
+        "action": "Picks PT-1",
+        "expected": "\"QA-PHA Pasien Satu MRN …\" is shown"
+      },
+      {
+        "step": 4,
+        "action": "Types \"QA-PARA\" in \"Search by name or code\" and clicks the result",
+        "expected": "\"Selected (1)\" with the item"
+      },
+      {
+        "step": 5,
+        "action": "Clicks Next, sets Requested 2 and Issued 2, clicks Next",
+        "expected": "\"No drug interactions detected for this order.\""
+      },
+      {
+        "step": 6,
+        "action": "Clicks Next",
+        "expected": "Confirm: patient and MRN, Visit \"Outpatient\", Store"
+      },
+      {
+        "step": 7,
+        "action": "Picks ST-OP and clicks \"Confirm dispense\"",
+        "expected": "Toast \"Dispense confirmed — issue lines saved.\" Label \"Issued 2 of 2\""
+      },
+      {
+        "step": 8,
+        "action": "Clicks Done",
+        "expected": "Wizard is empty and ready for the next sale"
+      }
+    ]
+  },
+  {
+    "id": "PHA-JRN-008",
+    "journey": "Counter sale to a new patient: register, then continue",
+    "path": "Happy path",
+    "priority": "P1",
+    "role": "Pharmacist",
+    "goal": "A person with no medical record is registered and served without starting over.",
+    "preconditions": "The pharmacist may register patients. No patient named \"QA-PHA Pasien Baru\" exists.",
+    "testData": "new patient \"QA-PHA Pasien Baru\", QA-PARA × 1",
+    "expectedEnd": "The patient exists in Ambulatory Care with a system-issued MRN. The invoice is labelled with the new patient's name.",
+    "steps": [
+      {
+        "step": 1,
+        "action": "Opens Pharmacy, Dispense and searches \"QA-PHA Pasien Baru\"",
+        "expected": "\"No medical record matches.\""
+      },
+      {
+        "step": 2,
+        "action": "Clicks \"Register on the patient form\"",
+        "expected": "Ambulatory Care patient form opens with the note \"Registration saves this walk-in. The pharmacy wizard continues with the saved patient.\""
+      },
+      {
+        "step": 3,
+        "action": "Fills the required fields and saves",
+        "expected": "Returns to the Dispense wizard. The new patient and MRN are already selected"
+      },
+      {
+        "step": 4,
+        "action": "Adds QA-PARA, completes the wizard and confirms",
+        "expected": "Confirmed toast"
+      }
+    ]
+  },
+  {
+    "id": "PHA-JRN-009",
+    "journey": "Several items in one sale, then labels",
+    "path": "Happy path",
+    "priority": "P1",
+    "role": "Pharmacist",
+    "goal": "One sale, one bill, one label per item.",
+    "preconditions": "QA-PARA and QA-IBU in stock in ST-OP.",
+    "testData": "PT-1, QA-PARA × 2, QA-IBU × 1",
+    "expectedEnd": "Two issue lines. One invoice, not two: charges 4,375.00, tax 481.25, total 4,856.25.",
+    "steps": [
+      {
+        "step": 1,
+        "action": "Opens Dispense, picks PT-1, adds QA-PARA and QA-IBU",
+        "expected": "\"Selected (2)\""
+      },
+      {
+        "step": 2,
+        "action": "Removes QA-IBU with Remove, then adds it again",
+        "expected": "Count goes 1, then 2"
+      },
+      {
+        "step": 3,
+        "action": "Sets quantities 2 and 1 and goes on",
+        "expected": "\"No drug interactions detected for this order.\""
+      },
+      {
+        "step": 4,
+        "action": "Confirms with ST-OP",
+        "expected": "Confirmed toast. Two labels, each with item, \"Issued n of n\" and a barcode of the item code"
+      },
+      {
+        "step": 5,
+        "action": "Clicks \"Print labels\"",
+        "expected": "Print preview contains the labels only"
+      },
+      {
+        "step": 6,
+        "action": "Clicks Done",
+        "expected": "Empty wizard"
+      }
+    ]
+  },
+  {
+    "id": "PHA-JRN-010",
+    "journey": "Selling a kit",
+    "path": "Happy path",
+    "priority": "P1",
+    "role": "Pharmacist",
+    "goal": "A kit takes its parts out of stock, and cannot be mixed with loose items.",
+    "preconditions": "QA-KIT defined. Its parts are in stock in ST-OP.",
+    "testData": "PT-1; QA-KIT × 2; then QA-KIT × 1 with QA-IBU × 1",
+    "expectedEnd": "After step 3 no issue line was added and stock is unchanged.",
+    "steps": [
+      {
+        "step": 1,
+        "action": "Sells QA-KIT × 2 to PT-1",
+        "expected": "Confirmed toast. One label for the kit"
+      },
+      {
+        "step": 2,
+        "action": "Opens Inventory, Item Master, QA-PARA and QA-OMEP",
+        "expected": "QA-PARA down by 4, QA-OMEP down by 2"
+      },
+      {
+        "step": 3,
+        "action": "Starts a new sale with QA-KIT and QA-IBU together and confirms",
+        "expected": "Refusal containing \"a kit cannot be issued with other items\""
+      }
+    ]
+  },
+  {
+    "id": "PHA-JRN-011",
+    "journey": "Finding an item by search and by scan",
+    "path": "Happy path",
+    "priority": "P2",
+    "role": "Pharmacist",
+    "goal": "Items are quick to find and wrong codes are caught.",
+    "preconditions": "QA-PARA active. One inactive item \"QA-INACTIVE Tablet\".",
+    "testData": "search \"paracet\", \"QA-INACTIVE\", \"zzzz\"; scan \"QA-PARA\" and \"QA-DOES-NOT-EXIST\"",
+    "expectedEnd": "Only QA-PARA is in \"Selected\".",
+    "steps": [
+      {
+        "step": 1,
+        "action": "Opens Dispense, picks PT-1, types \"paracet\" in \"Search by name or code\"",
+        "expected": "\"Searching…\", then matching active items"
+      },
+      {
+        "step": 2,
+        "action": "Types \"QA-INACTIVE\"",
+        "expected": "The inactive item is not offered"
+      },
+      {
+        "step": 3,
+        "action": "Types \"zzzz\"",
+        "expected": "\"No matching items.\""
+      },
+      {
+        "step": 4,
+        "action": "Clicks Scan",
+        "expected": "Dialog \"Scan item code\": \"Scan a barcode or type the exact code and press Enter.\""
+      },
+      {
+        "step": 5,
+        "action": "Types \"QA-PARA\" and presses Enter",
+        "expected": "The item is added with quantity 1"
+      },
+      {
+        "step": 6,
+        "action": "Clicks Scan again, types \"QA-DOES-NOT-EXIST\", presses Enter",
+        "expected": "Toast \"No catalog item found for that code.\" Nothing is added"
+      }
+    ]
+  },
+  {
+    "id": "PHA-JRN-012",
+    "journey": "Warning the pharmacist must acknowledge",
+    "path": "Happy path",
+    "priority": "P0",
+    "role": "Pharmacist",
+    "goal": "A soft warning is read and accepted before the sale.",
+    "preconditions": "QA-PARA and QA-OMEP in stock in ST-OP.",
+    "testData": "PT-1, QA-PARA × 1, QA-OMEP × 1",
+    "expectedEnd": "Two issue lines. Current behaviour: the acknowledgement is not kept on the issue line or in the audit entry, so later there is no record of who accepted the warning.",
+    "steps": [
+      {
+        "step": 1,
+        "action": "Adds both items for PT-1 and goes to \"Drug order alerts\"",
+        "expected": "Soft warning: \"Soft warning (sandbox): Paracetamol 500mg Tablet with Omeprazole 20mg Kapsul — acknowledge to continue.\""
+      },
+      {
+        "step": 2,
+        "action": "Goes to Confirm without acknowledging",
+        "expected": "\"Cannot confirm — resolve hard alerts or acknowledge soft warnings.\""
+      },
+      {
+        "step": 3,
+        "action": "Acknowledges the warning",
+        "expected": "The warning shows as acknowledged. Confirm becomes available"
+      },
+      {
+        "step": 4,
+        "action": "Confirms with ST-OP",
+        "expected": "Confirmed toast"
+      }
+    ]
+  },
+  {
+    "id": "PHA-JRN-013",
+    "journey": "Stock comes off the right batch",
+    "path": "Happy path",
+    "priority": "P0",
+    "role": "Pharmacist, Warehouse Staff",
+    "goal": "What leaves the shelf equals what was issued, and it leaves the expected batch.",
+    "preconditions": "BT-1 quantity 10 (received first, expires in 400 days). BT-2 quantity 10 (received later, expires in 60 days).",
+    "testData": "PT-1; first sale Requested 5, Issued 3; second sale 12",
+    "expectedEnd": "Total stock fell by 15. Current behaviour: the batch received first is used first, so BT-2, which expires sooner, stays on the shelf until BT-1 is empty. Drug stock is normally issued first-expired-first-out.",
+    "steps": [
+      {
+        "step": 1,
+        "action": "Opens Inventory, Item Master, QA-PARA, \"Stock on hand\"",
+        "expected": "BT-1 10, BT-2 10"
+      },
+      {
+        "step": 2,
+        "action": "Sells QA-PARA to PT-1 with Requested 5, Issued 3",
+        "expected": "Confirmed toast. Label \"Issued 3 of 5\""
+      },
+      {
+        "step": 3,
+        "action": "Reopens \"Stock on hand\"",
+        "expected": "BT-1 7, BT-2 10. Stock fell by the issued 3, not the requested 5"
+      },
+      {
+        "step": 4,
+        "action": "Sells 12 more",
+        "expected": "Confirmed toast"
+      },
+      {
+        "step": 5,
+        "action": "Reopens \"Stock on hand\"",
+        "expected": "BT-1 0, BT-2 5. One sale was drawn from two batches"
+      }
+    ]
+  },
+  {
+    "id": "PHA-JRN-014",
+    "journey": "A sale appears at the cashier and in Finance",
+    "path": "Happy path",
+    "priority": "P0",
+    "role": "Pharmacist, Cashier, Finance",
+    "goal": "Every dispense produces exactly one bill and one voucher for the right amount.",
+    "preconditions": "BR-A price rule as in the shared data. Tenant holds the Finance module.",
+    "testData": "PT-1, QA-PARA × 10",
+    "expectedEnd": "One invoice and one voucher per dispense, never one per line and never duplicated.",
+    "steps": [
+      {
+        "step": 1,
+        "action": "Pharmacist sells QA-PARA × 10 to PT-1",
+        "expected": "Confirmed toast"
+      },
+      {
+        "step": 2,
+        "action": "Cashier opens Hospital Accounts and looks for the newest invoice starting RX-",
+        "expected": "One open invoice dated today for BR-A: charges 12,500.00, tax 1,375.00, total 13,875.00"
+      },
+      {
+        "step": 3,
+        "action": "Finance user opens Finance, Vouchers after a few seconds",
+        "expected": "One sales voucher for 13,875.00 referring to the invoice"
+      },
+      {
+        "step": 4,
+        "action": "Reloads Vouchers a minute later",
+        "expected": "Still one voucher for this sale"
+      }
+    ]
+  },
+  {
+    "id": "PHA-JRN-015",
+    "journey": "Discount within the cashier's limit",
+    "path": "Happy path",
+    "priority": "P0",
+    "role": "Pharmacist",
+    "goal": "A small discount is applied at once and the bill is right.",
+    "preconditions": "\"Maximum line discount (%)\" is 10.",
+    "testData": "PT-1, QA-PARA × 10, Discount % 10",
+    "expectedEnd": "Tax is worked out on the discounted amount.",
+    "steps": [
+      {
+        "step": 1,
+        "action": "Runs a counter sale and types 10 in \"Discount %\" on \"Set quantities\"",
+        "expected": "The field accepts 0 to 100 with two decimals"
+      },
+      {
+        "step": 2,
+        "action": "Confirms with ST-OP",
+        "expected": "Confirmed toast straight away"
+      },
+      {
+        "step": 3,
+        "action": "Cashier opens the RX- invoice",
+        "expected": "Charges 12,500.00, discount 1,250.00, tax 1,237.50, total 12,487.50"
+      }
+    ]
+  },
+  {
+    "id": "PHA-JRN-016",
+    "journey": "Discount above the limit: held, approved, then issued",
+    "path": "Happy path",
+    "priority": "P0",
+    "role": "Pharmacist, Cashier",
+    "goal": "A large discount needs a second person, and nothing is handed over until it is approved.",
+    "preconditions": "Maximum 10%. One-step approval chain with Cashier as approver. Stock 20.",
+    "testData": "PT-1, QA-PARA × 10, Discount % 15",
+    "expectedEnd": "Stock is 10. Invoice: discount 1,875.00, tax 1,168.75, total 11,793.75. Audit has a discount request with \"discount 15.00%\" and then the dispense. Known risk on one point: the invoice of an approved counter sale has no patient name, because the held sale does not keep it.",
+    "steps": [
+      {
+        "step": 1,
+        "action": "Pharmacist runs the sale with Discount % 15 and clicks \"Confirm dispense\"",
+        "expected": "Toast \"Pharmacy discount sent for approval.\" The wizard stays on Confirm. No labels"
+      },
+      {
+        "step": 2,
+        "action": "Opens Issue Lines and \"Stock on hand\"",
+        "expected": "No new line. Stock still 20"
+      },
+      {
+        "step": 3,
+        "action": "Returns to the wizard and clicks \"Confirm dispense\" again",
+        "expected": "Refusal: \"Pharmacy discount approval task is pending, hence dispense cannot be done\""
+      },
+      {
+        "step": 4,
+        "action": "Cashier opens Hospital Accounts, Fast Cashier, \"Dispense discounts\"",
+        "expected": "The held sale with its visit type and line: Paracetamol 500mg Tablet, 10, 15%"
+      },
+      {
+        "step": 5,
+        "action": "Clicks Approve",
+        "expected": "The entry leaves the list. With nothing else waiting: \"No dispense discount is waiting.\""
+      },
+      {
+        "step": 6,
+        "action": "Pharmacist opens Issue Lines",
+        "expected": "New line: Issued 10"
+      }
+    ]
+  },
+  {
+    "id": "PHA-JRN-017",
+    "journey": "Patient returns part of a sale, then the rest",
+    "path": "Happy path",
+    "priority": "P0",
+    "role": "Pharmacist",
+    "goal": "Returned medicine goes back on the shelf and the line shows what came back.",
+    "preconditions": "A sale of QA-PARA × 10 to PT-1, all drawn from BT-1 (BT-1 now 0).",
+    "testData": "return 3, then 7",
+    "expectedEnd": "BT-1 is 10 again. Audit has two pharmacy entries issue.return naming the item. Finance receives two reversal entries.",
+    "steps": [
+      {
+        "step": 1,
+        "action": "Opens Pharmacy, Issue Lines",
+        "expected": "The sale's row: Issued 10, Returned 0, and a quantity field with a Return button"
+      },
+      {
+        "step": 2,
+        "action": "Types 3 in the quantity field and clicks Return",
+        "expected": "Toast \"Returned.\" The row shows Returned 3"
+      },
+      {
+        "step": 3,
+        "action": "Opens Inventory, Item Master, QA-PARA, \"Stock on hand\"",
+        "expected": "BT-1 is 3"
+      },
+      {
+        "step": 4,
+        "action": "Back on Issue Lines, types 7 and clicks Return",
+        "expected": "Toast \"Returned.\" Returned 10"
+      },
+      {
+        "step": 5,
+        "action": "Looks at the Return column of the row",
+        "expected": "\"—\" instead of the field and button"
+      }
+    ]
+  },
+  {
+    "id": "PHA-JRN-018",
+    "journey": "Nurse asks for a return, pharmacist posts it",
+    "path": "Happy path",
+    "priority": "P1",
+    "role": "Nurse, Pharmacist",
+    "goal": "Unused ward medicine is returned on the nurse's request with one click in the pharmacy.",
+    "preconditions": "OR-IP dispensed × 6 to PT-3 (PHA-JRN-005).",
+    "testData": "request 2",
+    "expectedEnd": "Stock in ST-IP up by 2. A stay with a return request still waiting cannot be discharged; that check belongs to the Inpatient module.",
+    "steps": [
+      {
+        "step": 1,
+        "action": "Nurse opens Inpatient, Admissions, Ward supply and picks PT-3's stay under \"Stay\"",
+        "expected": "The lines issued to this stay"
+      },
+      {
+        "step": 2,
+        "action": "Enters 2 on the Paracetamol line and clicks \"Request return\"",
+        "expected": "Toast \"Return request raised. The pharmacist posts it from issue lines.\""
+      },
+      {
+        "step": 3,
+        "action": "Pharmacist opens Pharmacy, Issue Lines",
+        "expected": "The row shows \"Request 2\" and the quantity field is prefilled with 2"
+      },
+      {
+        "step": 4,
+        "action": "Clicks Return",
+        "expected": "Toast \"Returned.\" Returned 2. \"Request 2\" is gone"
+      },
+      {
+        "step": 5,
+        "action": "Nurse enters 5 on the same line and clicks \"Request return\"",
+        "expected": "Toast: \"Quantity must be a whole number greater than zero, and already returned plus this request cannot exceed issued.\""
+      }
+    ]
+  },
+  {
+    "id": "PHA-JRN-019",
+    "journey": "Setting which lines may be returned",
+    "path": "Happy path",
+    "priority": "P1",
+    "role": "Pharmacist, Head pharmacist",
+    "goal": "Each branch chooses its own return rule.",
+    "preconditions": "BR-A and BR-B have no rule saved.",
+    "testData": "\"Verified lines only\" for BR-A",
+    "expectedEnd": "Audit has one pharmacy entry for saving the return settings. Lines made by the wizard are always Verified \"Yes\", so the stricter rule only affects older lines. Set BR-A back afterwards.",
+    "steps": [
+      {
+        "step": 1,
+        "action": "Pharmacist (BR-A) opens Issue Lines, section \"Which lines may be returned\"",
+        "expected": "\"Every issued line\" is selected. Hint: \"This branch only. Issued lines, or only lines that were verified.\""
+      },
+      {
+        "step": 2,
+        "action": "Selects \"Verified lines only\" and clicks Save",
+        "expected": "Toast \"Return rule saved.\""
+      },
+      {
+        "step": 3,
+        "action": "Reloads the page",
+        "expected": "\"Verified lines only\" is still selected. Rows with Verified \"No\" show \"—\" under Return"
+      },
+      {
+        "step": 4,
+        "action": "A BR-B pharmacist opens Issue Lines",
+        "expected": "\"Every issued line\" is selected"
+      },
+      {
+        "step": 5,
+        "action": "Head pharmacist on \"All branches\" opens Issue Lines and clicks Save without choosing a branch",
+        "expected": "Toast \"Choose a branch before saving the return rule.\""
+      }
+    ]
+  },
+  {
+    "id": "PHA-JRN-020",
+    "journey": "Head pharmacist working on \"All branches\"",
+    "path": "Happy path",
+    "priority": "P0",
+    "role": "Head pharmacist",
+    "goal": "A user who sees every branch still records each sale against one branch and that branch's stock.",
+    "preconditions": "Head pharmacist with the selector on \"All branches\". ST-OP in BR-A and an outpatient store ST-B in BR-B, both with QA-PARA.",
+    "testData": "PT-1, QA-PARA × 1",
+    "expectedEnd": "The line, the stock movement and the invoice all belong to BR-A. Known risk at step 3: the store list is not narrowed by the chosen branch, so ST-B is offered too. Choosing BR-A with ST-B records the sale and invoice in BR-A while taking stock from BR-B.",
+    "steps": [
+      {
+        "step": 1,
+        "action": "Opens Orders and Issue Lines",
+        "expected": "Rows of every branch"
+      },
+      {
+        "step": 2,
+        "action": "Runs a counter sale to Confirm and clicks \"Confirm dispense\" without choosing a branch",
+        "expected": "Toast \"Choose a branch before confirming the dispense.\""
+      },
+      {
+        "step": 3,
+        "action": "Chooses BR-A in \"Branch\" and opens the Store field",
+        "expected": "Stores of BR-A only"
+      },
+      {
+        "step": 4,
+        "action": "Picks ST-OP and confirms",
+        "expected": "Confirmed toast"
+      },
+      {
+        "step": 5,
+        "action": "Switches the header selector to BR-A and opens Issue Lines",
+        "expected": "The new line is there"
+      }
+    ]
+  },
+  {
+    "id": "PHA-JRN-021",
+    "journey": "Going back and forward, and clicking Confirm twice",
+    "path": "Happy path",
+    "priority": "P1",
+    "role": "Pharmacist",
+    "goal": "Nothing typed is lost inside the wizard, and a double click does not sell twice.",
+    "preconditions": "Stock 20.",
+    "testData": "PT-1, QA-PARA Requested 5 Issued 3, Discount % 5, Generic ticked",
+    "expectedEnd": "One issue line, stock down by 3, one invoice.",
+    "steps": [
+      {
+        "step": 1,
+        "action": "Fills \"Select items\" and \"Set quantities\" and goes to Confirm",
+        "expected": "Summary with 3 of 5 and \"· Generic\""
+      },
+      {
+        "step": 2,
+        "action": "Clicks Back twice",
+        "expected": "\"Select items\" with the patient and item still there"
+      },
+      {
+        "step": 3,
+        "action": "Goes forward to Confirm",
+        "expected": "Quantities, discount and the Generic tick unchanged"
+      },
+      {
+        "step": 4,
+        "action": "Double-clicks \"Confirm dispense\"",
+        "expected": "The button turns to \"Submitting…\" and cannot be clicked again. One confirmed toast"
+      }
+    ]
+  },
+  {
+    "id": "PHA-JRN-022",
+    "journey": "The whole journey in Indonesian",
+    "path": "Happy path",
+    "priority": "P2",
+    "role": "Pharmacist",
+    "goal": "A pharmacist working in Indonesian sees Indonesian throughout.",
+    "preconditions": "Language set to Indonesian.",
+    "testData": "PHA-JRN-007 repeated at /id/pharmacy",
+    "expectedEnd": "Known risk at step 1, seen on staging: \"Pharmacy\", \"Orders, dispense & issue lines\", the three cards, the sidebar and the breadcrumb words \"Home\" and \"Apps\" stay English. The page titles \"Dispense\" and \"Issue Lines\", the button \"Scan\" and the column \"Item\" are English in both languages.",
+    "steps": [
+      {
+        "step": 1,
+        "action": "Opens /id/pharmacy",
+        "expected": "Heading, description, cards, sidebar and breadcrumb in Indonesian"
+      },
+      {
+        "step": 2,
+        "action": "Opens Dispense",
+        "expected": "\"Penyerahan obat bertahap, dengan pemeriksaan interaksi klinis.\", \"Cari rekam medis\", \"Cari nama atau kode\", \"Lanjut\", \"Kembali\""
+      },
+      {
+        "step": 3,
+        "action": "Completes a counter sale",
+        "expected": "Indonesian step names, toast and label text"
+      },
+      {
+        "step": 4,
+        "action": "Opens Issue Lines",
+        "expected": "Indonesian headings and column names"
+      }
+    ]
+  },
+  {
+    "id": "PHA-JRN-023",
+    "journey": "Browsing Orders and Issue Lines",
+    "path": "Happy path",
+    "priority": "P2",
+    "role": "Pharmacist",
+    "goal": "Lists are easy to filter, search and page through.",
+    "preconditions": "More than 50 issue lines in the branch (staging had 251 on 2026-10-07). Three pending orders written at different times.",
+    "testData": "search \"Paracetamol\", \"generik\", \"zzzz\"",
+    "expectedEnd": "Current behaviour: the order queue puts the newest order on top, while a queue is usually worked oldest first. Seen on staging: the Issue Lines description reads \"pharmacy — persisted dispense issue lines (no issue header).\", two columns are both headed \"Issued\", and the item search hint in the wizard is \"Type QA- or Paracetamol…\".",
+    "steps": [
+      {
+        "step": 1,
+        "action": "Opens Orders with \"All\" selected",
+        "expected": "All pending orders, newest first. Text \"Choose outpatient or inpatient to pick a store.\""
+      },
+      {
+        "step": 2,
+        "action": "Selects Outpatient, then Inpatient",
+        "expected": "The list and the Store field follow the choice"
+      },
+      {
+        "step": 3,
+        "action": "Opens Orders in a branch with nothing pending",
+        "expected": "\"No pending orders.\""
+      },
+      {
+        "step": 4,
+        "action": "Opens Issue Lines and reads the pager",
+        "expected": "Newest lines first. A range and total such as \"1–25 of 251\""
+      },
+      {
+        "step": 5,
+        "action": "Goes to the next page and to the last page",
+        "expected": "Each page loads"
+      },
+      {
+        "step": 6,
+        "action": "Types each search term",
+        "expected": "Rows whose item or remarks match. \"zzzz\" gives an empty table"
+      }
+    ]
+  },
+  {
+    "id": "PHA-JRN-024",
+    "journey": "Hub and navigation",
+    "path": "Happy path",
+    "priority": "P3",
+    "role": "Pharmacist",
+    "goal": "Every pharmacy screen is one click away.",
+    "preconditions": "Signed in.",
+    "testData": "none",
+    "expectedEnd": "Matches staging on 2026-10-07.",
+    "steps": [
+      {
+        "step": 1,
+        "action": "Opens Apps and clicks Pharmacy",
+        "expected": "Breadcrumb Home / Apps / Pharmacy. Heading \"Pharmacy\", \"Orders, dispense & issue lines\". Cards Orders, Dispense, Issue Lines and a Dispense button"
+      },
+      {
+        "step": 2,
+        "action": "Clicks each card, then each sidebar item",
+        "expected": "The matching screen. The sidebar shows 3 items and highlights the current one"
+      },
+      {
+        "step": 3,
+        "action": "Clicks \"Pharmacy\" in a screen's breadcrumb",
+        "expected": "Back on the hub"
+      }
+    ]
+  },
+  {
+    "id": "PHA-JRN-025",
+    "journey": "Pharmacist cannot issue more than was ordered, or nothing",
+    "path": "Negative / error",
+    "priority": "P0",
+    "role": "Pharmacist",
+    "goal": "The order quantity is a hard ceiling.",
+    "preconditions": "OR-OP pending with Remaining 6 (after PHA-JRN-002 step 4), or a fresh order of 6.",
+    "testData": "Issued 50, then Issued 0",
+    "expectedEnd": "The order still shows the same Remaining. No new issue line. Current behaviour: the refusal text at step 4 is \"issued quantity exceeds the quantity ordered\", which does not describe a zero quantity.",
+    "steps": [
+      {
+        "step": 1,
+        "action": "Opens the order and goes to \"Set quantities\"",
+        "expected": "Requested 6, Issued 6"
+      },
+      {
+        "step": 2,
+        "action": "Types 50 in Issued",
+        "expected": "The field does not accept more than Requested"
+      },
+      {
+        "step": 3,
+        "action": "Types 50 in Requested, then 50 in Issued, and clicks Next",
+        "expected": "The line comes back as Requested 6, Issued 6"
+      },
+      {
+        "step": 4,
+        "action": "Sets Issued to 0 and goes to Confirm, clicks \"Confirm dispense\"",
+        "expected": "The dispense is refused. Nothing is saved"
+      }
+    ]
+  },
+  {
+    "id": "PHA-JRN-026",
+    "journey": "Counter sale with no patient chosen",
+    "path": "Negative / error",
+    "priority": "P0",
+    "role": "Pharmacist",
+    "goal": "Nothing is sold without a patient on record.",
+    "preconditions": "None.",
+    "testData": "QA-PARA",
+    "expectedEnd": "No issue line, no stock change.",
+    "steps": [
+      {
+        "step": 1,
+        "action": "Opens Dispense and adds QA-PARA without choosing a patient",
+        "expected": "\"Selected (1)\". \"No medical record selected.\""
+      },
+      {
+        "step": 2,
+        "action": "Tries to click Next",
+        "expected": "Next stays disabled"
+      }
+    ]
+  },
+  {
+    "id": "PHA-JRN-027",
+    "journey": "Admitted patient asks for a counter sale",
+    "path": "Negative / error",
+    "priority": "P0",
+    "role": "Pharmacist",
+    "goal": "Drugs for an admitted patient go through the inpatient order queue, not the counter.",
+    "preconditions": "PT-3 has an open admission in BR-A.",
+    "testData": "PT-3 picked by MRN, QA-PARA × 1, ST-OP",
+    "expectedEnd": "No issue line, no invoice, stock unchanged. Current behaviour: the refusal comes only at the last step, after the whole wizard has been filled, and the toast carries a technical prefix; see PHA-JRN-049.",
+    "steps": [
+      {
+        "step": 1,
+        "action": "Opens Dispense, searches PT-3 by MRN and picks it",
+        "expected": "PT-3 shown with its MRN"
+      },
+      {
+        "step": 2,
+        "action": "Adds QA-PARA and goes to Confirm",
+        "expected": "Summary"
+      },
+      {
+        "step": 3,
+        "action": "Clicks \"Confirm dispense\"",
+        "expected": "Refusal containing \"Patient has been admitted\""
+      }
+    ]
+  },
+  {
+    "id": "PHA-JRN-028",
+    "journey": "Two patients with the same name, one of them admitted",
+    "path": "Negative / error",
+    "priority": "P0",
+    "role": "Pharmacist",
+    "goal": "The patient who is not admitted can buy at the counter.",
+    "preconditions": "PT-2 (not admitted) and PT-3 (admitted) are both named \"QA-PHA Pasien Kembar\" in BR-A.",
+    "testData": "PT-2 picked by MRN, QA-PARA × 1, ST-OP",
+    "expectedEnd": "Issue line and invoice belong to PT-2. Known risk: the admission check looks at the patient name only, so PT-2 is refused with \"Patient has been admitted\". The sale also carries only the name, so the invoice cannot be told apart from one for PT-3.",
+    "steps": [
+      {
+        "step": 1,
+        "action": "Opens Dispense and searches \"QA-PHA Pasien Kembar\"",
+        "expected": "Two results with different MRNs"
+      },
+      {
+        "step": 2,
+        "action": "Picks PT-2 by its MRN",
+        "expected": "PT-2 shown with its MRN"
+      },
+      {
+        "step": 3,
+        "action": "Adds QA-PARA, completes the wizard and confirms",
+        "expected": "The sale goes through for PT-2"
+      }
+    ]
+  },
+  {
+    "id": "PHA-JRN-029",
+    "journey": "Two drugs that must not be given together",
+    "path": "Negative / error",
+    "priority": "P0",
+    "role": "Pharmacist",
+    "goal": "A hard interaction stops the sale until one drug is removed.",
+    "preconditions": "QA-IBU and QA-AMLO in stock in ST-OP.",
+    "testData": "PT-1, QA-IBU × 1, QA-AMLO × 1",
+    "expectedEnd": "One issue line, for Ibuprofen only. Nothing was saved before step 5.",
+    "steps": [
+      {
+        "step": 1,
+        "action": "Opens Dispense, picks PT-1, adds both items, goes to \"Drug order alerts\"",
+        "expected": "Hard alert: \"Hard interaction (sandbox): Ibuprofen 400mg Tablet with Amlodipine 5mg Tablet — remove one item before dispense can proceed.\""
+      },
+      {
+        "step": 2,
+        "action": "Goes to Confirm",
+        "expected": "\"Cannot confirm — resolve hard alerts or acknowledge soft warnings.\" The sale cannot be confirmed"
+      },
+      {
+        "step": 3,
+        "action": "Clicks Back to \"Select items\" and removes Amlodipine",
+        "expected": "\"Selected (1)\""
+      },
+      {
+        "step": 4,
+        "action": "Goes forward to \"Drug order alerts\"",
+        "expected": "\"No drug interactions detected for this order.\""
+      },
+      {
+        "step": 5,
+        "action": "Confirms with ST-OP",
+        "expected": "Confirmed toast"
+      }
+    ]
+  },
+  {
+    "id": "PHA-JRN-030",
+    "journey": "Patient with a recorded allergy to the drug",
+    "path": "Negative / error",
+    "priority": "P0",
+    "role": "Pharmacist",
+    "goal": "The pharmacist is warned before giving a drug the patient is allergic to.",
+    "preconditions": "PT-4 has an allergy to Paracetamol recorded in Patient Care.",
+    "testData": "PT-4, QA-PARA × 1, ST-OP",
+    "expectedEnd": "Known risk: step 2 shows \"No drug interactions detected for this order.\" and the sale goes through. The dispense path checks drug pairs only and never reads the patient's allergies.",
+    "steps": [
+      {
+        "step": 1,
+        "action": "Opens Dispense, picks PT-4, adds QA-PARA",
+        "expected": "Item selected"
+      },
+      {
+        "step": 2,
+        "action": "Goes to \"Drug order alerts\"",
+        "expected": "An allergy warning for Paracetamol"
+      },
+      {
+        "step": 3,
+        "action": "Goes to Confirm",
+        "expected": "Confirm is blocked or needs an acknowledgement"
+      }
+    ]
+  },
+  {
+    "id": "PHA-JRN-031",
+    "journey": "Interacting drugs sold in two separate visits",
+    "path": "Negative / error",
+    "priority": "P1",
+    "role": "Pharmacist",
+    "goal": "Know what the wizard does when a hard pair reaches one patient in two sales.",
+    "preconditions": "QA-IBU and QA-AMLO in stock.",
+    "testData": "PT-1; first sale QA-IBU × 1; second sale QA-AMLO × 1",
+    "expectedEnd": "Current behaviour: both sales succeed. The check covers only the items in the current sale.",
+    "steps": [
+      {
+        "step": 1,
+        "action": "Sells QA-IBU to PT-1",
+        "expected": "Confirmed toast"
+      },
+      {
+        "step": 2,
+        "action": "Starts a new sale for PT-1 with QA-AMLO only and goes to \"Drug order alerts\"",
+        "expected": "\"No drug interactions detected for this order.\""
+      },
+      {
+        "step": 3,
+        "action": "Confirms",
+        "expected": "Confirmed toast"
+      }
+    ]
+  },
+  {
+    "id": "PHA-JRN-032",
+    "journey": "Not enough stock",
+    "path": "Negative / error",
+    "priority": "P0",
+    "role": "Pharmacist",
+    "goal": "A sale that cannot be fully supplied leaves no trace.",
+    "preconditions": "QA-PARA total 20 in ST-OP. OR-OP pending for 10.",
+    "testData": "counter sale of 21; then, with stock reduced to 5, the order of 10",
+    "expectedEnd": "After each refusal nothing was saved in Pharmacy, Inventory, Hospital Accounts or Audit.",
+    "steps": [
+      {
+        "step": 1,
+        "action": "Runs a counter sale of QA-PARA × 21 for PT-1 and confirms",
+        "expected": "Refusal containing \"not enough stock\" and the item code"
+      },
+      {
+        "step": 2,
+        "action": "Opens Issue Lines, Hospital Accounts and \"Stock on hand\"",
+        "expected": "No new line, no new invoice, stock still 20"
+      },
+      {
+        "step": 3,
+        "action": "Sells 15 so that 5 remain, then opens OR-OP and confirms 10",
+        "expected": "Refusal containing \"not enough stock\""
+      },
+      {
+        "step": 4,
+        "action": "Opens Orders",
+        "expected": "OR-OP still listed with Remaining 10"
+      }
+    ]
+  },
+  {
+    "id": "PHA-JRN-033",
+    "journey": "Expired and nearly expired stock",
+    "path": "Negative / error",
+    "priority": "P0",
+    "role": "Pharmacist",
+    "goal": "Expired stock is never sold, and stock inside the freeze window is held back.",
+    "preconditions": "Freeze days 30 for BR-A. QA-EXP and QA-FRZ as in the shared data.",
+    "testData": "PT-1; QA-EXP × 1; QA-FRZ × 5, then × 1",
+    "expectedEnd": "The expired batch still holds 20. The rule is: a batch is skipped when the days left until expiry are less than or equal to the freeze days.",
+    "steps": [
+      {
+        "step": 1,
+        "action": "Sells QA-EXP × 1",
+        "expected": "Refusal containing \"not enough stock\", although 20 are on the shelf"
+      },
+      {
+        "step": 2,
+        "action": "Sells QA-FRZ × 5",
+        "expected": "Confirmed toast"
+      },
+      {
+        "step": 3,
+        "action": "Opens \"Stock on hand\" for QA-FRZ",
+        "expected": "The batch expiring in 31 days is 0. The batch expiring in exactly 30 days is still 5"
+      },
+      {
+        "step": 4,
+        "action": "Sells QA-FRZ × 1",
+        "expected": "Refusal containing \"not enough stock\""
+      },
+      {
+        "step": 5,
+        "action": "Opens Inventory, Stores, sets \"Freeze days\" to 29 and saves",
+        "expected": "Toast \"Freeze limit saved.\""
+      },
+      {
+        "step": 6,
+        "action": "Sells QA-FRZ × 1 again",
+        "expected": "Confirmed toast"
+      }
+    ]
+  },
+  {
+    "id": "PHA-JRN-034",
+    "journey": "Picking the store",
+    "path": "Negative / error",
+    "priority": "P1",
+    "role": "Pharmacist",
+    "goal": "A sale can only come from a store that serves that kind of visit.",
+    "preconditions": "ST-OP (Outpatient) and ST-IP (Inpatient) in BR-A. One inactive store.",
+    "testData": "PT-1, QA-PARA × 1",
+    "expectedEnd": "Nothing was issued. Restore ST-OP's visit type afterwards.",
+    "steps": [
+      {
+        "step": 1,
+        "action": "Runs a counter sale to Confirm with Visit \"Outpatient\"",
+        "expected": "Store offers ST-OP. ST-IP and the inactive store are not offered"
+      },
+      {
+        "step": 2,
+        "action": "Changes Visit to \"Inpatient\"",
+        "expected": "Store offers ST-IP only"
+      },
+      {
+        "step": 3,
+        "action": "Changes Visit back, clears the Store field and clicks \"Confirm dispense\"",
+        "expected": "Toast \"Choose a store this visit may dispense from.\""
+      },
+      {
+        "step": 4,
+        "action": "Opens Inventory, Stores, removes Outpatient from ST-OP's \"Visit types\" and saves",
+        "expected": "Toast \"Visit types saved.\""
+      },
+      {
+        "step": 5,
+        "action": "Returns to Dispense and reaches Confirm with Visit \"Outpatient\"",
+        "expected": "Store shows \"No store allows this visit.\""
+      }
+    ]
+  },
+  {
+    "id": "PHA-JRN-035",
+    "journey": "Item that cannot be priced, or would sell below cost",
+    "path": "Negative / error",
+    "priority": "P0",
+    "role": "Pharmacist, Cashier",
+    "goal": "Nothing leaves the pharmacy without a valid price.",
+    "preconditions": "QA-NOCOST in stock. \"Block a price below cost\" on.",
+    "testData": "PT-1; QA-NOCOST × 1; then a sales price of 900.00 for QA-PARA (cost 1,000)",
+    "expectedEnd": "Nothing issued in either case. Remove the 900.00 sales price afterwards.",
+    "steps": [
+      {
+        "step": 1,
+        "action": "Sells QA-NOCOST × 1",
+        "expected": "Refusal containing \"cashier refused the charge\" and \"no price for this item\""
+      },
+      {
+        "step": 2,
+        "action": "Opens Issue Lines and \"Stock on hand\"",
+        "expected": "No new line. Stock unchanged"
+      },
+      {
+        "step": 3,
+        "action": "Cashier opens Fast Cashier, price settings, adds a sales price of 900.00 for QA-PARA and saves",
+        "expected": "Saved"
+      },
+      {
+        "step": 4,
+        "action": "Pharmacist sells QA-PARA × 1",
+        "expected": "Refusal containing \"dispensing item with lesser rate than cost is not allowed: Paracetamol 500mg Tablet Cost: 1000.00, Rate: 900.00\""
+      }
+    ]
+  },
+  {
+    "id": "PHA-JRN-036",
+    "journey": "Discount rejected: sale goes ahead at full price",
+    "path": "Negative / error",
+    "priority": "P0",
+    "role": "Pharmacist, Cashier",
+    "goal": "A rejected discount does not issue anything by itself, and the pharmacist can still complete the sale.",
+    "preconditions": "A sale held as in PHA-JRN-016 step 1, wizard still open.",
+    "testData": "the held sale",
+    "expectedEnd": "One issue line for 10. Invoice at full price: 13,875.00, no discount. Audit has the request, the rejection and the dispense.",
+    "steps": [
+      {
+        "step": 1,
+        "action": "Cashier opens \"Dispense discounts\" and clicks Reject",
+        "expected": "The entry leaves the list"
+      },
+      {
+        "step": 2,
+        "action": "Pharmacist opens Issue Lines",
+        "expected": "No new line"
+      },
+      {
+        "step": 3,
+        "action": "Pharmacist returns to the wizard and clicks \"Confirm dispense\"",
+        "expected": "Toast \"The discount was rejected. The lines stay unissued.\""
+      },
+      {
+        "step": 4,
+        "action": "Clicks \"Confirm dispense\" once more",
+        "expected": "Confirmed toast"
+      }
+    ]
+  },
+  {
+    "id": "PHA-JRN-037",
+    "journey": "Who may approve a discount",
+    "path": "Negative / error",
+    "priority": "P0",
+    "role": "Pharmacist, Cashier 2, Cashier",
+    "goal": "The person who asked for the discount cannot approve it, and neither can a cashier outside the approval chain.",
+    "preconditions": "A sale held for discount by the pharmacist.",
+    "testData": "the held sale",
+    "expectedEnd": "Nothing was issued until step 4. One issue line after it.",
+    "steps": [
+      {
+        "step": 1,
+        "action": "Pharmacist opens Hospital Accounts, Fast Cashier, \"Dispense discounts\" and clicks Approve",
+        "expected": "Refused: the pharmacist has no cashier rights"
+      },
+      {
+        "step": 2,
+        "action": "Cashier 2 opens the same list and clicks Approve",
+        "expected": "Refusal containing \"you cannot approve this discount\""
+      },
+      {
+        "step": 3,
+        "action": "Cashier 2 clicks Reject",
+        "expected": "Same refusal"
+      },
+      {
+        "step": 4,
+        "action": "Cashier (the approver) clicks Approve",
+        "expected": "The entry leaves the list"
+      }
+    ]
+  },
+  {
+    "id": "PHA-JRN-038",
+    "journey": "Returning more than was issued",
+    "path": "Negative / error",
+    "priority": "P0",
+    "role": "Pharmacist, in two browser tabs",
+    "goal": "The total returned can never pass what was issued, even from a stale screen.",
+    "preconditions": "A row with Issued 10, Returned 0. Issue Lines open in two tabs, both showing Returned 0.",
+    "testData": "0, 1.5, 11; then 7 in tab A and 6 in tab B",
+    "expectedEnd": "Stock rose by 7 only. One return in Audit.",
+    "steps": [
+      {
+        "step": 1,
+        "action": "In tab A types 0 and clicks Return",
+        "expected": "The field refuses the value. Nothing is returned"
+      },
+      {
+        "step": 2,
+        "action": "Types 1.5, then 11, clicking Return each time",
+        "expected": "The field refuses each value: whole numbers from 1 to 10 only"
+      },
+      {
+        "step": 3,
+        "action": "Types 7 and clicks Return",
+        "expected": "Toast \"Returned.\" Returned 7"
+      },
+      {
+        "step": 4,
+        "action": "In tab B, without reloading, types 6 and clicks Return",
+        "expected": "Toast \"That quantity cannot be returned.\""
+      },
+      {
+        "step": 5,
+        "action": "Reloads tab B",
+        "expected": "Returned 7. The field now allows 1 to 3"
+      }
+    ]
+  },
+  {
+    "id": "PHA-JRN-039",
+    "journey": "Refund for a discounted sale",
+    "path": "Negative / error",
+    "priority": "P0",
+    "role": "Pharmacist, Finance",
+    "goal": "The patient gets back what they paid, no more.",
+    "preconditions": "QA-PARA × 10 sold to PT-1 with a 10% discount; invoice total 12,487.50 (PHA-JRN-015).",
+    "testData": "return 10",
+    "expectedEnd": "Known risk: the return is priced again from today's price rule without the discount, so the reversal is 13,875.00, which is 1,387.50 more than was charged.",
+    "steps": [
+      {
+        "step": 1,
+        "action": "Pharmacist opens Issue Lines and returns all 10",
+        "expected": "Toast \"Returned.\""
+      },
+      {
+        "step": 2,
+        "action": "Finance user opens Finance, Vouchers after a few seconds",
+        "expected": "A reversal voucher for this sale"
+      },
+      {
+        "step": 3,
+        "action": "Compares the reversal with the original sales voucher",
+        "expected": "Both are 12,487.50"
+      }
+    ]
+  },
+  {
+    "id": "PHA-JRN-040",
+    "journey": "Return after the price list changed",
+    "path": "Negative / error",
+    "priority": "P1",
+    "role": "Pharmacist, Cashier, Finance",
+    "goal": "Know what a later price change does to refunds.",
+    "preconditions": "QA-PARA × 10 sold at site margin 25% (13,875.00). QA-IBU × 1 sold.",
+    "testData": "margin changed to 50%; then method changed so that QA-IBU has no price",
+    "expectedEnd": "A physical return in step 5 cannot be recorded until pricing is fixed. Restore the price rule afterwards.",
+    "steps": [
+      {
+        "step": 1,
+        "action": "Cashier opens Fast Cashier, price settings, changes \"Site margin\" to 50% and saves",
+        "expected": "Saved"
+      },
+      {
+        "step": 2,
+        "action": "Pharmacist returns the 10 Paracetamol",
+        "expected": "Toast \"Returned.\""
+      },
+      {
+        "step": 3,
+        "action": "Finance user opens the reversal voucher",
+        "expected": "Current behaviour: 16,650.00, the new price, not the 13,875.00 that was charged"
+      },
+      {
+        "step": 4,
+        "action": "Cashier switches the outpatient price to a price list with no price for Ibuprofen",
+        "expected": "Saved"
+      },
+      {
+        "step": 5,
+        "action": "Pharmacist returns the 1 Ibuprofen",
+        "expected": "Current behaviour: toast \"That quantity cannot be returned.\" The stock is not put back"
+      }
+    ]
+  },
+  {
+    "id": "PHA-JRN-041",
+    "journey": "What a return does to the order and the bill",
+    "path": "Negative / error",
+    "priority": "P1",
+    "role": "Pharmacist, Cashier",
+    "goal": "Know how the patient's order and invoice look after a full return.",
+    "preconditions": "OR-OP dispensed in full; its RX- invoice is open.",
+    "testData": "return 10",
+    "expectedEnd": "Only Finance sees the reversal. If the patient still needs the drug, the doctor has to write a new order.",
+    "steps": [
+      {
+        "step": 1,
+        "action": "Pharmacist returns all 10 on Issue Lines",
+        "expected": "Toast \"Returned.\""
+      },
+      {
+        "step": 2,
+        "action": "Opens Pharmacy, Orders",
+        "expected": "Current behaviour: OR-OP does not come back to the queue"
+      },
+      {
+        "step": 3,
+        "action": "Cashier opens the RX- invoice",
+        "expected": "Current behaviour: total still 13,875.00 and still open"
+      }
+    ]
+  },
+  {
+    "id": "PHA-JRN-042",
+    "journey": "Finding the right line to return",
+    "path": "Negative / error",
+    "priority": "P1",
+    "role": "Pharmacist",
+    "goal": "The pharmacist returns medicine against the correct patient's sale.",
+    "preconditions": "PT-1 and PT-2 each bought QA-PARA × 10 today.",
+    "testData": "PT-2 brings back 2 tablets",
+    "expectedEnd": "Known risk: the columns are Item, Requested, Issued, Issued, Verified, Returned, Return, Remarks. The two rows are identical, so the return may be booked against PT-1's sale.",
+    "steps": [
+      {
+        "step": 1,
+        "action": "Opens Issue Lines and types \"Paracetamol\" in the search box",
+        "expected": "Both sales"
+      },
+      {
+        "step": 2,
+        "action": "Tries to tell which row is PT-2's",
+        "expected": "A patient name, MRN, date or invoice number on each row"
+      }
+    ]
+  },
+  {
+    "id": "PHA-JRN-043",
+    "journey": "Opening Pharmacy without being signed in",
+    "path": "Negative / error",
+    "priority": "P0",
+    "role": "Not signed in, then Pharmacist",
+    "goal": "No pharmacy screen is visible without a session, and the user lands where they were going.",
+    "preconditions": "No active session in the browser.",
+    "testData": "address /en/pharmacy/orders",
+    "expectedEnd": "Step 1 was seen on staging for /en/pharmacy on 2026-10-07.",
+    "steps": [
+      {
+        "step": 1,
+        "action": "Opens /en/pharmacy/orders",
+        "expected": "The sign-in page. The address ends with /en/login?next=%2Fpharmacy%2Forders"
+      },
+      {
+        "step": 2,
+        "action": "Signs in as the pharmacist",
+        "expected": "Pharmacy, Orders"
+      },
+      {
+        "step": 3,
+        "action": "Signs out and uses the browser Back button",
+        "expected": "The sign-in page, not the order list"
+      }
+    ]
+  },
+  {
+    "id": "PHA-JRN-044",
+    "journey": "User without dispensing rights tries to dispense and to return",
+    "path": "Negative / error",
+    "priority": "P0",
+    "role": "Staff",
+    "goal": "Only pharmacy staff can issue or return medicine.",
+    "preconditions": "Staff user in BR-A with no pharmacy rights. An issued line exists.",
+    "testData": "PT-1, QA-PARA × 1",
+    "expectedEnd": "No issue line, no return, rule unchanged. Current behaviour: the Dispense, Return and Save buttons are shown to this user; the refusal comes only after clicking, with the text \"advanceDispense: 403 missing required privilege\". See PHA-JRN-049.",
+    "steps": [
+      {
+        "step": 1,
+        "action": "Opens Pharmacy, Dispense, picks PT-1, adds QA-PARA and clicks Next",
+        "expected": "A refusal. The wizard stays on \"Select items\""
+      },
+      {
+        "step": 2,
+        "action": "Opens Issue Lines, types 1 on a row and clicks Return",
+        "expected": "Toast \"Return failed.\""
+      },
+      {
+        "step": 3,
+        "action": "Selects \"Verified lines only\" and clicks Save",
+        "expected": "A refusal. After reload the old rule is still selected"
+      }
+    ]
+  },
+  {
+    "id": "PHA-JRN-045",
+    "journey": "User with no pharmacy role looks at orders and issue lines",
+    "path": "Negative / error",
+    "priority": "P0",
+    "role": "Staff",
+    "goal": "Patient names and their medicines are visible to pharmacy staff only.",
+    "preconditions": "Staff user. OR-OP pending.",
+    "testData": "none",
+    "expectedEnd": "Known risk: the card is shown to every user of a licensed tenant, and both lists open with patient names and drugs. Viewing them leaves no entry in Audit.",
+    "steps": [
+      {
+        "step": 1,
+        "action": "Opens Apps",
+        "expected": "No Pharmacy card, or the card opens a \"no access\" page"
+      },
+      {
+        "step": 2,
+        "action": "Opens /en/pharmacy/orders directly",
+        "expected": "Access refused"
+      },
+      {
+        "step": 3,
+        "action": "Opens /en/pharmacy/issue-lines directly",
+        "expected": "Access refused"
+      }
+    ]
+  },
+  {
+    "id": "PHA-JRN-046",
+    "journey": "Pharmacist sees and touches only their own branch",
+    "path": "Negative / error",
+    "priority": "P0",
+    "role": "Pharmacist of BR-A",
+    "goal": "Orders, issued lines and stock of another branch are out of reach.",
+    "preconditions": "Pending orders and issued lines exist in both BR-A and BR-B. The address of a BR-B order's dispense page is known (/pharmacy/dispense?order=<id>).",
+    "testData": "that address",
+    "expectedEnd": "Nothing from BR-B was shown or changed.",
+    "steps": [
+      {
+        "step": 1,
+        "action": "Opens Orders",
+        "expected": "BR-A orders only"
+      },
+      {
+        "step": 2,
+        "action": "Opens Issue Lines and reads the total",
+        "expected": "BR-A lines only"
+      },
+      {
+        "step": 3,
+        "action": "Opens the branch selector in the header",
+        "expected": "BR-A only. No \"All branches\""
+      },
+      {
+        "step": 4,
+        "action": "Pastes the BR-B order address",
+        "expected": "The wizard opens empty, as a counter sale. The BR-B order is not loaded"
+      },
+      {
+        "step": 5,
+        "action": "On Confirm, opens the Store field",
+        "expected": "BR-A stores only"
+      }
+    ]
+  },
+  {
+    "id": "PHA-JRN-047",
+    "journey": "Tenant without the Pharmacy licence",
+    "path": "Negative / error",
+    "priority": "P1",
+    "role": "Admin of a tenant without Pharmacy, for example the Lab tenant",
+    "goal": "An unlicensed module cannot be reached by menu, search or address.",
+    "preconditions": "Signed in to that tenant.",
+    "testData": "address /en/pharmacy/dispense",
+    "expectedEnd": "On a tenant with the pharmacy edition, the Pharmacy, Inventory and Hospital Accounts cards appear together, because Pharmacy needs the other two.",
+    "steps": [
+      {
+        "step": 1,
+        "action": "Opens Apps",
+        "expected": "No Pharmacy card"
+      },
+      {
+        "step": 2,
+        "action": "Types \"Pharmacy\" in \"Search apps…\"",
+        "expected": "\"No apps match your search.\""
+      },
+      {
+        "step": 3,
+        "action": "Opens /en/pharmacy/dispense directly",
+        "expected": "The Apps page"
+      }
+    ]
+  },
+  {
+    "id": "PHA-JRN-048",
+    "journey": "Counter sale on a pharmacy-only tenant",
+    "path": "Negative / error",
+    "priority": "P0",
+    "role": "Pharmacist of the Apotek tenant",
+    "goal": "A stand-alone pharmacy can sell over the counter.",
+    "preconditions": "Tenant on the pharmacy edition: Pharmacy, Inventory, Hospital Accounts; no Ambulatory Care, no Patient Care. An item in stock.",
+    "testData": "one item × 1",
+    "expectedEnd": "The sale can be completed. Known risk: the search at step 3 fails because the patient list belongs to Ambulatory Care, which this tenant does not have; the link at step 4 sends the user back to Apps; and the wizard cannot go past step 2 without a patient or an order.",
+    "steps": [
+      {
+        "step": 1,
+        "action": "Opens Pharmacy, Orders",
+        "expected": "\"No pending orders.\" There is no module that could create one"
+      },
+      {
+        "step": 2,
+        "action": "Opens Dispense and adds the item",
+        "expected": "\"No medical record selected.\" Next is disabled"
+      },
+      {
+        "step": 3,
+        "action": "Searches a name under \"Search medical record\"",
+        "expected": "A way to pick or enter the customer"
+      },
+      {
+        "step": 4,
+        "action": "Clicks \"Register on the patient form\"",
+        "expected": "A way to register the customer"
+      }
+    ]
+  },
+  {
+    "id": "PHA-JRN-049",
+    "journey": "Messages the pharmacist sees when a sale is refused",
+    "path": "Negative / error",
+    "priority": "P2",
+    "role": "Pharmacist",
+    "goal": "Every refusal tells the pharmacist what to do next, in the language of the screen.",
+    "preconditions": "Situations from PHA-JRN-016, PHA-JRN-027, PHA-JRN-032, PHA-JRN-035.",
+    "testData": "those four refusals, in English and in Indonesian",
+    "expectedEnd": "Current behaviour: the toast is the raw server text with a prefix, in English in both languages, for example \"advanceDispense: 400 pharmacy: not enough stock …\", \"advanceDispense: 400 Patient has been admitted\", \"advanceDispense: 400 pharmacy: cashier refused the charge: billing: no price for this item …\". Record each text.",
+    "steps": [
+      {
+        "step": 1,
+        "action": "Triggers each refusal in English",
+        "expected": "A short sentence without technical words"
+      },
+      {
+        "step": 2,
+        "action": "Switches to Indonesian and triggers them again",
+        "expected": "The same sentences in Indonesian"
+      }
+    ]
+  },
+  {
+    "id": "PHA-JRN-050",
+    "journey": "The web session ends in the middle of a sale",
+    "path": "Negative / error",
+    "priority": "P1",
+    "role": "Pharmacist",
+    "goal": "A lost session never leaves a half-finished sale.",
+    "preconditions": "Wizard filled up to \"Set quantities\".",
+    "testData": "sign out in a second tab",
+    "expectedEnd": "No issue line and no stock change. Record whether the user is told that the entries were lost; the page keeps the wizard only in memory.",
+    "steps": [
+      {
+        "step": 1,
+        "action": "Signs out in a second browser tab",
+        "expected": "Sign-in page in that tab"
+      },
+      {
+        "step": 2,
+        "action": "Returns to the wizard tab and clicks Next",
+        "expected": "The step is not saved. The user is told, or taken to sign in"
+      },
+      {
+        "step": 3,
+        "action": "Signs in again and opens Dispense",
+        "expected": "An empty wizard"
+      }
+    ]
+  }
+]

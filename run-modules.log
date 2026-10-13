@@ -1,0 +1,1285 @@
+
+Running 29 tests using 1 worker
+
+  ok  1 [modules-setup] › tests\modules\modules.setup.ts:9:6 › login once as the module admin and save the session (2.9s)
+  x   2 [modules] › tests\modules\modules-scan.spec.ts:15:9 › Module scan - rs.admin › module registration: hub + 4 layar tampil (20.9s)
+  x   3 [modules] › tests\modules\modules-scan.spec.ts:15:9 › Module scan - rs.admin › module appointment: hub + 2 layar tampil (20.9s)
+  x   4 [modules] › tests\modules\modules-scan.spec.ts:15:9 › Module scan - rs.admin › module clinical: hub + 4 layar tampil (21.0s)
+  x   5 [modules] › tests\modules\modules-scan.spec.ts:15:9 › Module scan - rs.admin › module adt: hub + 6 layar tampil (21.0s)
+  x   6 [modules] › tests\modules\modules-scan.spec.ts:15:9 › Module scan - rs.admin › module pharmacy: hub + 4 layar tampil (21.0s)
+  x   7 [modules] › tests\modules\modules-scan.spec.ts:15:9 › Module scan - rs.admin › module bloodbank: hub + 5 layar tampil (20.9s)
+  x   8 [modules] › tests\modules\modules-scan.spec.ts:15:9 › Module scan - rs.admin › module inventory: hub + 5 layar tampil (21.0s)
+  x   9 [modules] › tests\modules\modules-scan.spec.ts:15:9 › Module scan - rs.admin › module ot: hub + 3 layar tampil (21.0s)
+  x  10 [modules] › tests\modules\modules-scan.spec.ts:15:9 › Module scan - rs.admin › module procurement: hub + 6 layar tampil (20.9s)
+  x  11 [modules] › tests\modules\modules-scan.spec.ts:15:9 › Module scan - rs.admin › module hr: hub + 3 layar tampil (21.0s)
+  x  12 [modules] › tests\modules\modules-scan.spec.ts:15:9 › Module scan - rs.admin › module laboratory: hub + 3 layar tampil (21.0s)
+  x  13 [modules] › tests\modules\modules-scan.spec.ts:15:9 › Module scan - rs.admin › module radiology: hub + 2 layar tampil (21.0s)
+  x  14 [modules] › tests\modules\modules-scan.spec.ts:15:9 › Module scan - rs.admin › module diet: hub + 3 layar tampil (21.0s)
+  x  15 [modules] › tests\modules\modules-scan.spec.ts:15:9 › Module scan - rs.admin › module billing: hub + 2 layar tampil (20.9s)
+  x  16 [modules] › tests\modules\modules-scan.spec.ts:15:9 › Module scan - rs.admin › module emergency: hub + 4 layar tampil (21.0s)
+  x  17 [modules] › tests\modules\modules-scan.spec.ts:15:9 › Module scan - rs.admin › module mrd: hub + 5 layar tampil (20.9s)
+  x  18 [modules] › tests\modules\modules-scan.spec.ts:15:9 › Module scan - rs.admin › module payroll: hub + 2 layar tampil (21.0s)
+  x  19 [modules] › tests\modules\modules-scan.spec.ts:15:9 › Module scan - rs.admin › module finance: hub + 11 layar tampil (21.0s)
+  x  20 [modules] › tests\modules\modules-scan.spec.ts:15:9 › Module scan - rs.admin › module budget: hub + 11 layar tampil (21.1s)
+  x  21 [modules] › tests\modules\modules-scan.spec.ts:15:9 › Module scan - rs.admin › module cssd: hub + 11 layar tampil (21.1s)
+  x  22 [modules] › tests\modules\modules-scan.spec.ts:15:9 › Module scan - rs.admin › module services: hub + 8 layar tampil (21.0s)
+  x  23 [modules] › tests\modules\modules-scan.spec.ts:15:9 › Module scan - rs.admin › module sourcing: hub + 6 layar tampil (21.0s)
+  x  24 [modules] › tests\modules\modules-scan.spec.ts:15:9 › Module scan - rs.admin › module housekeeping: hub + 5 layar tampil (21.0s)
+  x  25 [modules] › tests\modules\modules-scan.spec.ts:15:9 › Module scan - rs.admin › module linen: hub + 4 layar tampil (21.0s)
+  x  26 [modules] › tests\modules\modules-scan.spec.ts:15:9 › Module scan - rs.admin › module maintenance: hub + 4 layar tampil (21.0s)
+  x  27 [modules] › tests\modules\modules-scan.spec.ts:15:9 › Module scan - rs.admin › module fixed-assets: hub + 4 layar tampil (21.0s)
+  -  28 [modules] › tests\modules\modules-scan.spec.ts:57:9 › Module scan - rs.admin › Tenant lain (login diblokir auth staging yang tidak stabil) › apotek.admin - login diblokir server
+  -  29 [modules] › tests\modules\modules-scan.spec.ts:61:9 › Module scan - rs.admin › Tenant lain (login diblokir auth staging yang tidak stabil) › klinik.admin - login diblokir server
+
+
+  1) [modules] › tests\modules\modules-scan.spec.ts:15:9 › Module scan - rs.admin › module registration: hub + 4 layar tampil › Buka /en/registration 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('textbox', { name: /nama pengguna|username/i })
+    Expected: visible
+    Timeout: 20000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByRole('textbox', { name: /nama pengguna|username/i }) with timeout 20000ms
+      - waiting for getByRole('textbox', { name: /nama pengguna|username/i })
+
+
+       at ..\pages\LoginPage.ts:24
+
+      22 |   async open(): Promise<void> {
+      23 |     await this.page.goto('/');
+    > 24 |     await expect(this.username).toBeVisible({ timeout: 20_000 });
+         |                                 ^
+      25 |   }
+      26 |
+      27 |   /** Pin the UI to English; the choice persists with the saved session. */
+        at LoginPage.open (C:\Users\Administrator\Documents\automation\pages\LoginPage.ts:24:33)
+        at LoginPage.login (C:\Users\Administrator\Documents\automation\pages\LoginPage.ts:54:7)
+        at ensureSignedIn (C:\Users\Administrator\Documents\automation\lib\auth.ts:18:5)
+        at C:\Users\Administrator\Documents\automation\tests\modules\modules-scan.spec.ts:29:11
+        at C:\Users\Administrator\Documents\automation\tests\modules\modules-scan.spec.ts:25:9
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\modules-modules-scan-Modul-55b75-stration-hub-4-layar-tampil-modules\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: final screenshot (image/png) ────────────────────────────────────────────────────
+    test-results\modules-modules-scan-Modul-55b75-stration-hub-4-layar-tampil-modules\attachments\final-screenshot-1aba2cbb3be7bba5815b63e483143666394c4e31.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\modules-modules-scan-Modul-55b75-stration-hub-4-layar-tampil-modules\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\modules-modules-scan-Modul-55b75-stration-hub-4-layar-tampil-modules\trace.zip
+    Usage:
+
+        npx playwright show-trace test-results\modules-modules-scan-Modul-55b75-stration-hub-4-layar-tampil-modules\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [modules] › tests\modules\modules-scan.spec.ts:15:9 › Module scan - rs.admin › module appointment: hub + 2 layar tampil › Buka /en/appointment 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('textbox', { name: /nama pengguna|username/i })
+    Expected: visible
+    Timeout: 20000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByRole('textbox', { name: /nama pengguna|username/i }) with timeout 20000ms
+      - waiting for getByRole('textbox', { name: /nama pengguna|username/i })
+
+
+       at ..\pages\LoginPage.ts:24
+
+      22 |   async open(): Promise<void> {
+      23 |     await this.page.goto('/');
+    > 24 |     await expect(this.username).toBeVisible({ timeout: 20_000 });
+         |                                 ^
+      25 |   }
+      26 |
+      27 |   /** Pin the UI to English; the choice persists with the saved session. */
+        at LoginPage.open (C:\Users\Administrator\Documents\automation\pages\LoginPage.ts:24:33)
+        at LoginPage.login (C:\Users\Administrator\Documents\automation\pages\LoginPage.ts:54:7)
+        at ensureSignedIn (C:\Users\Administrator\Documents\automation\lib\auth.ts:18:5)
+        at C:\Users\Administrator\Documents\automation\tests\modules\modules-scan.spec.ts:29:11
+        at C:\Users\Administrator\Documents\automation\tests\modules\modules-scan.spec.ts:25:9
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\modules-modules-scan-Modul-8d056-ointment-hub-2-layar-tampil-modules\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: final screenshot (image/png) ────────────────────────────────────────────────────
+    test-results\modules-modules-scan-Modul-8d056-ointment-hub-2-layar-tampil-modules\attachments\final-screenshot-d5d11b71dbf00f4e40b4621d98d43d19b8937257.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\modules-modules-scan-Modul-8d056-ointment-hub-2-layar-tampil-modules\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\modules-modules-scan-Modul-8d056-ointment-hub-2-layar-tampil-modules\trace.zip
+    Usage:
+
+        npx playwright show-trace test-results\modules-modules-scan-Modul-8d056-ointment-hub-2-layar-tampil-modules\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3) [modules] › tests\modules\modules-scan.spec.ts:15:9 › Module scan - rs.admin › module clinical: hub + 4 layar tampil › Buka /en/clinical 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('textbox', { name: /nama pengguna|username/i })
+    Expected: visible
+    Timeout: 20000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByRole('textbox', { name: /nama pengguna|username/i }) with timeout 20000ms
+      - waiting for getByRole('textbox', { name: /nama pengguna|username/i })
+
+
+       at ..\pages\LoginPage.ts:24
+
+      22 |   async open(): Promise<void> {
+      23 |     await this.page.goto('/');
+    > 24 |     await expect(this.username).toBeVisible({ timeout: 20_000 });
+         |                                 ^
+      25 |   }
+      26 |
+      27 |   /** Pin the UI to English; the choice persists with the saved session. */
+        at LoginPage.open (C:\Users\Administrator\Documents\automation\pages\LoginPage.ts:24:33)
+        at LoginPage.login (C:\Users\Administrator\Documents\automation\pages\LoginPage.ts:54:7)
+        at ensureSignedIn (C:\Users\Administrator\Documents\automation\lib\auth.ts:18:5)
+        at C:\Users\Administrator\Documents\automation\tests\modules\modules-scan.spec.ts:29:11
+        at C:\Users\Administrator\Documents\automation\tests\modules\modules-scan.spec.ts:25:9
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\modules-modules-scan-Modul-31a1a-clinical-hub-4-layar-tampil-modules\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: final screenshot (image/png) ────────────────────────────────────────────────────
+    test-results\modules-modules-scan-Modul-31a1a-clinical-hub-4-layar-tampil-modules\attachments\final-screenshot-380360b3d1e3e4511168bea36ae99fa3c80faebf.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\modules-modules-scan-Modul-31a1a-clinical-hub-4-layar-tampil-modules\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\modules-modules-scan-Modul-31a1a-clinical-hub-4-layar-tampil-modules\trace.zip
+    Usage:
+
+        npx playwright show-trace test-results\modules-modules-scan-Modul-31a1a-clinical-hub-4-layar-tampil-modules\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  4) [modules] › tests\modules\modules-scan.spec.ts:15:9 › Module scan - rs.admin › module adt: hub + 6 layar tampil › Buka /en/adt 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('textbox', { name: /nama pengguna|username/i })
+    Expected: visible
+    Timeout: 20000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByRole('textbox', { name: /nama pengguna|username/i }) with timeout 20000ms
+      - waiting for getByRole('textbox', { name: /nama pengguna|username/i })
+
+
+       at ..\pages\LoginPage.ts:24
+
+      22 |   async open(): Promise<void> {
+      23 |     await this.page.goto('/');
+    > 24 |     await expect(this.username).toBeVisible({ timeout: 20_000 });
+         |                                 ^
+      25 |   }
+      26 |
+      27 |   /** Pin the UI to English; the choice persists with the saved session. */
+        at LoginPage.open (C:\Users\Administrator\Documents\automation\pages\LoginPage.ts:24:33)
+        at LoginPage.login (C:\Users\Administrator\Documents\automation\pages\LoginPage.ts:54:7)
+        at ensureSignedIn (C:\Users\Administrator\Documents\automation\lib\auth.ts:18:5)
+        at C:\Users\Administrator\Documents\automation\tests\modules\modules-scan.spec.ts:29:11
+        at C:\Users\Administrator\Documents\automation\tests\modules\modules-scan.spec.ts:25:9
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\modules-modules-scan-Modul-a7013-dule-adt-hub-6-layar-tampil-modules\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: final screenshot (image/png) ────────────────────────────────────────────────────
+    test-results\modules-modules-scan-Modul-a7013-dule-adt-hub-6-layar-tampil-modules\attachments\final-screenshot-89c53c7ac14218d75cbe62a024bdcb55cfa6e936.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\modules-modules-scan-Modul-a7013-dule-adt-hub-6-layar-tampil-modules\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\modules-modules-scan-Modul-a7013-dule-adt-hub-6-layar-tampil-modules\trace.zip
+    Usage:
+
+        npx playwright show-trace test-results\modules-modules-scan-Modul-a7013-dule-adt-hub-6-layar-tampil-modules\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  5) [modules] › tests\modules\modules-scan.spec.ts:15:9 › Module scan - rs.admin › module pharmacy: hub + 4 layar tampil › Buka /en/pharmacy 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('textbox', { name: /nama pengguna|username/i })
+    Expected: visible
+    Timeout: 20000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByRole('textbox', { name: /nama pengguna|username/i }) with timeout 20000ms
+      - waiting for getByRole('textbox', { name: /nama pengguna|username/i })
+
+
+       at ..\pages\LoginPage.ts:24
+
+      22 |   async open(): Promise<void> {
+      23 |     await this.page.goto('/');
+    > 24 |     await expect(this.username).toBeVisible({ timeout: 20_000 });
+         |                                 ^
+      25 |   }
+      26 |
+      27 |   /** Pin the UI to English; the choice persists with the saved session. */
+        at LoginPage.open (C:\Users\Administrator\Documents\automation\pages\LoginPage.ts:24:33)
+        at LoginPage.login (C:\Users\Administrator\Documents\automation\pages\LoginPage.ts:54:7)
+        at ensureSignedIn (C:\Users\Administrator\Documents\automation\lib\auth.ts:18:5)
+        at C:\Users\Administrator\Documents\automation\tests\modules\modules-scan.spec.ts:29:11
+        at C:\Users\Administrator\Documents\automation\tests\modules\modules-scan.spec.ts:25:9
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\modules-modules-scan-Modul-a05ae-pharmacy-hub-4-layar-tampil-modules\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: final screenshot (image/png) ────────────────────────────────────────────────────
+    test-results\modules-modules-scan-Modul-a05ae-pharmacy-hub-4-layar-tampil-modules\attachments\final-screenshot-a989bbce82ff9b5c5fd9999d232a98230503b9cf.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\modules-modules-scan-Modul-a05ae-pharmacy-hub-4-layar-tampil-modules\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\modules-modules-scan-Modul-a05ae-pharmacy-hub-4-layar-tampil-modules\trace.zip
+    Usage:
+
+        npx playwright show-trace test-results\modules-modules-scan-Modul-a05ae-pharmacy-hub-4-layar-tampil-modules\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  6) [modules] › tests\modules\modules-scan.spec.ts:15:9 › Module scan - rs.admin › module bloodbank: hub + 5 layar tampil › Buka /en/bloodbank 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('textbox', { name: /nama pengguna|username/i })
+    Expected: visible
+    Timeout: 20000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByRole('textbox', { name: /nama pengguna|username/i }) with timeout 20000ms
+      - waiting for getByRole('textbox', { name: /nama pengguna|username/i })
+
+
+       at ..\pages\LoginPage.ts:24
+
+      22 |   async open(): Promise<void> {
+      23 |     await this.page.goto('/');
+    > 24 |     await expect(this.username).toBeVisible({ timeout: 20_000 });
+         |                                 ^
+      25 |   }
+      26 |
+      27 |   /** Pin the UI to English; the choice persists with the saved session. */
+        at LoginPage.open (C:\Users\Administrator\Documents\automation\pages\LoginPage.ts:24:33)
+        at LoginPage.login (C:\Users\Administrator\Documents\automation\pages\LoginPage.ts:54:7)
+        at ensureSignedIn (C:\Users\Administrator\Documents\automation\lib\auth.ts:18:5)
+        at C:\Users\Administrator\Documents\automation\tests\modules\modules-scan.spec.ts:29:11
+        at C:\Users\Administrator\Documents\automation\tests\modules\modules-scan.spec.ts:25:9
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\modules-modules-scan-Modul-78c2d-loodbank-hub-5-layar-tampil-modules\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: final screenshot (image/png) ────────────────────────────────────────────────────
+    test-results\modules-modules-scan-Modul-78c2d-loodbank-hub-5-layar-tampil-modules\attachments\final-screenshot-1ba40c0cb94e45fb6c54cbbcabe84f88120ec0f0.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\modules-modules-scan-Modul-78c2d-loodbank-hub-5-layar-tampil-modules\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\modules-modules-scan-Modul-78c2d-loodbank-hub-5-layar-tampil-modules\trace.zip
+    Usage:
+
+        npx playwright show-trace test-results\modules-modules-scan-Modul-78c2d-loodbank-hub-5-layar-tampil-modules\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  7) [modules] › tests\modules\modules-scan.spec.ts:15:9 › Module scan - rs.admin › module inventory: hub + 5 layar tampil › Buka /en/inventory 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('textbox', { name: /nama pengguna|username/i })
+    Expected: visible
+    Timeout: 20000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByRole('textbox', { name: /nama pengguna|username/i }) with timeout 20000ms
+      - waiting for getByRole('textbox', { name: /nama pengguna|username/i })
+
+
+       at ..\pages\LoginPage.ts:24
+
+      22 |   async open(): Promise<void> {
+      23 |     await this.page.goto('/');
+    > 24 |     await expect(this.username).toBeVisible({ timeout: 20_000 });
+         |                                 ^
+      25 |   }
+      26 |
+      27 |   /** Pin the UI to English; the choice persists with the saved session. */
+        at LoginPage.open (C:\Users\Administrator\Documents\automation\pages\LoginPage.ts:24:33)
+        at LoginPage.login (C:\Users\Administrator\Documents\automation\pages\LoginPage.ts:54:7)
+        at ensureSignedIn (C:\Users\Administrator\Documents\automation\lib\auth.ts:18:5)
+        at C:\Users\Administrator\Documents\automation\tests\modules\modules-scan.spec.ts:29:11
+        at C:\Users\Administrator\Documents\automation\tests\modules\modules-scan.spec.ts:25:9
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\modules-modules-scan-Modul-85aaf-nventory-hub-5-layar-tampil-modules\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: final screenshot (image/png) ────────────────────────────────────────────────────
+    test-results\modules-modules-scan-Modul-85aaf-nventory-hub-5-layar-tampil-modules\attachments\final-screenshot-b4b3094c1f02fdbe8d78ad2db53db388134e823a.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\modules-modules-scan-Modul-85aaf-nventory-hub-5-layar-tampil-modules\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\modules-modules-scan-Modul-85aaf-nventory-hub-5-layar-tampil-modules\trace.zip
+    Usage:
+
+        npx playwright show-trace test-results\modules-modules-scan-Modul-85aaf-nventory-hub-5-layar-tampil-modules\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  8) [modules] › tests\modules\modules-scan.spec.ts:15:9 › Module scan - rs.admin › module ot: hub + 3 layar tampil › Buka /en/ot 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('textbox', { name: /nama pengguna|username/i })
+    Expected: visible
+    Timeout: 20000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByRole('textbox', { name: /nama pengguna|username/i }) with timeout 20000ms
+      - waiting for getByRole('textbox', { name: /nama pengguna|username/i })
+
+
+       at ..\pages\LoginPage.ts:24
+
+      22 |   async open(): Promise<void> {
+      23 |     await this.page.goto('/');
+    > 24 |     await expect(this.username).toBeVisible({ timeout: 20_000 });
+         |                                 ^
+      25 |   }
+      26 |
+      27 |   /** Pin the UI to English; the choice persists with the saved session. */
+        at LoginPage.open (C:\Users\Administrator\Documents\automation\pages\LoginPage.ts:24:33)
+        at LoginPage.login (C:\Users\Administrator\Documents\automation\pages\LoginPage.ts:54:7)
+        at ensureSignedIn (C:\Users\Administrator\Documents\automation\lib\auth.ts:18:5)
+        at C:\Users\Administrator\Documents\automation\tests\modules\modules-scan.spec.ts:29:11
+        at C:\Users\Administrator\Documents\automation\tests\modules\modules-scan.spec.ts:25:9
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\modules-modules-scan-Modul-00bda-odule-ot-hub-3-layar-tampil-modules\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: final screenshot (image/png) ────────────────────────────────────────────────────
+    test-results\modules-modules-scan-Modul-00bda-odule-ot-hub-3-layar-tampil-modules\attachments\final-screenshot-9c46cd42d8ee1a0f75d4de2b4bce0683c4c30e66.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\modules-modules-scan-Modul-00bda-odule-ot-hub-3-layar-tampil-modules\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\modules-modules-scan-Modul-00bda-odule-ot-hub-3-layar-tampil-modules\trace.zip
+    Usage:
+
+        npx playwright show-trace test-results\modules-modules-scan-Modul-00bda-odule-ot-hub-3-layar-tampil-modules\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  9) [modules] › tests\modules\modules-scan.spec.ts:15:9 › Module scan - rs.admin › module procurement: hub + 6 layar tampil › Buka /en/procurement 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('textbox', { name: /nama pengguna|username/i })
+    Expected: visible
+    Timeout: 20000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByRole('textbox', { name: /nama pengguna|username/i }) with timeout 20000ms
+      - waiting for getByRole('textbox', { name: /nama pengguna|username/i })
+
+
+       at ..\pages\LoginPage.ts:24
+
+      22 |   async open(): Promise<void> {
+      23 |     await this.page.goto('/');
+    > 24 |     await expect(this.username).toBeVisible({ timeout: 20_000 });
+         |                                 ^
+      25 |   }
+      26 |
+      27 |   /** Pin the UI to English; the choice persists with the saved session. */
+        at LoginPage.open (C:\Users\Administrator\Documents\automation\pages\LoginPage.ts:24:33)
+        at LoginPage.login (C:\Users\Administrator\Documents\automation\pages\LoginPage.ts:54:7)
+        at ensureSignedIn (C:\Users\Administrator\Documents\automation\lib\auth.ts:18:5)
+        at C:\Users\Administrator\Documents\automation\tests\modules\modules-scan.spec.ts:29:11
+        at C:\Users\Administrator\Documents\automation\tests\modules\modules-scan.spec.ts:25:9
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\modules-modules-scan-Modul-d647d-curement-hub-6-layar-tampil-modules\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: final screenshot (image/png) ────────────────────────────────────────────────────
+    test-results\modules-modules-scan-Modul-d647d-curement-hub-6-layar-tampil-modules\attachments\final-screenshot-dd42f69d1cc248fd34c957793caa8d4f7e217060.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\modules-modules-scan-Modul-d647d-curement-hub-6-layar-tampil-modules\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\modules-modules-scan-Modul-d647d-curement-hub-6-layar-tampil-modules\trace.zip
+    Usage:
+
+        npx playwright show-trace test-results\modules-modules-scan-Modul-d647d-curement-hub-6-layar-tampil-modules\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  10) [modules] › tests\modules\modules-scan.spec.ts:15:9 › Module scan - rs.admin › module hr: hub + 3 layar tampil › Buka /en/hr 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('textbox', { name: /nama pengguna|username/i })
+    Expected: visible
+    Timeout: 20000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByRole('textbox', { name: /nama pengguna|username/i }) with timeout 20000ms
+      - waiting for getByRole('textbox', { name: /nama pengguna|username/i })
+
+
+       at ..\pages\LoginPage.ts:24
+
+      22 |   async open(): Promise<void> {
+      23 |     await this.page.goto('/');
+    > 24 |     await expect(this.username).toBeVisible({ timeout: 20_000 });
+         |                                 ^
+      25 |   }
+      26 |
+      27 |   /** Pin the UI to English; the choice persists with the saved session. */
+        at LoginPage.open (C:\Users\Administrator\Documents\automation\pages\LoginPage.ts:24:33)
+        at LoginPage.login (C:\Users\Administrator\Documents\automation\pages\LoginPage.ts:54:7)
+        at ensureSignedIn (C:\Users\Administrator\Documents\automation\lib\auth.ts:18:5)
+        at C:\Users\Administrator\Documents\automation\tests\modules\modules-scan.spec.ts:29:11
+        at C:\Users\Administrator\Documents\automation\tests\modules\modules-scan.spec.ts:25:9
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\modules-modules-scan-Modul-abb09-odule-hr-hub-3-layar-tampil-modules\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: final screenshot (image/png) ────────────────────────────────────────────────────
+    test-results\modules-modules-scan-Modul-abb09-odule-hr-hub-3-layar-tampil-modules\attachments\final-screenshot-a2b421a268e014cfeecc2e5f281a54e2873c8023.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\modules-modules-scan-Modul-abb09-odule-hr-hub-3-layar-tampil-modules\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\modules-modules-scan-Modul-abb09-odule-hr-hub-3-layar-tampil-modules\trace.zip
+    Usage:
+
+        npx playwright show-trace test-results\modules-modules-scan-Modul-abb09-odule-hr-hub-3-layar-tampil-modules\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  11) [modules] › tests\modules\modules-scan.spec.ts:15:9 › Module scan - rs.admin › module laboratory: hub + 3 layar tampil › Buka /en/laboratory 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('textbox', { name: /nama pengguna|username/i })
+    Expected: visible
+    Timeout: 20000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByRole('textbox', { name: /nama pengguna|username/i }) with timeout 20000ms
+      - waiting for getByRole('textbox', { name: /nama pengguna|username/i })
+
+
+       at ..\pages\LoginPage.ts:24
+
+      22 |   async open(): Promise<void> {
+      23 |     await this.page.goto('/');
+    > 24 |     await expect(this.username).toBeVisible({ timeout: 20_000 });
+         |                                 ^
+      25 |   }
+      26 |
+      27 |   /** Pin the UI to English; the choice persists with the saved session. */
+        at LoginPage.open (C:\Users\Administrator\Documents\automation\pages\LoginPage.ts:24:33)
+        at LoginPage.login (C:\Users\Administrator\Documents\automation\pages\LoginPage.ts:54:7)
+        at ensureSignedIn (C:\Users\Administrator\Documents\automation\lib\auth.ts:18:5)
+        at C:\Users\Administrator\Documents\automation\tests\modules\modules-scan.spec.ts:29:11
+        at C:\Users\Administrator\Documents\automation\tests\modules\modules-scan.spec.ts:25:9
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\modules-modules-scan-Modul-d31b1-boratory-hub-3-layar-tampil-modules\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: final screenshot (image/png) ────────────────────────────────────────────────────
+    test-results\modules-modules-scan-Modul-d31b1-boratory-hub-3-layar-tampil-modules\attachments\final-screenshot-a6f9a891f78b8e39ffe45ee76fa815f04b8991eb.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\modules-modules-scan-Modul-d31b1-boratory-hub-3-layar-tampil-modules\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\modules-modules-scan-Modul-d31b1-boratory-hub-3-layar-tampil-modules\trace.zip
+    Usage:
+
+        npx playwright show-trace test-results\modules-modules-scan-Modul-d31b1-boratory-hub-3-layar-tampil-modules\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  12) [modules] › tests\modules\modules-scan.spec.ts:15:9 › Module scan - rs.admin › module radiology: hub + 2 layar tampil › Buka /en/radiology 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('textbox', { name: /nama pengguna|username/i })
+    Expected: visible
+    Timeout: 20000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByRole('textbox', { name: /nama pengguna|username/i }) with timeout 20000ms
+      - waiting for getByRole('textbox', { name: /nama pengguna|username/i })
+
+
+       at ..\pages\LoginPage.ts:24
+
+      22 |   async open(): Promise<void> {
+      23 |     await this.page.goto('/');
+    > 24 |     await expect(this.username).toBeVisible({ timeout: 20_000 });
+         |                                 ^
+      25 |   }
+      26 |
+      27 |   /** Pin the UI to English; the choice persists with the saved session. */
+        at LoginPage.open (C:\Users\Administrator\Documents\automation\pages\LoginPage.ts:24:33)
+        at LoginPage.login (C:\Users\Administrator\Documents\automation\pages\LoginPage.ts:54:7)
+        at ensureSignedIn (C:\Users\Administrator\Documents\automation\lib\auth.ts:18:5)
+        at C:\Users\Administrator\Documents\automation\tests\modules\modules-scan.spec.ts:29:11
+        at C:\Users\Administrator\Documents\automation\tests\modules\modules-scan.spec.ts:25:9
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\modules-modules-scan-Modul-d4dfd-adiology-hub-2-layar-tampil-modules\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: final screenshot (image/png) ────────────────────────────────────────────────────
+    test-results\modules-modules-scan-Modul-d4dfd-adiology-hub-2-layar-tampil-modules\attachments\final-screenshot-711784a98b37c68dc3df19b118b07f065738746a.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\modules-modules-scan-Modul-d4dfd-adiology-hub-2-layar-tampil-modules\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\modules-modules-scan-Modul-d4dfd-adiology-hub-2-layar-tampil-modules\trace.zip
+    Usage:
+
+        npx playwright show-trace test-results\modules-modules-scan-Modul-d4dfd-adiology-hub-2-layar-tampil-modules\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  13) [modules] › tests\modules\modules-scan.spec.ts:15:9 › Module scan - rs.admin › module diet: hub + 3 layar tampil › Buka /en/diet 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('textbox', { name: /nama pengguna|username/i })
+    Expected: visible
+    Timeout: 20000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByRole('textbox', { name: /nama pengguna|username/i }) with timeout 20000ms
+      - waiting for getByRole('textbox', { name: /nama pengguna|username/i })
+
+
+       at ..\pages\LoginPage.ts:24
+
+      22 |   async open(): Promise<void> {
+      23 |     await this.page.goto('/');
+    > 24 |     await expect(this.username).toBeVisible({ timeout: 20_000 });
+         |                                 ^
+      25 |   }
+      26 |
+      27 |   /** Pin the UI to English; the choice persists with the saved session. */
+        at LoginPage.open (C:\Users\Administrator\Documents\automation\pages\LoginPage.ts:24:33)
+        at LoginPage.login (C:\Users\Administrator\Documents\automation\pages\LoginPage.ts:54:7)
+        at ensureSignedIn (C:\Users\Administrator\Documents\automation\lib\auth.ts:18:5)
+        at C:\Users\Administrator\Documents\automation\tests\modules\modules-scan.spec.ts:29:11
+        at C:\Users\Administrator\Documents\automation\tests\modules\modules-scan.spec.ts:25:9
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\modules-modules-scan-Modul-0b2aa-ule-diet-hub-3-layar-tampil-modules\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: final screenshot (image/png) ────────────────────────────────────────────────────
+    test-results\modules-modules-scan-Modul-0b2aa-ule-diet-hub-3-layar-tampil-modules\attachments\final-screenshot-ee6203e6be4e21267136aa2d5dc069509e784e14.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\modules-modules-scan-Modul-0b2aa-ule-diet-hub-3-layar-tampil-modules\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\modules-modules-scan-Modul-0b2aa-ule-diet-hub-3-layar-tampil-modules\trace.zip
+    Usage:
+
+        npx playwright show-trace test-results\modules-modules-scan-Modul-0b2aa-ule-diet-hub-3-layar-tampil-modules\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  14) [modules] › tests\modules\modules-scan.spec.ts:15:9 › Module scan - rs.admin › module billing: hub + 2 layar tampil › Buka /en/billing 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('textbox', { name: /nama pengguna|username/i })
+    Expected: visible
+    Timeout: 20000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByRole('textbox', { name: /nama pengguna|username/i }) with timeout 20000ms
+      - waiting for getByRole('textbox', { name: /nama pengguna|username/i })
+
+
+       at ..\pages\LoginPage.ts:24
+
+      22 |   async open(): Promise<void> {
+      23 |     await this.page.goto('/');
+    > 24 |     await expect(this.username).toBeVisible({ timeout: 20_000 });
+         |                                 ^
+      25 |   }
+      26 |
+      27 |   /** Pin the UI to English; the choice persists with the saved session. */
+        at LoginPage.open (C:\Users\Administrator\Documents\automation\pages\LoginPage.ts:24:33)
+        at LoginPage.login (C:\Users\Administrator\Documents\automation\pages\LoginPage.ts:54:7)
+        at ensureSignedIn (C:\Users\Administrator\Documents\automation\lib\auth.ts:18:5)
+        at C:\Users\Administrator\Documents\automation\tests\modules\modules-scan.spec.ts:29:11
+        at C:\Users\Administrator\Documents\automation\tests\modules\modules-scan.spec.ts:25:9
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\modules-modules-scan-Modul-94c9b--billing-hub-2-layar-tampil-modules\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: final screenshot (image/png) ────────────────────────────────────────────────────
+    test-results\modules-modules-scan-Modul-94c9b--billing-hub-2-layar-tampil-modules\attachments\final-screenshot-5afa0426555a870cc1d8aac6cdefa08c502fc493.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\modules-modules-scan-Modul-94c9b--billing-hub-2-layar-tampil-modules\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\modules-modules-scan-Modul-94c9b--billing-hub-2-layar-tampil-modules\trace.zip
+    Usage:
+
+        npx playwright show-trace test-results\modules-modules-scan-Modul-94c9b--billing-hub-2-layar-tampil-modules\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  15) [modules] › tests\modules\modules-scan.spec.ts:15:9 › Module scan - rs.admin › module emergency: hub + 4 layar tampil › Buka /en/emergency 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('textbox', { name: /nama pengguna|username/i })
+    Expected: visible
+    Timeout: 20000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByRole('textbox', { name: /nama pengguna|username/i }) with timeout 20000ms
+      - waiting for getByRole('textbox', { name: /nama pengguna|username/i })
+
+
+       at ..\pages\LoginPage.ts:24
+
+      22 |   async open(): Promise<void> {
+      23 |     await this.page.goto('/');
+    > 24 |     await expect(this.username).toBeVisible({ timeout: 20_000 });
+         |                                 ^
+      25 |   }
+      26 |
+      27 |   /** Pin the UI to English; the choice persists with the saved session. */
+        at LoginPage.open (C:\Users\Administrator\Documents\automation\pages\LoginPage.ts:24:33)
+        at LoginPage.login (C:\Users\Administrator\Documents\automation\pages\LoginPage.ts:54:7)
+        at ensureSignedIn (C:\Users\Administrator\Documents\automation\lib\auth.ts:18:5)
+        at C:\Users\Administrator\Documents\automation\tests\modules\modules-scan.spec.ts:29:11
+        at C:\Users\Administrator\Documents\automation\tests\modules\modules-scan.spec.ts:25:9
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\modules-modules-scan-Modul-67a51-mergency-hub-4-layar-tampil-modules\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: final screenshot (image/png) ────────────────────────────────────────────────────
+    test-results\modules-modules-scan-Modul-67a51-mergency-hub-4-layar-tampil-modules\attachments\final-screenshot-144f8232f5a6d75b1a3647af546f635feaa80a53.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\modules-modules-scan-Modul-67a51-mergency-hub-4-layar-tampil-modules\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\modules-modules-scan-Modul-67a51-mergency-hub-4-layar-tampil-modules\trace.zip
+    Usage:
+
+        npx playwright show-trace test-results\modules-modules-scan-Modul-67a51-mergency-hub-4-layar-tampil-modules\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  16) [modules] › tests\modules\modules-scan.spec.ts:15:9 › Module scan - rs.admin › module mrd: hub + 5 layar tampil › Buka /en/mrd 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('textbox', { name: /nama pengguna|username/i })
+    Expected: visible
+    Timeout: 20000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByRole('textbox', { name: /nama pengguna|username/i }) with timeout 20000ms
+      - waiting for getByRole('textbox', { name: /nama pengguna|username/i })
+
+
+       at ..\pages\LoginPage.ts:24
+
+      22 |   async open(): Promise<void> {
+      23 |     await this.page.goto('/');
+    > 24 |     await expect(this.username).toBeVisible({ timeout: 20_000 });
+         |                                 ^
+      25 |   }
+      26 |
+      27 |   /** Pin the UI to English; the choice persists with the saved session. */
+        at LoginPage.open (C:\Users\Administrator\Documents\automation\pages\LoginPage.ts:24:33)
+        at LoginPage.login (C:\Users\Administrator\Documents\automation\pages\LoginPage.ts:54:7)
+        at ensureSignedIn (C:\Users\Administrator\Documents\automation\lib\auth.ts:18:5)
+        at C:\Users\Administrator\Documents\automation\tests\modules\modules-scan.spec.ts:29:11
+        at C:\Users\Administrator\Documents\automation\tests\modules\modules-scan.spec.ts:25:9
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\modules-modules-scan-Modul-7ad2e-dule-mrd-hub-5-layar-tampil-modules\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: final screenshot (image/png) ────────────────────────────────────────────────────
+    test-results\modules-modules-scan-Modul-7ad2e-dule-mrd-hub-5-layar-tampil-modules\attachments\final-screenshot-9d91c43cb8bd68e2fa8569aba18ba8843bb1f683.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\modules-modules-scan-Modul-7ad2e-dule-mrd-hub-5-layar-tampil-modules\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\modules-modules-scan-Modul-7ad2e-dule-mrd-hub-5-layar-tampil-modules\trace.zip
+    Usage:
+
+        npx playwright show-trace test-results\modules-modules-scan-Modul-7ad2e-dule-mrd-hub-5-layar-tampil-modules\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  17) [modules] › tests\modules\modules-scan.spec.ts:15:9 › Module scan - rs.admin › module payroll: hub + 2 layar tampil › Buka /en/payroll 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('textbox', { name: /nama pengguna|username/i })
+    Expected: visible
+    Timeout: 20000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByRole('textbox', { name: /nama pengguna|username/i }) with timeout 20000ms
+      - waiting for getByRole('textbox', { name: /nama pengguna|username/i })
+
+
+       at ..\pages\LoginPage.ts:24
+
+      22 |   async open(): Promise<void> {
+      23 |     await this.page.goto('/');
+    > 24 |     await expect(this.username).toBeVisible({ timeout: 20_000 });
+         |                                 ^
+      25 |   }
+      26 |
+      27 |   /** Pin the UI to English; the choice persists with the saved session. */
+        at LoginPage.open (C:\Users\Administrator\Documents\automation\pages\LoginPage.ts:24:33)
+        at LoginPage.login (C:\Users\Administrator\Documents\automation\pages\LoginPage.ts:54:7)
+        at ensureSignedIn (C:\Users\Administrator\Documents\automation\lib\auth.ts:18:5)
+        at C:\Users\Administrator\Documents\automation\tests\modules\modules-scan.spec.ts:29:11
+        at C:\Users\Administrator\Documents\automation\tests\modules\modules-scan.spec.ts:25:9
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\modules-modules-scan-Modul-4a6c8--payroll-hub-2-layar-tampil-modules\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: final screenshot (image/png) ────────────────────────────────────────────────────
+    test-results\modules-modules-scan-Modul-4a6c8--payroll-hub-2-layar-tampil-modules\attachments\final-screenshot-47842e7ed8a818b3bc12363fcd85d81e4c2cec41.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\modules-modules-scan-Modul-4a6c8--payroll-hub-2-layar-tampil-modules\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\modules-modules-scan-Modul-4a6c8--payroll-hub-2-layar-tampil-modules\trace.zip
+    Usage:
+
+        npx playwright show-trace test-results\modules-modules-scan-Modul-4a6c8--payroll-hub-2-layar-tampil-modules\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  18) [modules] › tests\modules\modules-scan.spec.ts:15:9 › Module scan - rs.admin › module finance: hub + 11 layar tampil › Buka /en/finance 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('textbox', { name: /nama pengguna|username/i })
+    Expected: visible
+    Timeout: 20000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByRole('textbox', { name: /nama pengguna|username/i }) with timeout 20000ms
+      - waiting for getByRole('textbox', { name: /nama pengguna|username/i })
+
+
+       at ..\pages\LoginPage.ts:24
+
+      22 |   async open(): Promise<void> {
+      23 |     await this.page.goto('/');
+    > 24 |     await expect(this.username).toBeVisible({ timeout: 20_000 });
+         |                                 ^
+      25 |   }
+      26 |
+      27 |   /** Pin the UI to English; the choice persists with the saved session. */
+        at LoginPage.open (C:\Users\Administrator\Documents\automation\pages\LoginPage.ts:24:33)
+        at LoginPage.login (C:\Users\Administrator\Documents\automation\pages\LoginPage.ts:54:7)
+        at ensureSignedIn (C:\Users\Administrator\Documents\automation\lib\auth.ts:18:5)
+        at C:\Users\Administrator\Documents\automation\tests\modules\modules-scan.spec.ts:29:11
+        at C:\Users\Administrator\Documents\automation\tests\modules\modules-scan.spec.ts:25:9
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\modules-modules-scan-Modul-792ec-finance-hub-11-layar-tampil-modules\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: final screenshot (image/png) ────────────────────────────────────────────────────
+    test-results\modules-modules-scan-Modul-792ec-finance-hub-11-layar-tampil-modules\attachments\final-screenshot-343ffaf8beee976e8f7140803038a51d90d6a525.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\modules-modules-scan-Modul-792ec-finance-hub-11-layar-tampil-modules\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\modules-modules-scan-Modul-792ec-finance-hub-11-layar-tampil-modules\trace.zip
+    Usage:
+
+        npx playwright show-trace test-results\modules-modules-scan-Modul-792ec-finance-hub-11-layar-tampil-modules\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  19) [modules] › tests\modules\modules-scan.spec.ts:15:9 › Module scan - rs.admin › module budget: hub + 11 layar tampil › Buka /en/budget 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('textbox', { name: /nama pengguna|username/i })
+    Expected: visible
+    Timeout: 20000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByRole('textbox', { name: /nama pengguna|username/i }) with timeout 20000ms
+      - waiting for getByRole('textbox', { name: /nama pengguna|username/i })
+
+
+       at ..\pages\LoginPage.ts:24
+
+      22 |   async open(): Promise<void> {
+      23 |     await this.page.goto('/');
+    > 24 |     await expect(this.username).toBeVisible({ timeout: 20_000 });
+         |                                 ^
+      25 |   }
+      26 |
+      27 |   /** Pin the UI to English; the choice persists with the saved session. */
+        at LoginPage.open (C:\Users\Administrator\Documents\automation\pages\LoginPage.ts:24:33)
+        at LoginPage.login (C:\Users\Administrator\Documents\automation\pages\LoginPage.ts:54:7)
+        at ensureSignedIn (C:\Users\Administrator\Documents\automation\lib\auth.ts:18:5)
+        at C:\Users\Administrator\Documents\automation\tests\modules\modules-scan.spec.ts:29:11
+        at C:\Users\Administrator\Documents\automation\tests\modules\modules-scan.spec.ts:25:9
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\modules-modules-scan-Modul-d0f74--budget-hub-11-layar-tampil-modules\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: final screenshot (image/png) ────────────────────────────────────────────────────
+    test-results\modules-modules-scan-Modul-d0f74--budget-hub-11-layar-tampil-modules\attachments\final-screenshot-b27727aedcb380cf273ee3a90f178c306ab4f048.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\modules-modules-scan-Modul-d0f74--budget-hub-11-layar-tampil-modules\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\modules-modules-scan-Modul-d0f74--budget-hub-11-layar-tampil-modules\trace.zip
+    Usage:
+
+        npx playwright show-trace test-results\modules-modules-scan-Modul-d0f74--budget-hub-11-layar-tampil-modules\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  20) [modules] › tests\modules\modules-scan.spec.ts:15:9 › Module scan - rs.admin › module cssd: hub + 11 layar tampil › Buka /en/cssd 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('textbox', { name: /nama pengguna|username/i })
+    Expected: visible
+    Timeout: 20000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByRole('textbox', { name: /nama pengguna|username/i }) with timeout 20000ms
+      - waiting for getByRole('textbox', { name: /nama pengguna|username/i })
+
+
+       at ..\pages\LoginPage.ts:24
+
+      22 |   async open(): Promise<void> {
+      23 |     await this.page.goto('/');
+    > 24 |     await expect(this.username).toBeVisible({ timeout: 20_000 });
+         |                                 ^
+      25 |   }
+      26 |
+      27 |   /** Pin the UI to English; the choice persists with the saved session. */
+        at LoginPage.open (C:\Users\Administrator\Documents\automation\pages\LoginPage.ts:24:33)
+        at LoginPage.login (C:\Users\Administrator\Documents\automation\pages\LoginPage.ts:54:7)
+        at ensureSignedIn (C:\Users\Administrator\Documents\automation\lib\auth.ts:18:5)
+        at C:\Users\Administrator\Documents\automation\tests\modules\modules-scan.spec.ts:29:11
+        at C:\Users\Administrator\Documents\automation\tests\modules\modules-scan.spec.ts:25:9
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\modules-modules-scan-Modul-07465-le-cssd-hub-11-layar-tampil-modules\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: final screenshot (image/png) ────────────────────────────────────────────────────
+    test-results\modules-modules-scan-Modul-07465-le-cssd-hub-11-layar-tampil-modules\attachments\final-screenshot-a952d83db688a8d3eb0cbe639d00c9ab066f99cb.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\modules-modules-scan-Modul-07465-le-cssd-hub-11-layar-tampil-modules\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\modules-modules-scan-Modul-07465-le-cssd-hub-11-layar-tampil-modules\trace.zip
+    Usage:
+
+        npx playwright show-trace test-results\modules-modules-scan-Modul-07465-le-cssd-hub-11-layar-tampil-modules\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  21) [modules] › tests\modules\modules-scan.spec.ts:15:9 › Module scan - rs.admin › module services: hub + 8 layar tampil › Buka /en/services 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('textbox', { name: /nama pengguna|username/i })
+    Expected: visible
+    Timeout: 20000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByRole('textbox', { name: /nama pengguna|username/i }) with timeout 20000ms
+      - waiting for getByRole('textbox', { name: /nama pengguna|username/i })
+
+
+       at ..\pages\LoginPage.ts:24
+
+      22 |   async open(): Promise<void> {
+      23 |     await this.page.goto('/');
+    > 24 |     await expect(this.username).toBeVisible({ timeout: 20_000 });
+         |                                 ^
+      25 |   }
+      26 |
+      27 |   /** Pin the UI to English; the choice persists with the saved session. */
+        at LoginPage.open (C:\Users\Administrator\Documents\automation\pages\LoginPage.ts:24:33)
+        at LoginPage.login (C:\Users\Administrator\Documents\automation\pages\LoginPage.ts:54:7)
+        at ensureSignedIn (C:\Users\Administrator\Documents\automation\lib\auth.ts:18:5)
+        at C:\Users\Administrator\Documents\automation\tests\modules\modules-scan.spec.ts:29:11
+        at C:\Users\Administrator\Documents\automation\tests\modules\modules-scan.spec.ts:25:9
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\modules-modules-scan-Modul-d8cc3-services-hub-8-layar-tampil-modules\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: final screenshot (image/png) ────────────────────────────────────────────────────
+    test-results\modules-modules-scan-Modul-d8cc3-services-hub-8-layar-tampil-modules\attachments\final-screenshot-3bcce060ee25d0eda994550b176598f65924947b.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\modules-modules-scan-Modul-d8cc3-services-hub-8-layar-tampil-modules\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\modules-modules-scan-Modul-d8cc3-services-hub-8-layar-tampil-modules\trace.zip
+    Usage:
+
+        npx playwright show-trace test-results\modules-modules-scan-Modul-d8cc3-services-hub-8-layar-tampil-modules\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  22) [modules] › tests\modules\modules-scan.spec.ts:15:9 › Module scan - rs.admin › module sourcing: hub + 6 layar tampil › Buka /en/sourcing 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('textbox', { name: /nama pengguna|username/i })
+    Expected: visible
+    Timeout: 20000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByRole('textbox', { name: /nama pengguna|username/i }) with timeout 20000ms
+      - waiting for getByRole('textbox', { name: /nama pengguna|username/i })
+
+
+       at ..\pages\LoginPage.ts:24
+
+      22 |   async open(): Promise<void> {
+      23 |     await this.page.goto('/');
+    > 24 |     await expect(this.username).toBeVisible({ timeout: 20_000 });
+         |                                 ^
+      25 |   }
+      26 |
+      27 |   /** Pin the UI to English; the choice persists with the saved session. */
+        at LoginPage.open (C:\Users\Administrator\Documents\automation\pages\LoginPage.ts:24:33)
+        at LoginPage.login (C:\Users\Administrator\Documents\automation\pages\LoginPage.ts:54:7)
+        at ensureSignedIn (C:\Users\Administrator\Documents\automation\lib\auth.ts:18:5)
+        at C:\Users\Administrator\Documents\automation\tests\modules\modules-scan.spec.ts:29:11
+        at C:\Users\Administrator\Documents\automation\tests\modules\modules-scan.spec.ts:25:9
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\modules-modules-scan-Modul-01298-sourcing-hub-6-layar-tampil-modules\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: final screenshot (image/png) ────────────────────────────────────────────────────
+    test-results\modules-modules-scan-Modul-01298-sourcing-hub-6-layar-tampil-modules\attachments\final-screenshot-ea045e91b6c1172ed556ef9e350280cb9b89f030.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\modules-modules-scan-Modul-01298-sourcing-hub-6-layar-tampil-modules\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\modules-modules-scan-Modul-01298-sourcing-hub-6-layar-tampil-modules\trace.zip
+    Usage:
+
+        npx playwright show-trace test-results\modules-modules-scan-Modul-01298-sourcing-hub-6-layar-tampil-modules\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  23) [modules] › tests\modules\modules-scan.spec.ts:15:9 › Module scan - rs.admin › module housekeeping: hub + 5 layar tampil › Buka /en/housekeeping 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('textbox', { name: /nama pengguna|username/i })
+    Expected: visible
+    Timeout: 20000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByRole('textbox', { name: /nama pengguna|username/i }) with timeout 20000ms
+      - waiting for getByRole('textbox', { name: /nama pengguna|username/i })
+
+
+       at ..\pages\LoginPage.ts:24
+
+      22 |   async open(): Promise<void> {
+      23 |     await this.page.goto('/');
+    > 24 |     await expect(this.username).toBeVisible({ timeout: 20_000 });
+         |                                 ^
+      25 |   }
+      26 |
+      27 |   /** Pin the UI to English; the choice persists with the saved session. */
+        at LoginPage.open (C:\Users\Administrator\Documents\automation\pages\LoginPage.ts:24:33)
+        at LoginPage.login (C:\Users\Administrator\Documents\automation\pages\LoginPage.ts:54:7)
+        at ensureSignedIn (C:\Users\Administrator\Documents\automation\lib\auth.ts:18:5)
+        at C:\Users\Administrator\Documents\automation\tests\modules\modules-scan.spec.ts:29:11
+        at C:\Users\Administrator\Documents\automation\tests\modules\modules-scan.spec.ts:25:9
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\modules-modules-scan-Modul-35576-ekeeping-hub-5-layar-tampil-modules\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: final screenshot (image/png) ────────────────────────────────────────────────────
+    test-results\modules-modules-scan-Modul-35576-ekeeping-hub-5-layar-tampil-modules\attachments\final-screenshot-3e2860a3dcbc3e7a096a0ae506b2b692620e8bc7.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\modules-modules-scan-Modul-35576-ekeeping-hub-5-layar-tampil-modules\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\modules-modules-scan-Modul-35576-ekeeping-hub-5-layar-tampil-modules\trace.zip
+    Usage:
+
+        npx playwright show-trace test-results\modules-modules-scan-Modul-35576-ekeeping-hub-5-layar-tampil-modules\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  24) [modules] › tests\modules\modules-scan.spec.ts:15:9 › Module scan - rs.admin › module linen: hub + 4 layar tampil › Buka /en/linen 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('textbox', { name: /nama pengguna|username/i })
+    Expected: visible
+    Timeout: 20000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByRole('textbox', { name: /nama pengguna|username/i }) with timeout 20000ms
+      - waiting for getByRole('textbox', { name: /nama pengguna|username/i })
+
+
+       at ..\pages\LoginPage.ts:24
+
+      22 |   async open(): Promise<void> {
+      23 |     await this.page.goto('/');
+    > 24 |     await expect(this.username).toBeVisible({ timeout: 20_000 });
+         |                                 ^
+      25 |   }
+      26 |
+      27 |   /** Pin the UI to English; the choice persists with the saved session. */
+        at LoginPage.open (C:\Users\Administrator\Documents\automation\pages\LoginPage.ts:24:33)
+        at LoginPage.login (C:\Users\Administrator\Documents\automation\pages\LoginPage.ts:54:7)
+        at ensureSignedIn (C:\Users\Administrator\Documents\automation\lib\auth.ts:18:5)
+        at C:\Users\Administrator\Documents\automation\tests\modules\modules-scan.spec.ts:29:11
+        at C:\Users\Administrator\Documents\automation\tests\modules\modules-scan.spec.ts:25:9
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\modules-modules-scan-Modul-1ccea-le-linen-hub-4-layar-tampil-modules\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: final screenshot (image/png) ────────────────────────────────────────────────────
+    test-results\modules-modules-scan-Modul-1ccea-le-linen-hub-4-layar-tampil-modules\attachments\final-screenshot-5da63257023e9b496cf332c32c050b307db3922b.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\modules-modules-scan-Modul-1ccea-le-linen-hub-4-layar-tampil-modules\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\modules-modules-scan-Modul-1ccea-le-linen-hub-4-layar-tampil-modules\trace.zip
+    Usage:
+
+        npx playwright show-trace test-results\modules-modules-scan-Modul-1ccea-le-linen-hub-4-layar-tampil-modules\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  25) [modules] › tests\modules\modules-scan.spec.ts:15:9 › Module scan - rs.admin › module maintenance: hub + 4 layar tampil › Buka /en/maintenance 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('textbox', { name: /nama pengguna|username/i })
+    Expected: visible
+    Timeout: 20000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByRole('textbox', { name: /nama pengguna|username/i }) with timeout 20000ms
+      - waiting for getByRole('textbox', { name: /nama pengguna|username/i })
+
+
+       at ..\pages\LoginPage.ts:24
+
+      22 |   async open(): Promise<void> {
+      23 |     await this.page.goto('/');
+    > 24 |     await expect(this.username).toBeVisible({ timeout: 20_000 });
+         |                                 ^
+      25 |   }
+      26 |
+      27 |   /** Pin the UI to English; the choice persists with the saved session. */
+        at LoginPage.open (C:\Users\Administrator\Documents\automation\pages\LoginPage.ts:24:33)
+        at LoginPage.login (C:\Users\Administrator\Documents\automation\pages\LoginPage.ts:54:7)
+        at ensureSignedIn (C:\Users\Administrator\Documents\automation\lib\auth.ts:18:5)
+        at C:\Users\Administrator\Documents\automation\tests\modules\modules-scan.spec.ts:29:11
+        at C:\Users\Administrator\Documents\automation\tests\modules\modules-scan.spec.ts:25:9
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\modules-modules-scan-Modul-562f9-ntenance-hub-4-layar-tampil-modules\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: final screenshot (image/png) ────────────────────────────────────────────────────
+    test-results\modules-modules-scan-Modul-562f9-ntenance-hub-4-layar-tampil-modules\attachments\final-screenshot-031184ce2c7bb18dde57d4032e75dbff1f3205fe.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\modules-modules-scan-Modul-562f9-ntenance-hub-4-layar-tampil-modules\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\modules-modules-scan-Modul-562f9-ntenance-hub-4-layar-tampil-modules\trace.zip
+    Usage:
+
+        npx playwright show-trace test-results\modules-modules-scan-Modul-562f9-ntenance-hub-4-layar-tampil-modules\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  26) [modules] › tests\modules\modules-scan.spec.ts:15:9 › Module scan - rs.admin › module fixed-assets: hub + 4 layar tampil › Buka /en/fixed-assets 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('textbox', { name: /nama pengguna|username/i })
+    Expected: visible
+    Timeout: 20000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByRole('textbox', { name: /nama pengguna|username/i }) with timeout 20000ms
+      - waiting for getByRole('textbox', { name: /nama pengguna|username/i })
+
+
+       at ..\pages\LoginPage.ts:24
+
+      22 |   async open(): Promise<void> {
+      23 |     await this.page.goto('/');
+    > 24 |     await expect(this.username).toBeVisible({ timeout: 20_000 });
+         |                                 ^
+      25 |   }
+      26 |
+      27 |   /** Pin the UI to English; the choice persists with the saved session. */
+        at LoginPage.open (C:\Users\Administrator\Documents\automation\pages\LoginPage.ts:24:33)
+        at LoginPage.login (C:\Users\Administrator\Documents\automation\pages\LoginPage.ts:54:7)
+        at ensureSignedIn (C:\Users\Administrator\Documents\automation\lib\auth.ts:18:5)
+        at C:\Users\Administrator\Documents\automation\tests\modules\modules-scan.spec.ts:29:11
+        at C:\Users\Administrator\Documents\automation\tests\modules\modules-scan.spec.ts:25:9
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\modules-modules-scan-Modul-ea66f-d-assets-hub-4-layar-tampil-modules\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: final screenshot (image/png) ────────────────────────────────────────────────────
+    test-results\modules-modules-scan-Modul-ea66f-d-assets-hub-4-layar-tampil-modules\attachments\final-screenshot-91714e1d517ba585d5d9a669047cb8d61a4eafc5.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\modules-modules-scan-Modul-ea66f-d-assets-hub-4-layar-tampil-modules\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\modules-modules-scan-Modul-ea66f-d-assets-hub-4-layar-tampil-modules\trace.zip
+    Usage:
+
+        npx playwright show-trace test-results\modules-modules-scan-Modul-ea66f-d-assets-hub-4-layar-tampil-modules\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  26 failed
+    [modules] › tests\modules\modules-scan.spec.ts:15:9 › Module scan - rs.admin › module registration: hub + 4 layar tampil 
+    [modules] › tests\modules\modules-scan.spec.ts:15:9 › Module scan - rs.admin › module appointment: hub + 2 layar tampil 
+    [modules] › tests\modules\modules-scan.spec.ts:15:9 › Module scan - rs.admin › module clinical: hub + 4 layar tampil 
+    [modules] › tests\modules\modules-scan.spec.ts:15:9 › Module scan - rs.admin › module adt: hub + 6 layar tampil 
+    [modules] › tests\modules\modules-scan.spec.ts:15:9 › Module scan - rs.admin › module pharmacy: hub + 4 layar tampil 
+    [modules] › tests\modules\modules-scan.spec.ts:15:9 › Module scan - rs.admin › module bloodbank: hub + 5 layar tampil 
+    [modules] › tests\modules\modules-scan.spec.ts:15:9 › Module scan - rs.admin › module inventory: hub + 5 layar tampil 
+    [modules] › tests\modules\modules-scan.spec.ts:15:9 › Module scan - rs.admin › module ot: hub + 3 layar tampil 
+    [modules] › tests\modules\modules-scan.spec.ts:15:9 › Module scan - rs.admin › module procurement: hub + 6 layar tampil 
+    [modules] › tests\modules\modules-scan.spec.ts:15:9 › Module scan - rs.admin › module hr: hub + 3 layar tampil 
+    [modules] › tests\modules\modules-scan.spec.ts:15:9 › Module scan - rs.admin › module laboratory: hub + 3 layar tampil 
+    [modules] › tests\modules\modules-scan.spec.ts:15:9 › Module scan - rs.admin › module radiology: hub + 2 layar tampil 
+    [modules] › tests\modules\modules-scan.spec.ts:15:9 › Module scan - rs.admin › module diet: hub + 3 layar tampil 
+    [modules] › tests\modules\modules-scan.spec.ts:15:9 › Module scan - rs.admin › module billing: hub + 2 layar tampil 
+    [modules] › tests\modules\modules-scan.spec.ts:15:9 › Module scan - rs.admin › module emergency: hub + 4 layar tampil 
+    [modules] › tests\modules\modules-scan.spec.ts:15:9 › Module scan - rs.admin › module mrd: hub + 5 layar tampil 
+    [modules] › tests\modules\modules-scan.spec.ts:15:9 › Module scan - rs.admin › module payroll: hub + 2 layar tampil 
+    [modules] › tests\modules\modules-scan.spec.ts:15:9 › Module scan - rs.admin › module finance: hub + 11 layar tampil 
+    [modules] › tests\modules\modules-scan.spec.ts:15:9 › Module scan - rs.admin › module budget: hub + 11 layar tampil 
+    [modules] › tests\modules\modules-scan.spec.ts:15:9 › Module scan - rs.admin › module cssd: hub + 11 layar tampil 
+    [modules] › tests\modules\modules-scan.spec.ts:15:9 › Module scan - rs.admin › module services: hub + 8 layar tampil 
+    [modules] › tests\modules\modules-scan.spec.ts:15:9 › Module scan - rs.admin › module sourcing: hub + 6 layar tampil 
+    [modules] › tests\modules\modules-scan.spec.ts:15:9 › Module scan - rs.admin › module housekeeping: hub + 5 layar tampil 
+    [modules] › tests\modules\modules-scan.spec.ts:15:9 › Module scan - rs.admin › module linen: hub + 4 layar tampil 
+    [modules] › tests\modules\modules-scan.spec.ts:15:9 › Module scan - rs.admin › module maintenance: hub + 4 layar tampil 
+    [modules] › tests\modules\modules-scan.spec.ts:15:9 › Module scan - rs.admin › module fixed-assets: hub + 4 layar tampil 
+  2 skipped
+  1 passed (9.4m)

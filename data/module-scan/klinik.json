@@ -1,0 +1,36 @@
+{
+  "admin": "klinik",
+  "username": "klinik.admin",
+  "loginOk": true,
+  "modules": [
+    {
+      "slug": "forgot-password",
+      "name": "Forgot password?",
+      "href": "/en/forgot-password",
+      "screens": [
+        {
+          "label": "forgot-password (hub)",
+          "data": {
+            "requested": "https://rs.showcase.atklik.xyz/en/forgot-password",
+            "shot": "screenshots-scan\\klinik-forgot-password-hub.png",
+            "path": "/en/forgot-password",
+            "headings": [
+              "Forgot password"
+            ],
+            "links": [],
+            "tables": [],
+            "empty": null,
+            "redirectedToLogin": false
+          }
+        }
+      ]
+    }
+  ],
+  "moduleSlugs": [
+    {
+      "slug": "forgot-password",
+      "name": "Forgot password?",
+      "href": "/en/forgot-password"
+    }
+  ]
+}
