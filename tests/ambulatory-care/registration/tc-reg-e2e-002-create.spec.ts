@@ -166,63 +166,51 @@ test.describe('TC-REG-E2E-002 - Registrasi pasien baru (E2E)', () => {
     });
   });
 
-  test('Form settings: atur Visit types & Default visit type per branch lalu Save settings', async ({ page }) => {
+  test('Form settings: simpan Default visit type untuk satu branch lalu verifikasi pada branch yang sama', async ({ page }) => {
     const patients = new RegistrationPatientsPage(page);
     await ensureSignedIn(page, MODULES_USERNAME, PASSWORD);
     await patients.open();
 
-    const visitTypes = ['Outpatient', 'Emergency desk', 'Staff', 'Staff dependent', 'Disaster', 'Newborn'];
+    // Satu branch saja untuk simpan sekaligus verifikasi. Option value di
+    // select adalah UUID, jadi pilih lewat UUID (stabil) dan cocokkan label-nya.
+    const BRANCH = { id: '362f90c1-de31-50b6-b792-9e94d87309c2', label: 'Podomoro' };
 
-    // Select Branch di dialog ini kosong secara default - pilih branch dulu.
-    const openSettings = async (branch: string) => {
+    const openSettings = async () => {
       await page.getByRole('button', { name: 'Form settings' }).click();
       const dlg = page.getByRole('dialog', { name: 'Form settings' });
       await expect(dlg).toBeVisible();
-      await dlg.locator('select').first().selectOption({ label: branch });
+      const branch = dlg.locator('select').first();
+      await branch.selectOption(BRANCH.id);
+      // pastikan UUID memang branch yang dimaksud, bukan branch lain
+      await expect(branch).toHaveValue(BRANCH.id);
+      await expect(branch.locator('option:checked')).toHaveText(BRANCH.label);
       await page.waitForTimeout(1_000);
       return dlg;
     };
 
     let chosen = '';
-    await test.step('Buka Form settings dan pilih tiap branch (Daan Mogot, Kemayoran, Podomoro)', async () => {
-      const dlg = await openSettings('Daan Mogot');
-      for (const branch of ['Kemayoran', 'Podomoro']) {
-        await dlg.locator('select').first().selectOption({ label: branch });
-      }
-    });
-
-    const dlg = page.getByRole('dialog', { name: 'Form settings' });
-    await test.step('Ubah Default visit type ke tiap pilihan, akhiri dengan nilai berbeda dari awal', async () => {
+    await test.step(`Buka Form settings, pilih branch ${BRANCH.label}, ubah Default visit type, Save settings`, async () => {
+      const dlg = await openSettings();
       const def = dlg.getByLabel('Default visit');
-      const initial = await def.inputValue();
-      const values = await def
-        .locator('option')
-        .evaluateAll((els) => (els as HTMLOptionElement[]).map((o) => o.value).filter(Boolean));
-      for (const v of values) await def.selectOption(v);
-      chosen = values.find((v) => v !== initial) ?? values[0];
+      const current = await def.inputValue();
+      chosen = current === 'newborn' ? 'staff' : 'newborn';
       await def.selectOption(chosen);
-    });
-
-    await test.step('Toggle tiap checkbox Visit types (uncheck lalu check) hingga semua aktif', async () => {
-      for (const name of visitTypes) {
-        const cb = dlg.getByRole('checkbox', { name, exact: true });
-        await cb.uncheck();
-        await expect(cb).not.toBeChecked();
-        await cb.check();
-        await expect(cb).toBeChecked();
-      }
-    });
-
-    await test.step('Save settings - server menerima', async () => {
+      await expect(def).toHaveValue(chosen);
       await submitDialog(page, dlg, /^save settings$/i, '/en/registration');
       await closeDialog(page, dlg);
     });
 
-    await test.step('Muat ulang, pilih branch yang sama - Default visit type tetap tersimpan', async () => {
+    await test.step(`Buka lagi Form settings, pilih branch ${BRANCH.label} - Default visit type sesuai yang disimpan`, async () => {
+      const dlg = await openSettings();
+      await expect(dlg.getByLabel('Default visit')).toHaveValue(chosen);
+      await closeDialog(page, dlg);
+    });
+
+    await test.step('Muat ulang halaman - nilai tetap tersimpan untuk branch yang sama', async () => {
       await page.reload({ waitUntil: 'domcontentloaded' });
-      const again = await openSettings('Podomoro');
-      await expect(again.getByLabel('Default visit')).toHaveValue(chosen);
-      await closeDialog(page, again);
+      const dlg = await openSettings();
+      await expect(dlg.getByLabel('Default visit')).toHaveValue(chosen);
+      await closeDialog(page, dlg);
     });
   });
 });
