@@ -1,0 +1,35 @@
+# Traceability: 24-housekeeping.xlsx
+
+Source: `reference/24-housekeeping.xlsx` (sheets Journeys, Steps). Generated read-only; do not edit by hand.
+
+Test title = `<TC ID> <Scenario Name> [<file> | Steps | rows a-b | <TC ID>]`; annotation `journey` = `[<file> | Journeys | row n | <Journey ID>]`.
+
+| TC ID | Journey ID | Scenario | Type | Prio | Steps rows | Journeys row | Planned spec | Users | Disposition | Reason |
+|---|---|---|---|---|---|---|---|---|---|---|
+| TC-APP024-001 | JRN-APP024-001 | Location: its manpower, shifts, activities and materials | Positive | High | rows 2-9 | 2 | `tests/e2e/24-housekeeping/locations.spec.ts` | U1 | FIXME | Expected Result TBD at step(s) 8 |
+| TC-APP024-002 | JRN-APP024-001 | Location that is refused | Negative | High | rows 10-15 | 2 | `tests/e2e/24-housekeeping/locations.spec.ts` | U1 | FIXME | Expected Result TBD at step(s) 1, 2, 3, 4, 5, 6 |
+| TC-APP024-003 | JRN-APP024-001 | Match that fails | Negative | High | rows 16-17 | 2 | `tests/e2e/24-housekeeping/locations.spec.ts` | U1 | FIXME | Expected Result TBD at step(s) 1, 2 |
+| TC-APP024-004 | JRN-APP024-002 | Contract with a cleaning vendor: save, price lines, send and approve | Positive | Critical | rows 18-22 | 3 | `tests/e2e/24-housekeeping/contracts.spec.ts` | U1 | FIXME | Expected Result TBD at step(s) 4 |
+| TC-APP024-005 | JRN-APP024-002 | Contract that is refused | Negative | Critical | rows 23-27 | 3 | `tests/e2e/24-housekeeping/contracts.spec.ts` | U1 | FIXME | Expected Result TBD at step(s) 1, 2, 3, 4, 5 |
+| TC-APP024-006 | JRN-APP024-002 | Contract that should be refused or asked | Negative | Critical | rows 28-30 | 3 | `tests/e2e/24-housekeeping/contracts.spec.ts` | U1 | FIXME | Expected Result TBD at step(s) 1, 2, 3 |
+| TC-APP024-007 | JRN-APP024-003 | Daily log: who cleaned where, and its approval | Positive | High | rows 31-34 | 4 | `tests/e2e/24-housekeeping/logs.spec.ts` | U1 | AUTOMATE-WRITE | Saves data: gated on go-ahead (Set-up row 1) |
+| TC-APP024-008 | JRN-APP024-003 | Log that is refused | Negative | High | rows 35-37 | 4 | `tests/e2e/24-housekeeping/logs.spec.ts` | U1 | FIXME | Expected Result TBD at step(s) 1, 2, 3 |
+| TC-APP024-009 | JRN-APP024-003 | Log that should be refused or asked | Negative | High | rows 38-41 | 4 | `tests/e2e/24-housekeeping/logs.spec.ts` | U1 | FIXME | Expected Result TBD at step(s) 1, 2, 3, 4 |
+| TC-APP024-010 | JRN-APP024-004 | Bill of the cleaning vendor, booked in Finance | Integration | Critical | rows 42-47 | 5 | `tests/e2e/24-housekeeping/bills.spec.ts` | U1 | FIXME | Expected Result TBD at step(s) 4, 6 |
+| TC-APP024-011 | JRN-APP024-004 | Bill that is refused | Negative | Critical | rows 48-50 | 5 | `tests/e2e/24-housekeeping/bills.spec.ts` | U1 | FIXME | Expected Result TBD at step(s) 1, 2, 3 |
+| TC-APP024-012 | JRN-APP024-004 | Bill that should be refused | Negative | Critical | rows 51-55 | 5 | `tests/e2e/24-housekeeping/bills.spec.ts` | U1 | FIXME | Expected Result TBD at step(s) 1, 2, 3, 4 |
+| TC-APP024-013 | JRN-APP024-005 | From the cleaning plan to the bill: one month, end to end | Integration | High | rows 56-61 | 6 | `tests/e2e/24-housekeeping/locations.spec.ts` | U1 | FIXME | Expected Result TBD at step(s) 5, 6 |
+| TC-APP024-014 | JRN-APP024-006 | Housekeeping without the housekeeping right, and what is recorded | Security | High | rows 62-67 | 7 | `tests/e2e/24-housekeeping/contracts.spec.ts` | U1, U3 | FIXME | Expected Result TBD at step(s) 1, 2, 3, 4, 5, 6 / Needs user(s) U3 (00-prerequisites: Open) |
+| TC-APP024-015 | JRN-APP024-007 | Screen /housekeeping opens | Regression | High | row 68 | 8 | `tests/e2e/24-housekeeping/hub.spec.ts` | U2 | AUTOMATE-WRITE | Saves data: gated on go-ahead (Set-up row 1) |
+| TC-APP024-016 | JRN-APP024-007 | Screen /housekeeping/bills opens | Regression | Medium | row 69 | 8 | `tests/e2e/24-housekeeping/bills.spec.ts` | U2 | AUTOMATE-WRITE | Saves data: gated on go-ahead (Set-up row 1) |
+| TC-APP024-017 | JRN-APP024-007 | Screen /housekeeping/contracts opens | Regression | Medium | row 70 | 8 | `tests/e2e/24-housekeeping/contracts.spec.ts` | U2 | AUTOMATE-WRITE | Saves data: gated on go-ahead (Set-up row 1) |
+| TC-APP024-018 | JRN-APP024-007 | Screen /housekeeping/locations opens | Regression | Medium | row 71 | 8 | `tests/e2e/24-housekeeping/locations.spec.ts` | U2 | AUTOMATE-WRITE | Saves data: gated on go-ahead (Set-up row 1) |
+| TC-APP024-019 | JRN-APP024-007 | Screen /housekeeping/logs opens | Regression | Medium | row 72 | 8 | `tests/e2e/24-housekeeping/logs.spec.ts` | U2 | AUTOMATE-WRITE | Saves data: gated on go-ahead (Set-up row 1) |
+| TC-APP024-020 | JRN-APP024-008 | Deep link without a session | Security | High | row 73 | 9 | `tests/e2e/24-housekeeping/access-control.spec.ts` | U1, U3, U10 | FIXME | Excel: Automation Candidate = Needs Evaluation / Needs user(s) U3, U10 (00-prerequisites: Open) |
+| TC-APP024-021 | JRN-APP024-008 | Tenant without the licence | Security | High | rows 74-75 | 9 | `tests/e2e/24-housekeeping/access-control.spec.ts` | U1, U3, U10 | FIXME | Excel: Automation Candidate = Needs Evaluation / Needs user(s) U3, U10 (00-prerequisites: Open) |
+| TC-APP024-022 | JRN-APP024-008 | Write without the write privilege | Security | High | row 76 | 9 | `tests/e2e/24-housekeeping/access-control.spec.ts` | U1, U3, U10 | FIXME | Expected Result TBD at step(s) 1 / Excel: Automation Candidate = Needs Evaluation / Needs user(s) U3, U10 (00-prerequisites: Open) |
+
+## Disposition counts
+
+- AUTOMATE-WRITE: 6
+- FIXME: 16

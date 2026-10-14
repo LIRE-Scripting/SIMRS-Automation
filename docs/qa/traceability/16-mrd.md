@@ -1,0 +1,63 @@
+# Traceability: 16-mrd.xlsx
+
+Source: `reference/16-mrd.xlsx` (sheets Journeys, Steps). Generated read-only; do not edit by hand.
+
+Test title = `<TC ID> <Scenario Name> [<file> | Steps | rows a-b | <TC ID>]`; annotation `journey` = `[<file> | Journeys | row n | <Journey ID>]`.
+
+| TC ID | Journey ID | Scenario | Type | Prio | Steps rows | Journeys row | Planned spec | Users | Disposition | Reason |
+|---|---|---|---|---|---|---|---|---|---|---|
+| TC-APP016-001 | JRN-APP016-001 | Creating a file request | Positive | Critical | rows 2-5 | 2 | `tests/e2e/16-mrd/requests.spec.ts` | U1 | AUTOMATE-WRITE | Saves data: gated on go-ahead (Set-up row 1) |
+| TC-APP016-002 | JRN-APP016-002 | Issuing a patient record | Positive | Critical | rows 6-11 | 3 | `tests/e2e/16-mrd/records.spec.ts` | U1 | AUTOMATE-WRITE | Saves data: gated on go-ahead (Set-up row 1) |
+| TC-APP016-003 | JRN-APP016-003 | Returning a patient record | Positive | Critical | rows 12-13 | 4 | `tests/e2e/16-mrd/records.spec.ts` | U1 | AUTOMATE-WRITE | Saves data: gated on go-ahead (Set-up row 1) |
+| TC-APP016-004 | JRN-APP016-004 | Finding the patient in the issue dialog | Positive | High | rows 14-17 | 5 | `tests/e2e/16-mrd/records.spec.ts` | U1 | AUTOMATE-RO | Read-only per Final State |
+| TC-APP016-005 | JRN-APP016-005 | Request list and record list: columns, order and paging | Positive | High | rows 18-21 | 6 | `tests/e2e/16-mrd/requests.spec.ts` | U1 | AUTOMATE-RO | Read-only per Final State |
+| TC-APP016-006 | JRN-APP016-006 | Records officer working on "All branches" | Positive | High | rows 22-27 | 7 | `tests/e2e/16-mrd/requests.spec.ts` | U2, U5 | FIXME | Needs user(s) U5 (00-prerequisites: Open) |
+| TC-APP016-007 | JRN-APP016-007 | Audit trail of requests, issues and returns | Positive | High | rows 28-29 | 8 | `tests/e2e/16-mrd/hub.spec.ts` | U1, U10 | FIXME | Needs user(s) U10 (00-prerequisites: Open) |
+| TC-APP016-008 | JRN-APP016-008 | Hub, navigation and Indonesian | Positive | Medium | rows 30-32 | 9 | `tests/e2e/16-mrd/hub.spec.ts` | U1 | AUTOMATE-WRITE | Saves data: gated on go-ahead (Set-up row 1) |
+| TC-APP016-009 | JRN-APP016-009 | File request without a patient or a requester | Negative | Critical | rows 33-35 | 10 | `tests/e2e/16-mrd/requests.spec.ts` | U1 | AUTOMATE-WRITE | Saves data: gated on go-ahead (Set-up row 1) |
+| TC-APP016-010 | JRN-APP016-010 | Request and issue are not connected | Negative | Critical | rows 36-38 | 11 | `tests/e2e/16-mrd/records.spec.ts` | U1 | AUTOMATE-WRITE | Saves data: gated on go-ahead (Set-up row 1) |
+| TC-APP016-011 | JRN-APP016-011 | Issuing a file that is already out | Negative | Critical | rows 39-40 | 12 | `tests/e2e/16-mrd/records.spec.ts` | U1, U4 | FIXME | Excel: Automation Candidate = Needs Evaluation / Needs user(s) U4 (00-prerequisites: Open) |
+| TC-APP016-012 | JRN-APP016-012 | Who has the file and when it is due | Negative | Critical | rows 41-44 | 13 | `tests/e2e/16-mrd/records.spec.ts` | U1 | AUTOMATE-WRITE | Saves data: gated on go-ahead (Set-up row 1) |
+| TC-APP016-013 | JRN-APP016-013 | Loan and access to the patient's chart | Negative | High | rows 45-47 | 14 | `tests/e2e/16-mrd/records.spec.ts` | U1 | FIXME | Excel: Automation Candidate = Needs Evaluation |
+| TC-APP016-014 | JRN-APP016-014 | No register of files: new patients, location and retention | Negative | High | rows 48-50 | 15 | `tests/e2e/16-mrd/records.spec.ts` | U1 | AUTOMATE-WRITE | Saves data: gated on go-ahead (Set-up row 1) |
+| TC-APP016-015 | JRN-APP016-015 | Document number that is already used | Negative | High | rows 51-54 | 16 | `tests/e2e/16-mrd/requests.spec.ts` | U1, U6 | FIXME | Needs user(s) U6 (00-prerequisites: Open) |
+| TC-APP016-016 | JRN-APP016-016 | Request form and issue form at their limits | Security | High | rows 55-60 | 17 | `tests/e2e/16-mrd/requests.spec.ts` | U1 | AUTOMATE-WRITE | Saves data: gated on go-ahead (Set-up row 1) |
+| TC-APP016-017 | JRN-APP016-017 | Patient search that finds nothing or too much | Negative | High | rows 61-64 | 18 | `tests/e2e/16-mrd/records.spec.ts` | U1, U6 | FIXME | Needs user(s) U6 (00-prerequisites: Open) |
+| TC-APP016-018 | JRN-APP016-018 | Returning a file twice or by mistake | Other | High | rows 65-68 | 19 | `tests/e2e/16-mrd/records.spec.ts` | U1, U4 | FIXME | Excel: Automation Candidate = Needs Evaluation / Needs user(s) U4 (00-prerequisites: Open) |
+| TC-APP016-019 | JRN-APP016-019 | Changing or cancelling a request or an issued record | Negative | High | rows 69-71 | 20 | `tests/e2e/16-mrd/requests.spec.ts` | U1 | AUTOMATE-WRITE | Saves data: gated on go-ahead (Set-up row 1) |
+| TC-APP016-020 | JRN-APP016-020 | Finding a request, a loan or the files that are out | Negative | High | rows 72-75 | 21 | `tests/e2e/16-mrd/records.spec.ts` | U1 | AUTOMATE-WRITE | Saves data: gated on go-ahead (Set-up row 1) |
+| TC-APP016-021 | JRN-APP016-021 | Patient merged after the record was issued | Negative | Medium | rows 76-77 | 22 | `tests/e2e/16-mrd/records.spec.ts` | U1 | FIXME | Excel: Automation Candidate = Needs Evaluation |
+| TC-APP016-022 | JRN-APP016-022 | User without the medical records right | Security | Critical | rows 78-80 | 23 | `tests/e2e/16-mrd/requests.spec.ts` | U1, U3 | FIXME | Needs user(s) U3 (00-prerequisites: Open) |
+| TC-APP016-023 | JRN-APP016-023 | User with no records role reads the loan list | Negative | Critical | rows 81-83 | 24 | `tests/e2e/16-mrd/hub.spec.ts` | U1, U3 | FIXME | Needs user(s) U3 (00-prerequisites: Open) |
+| TC-APP016-024 | JRN-APP016-024 | Requests and records of another branch | Security | Critical | rows 84-86 | 25 | `tests/e2e/16-mrd/requests.spec.ts` | U1, U6 | FIXME | Needs user(s) U6 (00-prerequisites: Open) |
+| TC-APP016-025 | JRN-APP016-025 | Tenant without the MRD licence | Security | High | rows 87-88 | 26 | `tests/e2e/16-mrd/hub.spec.ts` | U1, U10 | FIXME | Needs user(s) U10 (00-prerequisites: Open) |
+| TC-APP016-026 | JRN-APP016-026 | Opening the records without being signed in | Negative | Critical | rows 89-92 | 27 | `tests/e2e/16-mrd/records.spec.ts` | None (not signed in) | FIXME | Excel: Automation Candidate = Needs Evaluation |
+| TC-APP016-027 | JRN-APP016-027 | Script text in the fields of a request and a record | Negative | Medium | rows 93-96 | 28 | `tests/e2e/16-mrd/requests.spec.ts` | U1 | AUTOMATE-WRITE | Saves data: gated on go-ahead (Set-up row 1) |
+| TC-APP016-028 | JRN-APP016-028 | Double click, two officers at once, and reload | Other | Medium | rows 97-100 | 29 | `tests/e2e/16-mrd/records.spec.ts` | U1, U4 | FIXME | Excel: Automation Candidate = Needs Evaluation / Needs user(s) U4 (00-prerequisites: Open) |
+| TC-APP016-029 | JRN-APP016-029 | Request types and a file request with a type | Positive | High | rows 101-107 | 30 | `tests/e2e/16-mrd/requests.spec.ts` | U1 | AUTOMATE-WRITE | Saves data: gated on go-ahead (Set-up row 1) |
+| TC-APP016-030 | JRN-APP016-029 | Type and request that are refused | Negative | High | rows 108-111 | 30 | `tests/e2e/16-mrd/requests.spec.ts` | U1 | FIXME | Expected Result TBD at step(s) 2 |
+| TC-APP016-031 | JRN-APP016-029 | Changing a type | Negative | High | rows 112-113 | 30 | `tests/e2e/16-mrd/requests.spec.ts` | U1 | FIXME | Expected Result TBD at step(s) 1, 2 |
+| TC-APP016-032 | JRN-APP016-030 | Movement of a file: from and to on issue and on return | Positive | High | rows 114-120 | 31 | `tests/e2e/16-mrd/records.spec.ts` | U1 | AUTOMATE-WRITE | Saves data: gated on go-ahead (Set-up row 1) |
+| TC-APP016-033 | JRN-APP016-030 | Movement that says little | Negative | High | rows 121-124 | 31 | `tests/e2e/16-mrd/records.spec.ts` | U1 | FIXME | Expected Result TBD at step(s) 1, 3 |
+| TC-APP016-034 | JRN-APP016-031 | File review in two steps | Positive | High | rows 125-128 | 32 | `tests/e2e/16-mrd/records.spec.ts` | U1, U5 | FIXME | Expected Result TBD at step(s) 4 / Needs user(s) U5 (00-prerequisites: Open) |
+| TC-APP016-035 | JRN-APP016-031 | Review that is refused or lost | Negative | High | rows 129-132 | 32 | `tests/e2e/16-mrd/records.spec.ts` | U1, U5 | FIXME | Expected Result TBD at step(s) 3, 4 / Needs user(s) U5 (00-prerequisites: Open) |
+| TC-APP016-036 | JRN-APP016-032 | Missing diagnosis codes: recording the code of a discharged stay | Integration | Critical | rows 133-138 | 33 | `tests/e2e/16-mrd/coding.spec.ts` | U1 | FIXME | Blocker 6: "Record code" cannot be saved with "All branches" / Expected Result TBD at step(s) 2, 5 |
+| TC-APP016-037 | JRN-APP016-032 | Code that is refused | Negative | Critical | rows 139-141 | 33 | `tests/e2e/16-mrd/coding.spec.ts` | U1 | FIXME | Blocker 6: "Record code" cannot be saved with "All branches" |
+| TC-APP016-038 | JRN-APP016-032 | Code that should be refused | Negative | Critical | rows 142-144 | 33 | `tests/e2e/16-mrd/coding.spec.ts` | U1 | FIXME | Blocker 6: "Record code" cannot be saved with "All branches" / Expected Result TBD at step(s) 1, 2, 3 |
+| TC-APP016-039 | JRN-APP016-032 | List at its size | Negative | Critical | rows 145-146 | 33 | `tests/e2e/16-mrd/coding.spec.ts` | U1 | FIXME | Blocker 6: "Record code" cannot be saved with "All branches" / Expected Result TBD at step(s) 1, 2 |
+| TC-APP016-040 | JRN-APP016-033 | Visits without a document | Integration | Medium | rows 147-150 | 34 | `tests/e2e/16-mrd/outpatient.spec.ts` | U1 | FIXME | Expected Result TBD at step(s) 3, 4 |
+| TC-APP016-041 | JRN-APP016-034 | New MRD actions without the rights they need | Security | High | rows 151-154 | 35 | `tests/e2e/16-mrd/coding.spec.ts` | U1, U3 | FIXME | Expected Result TBD at step(s) 2, 3, 4 / Needs user(s) U3 (00-prerequisites: Open) |
+| TC-APP016-042 | JRN-APP016-035 | Screen /mrd opens | Regression | High | row 155 | 36 | `tests/e2e/16-mrd/hub.spec.ts` | U2 | AUTOMATE-WRITE | Saves data: gated on go-ahead (Set-up row 1) |
+| TC-APP016-043 | JRN-APP016-035 | Screen /mrd/coding opens | Regression | Medium | row 156 | 36 | `tests/e2e/16-mrd/coding.spec.ts` | U2 | AUTOMATE-WRITE | Saves data: gated on go-ahead (Set-up row 1) |
+| TC-APP016-044 | JRN-APP016-035 | Screen /mrd/outpatient opens | Regression | Medium | row 157 | 36 | `tests/e2e/16-mrd/outpatient.spec.ts` | U2 | AUTOMATE-WRITE | Saves data: gated on go-ahead (Set-up row 1) |
+| TC-APP016-045 | JRN-APP016-035 | Screen /mrd/records opens | Regression | Medium | row 158 | 36 | `tests/e2e/16-mrd/records.spec.ts` | U2 | AUTOMATE-WRITE | Saves data: gated on go-ahead (Set-up row 1) |
+| TC-APP016-046 | JRN-APP016-035 | Screen /mrd/requests opens | Regression | Medium | row 159 | 36 | `tests/e2e/16-mrd/requests.spec.ts` | U2 | AUTOMATE-WRITE | Saves data: gated on go-ahead (Set-up row 1) |
+| TC-APP016-047 | JRN-APP016-036 | Deep link without a session | Security | High | row 160 | 37 | `tests/e2e/16-mrd/access-control.spec.ts` | U1, U3, U10 | FIXME | Excel: Automation Candidate = Needs Evaluation / Needs user(s) U3, U10 (00-prerequisites: Open) |
+| TC-APP016-048 | JRN-APP016-036 | Tenant without the licence | Security | High | rows 161-162 | 37 | `tests/e2e/16-mrd/access-control.spec.ts` | U1, U3, U10 | FIXME | Excel: Automation Candidate = Needs Evaluation / Needs user(s) U3, U10 (00-prerequisites: Open) |
+| TC-APP016-049 | JRN-APP016-036 | Write without the write privilege | Security | High | row 163 | 37 | `tests/e2e/16-mrd/access-control.spec.ts` | U1, U3, U10 | FIXME | Expected Result TBD at step(s) 1 / Excel: Automation Candidate = Needs Evaluation / Needs user(s) U3, U10 (00-prerequisites: Open) |
+
+## Disposition counts
+
+- AUTOMATE-RO: 2
+- AUTOMATE-WRITE: 19
+- FIXME: 28

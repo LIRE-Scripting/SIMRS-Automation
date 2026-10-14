@@ -1,0 +1,33 @@
+# Traceability: 26-maintenance.xlsx
+
+Source: `reference/26-maintenance.xlsx` (sheets Journeys, Steps). Generated read-only; do not edit by hand.
+
+Test title = `<TC ID> <Scenario Name> [<file> | Steps | rows a-b | <TC ID>]`; annotation `journey` = `[<file> | Journeys | row n | <Journey ID>]`.
+
+| TC ID | Journey ID | Scenario | Type | Prio | Steps rows | Journeys row | Planned spec | Users | Disposition | Reason |
+|---|---|---|---|---|---|---|---|---|---|---|
+| TC-APP026-001 | JRN-APP026-001 | Plans: job card, plan, asset schedule, daily status and what is due | Positive | High | rows 2-8 | 2 | `tests/e2e/26-maintenance/plans.spec.ts` | U1 | FIXME | Expected Result TBD at step(s) 6, 7 |
+| TC-APP026-002 | JRN-APP026-001 | Plan that is refused | Negative | High | rows 9-15 | 2 | `tests/e2e/26-maintenance/plans.spec.ts` | U1 | FIXME | Expected Result TBD at step(s) 1, 2, 3, 4, 5, 6, 7 |
+| TC-APP026-003 | JRN-APP026-001 | Plan that should be refused or asked | Negative | High | rows 16-18 | 2 | `tests/e2e/26-maintenance/plans.spec.ts` | U1 | FIXME | Expected Result TBD at step(s) 1, 2, 3 |
+| TC-APP026-004 | JRN-APP026-002 | Breakdown to invoice: work order, budget, spare parts and completion | Integration | Critical | rows 19-26 | 3 | `tests/e2e/26-maintenance/work.spec.ts` | U1 | FIXME | Expected Result TBD at step(s) 8 |
+| TC-APP026-005 | JRN-APP026-002 | Work that is refused | Negative | Critical | rows 27-37 | 3 | `tests/e2e/26-maintenance/work.spec.ts` | U1 | FIXME | Expected Result TBD at step(s) 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 |
+| TC-APP026-006 | JRN-APP026-002 | Work that should be refused or asked | Negative | Critical | rows 38-42 | 3 | `tests/e2e/26-maintenance/work.spec.ts` | U1 | FIXME | Expected Result TBD at step(s) 1, 2, 3, 4 |
+| TC-APP026-007 | JRN-APP026-003 | AMC: indent, contract, schedule and instalment | Integration | Critical | rows 43-50 | 4 | `tests/e2e/26-maintenance/amc.spec.ts` | U1 | FIXME | Expected Result TBD at step(s) 8 |
+| TC-APP026-008 | JRN-APP026-003 | AMC that is refused | Negative | Critical | rows 51-59 | 4 | `tests/e2e/26-maintenance/amc.spec.ts` | U1 | FIXME | Expected Result TBD at step(s) 1, 2, 3, 4, 5, 6, 7, 8, 9 |
+| TC-APP026-009 | JRN-APP026-003 | AMC that should be refused or asked | Negative | Critical | rows 60-62 | 4 | `tests/e2e/26-maintenance/amc.spec.ts` | U1 | FIXME | Expected Result TBD at step(s) 1, 2, 3 |
+| TC-APP026-010 | JRN-APP026-004 | Warranty and certificate of an asset | Positive | Medium | rows 63-67 | 5 | `tests/e2e/26-maintenance/amc.spec.ts` | U1 | FIXME | Expected Result TBD at step(s) 5 |
+| TC-APP026-011 | JRN-APP026-004 | Warranty and certificate that are refused | Negative | Medium | rows 68-71 | 5 | `tests/e2e/26-maintenance/amc.spec.ts` | U1 | FIXME | Expected Result TBD at step(s) 1, 2, 3, 4 |
+| TC-APP026-012 | JRN-APP026-005 | Maintenance and the other applications: asset, budget, stock and Finance | Integration | High | rows 72-77 | 6 | `tests/e2e/26-maintenance/work.spec.ts` | U1 | FIXME | Expected Result TBD at step(s) 1, 2, 3, 4, 5, 6 |
+| TC-APP026-013 | JRN-APP026-006 | Maintenance without the maintenance right, and what is recorded | Security | High | rows 78-82 | 7 | `tests/e2e/26-maintenance/work.spec.ts` | U1, U3 | FIXME | Expected Result TBD at step(s) 1, 2, 3, 4, 5 / Needs user(s) U3 (00-prerequisites: Open) |
+| TC-APP026-014 | JRN-APP026-007 | Screen /maintenance opens | Regression | High | row 83 | 8 | `tests/e2e/26-maintenance/hub.spec.ts` | U2 | AUTOMATE-WRITE | Saves data: gated on go-ahead (Set-up row 1) |
+| TC-APP026-015 | JRN-APP026-007 | Screen /maintenance/amc opens | Regression | Medium | row 84 | 8 | `tests/e2e/26-maintenance/amc.spec.ts` | U2 | AUTOMATE-WRITE | Saves data: gated on go-ahead (Set-up row 1) |
+| TC-APP026-016 | JRN-APP026-007 | Screen /maintenance/plans opens | Regression | Medium | row 85 | 8 | `tests/e2e/26-maintenance/plans.spec.ts` | U2 | AUTOMATE-WRITE | Saves data: gated on go-ahead (Set-up row 1) |
+| TC-APP026-017 | JRN-APP026-007 | Screen /maintenance/work opens | Regression | Medium | row 86 | 8 | `tests/e2e/26-maintenance/work.spec.ts` | U2 | AUTOMATE-WRITE | Saves data: gated on go-ahead (Set-up row 1) |
+| TC-APP026-018 | JRN-APP026-008 | Deep link without a session | Security | High | row 87 | 9 | `tests/e2e/26-maintenance/access-control.spec.ts` | U1, U3, U10 | FIXME | Excel: Automation Candidate = Needs Evaluation / Needs user(s) U3, U10 (00-prerequisites: Open) |
+| TC-APP026-019 | JRN-APP026-008 | Tenant without the licence | Security | High | rows 88-89 | 9 | `tests/e2e/26-maintenance/access-control.spec.ts` | U1, U3, U10 | FIXME | Excel: Automation Candidate = Needs Evaluation / Needs user(s) U3, U10 (00-prerequisites: Open) |
+| TC-APP026-020 | JRN-APP026-008 | Write without the write privilege | Security | High | row 90 | 9 | `tests/e2e/26-maintenance/access-control.spec.ts` | U1, U3, U10 | FIXME | Expected Result TBD at step(s) 1 / Excel: Automation Candidate = Needs Evaluation / Needs user(s) U3, U10 (00-prerequisites: Open) |
+
+## Disposition counts
+
+- AUTOMATE-WRITE: 4
+- FIXME: 16
