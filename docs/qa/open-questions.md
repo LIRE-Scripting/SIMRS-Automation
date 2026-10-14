@@ -57,6 +57,8 @@ Row-level lists (TBD steps, discrepancies, …): [_generated-open-items.md](_gen
 
 **Q20. 04 Inpatient Ward supply (TC-APP004-044, 046, 047, 048)** needs inpatient orders OR-1/OR-2 (03 Patient Care, Visit "Inpatient"), stores ST-IP/ST-OP (07 Inventory) and medicine dispensed and issued to a stay (05 Pharmacy). The screen parts that need none of them are checked; the other steps are "not run" until 05 and 07 are automated, then they will be completed as a chain.
 
+**Q21. 06 Transfusion Medicine.** No unit can be made screened and available here: bags are numbered on Donors (HTTP 500, checklist blocker 2) and released by a second user (U4). Every step that needs UNIT-1/UNIT-2/UNIT-F, a collected bag or an issued unit is "Blocked" with blocker 2; tests whose steps are all blocked are skipped with that reason. The group chart rows of the catalogue name only the group (O Positive, A Positive); the reaction strengths typed for TC-APP006-072 (0 / 4) are an assumption. DEP-1 "QA Bangsal Dalam" is made once (code QA-DEP-BB1, Q14).
+
 ## Environment
 
 - **E1 (done).** `node_modules` was installed on another OS (no Linux TypeScript binary, `.bin` files without exec bit). Reinstalled with `npm ci`; `npm run typecheck` works.

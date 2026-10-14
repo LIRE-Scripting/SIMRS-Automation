@@ -173,6 +173,33 @@ export const FOUND_BLOCKERS: FoundBlocker[] = [
       { id: 'TC-APP002-026', steps: [1] },
     ],
   },
+  {
+    no: 25,
+    blocker: 'Saving an external bag or a quality-control record, and approving a blood request, answer HTTP 500',
+    category: 'Function',
+    scope:
+      '06 Transfusion Medicine\nStock, dialog "Receive an external bag" (Save); Quality control, dialog "Record" (Save); ' +
+      'Blood request, request dialog (Approve); Stock, dialog "Blood group chart" (Save chart)',
+    cause:
+      'With valid values these requests answer HTTP 500 and the screen shows "Minified React error #441" (seen 2026-10-15). ' +
+      'Saving the participant settings, the QC limits and a request works; the bag and the QC document are not saved, and a request stays ' +
+      '"Pending", so no request reaches the queue as "approved" (also when its author approves it: whether the author may approve is ' +
+      'TC-APP006-053, but the answer is a server error, not a refusal).',
+    fix:
+      '1. Find the failing requests in the server log (digests 1431275565 and 2743853802 of 2026-10-15) and fix them.\n' +
+      '2. Run TC-APP006-016, 022, 029, 055, 057 and 062 again.',
+    who: 'Development',
+    howFound: 'Seen on the site (automation of 06 Transfusion Medicine)',
+    testCases: [
+      { id: 'TC-APP006-016', steps: [3, 4] },
+      { id: 'TC-APP006-022', steps: [1, 2, 3, 4] },
+      { id: 'TC-APP006-029', steps: [3, 4] },
+      { id: 'TC-APP006-055', steps: [1, 2] },
+      { id: 'TC-APP006-057', steps: [1, 2] },
+      { id: 'TC-APP006-062', steps: [1, 2] },
+      { id: 'TC-APP006-072', steps: [3] },
+    ],
+  },
 ];
 
 export function foundBlocker(no: number): FoundBlocker {
