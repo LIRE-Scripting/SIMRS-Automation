@@ -11,7 +11,12 @@
     "test:modules": "playwright test --project=modules",
     "test:ambulatory-care": "playwright test --project=ambulatory-care",
     "test:flows": "playwright test --project=flows",
-    "test:suites": "playwright test --project=suites"
+    "test:suites": "playwright test --project=suites",
+    "test:e2e": "playwright test --project=e2e",
+    "qa:data": "tsx scripts/qa/build-test-data.ts",
+    "qa:inventory": "tsx scripts/qa/build-inventory.ts",
+    "typecheck": "tsc --noEmit -p .",
+    "qa:e2e-workbook": "tsx scripts/qa/build-e2e-workbook.ts"
   },
   "keywords": [],
   "author": "",
@@ -20,6 +25,9 @@
   "devDependencies": {
     "@playwright/test": "^1.64.0",
     "@types/node": "^26.6.4",
-    "typescript": "^7.0.2"
+    "exceljs": "^4.4.0",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2",
+    "zod": "^3.25.76"
   }
 }

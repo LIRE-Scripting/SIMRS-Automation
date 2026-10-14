@@ -10,6 +10,31 @@ Suites in one project:
 - **Suites** (`tests/suites/`) — pharmacy-style journeys per module
   (`data/module-journeys/*.json`, workbook `module-journeys-QA.xlsx`). Runs as `rs.admin`.
 
+## Workbook-driven E2E (`tests/e2e/`)
+
+Source of truth: the workbooks in `reference/` (never edited by the tests).
+
+```bash
+cp .env.example .env          # set QA_PASSWORD
+npm run qa:data               # reference/*.xlsx -> test-data/reference/*.json (fails on changed columns)
+npm run qa:inventory          # docs/qa/test-inventory.md + traceability/ + generated open items
+npm run test:e2e              # sign in U1/U2 once, then the specs
+npx playwright test --project=e2e --grep @smoke
+QA_ALLOW_WRITES=1 npm run test:e2e   # also the test cases that save data (needs a go-ahead)
+npm run typecheck
+
+# E2E result workbooks: reference workbook copies with Steps -> Execution Status / Actual Result / Defect Reference
+PLAYWRIGHT_JSON_OUTPUT_NAME=reports/e2e/results.json npx playwright test --project=e2e --reporter=list,json
+npm run qa:e2e-workbook       # -> reports/e2e/<NN-module>.xlsx
+```
+
+- `lib/qa-data/`: zod-validated loader, per-test-case plan (user, branch, fixme/skip reasons, tags), "QA-" names.
+- `fixtures/e2e.ts`: `qaTest('TC-APP001-003', async ({ page, qa }) => { await qa.step(1, ...) })`. Title, traceability tag, tags, session and fixme/skip come from the workbook.
+- Users: U1 `rs.admin2` (Podomoro), U2 `rs.admin` (All branches), sessions in `.auth/U1.json`, `.auth/U2.json`.
+- Plan and open points: `docs/qa/test-inventory.md`, `docs/qa/open-questions.md`; blockers found while automating: `docs/qa/blockers-found.md` (source `lib/qa-data/found-blockers.ts`).
+- Step annotations in the report: `deviation` (site differs from the Expected Result; the test asserts the site), `blocker`, `not-run`, `note`, `partial-expected`.
+- 01 Ambulatory Care shared data (`lib/ambulatory-data.ts`): departments, service center and doctor users are found or created once and reused; patients, bookings and arrivals are new every run. Appointment tests each claim a free Monday ("D-day"); the next one to try is kept in `.qa-state/d-day.json` (git-ignored, safe to delete).
+
 ## How it works
 
 - **Login once, encapsulated.** The `setup` project (`tests/auth/auth.setup.ts`) signs in

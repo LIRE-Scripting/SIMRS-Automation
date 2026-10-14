@@ -1,0 +1,36 @@
+{
+ "modules": [
+  "01-ambulatory-care",
+  "02-appointment",
+  "03-patient-care",
+  "04-inpatient",
+  "05-pharmacy",
+  "06-transfusion-medicine",
+  "07-inventory",
+  "08-operation-theater",
+  "09-procurement",
+  "10-hr",
+  "11-laboratory",
+  "12-ris",
+  "13-dietary",
+  "14-hospital-accounts",
+  "15-emergency",
+  "16-mrd",
+  "17-payroll",
+  "18-settings",
+  "19-finance",
+  "20-budget",
+  "21-cssd",
+  "22-services",
+  "23-sourcing",
+  "24-housekeeping",
+  "25-linen",
+  "26-maintenance",
+  "27-fixed-assets"
+ ],
+ "totals": {
+  "journeys": 1014,
+  "testCases": 1604,
+  "steps": 4885
+ }
+}

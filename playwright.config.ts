@@ -1,8 +1,12 @@
 import { defineConfig, devices } from '@playwright/test';
 
-import { AUTH_MODULES_FILE } from './lib/config';
+import { AUTH_MODULES_FILE, authFileOf } from './lib/config';
 
 const AUTH_FILE = '.auth/state.json';
+
+// One id per run for the names of created records (lib/qa-data/names.ts).
+// Set here in the main process; the workers inherit it.
+process.env.QA_RUN_ID ??= Date.now().toString(36).toUpperCase();
 
 /**
  * Pharmacy module test suite (KlikMed HMIS).
@@ -31,12 +35,12 @@ export default defineConfig({
   projects: [
     {
       name: 'setup',
-      testMatch: /auth\.setup\.ts/,
+      testMatch: /tests[\\/]auth[\\/]auth\.setup\.ts/,
       use: { ...devices['Desktop Chrome'], storageState: undefined },
     },
     {
       name: 'pharmacy',
-      testIgnore: /auth\.setup\.ts|modules\.setup\.ts|tests[\\/]modules[\\/]/,
+      testIgnore: /auth\.setup\.ts|modules\.setup\.ts|tests[\\/]modules[\\/]|tests[\\/]e2e[\\/]/,
       dependencies: ['setup'],
       use: { ...devices['Desktop Chrome'], storageState: AUTH_FILE },
     },
@@ -52,12 +56,6 @@ export default defineConfig({
       use: { ...devices['Desktop Chrome'], storageState: AUTH_MODULES_FILE },
     },
     {
-      name: 'ambulatory-care',
-      testMatch: /tests[\\/]ambulatory-care[\\/].*\.spec\.ts/,
-      dependencies: ['modules-setup'],
-      use: { ...devices['Desktop Chrome'], storageState: AUTH_MODULES_FILE },
-    },
-    {
       name: 'flows',
       testMatch: /tests[\\/]flows[\\/].*\.spec\.ts/,
       dependencies: ['modules-setup'],
@@ -68,6 +66,19 @@ export default defineConfig({
       testMatch: /tests[\\/]suites[\\/].*\.spec\.ts/,
       dependencies: ['modules-setup'],
       use: { ...devices['Desktop Chrome'], storageState: AUTH_MODULES_FILE },
+    },
+    {
+      // Workbook users U1 (rs.admin2, Podomoro) and U2 (rs.admin, All branches).
+      name: 'e2e-setup',
+      testMatch: /tests[\\/]e2e[\\/]auth\.setup\.ts/,
+      use: { ...devices['Desktop Chrome'], storageState: undefined },
+    },
+    {
+      // Specs generated from reference/*.xlsx; each test picks its user's session.
+      name: 'e2e',
+      testMatch: /tests[\\/]e2e[\\/].*\.spec\.ts/,
+      dependencies: ['e2e-setup'],
+      use: { ...devices['Desktop Chrome'], storageState: authFileOf('U1') },
     },
   ],
 });

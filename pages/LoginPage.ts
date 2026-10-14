@@ -37,6 +37,21 @@ export class LoginPage {
   }
 
   /**
+   * Signs in on the English site and lands on /en/apps.
+   *
+   * Blocker 1 (00-blockers-checklist-linked.xlsx | Checklist | row 5): from
+   * the default target the sign-in stays on the login page; "with the target
+   * /apps it goes on in half a second". So the login opens with next=/apps.
+   */
+  async signIn(username: string, password: string): Promise<void> {
+    await this.page.goto('/en/login?next=%2Fapps');
+    await this.username.fill(username);
+    await this.password.fill(password);
+    await this.submit.click();
+    await expect(this.page).toHaveURL(/\/en\/apps$/, { timeout: 20_000 });
+  }
+
+  /**
    * Signs in and lands on the app home.
    *
    * Known staging behaviour: after submitting, the page sometimes stays on

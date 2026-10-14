@@ -49,7 +49,7 @@ export async function openDialog(page: Page, trigger: Locator, title?: RegExp): 
 
 /** Pilih option pada select di dalam dialog berdasarkan label yang tampil. */
 export async function pickSelect(dlg: Locator, selector: string, label: string): Promise<void> {
-  await dlg.locator(selector).first().selectOption({ label, timeout: 8_000 });
+  await dlg.locator(selector).first().selectOption({ label }, { timeout: 8_000 });
 }
 
 /** Isi field (input/textarea) di dalam dialog berdasarkan selector. */
