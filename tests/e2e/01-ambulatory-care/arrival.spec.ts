@@ -1,5 +1,5 @@
 import { expect, qaTest, test } from '../../../fixtures/e2e';
-import { bookSettings, ensureMasterData, registerPatient, SHARED } from '../../../lib/ambulatory-data';
+import { bookSettings, ensureMasterData, registerPatient, releaseWeek, SHARED } from '../../../lib/ambulatory-data';
 import { installToastRecorder, toastLocator, toastMark, toastsSince } from '../../../lib/assertions';
 import { authFileOf } from '../../../lib/config';
 import { addDays, todayWib, weekdayOf } from '../../../lib/dates';
@@ -201,7 +201,7 @@ qaTest('TC-APP001-055', async ({ page, qa }) => {
   await qa.step(3, async () => {
     await appts.open();
     await appts.showRange(today);
-    const status = (await appts.rowTexts()).find((r) => r.Patient === pt1.fullName)!.Status;
+    const status = (await appts.allRowTexts()).find((r) => r.Patient === pt1.fullName)!.Status;
     if (status === 'Waiting') qa.deviation(3, 'PT-1\'s row no longer reads "Waiting"', 'the appointment still reads "Waiting"');
     else expect(status).not.toBe('Waiting');
   });
@@ -277,6 +277,8 @@ qaTest('TC-APP001-060', async ({ page, context, qa }) => {
   await arrival.arrive(pt1.fullName, SHARED.dep1.name);
   const board = new QueueBoardPage(await context.newPage());
   await board.open();
+  // "Next week": the Monday after next Monday's week starts (always a Monday).
+  const nextWeek = addDays(todayWib(), 7 + ((8 - weekdayOf(todayWib())) % 7));
   const r = () => board.rowTexts().then((rows) => rows.find((x) => (x.Patient ?? '').includes(pt1.fullName) || x.MRN === pt1.mrn));
 
   await qa.step(1, async () => {
@@ -300,7 +302,6 @@ qaTest('TC-APP001-060', async ({ page, context, qa }) => {
   });
 
   await qa.step(3, async () => {
-    const nextWeek = addDays(todayWib(), 7 + ((8 - weekdayOf(todayWib())) % 7));
     const before = await board.rows().count();
     await appts.open();
     await appts.book({ patient: pt2.fullName, department: SHARED.dep1.name, resource: SHARED.dr1.name, type: bookSettings().types[0].name, date: nextWeek });
@@ -313,6 +314,8 @@ qaTest('TC-APP001-060', async ({ page, context, qa }) => {
     }
   });
 
+  // Frees DR-1's quota on that Monday for the appointment tests (lib/ambulatory-data.ts, D-day).
+  await releaseWeek(page, nextWeek);
   qa.notRun(4, 'needs a BR-B clerk: user U6 is not prepared (00-prerequisites.xlsx | Users | row 10)');
   qa.notRun(5, 'needs a day on which nobody has arrived in the branch; the shared board already has rows today');
 });

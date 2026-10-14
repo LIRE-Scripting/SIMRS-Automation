@@ -24,8 +24,9 @@ QA_ALLOW_WRITES=1 npm run test:e2e   # also the test cases that save data (needs
 npm run typecheck
 
 # E2E result workbooks: reference workbook copies with Steps -> Execution Status / Actual Result / Defect Reference
-PLAYWRIGHT_JSON_OUTPUT_NAME=reports/e2e/results.json npx playwright test --project=e2e --reporter=list,json
-npm run qa:e2e-workbook       # -> reports/e2e/<NN-module>.xlsx
+PLAYWRIGHT_JSON_OUTPUT_NAME=reports/e2e/results-02-appointment.json \
+  npx playwright test --project=e2e tests/e2e/02-appointment/ --reporter=list,json
+npm run qa:e2e-workbook       # reads every reports/e2e/results-*.json -> reports/e2e/<NN-module>.xlsx
 ```
 
 - `lib/qa-data/`: zod-validated loader, per-test-case plan (user, branch, fixme/skip reasons, tags), "QA-" names.

@@ -1,5 +1,6 @@
 import { expect, qaTest } from '../../../fixtures/e2e';
 import { AppHeader } from '../../../pages/AppHeader';
+import { screenOpens } from '../shared/screen-opens';
 
 /**
  * 01-ambulatory-care.xlsx, feature "Ambulatory Care (/registration)" and the
@@ -64,30 +65,6 @@ qaTest('TC-APP001-026', async ({ page, qa }) => {
     }
   });
 });
-
-/** "HTTP 200; the screen shows its title and controls; no error screen; no request of the page fails." */
-async function screenOpens(
-  page: import('@playwright/test').Page,
-  route: string,
-  heading: string,
-): Promise<void> {
-  const failed: string[] = [];
-  page.on('requestfailed', (r) => {
-    if (!/ERR_ABORTED/.test(r.failure()?.errorText ?? '')) failed.push(`${r.url()} ${r.failure()?.errorText}`);
-  });
-  page.on('response', (r) => {
-    if (r.status() >= 400 && r.url().startsWith(new URL(page.url() || 'https://rs.showcase.atklik.xyz').origin)) {
-      failed.push(`${r.status()} ${r.url()}`);
-    }
-  });
-  const response = await page.goto(`/en${route}`);
-  expect(response?.status()).toBe(200);
-  await expect(page.getByRole('main').getByRole('heading', { level: 1, name: heading })).toBeVisible();
-  await expect(page.getByText("This page couldn't load")).toHaveCount(0);
-  // Controls: buttons on the work screens, links (tiles) on the hub.
-  await expect(page.getByRole('main').getByRole('button').or(page.getByRole('main').getByRole('link')).first()).toBeVisible();
-  expect(failed).toEqual([]);
-}
 
 const SCREENS: [string, string, string][] = [
   ['TC-APP001-081', '/registration', 'Ambulatory Care'],

@@ -45,6 +45,18 @@ Row-level lists (TBD steps, discrepancies, …): [_generated-open-items.md](_gen
 
 **Q17. Browser locale.** The suite runs with `locale: 'en-US'` (global config), so lists show "08:00 AM–08:30 AM" and "Oct 26, 2026, 08:00" where the workbook writes 08:00–08:30. The tests convert to 24-hour form; not counted as a deviation.
 
+**Q18. D-day on a shared DR-1 (changed 2026-10-15).** The site books at most one year ahead (2027-10-12 booked, 2027-10-19 "Booking failed" on 2026-10-15; the dialog still offers open times there), so "one new Monday per test" ran out after three runs. Now (`lib/ambulatory-data.ts`): each appointment test cancels its own bookings in DEP-1/DEP-2 afterwards (a cancelled booking no longer counts against the quota), most tests reuse the first Monday with no active booking and DR-1 fully open, the calendar and block tests take a Monday never used before, and the two other block tests reuse Mondays already blocked. Blocks cannot be removed on the site (TC-…-052), so each run of 01 + 02 still uses about four new Mondays for good; with ~52 Mondays in the year ahead and one new Monday each week, that is about one full run a week in the long run. The leftover bookings of the earlier runs (2026-10-19 … 2027-10-11, our QA departments only) were cancelled once on 2026-10-15. Is cancelling our own test bookings after each test acceptable, or should a block-removal function / a separate consultant for block tests be asked for?
+
+**Applied in 02 Appointment (2026-10-15).** TC-APP002-001 … 018 have the same steps as TC-APP001-011 … 054 word for word; they run the same code (`tests/e2e/shared/appointment-cases.ts`) on `/appointment/schedule`, and blockers 17 and 18 list them too. Type codes "X-01"/"X-02" become "QA-01-<token>"/"QA-02-<token>" (Q5, `qa.code`), names "X Tipe uji 01" → "QA-Tipe uji 01 <token>". TC-APP002-022/026 step 3 is TBD and needs a data fix (not run).
+
+**Q19. 03 Patient Care data the workbook does not give** (applied, change if you want others):
+- Full formulary for drugs named only by their label ("Omeprazole 20mg Kapsul", "Ibuprofen 400mg Tablet", "Amlodipine 5mg Tablet", "Meropenem 1g Injection"): generic, strength and form are read from the label, the rest is the standard order's (`lib/clinical-data.ts`).
+- PT-1 "with a date of birth": 01's PT-1 date (1990-05-17) is used.
+- TC-APP003-022 step 2 and TC-APP003-040 step 2 ask to sign out: signing out may end the U1 session every other test uses, so 022 signs in afresh in a new browser context (no sign-out) and 040 step 2 is not run.
+- TC-APP003-050 and TC-APP004-061 need "All branches" active: run as U2 (rs.admin) inside the test.
+
+**Q20. 04 Inpatient Ward supply (TC-APP004-044, 046, 047, 048)** needs inpatient orders OR-1/OR-2 (03 Patient Care, Visit "Inpatient"), stores ST-IP/ST-OP (07 Inventory) and medicine dispensed and issued to a stay (05 Pharmacy). The screen parts that need none of them are checked; the other steps are "not run" until 05 and 07 are automated, then they will be completed as a chain.
+
 ## Environment
 
 - **E1 (done).** `node_modules` was installed on another OS (no Linux TypeScript binary, `.bin` files without exec bit). Reinstalled with `npm ci`; `npm run typecheck` works.

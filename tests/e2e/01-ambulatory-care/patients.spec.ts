@@ -1,6 +1,7 @@
 import { expect, qaTest, test, type Qa } from '../../../fixtures/e2e';
 import { installToastRecorder, toastLocator, toastMark, toastsSince } from '../../../lib/assertions';
-import { bookSettings, claimDDay, ensureMasterData, SHARED } from '../../../lib/ambulatory-data';
+import { bookSettings, claimDDay, ensureMasterData, releaseWeek, SHARED } from '../../../lib/ambulatory-data';
+import { hourWib } from '../../../lib/dates';
 import { AppointmentsPage, whenText } from '../../../pages/ambulatory/AppointmentsPage';
 import { ArrivalPage, QueueBoardPage } from '../../../pages/ambulatory/ArrivalPage';
 import { DEFAULT_FORM_SETTINGS, RegisteredPatientsPage } from '../../../pages/ambulatory/RegisteredPatientsPage';
@@ -86,7 +87,13 @@ qaTest('TC-APP001-001', async ({ page, qa }) => {
     await expect(await reg.cell(row, 'Visit')).toHaveText('Outpatient');
     await expect(await reg.cell(row, 'Date of birth')).toHaveText(`${dob} · ${ageInYears(dob)} years`);
     // The column title is a message key on the site (FND-07 in the Summary of the workbook).
-    await expect(row.getByRole('cell').nth(6)).toHaveText(todayWib());
+    const registered = (await row.getByRole('cell').nth(6).innerText()).trim();
+    if (registered === todayWib(-1) && hourWib() < 7) {
+      // TC-APP001-058 known risk: dates are kept in world time, so before 07:00 WIB the column shows yesterday.
+      qa.deviation(4, `Registered: today's date (${todayWib()})`, `"${registered}" (before 07:00 WIB the site shows yesterday's date)`);
+    } else {
+      expect(registered).toBe(todayWib());
+    }
   });
 
   await qa.step(5, async () => {
@@ -560,12 +567,14 @@ qaTest('TC-APP001-010', async ({ page, qa }) => {
   await qa.step(6, async () => {
     await appts.open();
     await appts.showRange(dDay);
-    const row = (await appts.rowTexts()).find((r) => r.Patient === a.fullName && r.When === whenText(dDay, '08:00'));
+    const row = (await appts.allRowTexts()).find((r) => r.Patient === a.fullName && r.When === whenText(dDay, '08:00'));
     expect(row, 'the booking of PT-DUP-B').toBeDefined();
     if (row!.MRN !== a.mrn) {
       qa.deviation(6, "The appointment now shows PT-DUP-A's name and MRN", `the appointment still shows PT-DUP-B's MRN ${row!.MRN}`);
     }
   });
+  // Frees DR-1's quota on that Monday for later tests (lib/ambulatory-data.ts, D-day).
+  await releaseWeek(page, dDay);
 });
 
 qaTest('TC-APP001-027', async ({ page, qa }) => {

@@ -10,10 +10,10 @@
  *
  * Sheet Summary gets an "E2E run" block at the end. reference/ is only read.
  *
- * Usage:
- *   PLAYWRIGHT_JSON_OUTPUT_NAME=reports/e2e/results.json \
- *     npx playwright test --project=e2e --reporter=line,json
- *   npm run qa:e2e-workbook [-- reports/e2e/results.json]
+ * Usage (one JSON report per module run; every reports/e2e/results-*.json is read):
+ *   PLAYWRIGHT_JSON_OUTPUT_NAME=reports/e2e/results-02-appointment.json \
+ *     npx playwright test --project=e2e tests/e2e/02-appointment/ --reporter=list,json
+ *   npm run qa:e2e-workbook [-- <report.json> ...]
  *
  * Step status rules (docs/qa/open-questions.md, answers C2 and Q8):
  * - a step that passed with a "deviation" did not meet the workbook's
@@ -26,8 +26,10 @@ import path from 'node:path';
 import ExcelJS from 'exceljs';
 import { modules } from '../../lib/qa-data';
 
-const REPORT = process.argv[2] ?? 'reports/e2e/results.json';
 const OUT = 'reports/e2e';
+const REPORTS = process.argv.length > 2
+  ? process.argv.slice(2)
+  : fs.readdirSync(OUT).filter((f) => /^results.*\.json$/.test(f)).sort().map((f) => path.join(OUT, f));
 
 interface PwStep {
   title: string;
@@ -62,8 +64,9 @@ interface StepOutcome {
   defect?: string;
 }
 
-const report = JSON.parse(fs.readFileSync(REPORT, 'utf8')) as { suites: PwSuite[]; stats?: { startTime?: string } };
-const runDate = (report.stats?.startTime ?? new Date().toISOString()).slice(0, 10);
+type Report = { suites: PwSuite[]; stats?: { startTime?: string } };
+const reports = REPORTS.map((file) => ({ file, report: JSON.parse(fs.readFileSync(file, 'utf8')) as Report }));
+let runDate = new Date().toISOString().slice(0, 10);
 
 function* specsOf(suites: PwSuite[]): Generator<PwSpec> {
   for (const s of suites) {
@@ -175,16 +178,26 @@ function compactValidations(ws: ExcelJS.Worksheet): void {
 }
 
 async function main(): Promise<void> {
+  // A test case's newest result wins (by the report's start time): a rerun of a few tests overrides the full run.
   const byTc = new Map<string, PwSpec>();
-  for (const spec of specsOf(report.suites)) {
-    const id = spec.title.match(/^(TC-APP\d{3}-\d{3}) /)?.[1];
-    if (id) byTc.set(id, spec);
+  const source = new Map<string, { file: string; date: string; start: string }>();
+  for (const { file, report } of reports) {
+    const start = report.stats?.startTime ?? new Date().toISOString();
+    for (const spec of specsOf(report.suites)) {
+      const id = spec.title.match(/^(TC-APP\d{3}-\d{3}) /)?.[1];
+      if (id && !(source.get(id)?.start ?? '' > start)) {
+        byTc.set(id, spec);
+        source.set(id, { file, date: start.slice(0, 10), start });
+      }
+    }
   }
   fs.mkdirSync(OUT, { recursive: true });
 
   for (const m of modules()) {
     const tcs = m.testCases.filter((t) => byTc.has(t.id));
     if (!tcs.length) continue;
+    const files = [...new Set(tcs.map((t) => source.get(t.id)!.file))];
+    runDate = tcs.map((t) => source.get(t.id)!.date).sort().at(-1)!;
     const wb = new ExcelJS.Workbook();
     await wb.xlsx.readFile(path.join('reference', m.source));
     const ws = wb.getWorksheet('Steps')!;
@@ -224,7 +237,7 @@ async function main(): Promise<void> {
     if (summary) {
       const start = summary.rowCount + 2;
       const lines: [string, string][] = [
-        ['E2E run', `${runDate}, Playwright project "e2e" (tests/e2e/${m.slug}/), report ${REPORT}`],
+        ['E2E run', `${runDate}, Playwright project "e2e" (tests/e2e/${m.slug}/), report ${files.join(', ')}`],
         ['E2E steps', `Passed ${count.Passed}, Failed ${count.Failed}, Blocked ${count.Blocked}, Not Run ${count['Not Run']}`],
         ['E2E test cases in the run', `${tcs.length} of ${m.testCases.length}`],
         ['E2E rules', 'Failed = the Expected Result was not met (also when the test asserts the site\'s current behaviour). Blocked = docs/qa/blockers-found.md or 00-blockers-checklist-linked.xlsx.'],

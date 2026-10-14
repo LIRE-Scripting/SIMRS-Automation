@@ -10,4 +10,4 @@ screenshots/
 .qa-state/
 
 # Raw Playwright JSON of a run (input of npm run qa:e2e-workbook)
-reports/e2e/results.json
+reports/e2e/results*.json

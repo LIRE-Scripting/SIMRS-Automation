@@ -4,7 +4,8 @@ import type { BookSettings } from '../../lib/ambulatory-data';
 import { escapeRe } from './RegisteredPatientsPage';
 
 /**
- * Ambulatory Care > Appointments (/en/registration/appointments).
+ * Appointments: the same screen under Ambulatory Care
+ * (/en/registration/appointments) and under Appointment (/en/appointment/schedule).
  * Read from the live screen on 2026-10-14. The type-ahead fields
  * (Patient, Department, Consultant or unit) are comboboxes whose listbox
  * offers buttons "MRN · name" / "code · name".
@@ -66,17 +67,6 @@ export function weekLabelOf(iso: string): string {
   return `${f(sun)} – ${f(sat)}`;
 }
 
-/** The Sunday (yyyy-mm-dd) of a shown label, taking the year nearest to `near`. */
-function sundayFromLabel(label: string, near: string): string {
-  const [m, d] = label.split(' – ')[0].split(' ');
-  const year = Number(near.slice(0, 4));
-  const candidates = [year - 1, year, year + 1].map(
-    (y) => `${y}-${String(MONTHS.indexOf(m) + 1).padStart(2, '0')}-${d.padStart(2, '0')}`,
-  );
-  const t = Date.parse(near);
-  return candidates.sort((a, b) => Math.abs(Date.parse(a) - t) - Math.abs(Date.parse(b) - t))[0];
-}
-
 export class AppointmentsPage {
   readonly page: Page;
   readonly main: Locator;
@@ -92,8 +82,12 @@ export class AppointmentsPage {
   readonly nextPageButton: Locator;
   readonly openHours: Locator;
 
-  constructor(page: Page) {
+  /** Route of the screen; the list reloads with a POST to this path. */
+  readonly route: string;
+
+  constructor(page: Page, route = '/en/registration/appointments') {
     this.page = page;
+    this.route = route;
     this.main = page.getByRole('main');
     this.heading = this.main.getByRole('heading', { level: 1, name: 'Appointments' });
     this.bookButton = this.main.getByRole('button', { name: 'Book', exact: true });
@@ -109,7 +103,7 @@ export class AppointmentsPage {
   }
 
   async open(): Promise<void> {
-    await this.page.goto('/en/registration/appointments');
+    await this.page.goto(this.route);
     await expect(this.heading).toBeVisible();
   }
 
@@ -127,16 +121,25 @@ export class AppointmentsPage {
    * more than 30 days) sends nothing, so the wait is for the final pair.
    */
   async showRange(from: string, to: string = from): Promise<void> {
-    if ((await this.fromDate.inputValue()) !== from || (await this.toDate.inputValue()) !== to) {
-      const loaded = this.page.waitForResponse((r) => {
-        const body = r.request().postData() ?? '';
-        return (
-          r.request().method() === 'POST' &&
-          new URL(r.url()).pathname === '/en/registration/appointments' &&
-          body.includes(`"${from}T`) &&
-          body.includes(`"${dayAfter(to)}T`)
-        );
-      });
+    // Right after a load the page may still reset the fields while it hydrates;
+    // the fill is repeated until the list request with the final pair is seen.
+    for (let attempt = 1; ; attempt++) {
+      // Already shown (first pass), or set by an earlier pass whose request came before the wait.
+      if ((await this.fromDate.inputValue()) === from && (await this.toDate.inputValue()) === to) break;
+      const loaded = this.page
+        .waitForResponse(
+          (r) => {
+            const body = r.request().postData() ?? '';
+            return (
+              r.request().method() === 'POST' &&
+              new URL(r.url()).pathname === this.route &&
+              body.includes(`"${from}T`) &&
+              body.includes(`"${dayAfter(to)}T`)
+            );
+          },
+          { timeout: 10_000 },
+        )
+        .catch(() => null);
       if (from > (await this.toDate.inputValue())) {
         await this.toDate.fill(to);
         await this.fromDate.fill(from);
@@ -144,8 +147,11 @@ export class AppointmentsPage {
         await this.fromDate.fill(from);
         await this.toDate.fill(to);
       }
-      await loaded;
+      if (await loaded) break;
+      if (attempt === 3) throw new Error(`The Schedule list did not load ${from} to ${to}`);
     }
+    await expect(this.fromDate).toHaveValue(from);
+    await expect(this.toDate).toHaveValue(to);
     await expect(this.pagingSummary).toBeVisible();
   }
 
@@ -169,12 +175,50 @@ export class AppointmentsPage {
   /** Every row of the current page as { column: text }, times in 24-hour form. */
   async rowTexts(): Promise<Record<string, string>[]> {
     const headers = (await this.table.getByRole('columnheader').allInnerTexts()).map((h) => h.trim());
-    const out: Record<string, string>[] = [];
-    for (const r of await this.rows().all()) {
-      const cells = (await r.getByRole('cell').allInnerTexts()).map((c) => c.trim());
-      out.push(Object.fromEntries(headers.map((h, i) => [h, to24h(cells[i] ?? '')])));
-    }
+    // One read for the whole page (the rows' cells in order).
+    const rows = await this.rows().evaluateAll((trs) =>
+      trs.map((tr) => [...tr.querySelectorAll('td')].map((td) => (td as HTMLElement).innerText.trim())),
+    );
+    return rows.map((cells) => Object.fromEntries(headers.map((h, i) => [h, to24h(cells[i] ?? '')])));
+  }
+
+  /**
+   * Every row of the shown range, page by page, as { column: text }. Ends on
+   * the last page. Mondays are reused by the tests, so a day may hold more
+   * than one page of rows (cancelled rows stay listed).
+   */
+  async allRowTexts(): Promise<Record<string, string>[]> {
+    await this.firstPage();
+    const out = await this.rowTexts();
+    while (await this.nextPage()) out.push(...(await this.rowTexts()));
     return out;
+  }
+
+  /** Goes to the page that lists every one of `patients` (they must share a page). */
+  async pageWith(patients: string[]): Promise<void> {
+    await this.firstPage();
+    for (;;) {
+      const names = (await this.rowTexts()).map((r) => r.Patient);
+      if (patients.every((p) => names.includes(p))) return;
+      if (!(await this.nextPage())) throw new Error(`No page lists all of ${patients.join(', ')}`);
+    }
+  }
+
+  /** Clicks "Next page" when it is enabled and waits for the rows to change; false on the last page. */
+  async nextPage(): Promise<boolean> {
+    if (!(await this.nextPageButton.isVisible()) || (await this.nextPageButton.isDisabled())) return false;
+    const first = await this.rows().first().innerText();
+    await this.nextPageButton.click({ timeout: 15_000 });
+    await expect(this.rows().first()).not.toHaveText(first);
+    return true;
+  }
+
+  async firstPage(): Promise<void> {
+    const one = this.main.getByRole('button', { name: '1', exact: true });
+    if (!(await one.isVisible()) || (await this.pagingSummary.innerText()).match(/^Showing (0|1)\b/)) return;
+    const first = await this.rows().first().innerText();
+    await one.click();
+    await expect(this.rows().first()).not.toHaveText(first);
   }
 
   selectionBar(): Locator {
@@ -205,15 +249,21 @@ export class AppointmentsPage {
     return this.main.getByRole('button', { name, exact: true });
   }
 
-  /** Clicks "Next week"/"Previous week" until the week of `iso` is shown. */
-  async goToWeekOf(iso: string): Promise<void> {
-    const label = weekLabelOf(iso);
-    for (let i = 0; i < 600 && (await this.weekLabel().innerText()) !== label; i++) {
+  /**
+   * Shows the week of `iso`: "Today", then "Next week"/"Previous week" as many
+   * times as there are weeks between (the label has no year to steer by).
+   */
+  async goToWeekOf(iso: string, today: string): Promise<void> {
+    await this.weekButton('Today').click();
+    await expect(this.weekLabel()).toHaveText(weekLabelOf(today));
+    const weeks = Math.round((Date.parse(sundayOfIso(iso)) - Date.parse(sundayOfIso(today))) / (7 * 86_400_000));
+    const button = this.weekButton(weeks > 0 ? 'Next week' : 'Previous week');
+    for (let i = 0; i < Math.abs(weeks); i++) {
       const shown = await this.weekLabel().innerText();
-      await this.weekButton(sundayFromLabel(shown, iso) < sundayOfIso(iso) ? 'Next week' : 'Previous week').click();
+      await button.click();
       await expect(this.weekLabel()).not.toHaveText(shown);
     }
-    await expect(this.weekLabel()).toHaveText(label);
+    await expect(this.weekLabel()).toHaveText(weekLabelOf(iso));
   }
 
   /**

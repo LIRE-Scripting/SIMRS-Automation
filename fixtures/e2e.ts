@@ -2,9 +2,9 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { test as base, type Page, type TestInfo } from '@playwright/test';
 import { authFileOf, SCREENSHOT_DIR } from '../lib/config';
-import { testCaseRef, type TestCaseRef } from '../lib/qa-data';
+import { blockers, testCaseRef, type TestCaseRef } from '../lib/qa-data';
 import { foundBlocker } from '../lib/qa-data/found-blockers';
-import { qaName, qaPrefix, uniqueMrn, uniqueToken } from '../lib/qa-data/names';
+import { qaCode, qaName, qaPrefix, uniqueMrn, uniqueToken } from '../lib/qa-data/names';
 import { journeyTag, planFor, traceTag, type Plan } from '../lib/qa-data/plan';
 
 /**
@@ -24,6 +24,8 @@ export interface Qa {
   step<T>(n: number, body: () => Promise<T>): Promise<T>;
   /** Name for a record this test creates: "QA-" prefix plus the run id. */
   name(excelName: string): string;
+  /** A code ("X-01" in the workbook) with the prefix and a new token: "QA-01-<token>". */
+  code(excelValue: string): string;
   /** Only the "QA-" prefix rule, for fields that cannot take a token. */
   prefix(excelName: string): string;
   /** A new token for every call (run id + counter): makes each saved value unique. */
@@ -38,8 +40,9 @@ export interface Qa {
   /** A step (or part of it) that cannot be run yet, with the reason. Never counted as passed. */
   notRun(step: number, reason: string): void;
   /**
-   * A step stopped by a blocker found while automating (lib/qa-data/found-blockers.ts).
-   * Never counted as passed; the blocker must list this test case and step.
+   * A step stopped by a blocker: a checklist blocker (1-16) or one found while
+   * automating (lib/qa-data/found-blockers.ts, which must list this test case and step).
+   * Never counted as passed.
    */
   blocked(step: number, blockerNo: number): void;
   /** A remark on how a step was run, e.g. a precondition the shared site cannot guarantee. */
@@ -80,6 +83,7 @@ const test = base.extend<Fixtures & { qaId: string }>({
         return base.step(title, body);
       },
       name: qaName,
+      code: qaCode,
       prefix: qaPrefix,
       token: uniqueToken,
       mrn: () => uniqueMrn(),
@@ -96,6 +100,16 @@ const test = base.extend<Fixtures & { qaId: string }>({
         testInfo.annotations.push({ type: 'note', description: `Step ${step}: ${text}` });
       },
       blocked: (step, blockerNo) => {
+        // Checklist blockers (1-16, 00-blockers-checklist-linked.xlsx) may stop steps of journeys the checklist
+        // does not link (a precondition made on a blocked screen); found blockers must list the step.
+        const listed = blockers().blockers.find((b) => b.no === blockerNo);
+        if (listed) {
+          testInfo.annotations.push({
+            type: 'blocker',
+            description: `Step ${step}: blocker ${blockerNo} (00-blockers-checklist-linked.xlsx | Checklist | row ${listed.row}): ${listed.blocker}`,
+          });
+          return;
+        }
         const b = foundBlocker(blockerNo);
         if (!b.testCases.some((t) => t.id === ref.testCase.id && t.steps?.includes(step))) {
           throw new Error(`Blocker ${blockerNo} does not list ${ref.testCase.id} step ${step}`);

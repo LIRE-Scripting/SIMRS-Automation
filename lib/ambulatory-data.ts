@@ -4,6 +4,7 @@ import { expect, type Locator, type Page } from '@playwright/test';
 import { AppointmentsPage } from '../pages/ambulatory/AppointmentsPage';
 import { RegisteredPatientsPage } from '../pages/ambulatory/RegisteredPatientsPage';
 import { MasterListPage } from '../pages/settings/MasterListPage';
+import { toastLocator, toastMark, toastsSince } from './assertions';
 import { PASSWORD } from './config';
 import { addDays, nextWeekday, todayWib } from './dates';
 import { catalogueOf } from './qa-data';
@@ -191,33 +192,67 @@ export async function registerPatient(
 
 /**
  * D-day (00-test-data.xlsx | Catalogue, row 17): "A Monday in the future
- * with no bookings for DR-1 or UNIT-1". DR-1 and UNIT-1 are shared by every
- * run, so each test that books or blocks them claims a Monday of its own:
- * one whose week has no booking in DEP-1/DEP-2 and on which DR-1 and UNIT-1
- * still offer every open time (no booking, no block).
+ * with no bookings for DR-1 or UNIT-1". DR-1 is shared by every run, and the
+ * site books at most one year ahead ("Booking failed" after that), so Mondays
+ * are reused:
  *
- * Used Mondays pile up from next week onwards, run after run, so the first
- * free one is found by doubling the distance, then halving it.
+ * - after each appointment test its bookings in DEP-1/DEP-2 are cancelled
+ *   (releaseWeek): a cancelled booking no longer counts against the quota;
+ * - "free": no active booking in DEP-1/DEP-2 that week and DR-1 offers every
+ *   open time (no block, quota free). Most tests take this;
+ * - "fresh": a weekday (Monday to Friday, DR-1's open days) with no row at
+ *   all, cancelled ones included: the calendars show four bookings a day
+ *   before "+N" (TC-…-015). Mondays are all reused, so this one may be
+ *   another weekday; the test notes it;
+ * - "08:00": no active booking and 08:00 still offered (TC-…-052 books 08:00
+ *   and blocks 08:00–09:00), and "unbooked": no active booking, blocks
+ *   allowed (TC-…-044 blocks the whole morning). These reuse Mondays blocked
+ *   by earlier runs; blocks cannot be removed on the site.
+ *
+ * Mondays found blocked or used are remembered in a git-ignored file so the
+ * next search skips them (blocks and rows never go away).
  */
 const DR1_TIMES = ['08:00', '08:30', '09:00', '09:30', '10:00', '10:30', '11:00', '11:30'];
 const UNIT1_TIMES = ['09:00', '09:30', '10:00', '10:30'];
-/**
- * The next Monday to try, kept between workers and runs in a git-ignored
- * file, so a claim normally costs one check instead of a search.
- */
-const STATE_FILE = path.join('.qa-state', 'd-day.json');
 
-function readCursor(): string | null {
+export type DDayNeed = 'free' | 'fresh' | '08:00' | 'unbooked';
+
+const STATE_FILE = path.join('.qa-state', 'd-day.json');
+interface DDayState {
+  /** Mondays (or days) on which DR-1 does not offer every time with no active booking: blocked for good. */
+  blocked: string[];
+  /** Days that hold rows (cancelled ones stay): never "fresh" again. */
+  used: string[];
+  /** Rows last seen in the week of each Monday: claims prefer the emptiest week. */
+  rows: Record<string, number>;
+}
+
+function readState(): DDayState {
   try {
-    return (JSON.parse(fs.readFileSync(STATE_FILE, 'utf8')) as { next?: string }).next ?? null;
+    const s = JSON.parse(fs.readFileSync(STATE_FILE, 'utf8')) as Partial<DDayState>;
+    return { blocked: s.blocked ?? [], used: s.used ?? [], rows: s.rows ?? {} };
   } catch {
-    return null;
+    return { blocked: [], used: [], rows: {} };
   }
 }
 
-function writeCursor(next: string): void {
+function writeState(s: DDayState): void {
   fs.mkdirSync(path.dirname(STATE_FILE), { recursive: true });
-  fs.writeFileSync(STATE_FILE, JSON.stringify({ next }, null, 2));
+  fs.writeFileSync(STATE_FILE, JSON.stringify(s, null, 2));
+}
+
+function remember(kind: 'blocked' | 'used', day: string): void {
+  const s = readState();
+  if (s[kind].includes(day)) return;
+  s[kind].push(day);
+  s[kind].sort();
+  writeState(s);
+}
+
+function rememberRows(monday: string, rows: number): void {
+  const s = readState();
+  s.rows[monday] = rows;
+  writeState(s);
 }
 
 /** Times offered in "Open time" for DR-1 (or UNIT-1) with type "QA Konsultasi" on `date`. */
@@ -235,43 +270,136 @@ export async function offeredTimes(page: Page, date: string, kind: 'Consultant' 
   return times;
 }
 
-async function mondayIsFree(page: Page, monday: string): Promise<boolean> {
+const QA_DEPARTMENTS = () => [SHARED.dep1.name, SHARED.dep2.name];
+
+/** Rows of the shown range, from "Showing 1–10 of N" (0 when empty). */
+async function shownTotal(appts: AppointmentsPage): Promise<number> {
+  return Number((await appts.pagingSummary.innerText()).match(/of (\d+)$/)?.[1] ?? 0);
+}
+
+/** A weekday with no row at all and DR-1 fully open (need "fresh"). */
+async function dayIsFresh(page: Page, day: string): Promise<boolean> {
+  const state = readState();
+  if (state.used.includes(day) || state.blocked.includes(day)) return false;
+  const appts = new AppointmentsPage(page);
+  await appts.open();
+  await appts.showRange(day);
+  if ((await shownTotal(appts)) > 0) {
+    remember('used', day);
+    return false;
+  }
+  const times = await offeredTimes(page, day, 'Consultant');
+  if (times.join() !== DR1_TIMES.join()) {
+    remember('blocked', day);
+    return false;
+  }
+  return true;
+}
+
+async function mondaySuits(page: Page, monday: string, need: DDayNeed): Promise<boolean> {
+  const state = readState();
+  if (need === 'free' && state.blocked.includes(monday)) return false;
   const appts = new AppointmentsPage(page);
   await appts.open();
   await appts.showRange(monday, addDays(monday, 6));
-  const deps = [SHARED.dep1.name, SHARED.dep2.name];
-  if ((await appts.rowTexts()).some((r) => deps.includes(r.Department))) return false;
+  const total = await shownTotal(appts);
+  rememberRows(monday, total);
+  if (total > 0) {
+    remember('used', monday);
+    const rows = await appts.allRowTexts();
+    if (rows.some((r) => QA_DEPARTMENTS().includes(r.Department) && r.Status === 'Waiting')) return false;
+  }
+  if (need === 'unbooked') return true;
+  const times = await offeredTimes(page, monday, 'Consultant');
+  if (times.join() !== DR1_TIMES.join()) remember('blocked', monday);
   // UNIT-1 offers no time at all while blocker 17 stands, so only DR-1 is checked.
-  return (await offeredTimes(page, monday, 'Consultant')).join() === DR1_TIMES.join();
+  return need === '08:00' ? times.includes('08:00') : times.join() === DR1_TIMES.join();
 }
 
-/** Claims the next free D-day for one test. Needs the shared Book settings. */
-export async function claimDDay(page: Page): Promise<string> {
-  const first = nextWeekday(todayWib(), 1);
-  const saved = readCursor();
-  let dDay: string;
-  if (saved && saved >= first) {
-    dDay = saved;
-    while (!(await mondayIsFree(page, dDay))) dDay = addDays(dDay, 7);
+/**
+ * Claims a Monday for one test (see above). Needs the shared Book settings.
+ * Mondays are tried emptiest week first, so the rows that stay behind
+ * (cancelled bookings) spread over the year instead of piling up on a few
+ * weeks; "08:00" and "unbooked" try Mondays that are blocked already first.
+ * Release it with releaseWeek() when the test ends.
+ */
+export async function claimDDay(page: Page, need: DDayNeed = 'free'): Promise<string> {
+  const today = todayWib();
+  // The test may book up to two days after D-day; the site books one year ahead at most.
+  const last = addDays(today, 365 - 2);
+  const mondays: string[] = [];
+  for (let m = nextWeekday(today, 1); m <= last; m = addDays(m, 7)) mondays.push(m);
+  if (need === 'fresh') {
+    for (const monday of mondays) {
+      for (let i = 0; i < 5; i++) {
+        const day = addDays(monday, i);
+        if (day <= last && (await dayIsFresh(page, day))) {
+          remember('used', day);
+          return day;
+        }
+      }
+    }
   } else {
-    // No saved cursor: search from next week, doubling the distance, then halving it.
-    const week = (k: number) => addDays(first, 7 * k);
-    let used = -1;
-    let free = 0;
-    while (!(await mondayIsFree(page, week(free)))) {
-      used = free;
-      free = free ? free * 2 : 1;
-      if (free > 512) throw new Error(`No free Monday within ten years from ${first}: is DR-1's book setting missing?`);
-    }
-    while (free - used > 1) {
-      const mid = Math.floor((used + free) / 2);
-      if (await mondayIsFree(page, week(mid))) free = mid;
-      else used = mid;
-    }
-    dDay = week(free);
+    const state = readState();
+    const blockedFirst = need !== 'free';
+    const order = [...mondays].sort(
+      (a, b) =>
+        (blockedFirst ? Number(!state.blocked.includes(a)) - Number(!state.blocked.includes(b)) : 0) ||
+        (state.rows[a] ?? 0) - (state.rows[b] ?? 0) ||
+        a.localeCompare(b),
+    );
+    for (const monday of order) if (await mondaySuits(page, monday, need)) return monday;
   }
-  writeCursor(addDays(dDay, 7));
-  return dDay;
+  throw new Error(
+    `No ${need} Monday for DR-1 between ${nextWeekday(today, 1)} and ${last} (the site books one year ahead at most). ` +
+      'Blocks cannot be removed on the site; see docs/qa/open-questions.md Q18.',
+  );
+}
+
+/**
+ * Cancels every waiting booking in DEP-1/DEP-2 in the week of `monday` (the
+ * test's own bookings): a page at a time, and one by one when the site
+ * refuses the page. A booking the site refuses to cancel (e.g. one whose
+ * patient was merged away, TC-APP001-010, "Booking failed") is left as it
+ * is; its Monday then no longer counts as free.
+ */
+export async function releaseWeek(page: Page, monday: string): Promise<void> {
+  const appts = new AppointmentsPage(page);
+  const key = (r: Record<string, string>) => `${r.Patient}|${r.When}|${r.Token}`;
+  const refused = new Set<string>();
+  let single = false;
+  const cancellable = (r: Record<string, string>) =>
+    QA_DEPARTMENTS().includes(r.Department) && r.Status === 'Waiting' && !refused.has(key(r));
+  await appts.open();
+  await appts.showRange(monday, addDays(monday, 6));
+  for (let round = 0; round < 60; round++) {
+    if ((await shownTotal(appts)) === 0 || !(await appts.allRowTexts()).some(cancellable)) {
+      rememberRows(monday, await shownTotal(appts));
+      return;
+    }
+    await appts.firstPage();
+    const ticked: Record<string, string>[] = [];
+    for (;;) {
+      const rows = await appts.rowTexts();
+      for (const [i, r] of rows.entries()) {
+        if (!cancellable(r) || (single && ticked.length)) continue;
+        await appts.rows().nth(i).getByRole('checkbox').check();
+        ticked.push(r);
+      }
+      if (ticked.length || !(await appts.nextPage())) break;
+    }
+    if (!ticked.length) return;
+    const mark = await toastMark(page);
+    await appts.cancelSelectedButton().click();
+    await expect.poll(async () => (await toastsSince(page, mark)).length, { timeout: 15_000 }).toBeGreaterThan(0);
+    if (!(await toastsSince(page, mark)).includes('Appointments cancelled')) {
+      if (single) refused.add(key(ticked[0]));
+      single = true;
+    }
+    await page.reload();
+    await appts.showRange(monday, addDays(monday, 6));
+  }
+  throw new Error(`Could not cancel the QA bookings in the week of ${monday}`);
 }
 
 export { DR1_TIMES, UNIT1_TIMES };

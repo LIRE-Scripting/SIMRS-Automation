@@ -26,12 +26,12 @@ export function uniqueToken(): string {
   return `${runId()}${worker}${counter.toString(36).toUpperCase().padStart(2, '0')}`;
 }
 
-/** "X Pasien OT 01" -> "QA-Pasien OT 01"; values already starting with "QA" stay as they are. */
+/** "X Pasien OT 01" -> "QA-Pasien OT 01", code "X-01" -> "QA-01"; values already starting with "QA" stay as they are. */
 export function qaPrefix(excelValue: string): string {
   const value = excelValue.trim();
   if (/^QA[- ]/.test(value)) return value;
-  if (value.startsWith('X ')) return `QA-${value.slice(2)}`;
-  throw new Error(`"${excelValue}" is not a made-up value from the workbooks (no "QA" or "X " prefix)`);
+  if (value.startsWith('X ') || value.startsWith('X-')) return `QA-${value.slice(2)}`;
+  throw new Error(`"${excelValue}" is not a made-up value from the workbooks (no "QA", "X " or "X-" prefix)`);
 }
 
 /** The value a test saves: the workbook value with the QA- prefix and a new token. */
@@ -48,4 +48,9 @@ export function uniqueMrn(year = new Date().getFullYear()): string {
   counter += 1;
   const n = (Date.now() * 16 + counter) % 0xffffffff;
   return `MRN-${year}-${n.toString(16).toUpperCase().padStart(8, '0')}`;
+}
+
+/** A code the workbook writes as "X-01", made unique per save: "QA-01-<token>". */
+export function qaCode(excelValue: string): string {
+  return `${qaPrefix(excelValue)}-${uniqueToken()}`;
 }

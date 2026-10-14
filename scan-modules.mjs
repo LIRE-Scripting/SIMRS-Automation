@@ -11,7 +11,14 @@ import path from 'node:path';
 const BASE = 'https://rs.showcase.atklik.xyz/';
 const OUT_DIR = 'data/module-scan';
 const SHOT_DIR = 'screenshots-scan';
-const PASSWORD = process.env.SCAN_PASSWORD ?? 'Password123';
+// No password in code: SCAN_PASSWORD, else the shared QA_PASSWORD from .env (Q2).
+try {
+  process.loadEnvFile('.env');
+} catch {
+  // no .env file: rely on the process environment
+}
+const PASSWORD = process.env.SCAN_PASSWORD ?? process.env.QA_PASSWORD;
+if (!PASSWORD) throw new Error('Set SCAN_PASSWORD or QA_PASSWORD (see .env.example)');
 const ADMINS = [
   { key: 'rs', user: process.env.SCAN_RS ?? 'rs.admin' },
   { key: 'apotek', user: process.env.SCAN_APOTEK ?? 'apotek.admin' },
