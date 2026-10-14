@@ -5,7 +5,7 @@ Suites in one project:
 - **Pharmacy** (`tests/pharmacy/`) — generated from `pharmacy-test-journeys-QA.xlsx`
   (50 journeys / 213 steps, kept verbatim in `data/journeys.json`). Runs as
   `klikmed.superadmin`.
-- **Registration** (`tests/registration/`) — patient search & registration E2E.
+- **Ambulatory Care** (`tests/ambulatory-care/`) — sub-modul `registration/` (Registered Patients, Priority rules, Patient flags), `appointment/` (Appointments), `queue/` (Arrival). Jalankan: `npm run test:ambulatory-care`.
 - **Flows** (`tests/flows/`) — per-module feature E2E (2 per module).
 - **Suites** (`tests/suites/`) — pharmacy-style journeys per module
   (`data/module-journeys/*.json`, workbook `module-journeys-QA.xlsx`). Runs as `rs.admin`.

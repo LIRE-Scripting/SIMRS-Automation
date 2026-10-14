@@ -52,8 +52,8 @@ export default defineConfig({
       use: { ...devices['Desktop Chrome'], storageState: AUTH_MODULES_FILE },
     },
     {
-      name: 'registration',
-      testMatch: /tests[\\/]registration[\\/].*\.spec\.ts/,
+      name: 'ambulatory-care',
+      testMatch: /tests[\\/]ambulatory-care[\\/].*\.spec\.ts/,
       dependencies: ['modules-setup'],
       use: { ...devices['Desktop Chrome'], storageState: AUTH_MODULES_FILE },
     },

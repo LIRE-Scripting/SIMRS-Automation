@@ -1,7 +1,7 @@
-import { test, expect } from '../../fixtures/pharmacy';
-import { ensureSignedIn } from '../../lib/auth';
-import { MODULES_USERNAME, PASSWORD } from '../../lib/config';
-import { RegistrationPatientsPage } from '../../pages/RegistrationPage';
+import { test, expect } from '../../../fixtures/pharmacy';
+import { ensureSignedIn } from '../../../lib/auth';
+import { MODULES_USERNAME, PASSWORD } from '../../../lib/config';
+import { RegistrationPatientsPage } from '../../../pages/RegistrationPage';
 
 /**
  * TC-REG-E2E-001 - Pencarian pasien (search data).

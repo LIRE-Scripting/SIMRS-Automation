@@ -9,7 +9,7 @@
     "test:headed": "playwright test --headed",
     "report": "playwright show-report",
     "test:modules": "playwright test --project=modules",
-    "test:registration": "playwright test --project=registration",
+    "test:ambulatory-care": "playwright test --project=ambulatory-care",
     "test:flows": "playwright test --project=flows",
     "test:suites": "playwright test --project=suites"
   },
