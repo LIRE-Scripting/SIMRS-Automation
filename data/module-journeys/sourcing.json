@@ -1,0 +1,30 @@
+[
+  {
+    "id": "SRC-JRN-001",
+    "journey": "Panitia lelang membuat tender baru",
+    "path": "Happy path",
+    "priority": "P0",
+    "role": "Panitia pengadaan",
+    "goal": "Wizard tender dapat dijalankan tanpa error.",
+    "preconditions": "Login rs.admin; layar Sourcing > Tenders terbuka.",
+    "testData": "Nomor TND-QA-<timestamp> unik",
+    "expectedEnd": "Wizard tender selesai; layar tetap sehat.",
+    "steps": [
+      {
+        "step": 1,
+        "action": "Buka Apps, Sourcing, Tenders",
+        "expected": "Layar tender tampil"
+      },
+      {
+        "step": 2,
+        "action": "Klik Create tender",
+        "expected": "Wizard Tenders terbuka (langkah Details -> Review)"
+      },
+      {
+        "step": 3,
+        "action": "Isi nomor & nama tender, lanjut Review, simpan",
+        "expected": "Wizard selesai tanpa error"
+      }
+    ]
+  }
+]

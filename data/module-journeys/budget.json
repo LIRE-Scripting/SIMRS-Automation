@@ -1,0 +1,53 @@
+[
+  {
+    "id": "BDG-JRN-001",
+    "journey": "PPA membuat buku anggaran baru",
+    "path": "Happy path",
+    "priority": "P0",
+    "role": "Perencanaan (PPA)",
+    "goal": "Buku anggaran terdaftar dan dapat dicari.",
+    "preconditions": "Login rs.admin; layar Budget > Books terbuka.",
+    "testData": "Kode B14-QA<timestamp> unik",
+    "expectedEnd": "Buku baru tampil pada daftar buku.",
+    "steps": [
+      {"step": 1, "action": "Buka Apps, Budget, Books", "expected": "Tabel buku tampil: Code, Book name, Sponsor, Status"},
+      {"step": 2, "action": "Klik New book", "expected": "Dialog New budget book terbuka: Code, Book name, Sponsor, Remarks"},
+      {"step": 3, "action": "Isi kode, nama buku, sponsor lalu Save", "expected": "Buku tersimpan tanpa error"},
+      {"step": 4, "action": "Cari kode buku", "expected": "Buku baru tampil pada daftar"}
+    ]
+  },
+  {
+    "id": "BDG-JRN-002",
+    "journey": "PPA membuat pagu anggaran (head) untuk tahun berjalan",
+    "path": "Happy path",
+    "priority": "P0",
+    "role": "Perencanaan (PPA)",
+    "goal": "Pagu anggaran terdaftar untuk tahun 2026.",
+    "preconditions": "Login rs.admin; layar Budget > Heads terbuka.",
+    "testData": "Kode HD-QA<timestamp> unik",
+    "expectedEnd": "Pagu baru tampil pada daftar heads.",
+    "steps": [
+      {"step": 1, "action": "Buka Budget, Heads", "expected": "Tabel heads tampil: Code, Name, Spending type, Financial year, Status"},
+      {"step": 2, "action": "Klik New head", "expected": "Dialog New budget head terbuka: Code, Spending type, Head name, Financial year"},
+      {"step": 3, "action": "Isi kode, type Operating, tahun 2026, nama, lalu Save", "expected": "Pagu tersimpan tanpa error"},
+      {"step": 4, "action": "Cari kode pagu", "expected": "Pagu baru tampil pada daftar"}
+    ]
+  },
+  {
+    "id": "BDG-JRN-003",
+    "journey": "PPA menambah pertanyaan checklist sanksi",
+    "path": "Happy path",
+    "priority": "P1",
+    "role": "Perencanaan (PPA)",
+    "goal": "Checklist sanksi buku OPS memiliki pertanyaan baru.",
+    "preconditions": "Login rs.admin; buku B14-OPS ada.",
+    "testData": "Pertanyaan bertanda (uji QA)",
+    "expectedEnd": "Pertanyaan tampil pada daftar checklist.",
+    "steps": [
+      {"step": 1, "action": "Buka Budget, Sanction checklists", "expected": "Tabel pertanyaan tampil"},
+      {"step": 2, "action": "Klik New question", "expected": "Dialog New checklist question terbuka: Budget book, Order, Question"},
+      {"step": 3, "action": "Pilih buku B14-OPS, urutan 99, isi pertanyaan, lalu Save", "expected": "Pertanyaan tersimpan tanpa error"},
+      {"step": 4, "action": "Periksa daftar", "expected": "Pertanyaan baru tampil"}
+    ]
+  }
+]

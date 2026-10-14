@@ -1,0 +1,47 @@
+[
+  {
+    "id": "HK-JRN-001",
+    "journey": "Supervisor housekeeping membuat lokasi baru",
+    "path": "Happy path",
+    "priority": "P0",
+    "role": "Supervisor housekeeping",
+    "goal": "Lokasi kebersihan baru tersimpan.",
+    "preconditions": "Login rs.admin; layar Housekeeping > Locations terbuka.",
+    "testData": "Kode HK<timestamp> unik",
+    "expectedEnd": "Lokasi baru tersimpan.",
+    "steps": [
+      {"step": 1, "action": "Buka Apps, Housekeeping, Locations, klik New location", "expected": "Dialog Locations terbuka dengan aksi Save location"},
+      {"step": 2, "action": "Pilih aksi Save location, isi kode dan nama, lalu Save", "expected": "Lokasi tersimpan tanpa error"}
+    ]
+  },
+  {
+    "id": "HK-JRN-002",
+    "journey": "Supervisor housekeeping menyimpan kontrak kebersihan",
+    "path": "Happy path",
+    "priority": "P1",
+    "role": "Supervisor housekeeping",
+    "goal": "Kontrak kebersihan tersimpan.",
+    "preconditions": "Login rs.admin; layar Housekeeping > Contracts terbuka.",
+    "testData": "Nomor HKC-QA-<timestamp> unik",
+    "expectedEnd": "Kontrak tersimpan.",
+    "steps": [
+      {"step": 1, "action": "Buka Housekeeping, Contracts, klik New", "expected": "Dialog Contracts terbuka dengan aksi Save contract"},
+      {"step": 2, "action": "Pilih aksi Save contract, isi nomor dan nama, lalu Save", "expected": "Kontrak tersimpan tanpa error"}
+    ]
+  },
+  {
+    "id": "HK-JRN-003",
+    "journey": "Petugas housekeeping mencatat log harian",
+    "path": "Happy path",
+    "priority": "P1",
+    "role": "Petugas housekeeping",
+    "goal": "Log kegiatan harian tersimpan.",
+    "preconditions": "Login rs.admin; layar Housekeeping > Logs terbuka.",
+    "testData": "Nomor HKL-QA-<timestamp> unik",
+    "expectedEnd": "Log tersimpan.",
+    "steps": [
+      {"step": 1, "action": "Buka Housekeeping, Logs, klik New", "expected": "Dialog Daily logs terbuka dengan aksi Log"},
+      {"step": 2, "action": "Pilih aksi Log, isi nomor, lalu Save", "expected": "Log tersimpan tanpa error"}
+    ]
+  }
+]

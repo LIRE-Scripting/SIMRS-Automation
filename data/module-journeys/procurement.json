@@ -1,0 +1,35 @@
+[
+  {
+    "id": "PRC-JRN-001",
+    "journey": "Staf pengadaan membuat purchase order",
+    "path": "Happy path",
+    "priority": "P0",
+    "role": "Staf pengadaan",
+    "goal": "PO tersimpan dan tampil pada daftar purchase orders.",
+    "preconditions": "Login rs.admin; layar Procurement > Purchase orders terbuka.",
+    "testData": "Doc number PO-QA-<timestamp> unik",
+    "expectedEnd": "PO tampil pada daftar purchase orders.",
+    "steps": [
+      {
+        "step": 1,
+        "action": "Buka Apps, Procurement, Purchase orders",
+        "expected": "Layar purchase orders tampil"
+      },
+      {
+        "step": 2,
+        "action": "Buka dialog Create purchase order",
+        "expected": "Dialog terbuka: Branch, Doc number, Doc date, Vendor, Currency, Advance amount"
+      },
+      {
+        "step": 3,
+        "action": "Isi branch, doc number, vendor, currency, amount, lalu Save",
+        "expected": "PO tersimpan tanpa error"
+      },
+      {
+        "step": 4,
+        "action": "Periksa daftar purchase orders",
+        "expected": "PO tampil pada daftar"
+      }
+    ]
+  }
+]

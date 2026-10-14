@@ -1,0 +1,33 @@
+[
+  {
+    "id": "FIN-JRN-001",
+    "journey": "Akuntan membuat jurnal ganda berimbang",
+    "path": "Happy path",
+    "priority": "P0",
+    "role": "Akuntan",
+    "goal": "Jurnal debit Kas = kredit Pendapatan tersimpan dan tampil di daftar.",
+    "preconditions": "Login rs.admin; akun 1101 Kas dan 4101 Pendapatan ada.",
+    "testData": "Narrasi bertanda QA + timestamp",
+    "expectedEnd": "Jurnal tampil pada daftar jurnal.",
+    "steps": [
+      {"step": 1, "action": "Buka Apps, Finance, Journals", "expected": "Daftar jurnal tampil: Number, Date, Narration, Amount, Approval"},
+      {"step": 2, "action": "Klik New journal", "expected": "Dialog New journal terbuka: Date, Subtype, Narration, baris debit/kredit"},
+      {"step": 3, "action": "Isi tanggal, narrasi, debit Kas 100000 dan kredit Pendapatan 100000, lalu Save", "expected": "Jurnal tersimpan tanpa error"},
+      {"step": 4, "action": "Periksa daftar jurnal", "expected": "Jurnal baru tampil pada daftar"}
+    ]
+  },
+  {
+    "id": "FIN-JRN-002",
+    "journey": "Validasi chart of account berisi data",
+    "path": "Verifikasi",
+    "priority": "P1",
+    "role": "Akuntan",
+    "goal": "Master akun terisi sehingga jurnal dapat memakai akun.",
+    "preconditions": "Login rs.admin.",
+    "testData": "-",
+    "expectedEnd": "Daftar akun tampil berisi data.",
+    "steps": [
+      {"step": 1, "action": "Buka Finance, Accounts", "expected": "Daftar akun tampil: Code, Name, Kind, Type, Branch"}
+    ]
+  }
+]

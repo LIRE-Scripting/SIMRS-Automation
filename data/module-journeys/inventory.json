@@ -1,0 +1,83 @@
+[
+  {
+    "id": "INV-JRN-001",
+    "journey": "Staf inventory menambahkan item baru ke katalog",
+    "path": "Happy path",
+    "priority": "P0",
+    "role": "Staf inventory",
+    "goal": "Item baru terdaftar dengan stok minimum/maksimum dan dapat dicari.",
+    "preconditions": "Login rs.admin; layar Inventory > Items terbuka.",
+    "testData": "Kode item QA-<timestamp> unik",
+    "expectedEnd": "Items list memuat item QA-<timestamp> berstatus Active dan dapat ditemukan lewat pencarian.",
+    "steps": [
+      {"step": 1, "action": "Buka Apps, Inventory, Items", "expected": "Tabel item tampil dengan kolom Code, Name, Batch, Serialized, Status"},
+      {"step": 2, "action": "Klik Add Item", "expected": "Dialog Add Item terbuka: Item code, Item name, Description, Minimum/Maximum stock, Batch tracked, Active"},
+      {"step": 3, "action": "Isi Item code QA-<timestamp>, Item name, min 1, max 10, lalu Save", "expected": "Item tersimpan tanpa error; dialog tertutup"},
+      {"step": 4, "action": "Isi kolom pencarian dengan kode item lalu Enter", "expected": "Baris item baru tampil berstatus Active"}
+    ]
+  },
+  {
+    "id": "INV-JRN-002",
+    "journey": "Departemen mengajukan stock request urgent",
+    "path": "Happy path",
+    "priority": "P0",
+    "role": "Staf departemen",
+    "goal": "Dokumen permintaan stok tercatat dan masuk antrean persetujuan.",
+    "preconditions": "Login rs.admin; layar Inventory > Stock Requests terbuka.",
+    "testData": "Doc number SR-QA-<timestamp> unik",
+    "expectedEnd": "Dokumen SR-QA-<timestamp> tampil pada daftar dengan status approval awal (menunggu).",
+    "steps": [
+      {"step": 1, "action": "Buka Inventory, Stock Requests", "expected": "Tabel dokumen tampil: Doc #, Date, Department, Type, Approval"},
+      {"step": 2, "action": "Klik New Stock Request", "expected": "Dialog terbuka: Branch, Document number, Document date, Request type, Currency, Net amount, Remarks"},
+      {"step": 3, "action": "Pilih branch Daan Mogot, isi doc number SR-QA-<timestamp>, type Urgent, currency IDR, net amount, remarks, lalu Create", "expected": "Dokumen tersimpan tanpa error; dialog tertutup"},
+      {"step": 4, "action": "Periksa daftar dokumen", "expected": "Dokumen SR-QA-<timestamp> tampil pada daftar"}
+    ]
+  },
+  {
+    "id": "INV-JRN-003",
+    "journey": "Approve stock request yang menunggu persetujuan",
+    "path": "Happy path",
+    "priority": "P1",
+    "role": "Atasan departemen / inventory",
+    "goal": "Permintaan stok disetujui dan status approval berubah.",
+    "preconditions": "Ada dokumen stock request berstatus menunggu (hasil INV-JRN-002).",
+    "testData": "Dokumen pertama pada daftar",
+    "expectedEnd": "Status approval dokumen berubah menjadi disetujui.",
+    "steps": [
+      {"step": 1, "action": "Buka Inventory, Stock Requests", "expected": "Tabel dokumen tampil"},
+      {"step": 2, "action": "Klik Approve pada dokumen pertama", "expected": "Aksi approve dijalankan tanpa error"},
+      {"step": 3, "action": "Periksa kolom Approval dokumen tersebut", "expected": "Status approval berubah (approved)"}
+    ]
+  },
+  {
+    "id": "INV-JRN-004",
+    "journey": "Memfilter katalog item berdasarkan status",
+    "path": "Alternatif",
+    "priority": "P2",
+    "role": "Staf inventory",
+    "goal": "Filter status bekerja: Active dan Inactive terpisah.",
+    "preconditions": "Login rs.admin; ada item pada katalog.",
+    "testData": "-",
+    "expectedEnd": "Daftar item mengikuti filter status yang dipilih.",
+    "steps": [
+      {"step": 1, "action": "Buka Inventory, Items", "expected": "Tabel item tampil dengan dropdown status"},
+      {"step": 2, "action": "Pilih filter Active", "expected": "Semua baris berstatus Active"},
+      {"step": 3, "action": "Pilih filter Inactive", "expected": "Baris kosong atau berstatus Inactive"}
+    ]
+  },
+  {
+    "id": "INV-JRN-005",
+    "journey": "Ledger mencatat mutasi stok",
+    "path": "Verifikasi",
+    "priority": "P2",
+    "role": "Staf inventory",
+    "goal": "Buku besar mutasi stok dapat diakses.",
+    "preconditions": "Login rs.admin.",
+    "testData": "-",
+    "expectedEnd": "Layar Ledger terbuka (riwayat mutasi atau empty-state bila belum ada transaksi).",
+    "steps": [
+      {"step": 1, "action": "Buka Inventory, Ledger", "expected": "Halaman Ledger tampil tanpa error"},
+      {"step": 2, "action": "Periksa isi ledger", "expected": "Riwayat mutasi tampil, atau empty-state bila belum ada mutasi"}
+    ]
+  }
+]

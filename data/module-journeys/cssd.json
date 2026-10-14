@@ -1,0 +1,52 @@
+[
+  {
+    "id": "CSS-JRN-001",
+    "journey": "Teknisi CSSD menambah indikator sterilisasi baru",
+    "path": "Happy path",
+    "priority": "P0",
+    "role": "Teknisi CSSD",
+    "goal": "Master indikator bertambah dan dapat dicari.",
+    "preconditions": "Login rs.admin; layar CSSD > Indicator types terbuka.",
+    "testData": "Kode IT<timestamp> unik",
+    "expectedEnd": "Indikator baru tampil pada daftar.",
+    "steps": [
+      {"step": 1, "action": "Buka Apps, CSSD, Indicator types", "expected": "Tabel indikator tampil: Code, Name, Status"},
+      {"step": 2, "action": "Klik New", "expected": "Dialog New terbuka: Code, Name, Active"},
+      {"step": 3, "action": "Isi kode IT<timestamp> dan nama, lalu Save", "expected": "Indikator tersimpan tanpa error"},
+      {"step": 4, "action": "Periksa daftar", "expected": "Indikator baru tampil"}
+    ]
+  },
+  {
+    "id": "CSS-JRN-002",
+    "journey": "Teknisi CSSD menambah nama uji yang merujuk indikator",
+    "path": "Happy path",
+    "priority": "P0",
+    "role": "Teknisi CSSD",
+    "goal": "Nama uji terdaftar dengan referensi indikator.",
+    "preconditions": "Indikator dari CSS-JRN-001 sudah dibuat.",
+    "testData": "Kode TN<timestamp> unik",
+    "expectedEnd": "Nama uji baru tampil pada daftar.",
+    "steps": [
+      {"step": 1, "action": "Buka CSSD, Test names", "expected": "Tabel nama uji tampil: Code, Name, Indicator Type, Status"},
+      {"step": 2, "action": "Klik New", "expected": "Dialog New terbuka: Code, Name, Indicator Type"},
+      {"step": 3, "action": "Isi kode TN<timestamp>, nama, pilih indikator, lalu Save", "expected": "Nama uji tersimpan tanpa error"},
+      {"step": 4, "action": "Periksa daftar", "expected": "Nama uji baru tampil"}
+    ]
+  },
+  {
+    "id": "CSS-JRN-003",
+    "journey": "Validasi data operasional CSSD (requests, receipts, cycles)",
+    "path": "Verifikasi",
+    "priority": "P2",
+    "role": "Supervisor CSSD",
+    "goal": "Data transaksi harian CSSD tersedia.",
+    "preconditions": "Login rs.admin.",
+    "testData": "-",
+    "expectedEnd": "Ketiga daftar operasional berisi data.",
+    "steps": [
+      {"step": 1, "action": "Buka CSSD, Requests", "expected": "Daftar sterile request berisi data"},
+      {"step": 2, "action": "Buka CSSD, Receipts", "expected": "Daftar penerimaan berisi data"},
+      {"step": 3, "action": "Buka CSSD, Cycles", "expected": "Daftar siklus sterilisasi berisi data"}
+    ]
+  }
+]

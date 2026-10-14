@@ -1,0 +1,35 @@
+[
+  {
+    "id": "ADT-JRN-001",
+    "journey": "Staf ADT menambahkan tempat tidur baru",
+    "path": "Happy path",
+    "priority": "P0",
+    "role": "Staf ADT",
+    "goal": "Bed baru terdaftar pada branch dan dapat dicari.",
+    "preconditions": "Login rs.admin; layar Inpatient > Beds terbuka.",
+    "testData": "Bed no QA-<timestamp> unik",
+    "expectedEnd": "Bed baru ditemukan lewat pencarian.",
+    "steps": [
+      {"step": 1, "action": "Buka Apps, Inpatient, Beds", "expected": "Tabel bed tampil: Bed no, Patient, Admission no, Availability"},
+      {"step": 2, "action": "Klik Add bed", "expected": "Dialog Add bed terbuka: Branch, Bed no, Description, Availability"},
+      {"step": 3, "action": "Pilih branch Daan Mogot, isi bed no dan deskripsi, availability Available, lalu Save", "expected": "Bed tersimpan tanpa error"},
+      {"step": 4, "action": "Cari bed no", "expected": "Bed baru tampil pada daftar"}
+    ]
+  },
+  {
+    "id": "ADT-JRN-002",
+    "journey": "Perawat ward mencatat pemberian obat (Record dose)",
+    "path": "Happy path",
+    "priority": "P0",
+    "role": "Perawat ward",
+    "goal": "Dosis obat tercatat untuk pasien rawat inap yang memiliki order.",
+    "preconditions": "Pasien teradmisikan dan memiliki order obat (dari modul Clinical/Pharmacy).",
+    "testData": "Pasien pertama dari daftar Registration",
+    "expectedEnd": "Dosis tercatat pada Ward care.",
+    "steps": [
+      {"step": 1, "action": "Ambil pasien dari modul Registration", "expected": "MRN dan nama pasien diperoleh"},
+      {"step": 2, "action": "Buka Inpatient, Ward, klik Record dose", "expected": "Dialog Record dose terbuka: Branch, Patient, Order, Status, Reason"},
+      {"step": 3, "action": "Pilih branch, pasien, order obat, status Given, lalu Save", "expected": "Dosis tersimpan; daftar Ward care tidak lagi kosong"}
+    ]
+  }
+]

@@ -1,0 +1,34 @@
+[
+  {
+    "id": "OT-JRN-001",
+    "journey": "Bedah membuat permintaan jadwal operasi",
+    "path": "Happy path",
+    "priority": "P0",
+    "role": "Bedah",
+    "goal": "OT request tercatat dengan prosedur, pasien, ruang, dan jadwal.",
+    "preconditions": "Login rs.admin; pasien terdaftar; typeahead pasien pada dialog OT berfungsi.",
+    "testData": "Pasien pertama dari daftar Registration",
+    "expectedEnd": "OT request tampil pada daftar dengan prosedur yang diisi.",
+    "steps": [
+      {"step": 1, "action": "Ambil pasien dari modul Registration", "expected": "MRN dan nama pasien diperoleh"},
+      {"step": 2, "action": "Buka Operation Theater, Requests, klik New request", "expected": "Dialog New OT request terbuka: Branch, Procedures, Patient, Room, Start, End, Chief surgeon"},
+      {"step": 3, "action": "Isi prosedur, pasien, ruang OK-01, jadwal besok, dokter bedah, lalu Save", "expected": "Request tersimpan tanpa error"},
+      {"step": 4, "action": "Periksa daftar request", "expected": "Request tampil dengan prosedur yang diisi"}
+    ]
+  },
+  {
+    "id": "OT-JRN-002",
+    "journey": "Validasi alur kerja OT request",
+    "path": "Verifikasi",
+    "priority": "P1",
+    "role": "Koordinator OT",
+    "goal": "Aksi Schedule/Consume/Validate tersedia pada daftar request.",
+    "preconditions": "Login rs.admin; ada request pada daftar.",
+    "testData": "-",
+    "expectedEnd": "Ketiga aksi alur kerja tersedia.",
+    "steps": [
+      {"step": 1, "action": "Buka Operation Theater, Requests", "expected": "Daftar request tampil berisi data"},
+      {"step": 2, "action": "Periksa aksi", "expected": "Schedule, Consume, Validate tersedia"}
+    ]
+  }
+]

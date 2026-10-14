@@ -1,0 +1,35 @@
+[
+  {
+    "id": "APT-JRN-001",
+    "journey": "Petugas memblokir jadwal konsultan",
+    "path": "Happy path",
+    "priority": "P0",
+    "role": "Petugas appointment",
+    "goal": "Waktu konsultan terblokir untuk rentang yang ditentukan.",
+    "preconditions": "Login rs.admin; layar Appointment > Schedule terbuka.",
+    "testData": "Besok, 1 jam",
+    "expectedEnd": "Blok tersimpan dan dialog tertutup.",
+    "steps": [
+      {"step": 1, "action": "Buka Apps, Appointment, Schedule", "expected": "Layar jadwal tampil dengan tombol Book, Block time, Calendar"},
+      {"step": 2, "action": "Klik Block time", "expected": "Dialog Block consultant terbuka: Branch, Consultant, From, To"},
+      {"step": 3, "action": "Pilih branch Daan Mogot, konsultan Agus Wijaya, isi rentang waktu besok, lalu Block", "expected": "Blok tersimpan; dialog tertutup"}
+    ]
+  },
+  {
+    "id": "APT-JRN-002",
+    "journey": "Petugas membuat appointment untuk pasien",
+    "path": "Happy path",
+    "priority": "P0",
+    "role": "Petugas appointment",
+    "goal": "Pasien dari modul Registration terbooking pada konsultan.",
+    "preconditions": "Pasien terdaftar; master Appointment type terisi untuk branch.",
+    "testData": "Pasien pertama dari daftar Registration",
+    "expectedEnd": "Appointment tampil pada tabel jadwal.",
+    "steps": [
+      {"step": 1, "action": "Ambil pasien dari modul Registration", "expected": "MRN dan nama pasien diperoleh"},
+      {"step": 2, "action": "Klik Book pada layar Schedule", "expected": "Dialog Book appointment terbuka: Branch, Patient, Department, Consultant, Type, Date"},
+      {"step": 3, "action": "Pilih branch, pasien, department, konsultan, type, tanggal, lalu Book", "expected": "Booking tersimpan; toast konfirmasi"},
+      {"step": 4, "action": "Periksa tabel jadwal", "expected": "Appointment pasien tampil"}
+    ]
+  }
+]

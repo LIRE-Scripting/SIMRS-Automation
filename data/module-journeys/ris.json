@@ -1,0 +1,34 @@
+[
+  {
+    "id": "RIS-JRN-001",
+    "journey": "Radiographer membuat order radiologi baru",
+    "path": "Happy path",
+    "priority": "P0",
+    "role": "Radiographer",
+    "goal": "Order studi radiologi tercatat dengan nomor order, accession, dan jadwal studi.",
+    "preconditions": "Login rs.admin; layar RIS > Orders terbuka.",
+    "testData": "Order ref RAD-QA-<timestamp> unik",
+    "expectedEnd": "Order baru tampil pada daftar dengan studi dan tanggal yang diisi.",
+    "steps": [
+      {"step": 1, "action": "Buka Apps, RIS, Orders", "expected": "Tabel order tampil: Order ref, Study, Study date, Accession, Reported by"},
+      {"step": 2, "action": "Klik New Order", "expected": "Dialog Create order terbuka: Branch, Order ref, Accession no, Study description, Study date"},
+      {"step": 3, "action": "Pilih branch Daan Mogot, isi order ref, accession, studi Thorax PA, study date besok, lalu Save", "expected": "Order tersimpan tanpa error; dialog tertutup"},
+      {"step": 4, "action": "Periksa daftar order", "expected": "Order baru tampil memuat order ref dan studi yang diisi"}
+    ]
+  },
+  {
+    "id": "RIS-JRN-002",
+    "journey": "Order tersimpan permanen dan kolom lengkap",
+    "path": "Verifikasi",
+    "priority": "P1",
+    "role": "Radiographer",
+    "goal": "Order tetap ada setelah halaman dimuat ulang dan kolom kunci terisi.",
+    "preconditions": "Order dari RIS-JRN-001 sudah dibuat.",
+    "testData": "Order ref dari RIS-JRN-001",
+    "expectedEnd": "Baris order memuat order ref, studi, dan accession.",
+    "steps": [
+      {"step": 1, "action": "Muat ulang halaman Orders", "expected": "Daftar order tetap tampil"},
+      {"step": 2, "action": "Cari baris order yang dibuat", "expected": "Baris memuat order ref, studi, dan accession"}
+    ]
+  }
+]

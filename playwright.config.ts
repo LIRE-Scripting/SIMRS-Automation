@@ -51,5 +51,23 @@ export default defineConfig({
       dependencies: ['modules-setup'],
       use: { ...devices['Desktop Chrome'], storageState: AUTH_MODULES_FILE },
     },
+    {
+      name: 'registration',
+      testMatch: /tests[\\/]registration[\\/].*\.spec\.ts/,
+      dependencies: ['modules-setup'],
+      use: { ...devices['Desktop Chrome'], storageState: AUTH_MODULES_FILE },
+    },
+    {
+      name: 'flows',
+      testMatch: /tests[\\/]flows[\\/].*\.spec\.ts/,
+      dependencies: ['modules-setup'],
+      use: { ...devices['Desktop Chrome'], storageState: AUTH_MODULES_FILE },
+    },
+    {
+      name: 'suites',
+      testMatch: /tests[\\/]suites[\\/].*\.spec\.ts/,
+      dependencies: ['modules-setup'],
+      use: { ...devices['Desktop Chrome'], storageState: AUTH_MODULES_FILE },
+    },
   ],
 });

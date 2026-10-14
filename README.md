@@ -1,13 +1,14 @@
 # KlikMed HMIS — Playwright Test Suite
 
-Two suites, one project:
+Suites in one project:
 
 - **Pharmacy** (`tests/pharmacy/`) — generated from `pharmacy-test-journeys-QA.xlsx`
   (50 journeys / 213 steps, kept verbatim in `data/journeys.json`). Runs as
   `klikmed.superadmin`.
-- **Module scan** (`tests/modules/`) — data-driven coverage of every reachable module
-  (26 modules / 127 screens), generated from `data/module-scan/rs.json` by
-  `scan-modules.mjs`. Runs as `rs.admin`.
+- **Registration** (`tests/registration/`) — patient search & registration E2E.
+- **Flows** (`tests/flows/`) — per-module feature E2E (2 per module).
+- **Suites** (`tests/suites/`) — pharmacy-style journeys per module
+  (`data/module-journeys/*.json`, workbook `module-journeys-QA.xlsx`). Runs as `rs.admin`.
 
 ## How it works
 
@@ -29,7 +30,8 @@ Two suites, one project:
 npm install
 npx playwright install chromium
 npm test                # setup (login) + all pharmacy journeys
-npm run test:modules    # module scan suite (login rs.admin + 26 modules)
+npm run test:modules    # login rs.admin (shared setup for module suites)
+npm run test:suites     # pharmacy-style journeys per module
 ```
 
 Useful variants:
