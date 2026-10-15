@@ -132,6 +132,8 @@ Row-level lists (TBD steps, discrepancies, …): [_generated-open-items.md](_gen
 
 **Q38. 26 Maintenance data** (applied, change if you want others): job cards, assets, breakdowns, orders, indents and contracts carry a token. No budget head has a balance (allocations need U5): the work order names the seed head "ALKES", its approval is refused (HTTP 500), so completing, the spare and the invoice are not run; the spare "X-FREON" in "X Gudang IPSRS" is not in Inventory (checklist blocker 14). The AMC contract runs 2026-11-01 to 2027-10-31 as in the workbook.
 
+**Q39. 27 Fixed assets data** (applied, change if you want others): categories, sub categories and purchases carry a token; the sub category takes a test leaf asset account of Finance ("QA-1501-<token>"), since the workbook's 1501 is not in the chart of accounts. "Buy" takes the id of an approved order on /procurement/requests (09). The item "X-USG-01" with a batch in "X Gudang umum" is not in Inventory, so no test asset can be installed or commissioned and depreciation, sale, write-off and movements cite checklist blocker 14; the seed assets (USG-001, USG-SOLD, USG-WO) are not touched.
+
 ## Environment
 
 - **E1 (done).** `node_modules` was installed on another OS (no Linux TypeScript binary, `.bin` files without exec bit). Reinstalled with `npm ci`; `npm run typecheck` works.
