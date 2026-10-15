@@ -68,6 +68,10 @@ Row-level lists (TBD steps, discrepancies, …): [_generated-open-items.md](_gen
 - PT-3 "admitted" is a registered patient admitted by name in 04 Inpatient (Admissions) on a new bed.
 - Every refused dispense seen (not enough stock, admitted patient, discount) shows the toast "Minified React error #441" instead of a refusal text. The steps check that nothing was confirmed and record the expected text as a deviation.
 
+**Q24. 08 Operation Theater and 09 Procurement data** (applied, change if you want others):
+- 08: every request carries the workbook procedure plus a token. "PT-1 admitted" is not needed: the request's patient is free text, typed as "QA-Pasien OT 01 <token>". Pain: the patient field is prefilled with one id; no other patient id is shown anywhere, so a second chronic note for that id is refused and TC-APP008-040 step 2 is "not run" after the first run.
+- 09: the approval chain on the site has one step "Persetujuan" (found blocker 30), so PO-S2 … PO-S4 cannot exist. "An approved order of the new screen" for Receipts is made on /procurement/requests with the seed supplier "PT Enseval" and the item QA-PARA (the prefilled item code does not exist and its save answers HTTP 500). Store "X-ST1" is the 07 stand-in FI01-00-00 (found blocker 26). TC-APP009-027 needs the 25 seeded QA-PO- orders, which are not on the site (three seed orders); it is "not run" so the seed orders are not advanced.
+
 ## Environment
 
 - **E1 (done).** `node_modules` was installed on another OS (no Linux TypeScript binary, `.bin` files without exec bit). Reinstalled with `npm ci`; `npm run typecheck` works.
