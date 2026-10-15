@@ -122,6 +122,8 @@ Row-level lists (TBD steps, discrepancies, …): [_generated-open-items.md](_gen
 
 **Q33. 21 CSSD data** (applied, change if you want others): masters (autoclave, cycle, packing, indicator, test name, result type) carry a token; the autoclave number is typed in small letters ("qa-a2-<token>"). The sterilization loop (requests, receipts, cycles, Bowie Dick, issues, sterile receipts, sets) needs approvers (U5) and stays fixme, so Pack Trace is checked without a pack. /cssd/issues/new answers HTTP 500 (TC-APP021-043 fails).
 
+**Q34. 22 Services data** (applied, change if you want others): categories, items, requests and orders carry a token; "Service center" keeps the dialog's "CSSD" and the purchase request's store "CSSD" (the workbook says "of the branch"). Refusals show "Minified React error #441"; the server text of the workbook is recorded next to it. A service purchase order is saved with "Document" empty (TC-APP022-013 fails at step 2). Receipts and bills need approvers (U5) and stay fixme; the "All branches" cases need U2.
+
 ## Environment
 
 - **E1 (done).** `node_modules` was installed on another OS (no Linux TypeScript binary, `.bin` files without exec bit). Reinstalled with `npm ci`; `npm run typecheck` works.
