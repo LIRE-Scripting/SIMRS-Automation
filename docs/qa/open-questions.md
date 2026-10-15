@@ -61,6 +61,13 @@ Row-level lists (TBD steps, discrepancies, …): [_generated-open-items.md](_gen
 
 **Q22. 07 Inventory stores.** No store can be made (Stores has no "Add"; "Branch and stores" answers HTTP 500, found blocker 26). Seed stores of Podomoro stand in: FI01-00-00 "GUDANG FARMASI RUMAH SAKIT" for ST-1 / "X-ST1", FI01-01-01 "FARMASI REGULER" for "X-ST2"; each test notes it. TC-APP007-010 changes the stand-in's visit types and sets them back. Steps that need an inactive store (ST-OFF) or a store of BR-B are blocked. Is using these seed stores acceptable, or should the stores be made by an administrator first?
 
+**Q23. 05 Pharmacy data** (applied, change if you want others):
+- ST-OP and ST-IP cannot be made (found blocker 26). The 07 stand-in FI01-00-00, which dispenses Outpatient and Inpatient, stands in for both. Steps that need a store for one visit type only are blocked.
+- QA-PARA, QA-OMEP, QA-IBU and QA-AMLO are made once with the exact names of the catalogue (codes as the short names, last cost from the catalogue) and reused, because Patient Care orders name the drug and the dispense finds the item by that name. Each test receives its own batches (BT-1/BT-2 for QA-PARA, 20 of the others). Stock is checked as a drop of the item's total in the stand-in, because a sale takes the oldest batch received, which may belong to an earlier run.
+- TC-APP005-032, 033 and 049 need an exact stock (20, an expired batch, batches 30/31 days ahead). They use items made for the test (QA-PARA-<token>, QA-EXP-<token>, QA-FRZ-<token>). TC-032 step 3 sells 10 at the counter instead of dispensing OR-OP, because an order always names the shared QA-PARA.
+- PT-3 "admitted" is a registered patient admitted by name in 04 Inpatient (Admissions) on a new bed.
+- Every refused dispense seen (not enough stock, admitted patient, discount) shows the toast "Minified React error #441" instead of a refusal text. The steps check that nothing was confirmed and record the expected text as a deviation.
+
 ## Environment
 
 - **E1 (done).** `node_modules` was installed on another OS (no Linux TypeScript binary, `.bin` files without exec bit). Reinstalled with `npm ci`; `npm run typecheck` works.

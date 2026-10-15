@@ -15,7 +15,7 @@ Test title = `<TC ID> <Scenario Name> [<file> | Steps | rows a-b | <TC ID>]`; an
 | TC-APP005-007 | JRN-APP005-007 | Counter sale to a registered patient | Positive | Critical | rows 35-42 | 8 | `tests/e2e/05-pharmacy/dispense.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP005-008 | JRN-APP005-008 | Counter sale to a new patient: register, then continue | Positive | High | rows 43-46 | 9 | `tests/e2e/05-pharmacy/dispense.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP005-009 | JRN-APP005-009 | Several items in one sale, then labels | Positive | High | rows 47-52 | 10 | `tests/e2e/05-pharmacy/dispense.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
-| TC-APP005-010 | JRN-APP005-010 | Selling a kit | Positive | High | rows 53-55 | 11 | `tests/e2e/05-pharmacy/dispense.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
+| TC-APP005-010 | JRN-APP005-010 | Selling a kit | Positive | High | rows 53-55 | 11 | `tests/e2e/05-pharmacy/dispense.spec.ts` | U1 / Podomoro | fixme | Blocker 27 (found by automation, docs/qa/blockers-found.md): Saving a kit answers HTTP 500 |
 | TC-APP005-011 | JRN-APP005-011 | Finding an item by search and by scan | Positive | Medium | rows 56-61 | 12 | `tests/e2e/05-pharmacy/dispense.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP005-012 | JRN-APP005-012 | Warning the pharmacist must acknowledge | Positive | Critical | rows 62-65 | 13 | `tests/e2e/05-pharmacy/dispense.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP005-013 | JRN-APP005-013 | Stock comes off the right batch | Positive | Critical | rows 66-70 | 14 | `tests/e2e/05-pharmacy/dispense.spec.ts` | U1 / Podomoro | fixme | 05-pharmacy.xlsx \| Journeys \| row 14: Automation Candidate = Needs Evaluation |
@@ -88,8 +88,8 @@ Test title = `<TC ID> <Scenario Name> [<file> | Steps | rows a-b | <TC ID>]`; an
 ## Counts
 
 - automate (read-only): 0
-- automate (saves; needs QA_ALLOW_WRITES): 46
+- automate (saves; needs QA_ALLOW_WRITES): 45
 - automate (chain; needs a record from another app): 0
-- fixme: 32
+- fixme: 33
 - skip: 0
 - test cases with a "TBD" step (asserted partially): 11

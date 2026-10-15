@@ -118,13 +118,15 @@ export const FOUND_BLOCKERS: FoundBlocker[] = [
     cause:
       '"Check interactions" flags neither the warning pair (Paracetamol 500mg Tablet with Omeprazole 20mg Kapsul) nor the blocking pair ' +
       '(Ibuprofen 400mg Tablet with Amlodipine 5mg Tablet): no warning, no alert (seen 2026-10-15). No screen found to create pairs.',
-    fix: '1. Load the two pairs (or name the screen or seed that does it).\n2. Run TC-APP003-005, 015 and 029 again.',
+    fix: '1. Load the two pairs (or name the screen or seed that does it).\n2. Run TC-APP003-005, 015, 029 and TC-APP005-012, 029 again.',
     who: 'Site administrator, then Tester',
     howFound: 'Seen on the site (automation of 03 Patient Care)',
     testCases: [
       { id: 'TC-APP003-005', steps: [1, 2] },
       { id: 'TC-APP003-015', steps: [1, 2] },
       { id: 'TC-APP003-029', steps: [1] },
+      { id: 'TC-APP005-012', steps: [1, 2, 3] },
+      { id: 'TC-APP005-029', steps: [1, 2] },
     ],
   },
   {
@@ -226,6 +228,7 @@ export const FOUND_BLOCKERS: FoundBlocker[] = [
       { id: 'TC-APP007-047', steps: [1, 2] },
       { id: 'TC-APP007-048', steps: [1, 2] },
       { id: 'TC-APP007-050', steps: [1] },
+      { id: 'TC-APP005-034', steps: [2] },
     ],
   },
   {
@@ -239,7 +242,44 @@ export const FOUND_BLOCKERS: FoundBlocker[] = [
     fix: '1. Fix the kit save.\n2. Run TC-APP007-007 and TC-APP005-010 again.',
     who: 'Development',
     howFound: 'Seen on the site (automation of 07 Inventory)',
-    testCases: [{ id: 'TC-APP007-007', steps: [3, 4] }],
+    testCases: [{ id: 'TC-APP007-007', steps: [3, 4] }, { id: 'TC-APP005-010' }],
+  },
+  {
+    no: 28,
+    blocker: 'A counter sale with a line discount answers HTTP 500',
+    category: 'Data + Function',
+    scope:
+      '05 Pharmacy\nDispense, /pharmacy/dispense, "Set quantities" column "Discount %", then "Confirm dispense"\n' +
+      '00-test-data.xlsx | Catalogue, 05 row "Rules for BR-A" ("Maximum line discount (%)" 10, approval chain for billing discounts)',
+    cause:
+      'With "Discount %" 5 or 10 on a line, "Confirm dispense" answers HTTP 500 ("Minified React error #441", seen 2026-10-15). The same ' +
+      'sale without a discount, with Generic ticked or with Issued below Requested is confirmed. Whether the cashier rule "Maximum line ' +
+      'discount (%)" is unset on BR-A, and where it is set, is not known.',
+    fix: '1. Fix the discounted dispense (or set the BR-A discount rule and name the screen).\n2. Run TC-APP005-015 and 021 again.',
+    who: 'Development; Site administrator for the discount rule',
+    howFound: 'Seen on the site (automation of 05 Pharmacy)',
+    testCases: [
+      { id: 'TC-APP005-015', steps: [2, 3] },
+      { id: 'TC-APP005-021', steps: [4] },
+    ],
+  },
+  {
+    no: 29,
+    blocker: 'A dispense opened from an order cannot change Issued, Requested or Generic',
+    category: 'Function',
+    scope: '05 Pharmacy\nDispense, /pharmacy/dispense?order=…, step "Set quantities" (Requested, Issued, Discount %, Generic)',
+    cause:
+      'On a line that comes from an order, typing in Requested or Issued and ticking Generic change nothing: the fields keep the ' +
+      'ordered quantity and the box stays unticked (seen 2026-10-15; at the counter the same fields work). A part of an order ' +
+      'cannot be issued, a generic cannot be recorded and Issued cannot be set to 0.',
+    fix: '1. Let the order line take the typed quantities and the Generic tick.\n2. Run TC-APP005-002, 004 and 025 again.',
+    who: 'Development',
+    howFound: 'Seen on the site (automation of 05 Pharmacy)',
+    testCases: [
+      { id: 'TC-APP005-002', steps: [2, 3, 4, 5, 6, 7] },
+      { id: 'TC-APP005-004', steps: [2, 3, 4] },
+      { id: 'TC-APP005-025', steps: [4] },
+    ],
   },
 ];
 
