@@ -128,6 +128,8 @@ Row-level lists (TBD steps, discrepancies, …): [_generated-open-items.md](_gen
 
 **Q36. 24 Housekeeping data** (applied, change if you want others): locations, contracts, logs and bills carry a token; the service center of a location is QA-UNIT-1 "QA Ruang Tindakan" (01). The contract runs 2026-11-01 to 2027-10-31 as in the workbook; each bill books a Finance voucher (go-ahead in the precondition). TC-APP024-013 uses the logs of one day for "the logs of a month". A shift is saved for a location code that does not exist (TC-APP024-002 fails at step 5).
 
+**Q37. 25 Linen data** (applied, change if you want others): the branch already names its linen stores GLB / LDR / GST; "Save stores" is run with these (the workbook's "X Gudang linen", "X Laundry", "X Gudang bangsal" are not in Inventory) and any other save is put back to them. The items "X-SPREI" and "X-KAIN" and their stock in the linen store do not exist in Inventory, so recipes, work orders and the circulation round cite checklist blocker 14. Should these items be made in 07 and stocked, or may the seed item SET-LINEN (batch GLB-0918) be used for the round?
+
 ## Environment
 
 - **E1 (done).** `node_modules` was installed on another OS (no Linux TypeScript binary, `.bin` files without exec bit). Reinstalled with `npm ci`; `npm run typecheck` works.
