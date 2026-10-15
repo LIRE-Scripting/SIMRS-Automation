@@ -72,6 +72,13 @@ Row-level lists (TBD steps, discrepancies, …): [_generated-open-items.md](_gen
 - 08: every request carries the workbook procedure plus a token. "PT-1 admitted" is not needed: the request's patient is free text, typed as "QA-Pasien OT 01 <token>". Pain: the patient field is prefilled with one id; no other patient id is shown anywhere, so a second chronic note for that id is refused and TC-APP008-040 step 2 is "not run" after the first run.
 - 09: the approval chain on the site has one step "Persetujuan" (found blocker 30), so PO-S2 … PO-S4 cannot exist. "An approved order of the new screen" for Receipts is made on /procurement/requests with the seed supplier "PT Enseval" and the item QA-PARA (the prefilled item code does not exist and its save answers HTTP 500). Store "X-ST1" is the 07 stand-in FI01-00-00 (found blocker 26). TC-APP009-027 needs the 25 seeded QA-PO- orders, which are not on the site (three seed orders); it is "not run" so the seed orders are not advanced.
 
+**Q25. 10 HR data** (applied, change if you want others):
+- Employees are made per test ("QA-EMP-001-<token>", "QA-HRM Karyawan Satu <token>") with DEP-A "QA Poli Umum" (QA-DEP-1 of 01). SC-A "QA Layanan Rawat Jalan" and ST-A "QA Gudang Farmasi" are not on the site; QA-UNIT-1 "QA Ruang Tindakan" and the 07 stand-in store FI01-00-00 stand in.
+- LT-ANNUAL "QA-Annual" (ANNUAL, 12) and LT-OFF "QA-Lama" (not active) were not in the seed data; they are made once and reused. TC-APP010-032 switches off a type of its own instead of LT-ANNUAL, so the shared type stays active.
+- Leave applications have no employee column; each test's applications are found by a reason carrying the token.
+- TC-APP010-028 step 4 is "not run": it needs USR-1 and a user linked to EMP-2; linking the admin accounts U1/U2 to a test employee would change real accounts. TC-APP010-023 step 3 needs more than 200 employees in a branch.
+- Year balance (TC-APP010-047/048): the balance of the precondition is set with the action "Year balance" (data of TC-APP010-043: type "QA-Tahunan", 2027, 12 days).
+
 ## Environment
 
 - **E1 (done).** `node_modules` was installed on another OS (no Linux TypeScript binary, `.bin` files without exec bit). Reinstalled with `npm ci`; `npm run typecheck` works.
