@@ -116,6 +116,10 @@ Row-level lists (TBD steps, discrepancies, …): [_generated-open-items.md](_gen
 - Account maps: a QA tax code (18) is mapped instead of the seed PPN; the salary component GAPOK (Expenditure) is mapped to a test expense account. Tariff mapping uses 1101 Kas and 4101 Pendapatan as debit and credit (Podomoro has no finance configuration). The currency "XTS" is saved again by every run (three letters leave no room for a token); IDR is put back if a test renames it.
 - Journals, documents, payments, bill adjustment with advances and the steps that need them need U5 and are not run.
 
+**Q32. 20 Budget data** (applied, change if you want others):
+- Books, heads, utilisation types, projects and checklist questions carry a token ("QA-OPS-<token>", …); heads take the open year of Finance. The tenant's default book is never moved: TC-APP020-002 step 2 runs only when the list marks a default book.
+- Circulars, internal budgets, requests, allocations, releases, withdrawals, sanctions, utilisations and transfers need approvers (U5) and are not run; TC-APP020-042 is not run (TBD with the product owner, needs a budget line).
+
 ## Environment
 
 - **E1 (done).** `node_modules` was installed on another OS (no Linux TypeScript binary, `.bin` files without exec bit). Reinstalled with `npm ci`; `npm run typecheck` works.
