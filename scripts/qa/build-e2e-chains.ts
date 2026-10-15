@@ -325,7 +325,7 @@ async function main(): Promise<void> {
       chain.steps.map((s) => s.tc).join(', '),
       [...new Set(chain.steps.map((s) => `reports/e2e/${fileOf(s.tc)}`))].join(', '),
       breakAt ? 'Needs Review' : 'Ready',
-      `${status}. Steps Passed ${cs.filter((s) => s.status === 'Passed').length}, Blocked ${cs.filter((s) => s.status === 'Blocked').length}. Blockers: ${causes.filter((c) => !NON_STOPPING.has(c)).join('; ') || 'none'}. Notes: ${causes.filter((c) => NON_STOPPING.has(c)).join('; ') || 'none'}.`,
+      `${chain.practice ? `Practice: ${chain.practice} ` : ''}${status}. Steps Passed ${cs.filter((s) => s.status === 'Passed').length}, Blocked ${cs.filter((s) => s.status === 'Blocked').length}. Blockers: ${causes.filter((c) => !NON_STOPPING.has(c)).join('; ') || 'none'}. Notes: ${causes.filter((c) => NON_STOPPING.has(c)).join('; ') || 'none'}.`,
       chain.data,
       'As in the source test cases.',
       null,
@@ -368,9 +368,10 @@ async function main(): Promise<void> {
   add('Sheets', 'Journeys: one row per chain. Steps: one row per chain step, each pointing to its source test case (file, rows). Blockers: every blocker a chain meets, with its cause and fix.');
   add('Step status', 'Passed: the flow goes through the source test case (its steps passed; a deviation from the wording, or a check that another step of the chain makes, is noted but does not stop the flow). Blocked: anything else; Defect Reference names the blocker (see sheet Blockers).');
   add('Blocker IDs', '"Blocker N": checklist blockers 1-16 (00-blockers-checklist-linked.xlsx) and blockers found while automating (17 and up, docs/qa/blockers-found.md). "User Ux": a user of 00-prerequisites.xlsx that does not exist yet. DEVIATION, SITE-DEFECT, NEEDS-EVALUATION, NEEDS-OTHER-RUN, STATE-CASHIER: see sheet Blockers.');
+  add('Chain design', 'The chains follow the usual hospital-system flows: outpatient, emergency, inpatient and surgical pathways; order-to-result; closed-loop medication; vein-to-vein blood; revenue cycle and cash control; procure-to-pay with three-way match; inventory control; budget commitment control; hire-to-pay; record-to-report; asset, maintenance and support services. Column "Hospital-system practice checked" names the practice of each chain.');
   add('Note', 'Each source test case was run on its own (with its own data). A chain is "Ready" when all its steps passed; running it as one test passing the records on is the next step.');
   add();
-  const head = add('Chain', 'Name', 'Applications', 'Steps', 'Passed', 'Blocked', 'Status', 'First stop', 'Blockers that stop the flow', 'Notes that do not stop it');
+  const head = add('Chain', 'Name', 'Applications', 'Steps', 'Passed', 'Blocked', 'Status', 'First stop', 'Blockers that stop the flow', 'Notes that do not stop it', 'Hospital-system practice checked');
   head.font = { bold: true };
   for (const { chain, steps: cs } of evaluated) {
     const breakAt = cs.find((s) => s.status !== 'Passed');
@@ -386,9 +387,10 @@ async function main(): Promise<void> {
       breakAt ? `Step ${breakAt.n} ${breakAt.tc} (${breakAt.status}): ${breakAt.causes.filter((c) => !NON_STOPPING.has(c)).join('; ')}` : '—',
       [...new Set(cs.flatMap((s) => (s.status === 'Passed' ? [] : s.causes.filter((c) => !NON_STOPPING.has(c)))))].join('; ') || 'none',
       [...new Set(cs.flatMap((s) => s.causes.filter((c) => NON_STOPPING.has(c))))].join('; ') || 'none',
+      chain.practice ?? '',
     );
   }
-  summary.columns.forEach((c, i) => (c.width = [12, 52, 18, 7, 8, 8, 18, 44, 44, 30][i] ?? 12));
+  summary.columns.forEach((c, i) => (c.width = [12, 52, 18, 7, 8, 8, 18, 44, 44, 30, 60][i] ?? 12));
   summary.eachRow((r) => (r.alignment = { wrapText: true, vertical: 'top' }));
 
   fs.mkdirSync(OUT_DIR, { recursive: true });
