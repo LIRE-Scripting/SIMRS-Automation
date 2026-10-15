@@ -185,7 +185,7 @@ async function main(): Promise<void> {
     const start = report.stats?.startTime ?? new Date().toISOString();
     for (const spec of specsOf(report.suites)) {
       const id = spec.title.match(/^(TC-APP\d{3}-\d{3}) /)?.[1];
-      if (id && !(source.get(id)?.start ?? '' > start)) {
+      if (id && !((source.get(id)?.start ?? '') > start)) {
         byTc.set(id, spec);
         source.set(id, { file, date: start.slice(0, 10), start });
       }
