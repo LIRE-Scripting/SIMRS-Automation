@@ -16,7 +16,8 @@
     "qa:data": "tsx scripts/qa/build-test-data.ts",
     "qa:inventory": "tsx scripts/qa/build-inventory.ts",
     "typecheck": "tsc --noEmit -p .",
-    "qa:e2e-workbook": "tsx scripts/qa/build-e2e-workbook.ts"
+    "qa:e2e-workbook": "tsx scripts/qa/build-e2e-workbook.ts",
+    "qa:e2e-chains": "tsx scripts/qa/build-e2e-chains.ts"
   },
   "keywords": [],
   "author": "",
