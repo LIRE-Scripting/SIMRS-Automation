@@ -411,6 +411,20 @@ export const FOUND_BLOCKERS: FoundBlocker[] = [
       { id: 'TC-APP017-011' },
     ],
   },
+  {
+    no: 38,
+    blocker: 'Saving the rights of a role answers HTTP 500 ("Failed to save rights.")',
+    category: 'Function',
+    scope: '18 Settings\nUser Rights, /identity/rights, "Save rights"',
+    cause:
+      'With a new test role picked ("0 / 40") and DIET_WRITE ticked, "Save rights" posts to /identity/rights and gets HTTP 500; ' +
+      'the toast is "Failed to save rights." (seen 2026-10-15). No privilege can be granted to a role, so a role made on Roles ' +
+      'cannot be given any right. The shared role admin was not tried.',
+    fix: '1. Fix the save of role privileges.\n2. Run TC-APP018-039 again (and steps 4 and 5 with the 13 Dietary flow).',
+    who: 'Development',
+    howFound: 'Seen on the site (automation of 18 Settings)',
+    testCases: [{ id: 'TC-APP018-039', steps: [3] }],
+  },
 ];
 
 export function foundBlocker(no: number): FoundBlocker {

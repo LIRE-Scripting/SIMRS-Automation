@@ -102,6 +102,13 @@ Row-level lists (TBD steps, discrepancies, …): [_generated-open-items.md](_gen
 - The doctor of Doctor fee (043 … 045) is a test employee with a payroll record on the account "QA-6101" (the workbook's "X-6101"). Payslips for 046/047/051 are made with "Correct" for "2026-10". TC-APP017-045 locks the month "2090-01", which no other test uses.
 - TC-APP017-004: if the branch has 10 batches or fewer, the test runs batches for a test employee first.
 
+**Q30. 18 Settings data and safety** (applied, change if you want others):
+- SITE-NEW "QA-SITE-01" "QA Klinik Uji" is made once and reused (a site is a branch for every user and cannot be removed); TC-APP018-002 adds one new token site per run, TC-APP018-015 step 5 added "qa-site-01" once. Departments, service centers, countries, cities, units, tax codes and roles carry a token; test departments and roles are set inactive where the test ends with them.
+- Test accounts ("qa.perawat1.<token>", role perawat at Daan Mogot) get a random password per run that is never reported, and are blocked at the end of their test. TC-APP018-049 … 051 change the password of such an account, not of U1.
+- Not run, because they would lock out the shared administrators: blocking the own account and taking the role admin from it (036 steps 1, 2), switching a seed doctor off (036 step 3), setting the role admin inactive (038 step 3), taking the right to grant rights from admin (040 step 2).
+- Branding (043 … 045), the colour and the dashboard widget (046) are put back to what they were at the end of each test. Holidays are made on Sundays three or four weeks ahead (DR-1 of 02 works Monday to Friday) and set inactive at the end; 053 step 3 (a day with appointments) is not run.
+- Saving the rights of a role answers HTTP 500 (found blocker 38). /tenants and /entitlements answer HTTP 500 ("This page couldn't load"): TC-APP018-062 and 088 fail.
+
 ## Environment
 
 - **E1 (done).** `node_modules` was installed on another OS (no Linux TypeScript binary, `.bin` files without exec bit). Reinstalled with `npm ci`; `npm run typecheck` works.
