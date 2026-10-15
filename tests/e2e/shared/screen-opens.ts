@@ -22,10 +22,12 @@ export async function screenOpens(
   });
   const response = await page.goto(`/en${route}`);
   expect(response?.status()).toBe(200);
-  await expect(page.getByRole('main').getByRole('heading', { level: 1, name: heading })).toBeVisible();
+  // Some screens (Procurement hub, Purchase orders) have no <main> landmark; the page body stands in.
+  await expect(page.getByRole('heading', { level: 1, name: heading }).first()).toBeVisible();
+  const main = (await page.getByRole('main').count()) ? page.getByRole('main') : page.locator('body');
   await expect(page.getByText("This page couldn't load")).toHaveCount(0);
-  // Controls: buttons on the work screens, links (tiles) on the hub.
-  await expect(page.getByRole('main').getByRole('button').or(page.getByRole('main').getByRole('link')).first()).toBeVisible();
+  // Controls: buttons on the work screens, links (tiles) on the hub, or an input (a day picker with nothing listed).
+  await expect(main.getByRole('button').or(main.getByRole('link')).or(main.locator('input')).first()).toBeVisible();
   expect(failed).toEqual([]);
 }
 

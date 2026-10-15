@@ -281,6 +281,57 @@ export const FOUND_BLOCKERS: FoundBlocker[] = [
       { id: 'TC-APP005-025', steps: [4] },
     ],
   },
+  {
+    no: 30,
+    blocker: 'The purchase order approval chain has one step, not the four of the shared data',
+    category: 'Data',
+    scope:
+      '09 Procurement\nPurchase orders, /procurement/purchase-orders, the opened order ("Approval chain")\n' +
+      '00-test-data.xlsx | Catalogue, 09 row "Chain" (purchase_order "Persetujuan Purchase Order", four steps with roles)',
+    cause:
+      'A new purchase order shows "Purchase order (1 steps)" with the single step "Persetujuan"; one "Advance approval" completes it ' +
+      '(seen 2026-10-15). No order can wait at step 2, 3 or 4, so PO-S2, PO-S3 and PO-S4 cannot exist and the role of each step cannot be checked.',
+    fix: '1. Load the four-step chain of the shared data (or name the Workflow screen that does it).\n2. Run TC-APP009-001, 004, 006, 015 and 016 again.',
+    who: 'Site administrator (Workflow)',
+    howFound: 'Seen on the site (automation of 09 Procurement)',
+    testCases: [
+      { id: 'TC-APP009-004', steps: [3, 4] },
+      { id: 'TC-APP009-006' },
+      { id: 'TC-APP009-015', steps: [1] },
+      { id: 'TC-APP009-016' },
+    ],
+  },
+  {
+    no: 31,
+    blocker: 'Goods receipt, supplier invoice and returns answer HTTP 500',
+    category: 'Function',
+    scope: '09 Procurement\nReceipts and returns, /procurement/receipts, buttons "grn", "invoice", "vendor_return", "expiry_return"',
+    cause:
+      'For an order made, sent and approved on /procurement/requests, "gate" saves ("Saved."), but "grn" answers HTTP 500 ("Minified React ' +
+      'error #441") with the store typed as its code, its id, its name or the default "127-CART"; "invoice", "vendor_return" and ' +
+      '"expiry_return" answer HTTP 500 too (seen 2026-10-15). No goods can be received, billed or returned.',
+    fix: '1. Fix the four actions (or name the store value "Store" expects).\n2. Run TC-APP009-046, 049 and 051 again.',
+    who: 'Development',
+    howFound: 'Seen on the site (automation of 09 Procurement)',
+    testCases: [
+      { id: 'TC-APP009-046', steps: [3, 4] },
+      { id: 'TC-APP009-049', steps: [1, 2] },
+      { id: 'TC-APP009-051', steps: [1, 2, 3] },
+    ],
+  },
+  {
+    no: 32,
+    blocker: 'Shifting an operating theatre slot by one hour answers HTTP 500',
+    category: 'Function',
+    scope: '08 Operation Theater\nCalendar, /ot/calendar, drop zone "Shift one hour"',
+    cause:
+      'A slot placed on the calendar through "Place on calendar" (room, start and end tomorrow) is dragged onto "Shift one hour"; the ' +
+      'answer is HTTP 500 ("Minified React error #441", seen 2026-10-15) and the slot keeps its time.',
+    fix: '1. Fix the shift.\n2. Run TC-APP008-039 again.',
+    who: 'Development',
+    howFound: 'Seen on the site (automation of 08 Operation Theater)',
+    testCases: [{ id: 'TC-APP008-039', steps: [3] }],
+  },
 ];
 
 export function foundBlocker(no: number): FoundBlocker {

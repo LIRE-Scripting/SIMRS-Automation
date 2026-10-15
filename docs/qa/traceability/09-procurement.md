@@ -11,7 +11,7 @@ Test title = `<TC ID> <Scenario Name> [<file> | Steps | rows a-b | <TC ID>]`; an
 | TC-APP009-003 | JRN-APP009-003 | Advance amount, amount paid and balance | Positive | Critical | rows 10-12 | 4 | `tests/e2e/09-procurement/purchase-orders.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP009-004 | JRN-APP009-004 | Advancing one approval step | Positive | Critical | rows 13-16 | 5 | `tests/e2e/09-procurement/purchase-orders.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP009-005 | JRN-APP009-005 | Purchase order approved through all four steps | Positive | Critical | rows 17-20 | 6 | `tests/e2e/09-procurement/purchase-orders.spec.ts` | U1 / Podomoro | fixme | 09-procurement.xlsx \| Journeys \| row 6: Automation Candidate = Needs Evaluation / Needs user U4 "Second user of the same role" (00-prerequisites.xlsx \| Users \| row 8: To create) / Needs user U5 "Approvers and heads" (00-prerequisites.xlsx \| Users \| row 9: To create) |
-| TC-APP009-006 | JRN-APP009-006 | Approval steps shown in the opened purchase order | Positive | High | rows 21-23 | 7 | `tests/e2e/09-procurement/purchase-orders.spec.ts` | U1 / Podomoro | automate (read-only) |  |
+| TC-APP009-006 | JRN-APP009-006 | Approval steps shown in the opened purchase order | Positive | High | rows 21-23 | 7 | `tests/e2e/09-procurement/purchase-orders.spec.ts` | U1 / Podomoro | fixme | Blocker 30 (found by automation, docs/qa/blockers-found.md): The purchase order approval chain has one step, not the four of the shared data |
 | TC-APP009-007 | JRN-APP009-007 | Purchase order list: columns, order and paging | Positive | High | rows 24-26 | 8 | `tests/e2e/09-procurement/purchase-orders.spec.ts` | U1 / Podomoro | automate (read-only) |  |
 | TC-APP009-008 | JRN-APP009-008 | Officer working on "All branches" | Positive | High | rows 27-31 | 9 | `tests/e2e/09-procurement/purchase-orders.spec.ts` | U2 / All branches | fixme | Needs user U5 "Approvers and heads" (00-prerequisites.xlsx \| Users \| row 9: To create) / Needs user U6 "User at a second branch only" (00-prerequisites.xlsx \| Users \| row 10: To create) |
 | TC-APP009-009 | JRN-APP009-009 | Home tiles count the approvals that wait | Positive | Medium | rows 32-34 | 10 | `tests/e2e/09-procurement/purchase-orders.spec.ts` | U1 / Podomoro | fixme | 09-procurement.xlsx \| Journeys \| row 10: Automation Candidate = Needs Evaluation / Needs user U4 "Second user of the same role" (00-prerequisites.xlsx \| Users \| row 8: To create) / Needs user U5 "Approvers and heads" (00-prerequisites.xlsx \| Users \| row 9: To create) |
@@ -21,7 +21,7 @@ Test title = `<TC ID> <Scenario Name> [<file> | Steps | rows a-b | <TC ID>]`; an
 | TC-APP009-013 | JRN-APP009-013 | Purchase request and tender | Negative | High | rows 43-46 | 14 | `tests/e2e/09-procurement/hub.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP009-014 | JRN-APP009-014 | Vendor and department typed as free text | Negative | High | rows 47-50 | 15 | `tests/e2e/09-procurement/purchase-orders.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP009-015 | JRN-APP009-015 | Approved purchase order looks like one that still waits | Negative | Critical | rows 51-53 | 16 | `tests/e2e/09-procurement/purchase-orders.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
-| TC-APP009-016 | JRN-APP009-016 | Advancing a step that waits for another role | Negative | Critical | rows 54-56 | 17 | `tests/e2e/09-procurement/purchase-orders.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
+| TC-APP009-016 | JRN-APP009-016 | Advancing a step that waits for another role | Negative | Critical | rows 54-56 | 17 | `tests/e2e/09-procurement/purchase-orders.spec.ts` | U1 / Podomoro | fixme | Blocker 30 (found by automation, docs/qa/blockers-found.md): The purchase order approval chain has one step, not the four of the shared data |
 | TC-APP009-017 | JRN-APP009-017 | Approver who holds the step's role but not the procurement right | Security | Critical | rows 57-58 | 18 | `tests/e2e/09-procurement/purchase-orders.spec.ts` | U1 / Podomoro | fixme | 09-procurement.xlsx \| Journeys \| row 18: Automation Candidate = Needs Evaluation |
 | TC-APP009-018 | JRN-APP009-018 | One person creates and approves, or approves several steps | Negative | Critical | rows 59-61 | 19 | `tests/e2e/09-procurement/purchase-orders.spec.ts` | U1 / Podomoro | fixme | 09-procurement.xlsx \| Journeys \| row 19: Automation Candidate = Needs Evaluation |
 | TC-APP009-019 | JRN-APP009-019 | Rejecting a purchase order or sending it back | Negative | Critical | rows 62-64 | 20 | `tests/e2e/09-procurement/purchase-orders.spec.ts` | U1 / Podomoro | fixme | Needs user U4 "Second user of the same role" (00-prerequisites.xlsx \| Users \| row 8: To create) / Needs user U5 "Approvers and heads" (00-prerequisites.xlsx \| Users \| row 9: To create) |
@@ -74,9 +74,9 @@ Test title = `<TC ID> <Scenario Name> [<file> | Steps | rows a-b | <TC ID>]`; an
 
 ## Counts
 
-- automate (read-only): 2
-- automate (saves; needs QA_ALLOW_WRITES): 30
+- automate (read-only): 1
+- automate (saves; needs QA_ALLOW_WRITES): 29
 - automate (chain; needs a record from another app): 0
-- fixme: 33
+- fixme: 35
 - skip: 0
 - test cases with a "TBD" step (asserted partially): 19
