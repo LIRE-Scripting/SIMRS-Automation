@@ -392,6 +392,25 @@ export const FOUND_BLOCKERS: FoundBlocker[] = [
       { id: 'TC-APP014-069', steps: [1, 2, 4] },
     ],
   },
+  {
+    no: 37,
+    blocker: 'The 12 salary components of the workbook are not on the site, and no screen makes them',
+    category: 'Data',
+    scope: '17 Payroll\nPayroll batches, /payroll/batches, "Batch result" (lines, Gross and Net)',
+    cause:
+      'The figures of the workbook come from the 12 seed components "QA-BASIC" … "QA-PF" (00-test-data.xlsx | Catalogue, "Components"). ' +
+      'A batch on the site lists three other components, "GAPOK", "POTBPJS" and "TUNJAB" (PassthroughAgent, IDR 10.000.000,00 each), ' +
+      'Gross and Net "IDR 40.000.000,00" for a base of 10000000 (seen 2026-10-15). No screen shows or changes components (TC-APP017-020), ' +
+      'so the components of the workbook cannot be made.',
+    fix: '1. Load the 12 components of the workbook into the test tenant (or give the figures for GAPOK, POTBPJS and TUNJAB).\n2. Run TC-APP017-002, 003 and 011 again.',
+    who: 'Development / Product owner',
+    howFound: 'Seen on the site (automation of 17 Payroll)',
+    testCases: [
+      { id: 'TC-APP017-002' },
+      { id: 'TC-APP017-003', steps: [2, 3, 4] },
+      { id: 'TC-APP017-011' },
+    ],
+  },
 ];
 
 export function foundBlocker(no: number): FoundBlocker {

@@ -96,6 +96,12 @@ Row-level lists (TBD steps, discrepancies, …): [_generated-open-items.md](_gen
 - Patient Records lists loans only; the steps that expect a register of files, a borrower, a due date, a link between request and issue, search or sort are recorded as deviations, not failures.
 - TC-APP016-040 steps 2 … 4 are "not run": which document makes a visit leave the list is TBD.
 
+**Q29. 17 Payroll data** (applied, change if you want others):
+- Employees (EMP-1, EMP-2, EMP-OFF "QA-EMP-NONAKTIF", "QA-EMP-ZZZ", "QA-EMP-XSS") are made per test in HR with a token in number and name.
+- The site has the components GAPOK, POTBPJS and TUNJAB, not the 12 of the workbook (found blocker 37): TC-APP017-002 and 011 and the figures of 003 are blocked; the other batch tests check the site's components and record the figures.
+- The doctor of Doctor fee (043 … 045) is a test employee with a payroll record on the account "QA-6101" (the workbook's "X-6101"). Payslips for 046/047/051 are made with "Correct" for "2026-10". TC-APP017-045 locks the month "2090-01", which no other test uses.
+- TC-APP017-004: if the branch has 10 batches or fewer, the test runs batches for a test employee first.
+
 ## Environment
 
 - **E1 (done).** `node_modules` was installed on another OS (no Linux TypeScript binary, `.bin` files without exec bit). Reinstalled with `npm ci`; `npm run typecheck` works.

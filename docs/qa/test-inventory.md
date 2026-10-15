@@ -451,7 +451,7 @@ Journey IDs are shortened: `001-003` = `JRN-APP001-003`.
 | [14 Hospital Accounts](traceability/14-hospital-accounts.md) | 85 | 0 | 50 | 0 | 35 | 0 | 25 |
 | [15 Emergency](traceability/15-emergency.md) | 69 | 1 | 43 | 2 | 23 | 0 | 28 |
 | [16 MRD](traceability/16-mrd.md) | 49 | 2 | 22 | 1 | 24 | 0 | 11 |
-| [17 Payroll](traceability/17-payroll.md) | 69 | 1 | 27 | 1 | 40 | 0 | 32 |
+| [17 Payroll](traceability/17-payroll.md) | 69 | 1 | 25 | 1 | 42 | 0 | 32 |
 | [18 Settings](traceability/18-settings.md) | 92 | 2 | 71 | 0 | 19 | 0 | 29 |
 | [19 Finance](traceability/19-finance.md) | 128 | 4 | 66 | 5 | 53 | 0 | 31 |
 | [20 Budget](traceability/20-budget.md) | 64 | 0 | 22 | 7 | 35 | 0 | 13 |
@@ -462,4 +462,4 @@ Journey IDs are shortened: `001-003` = `JRN-APP001-003`.
 | [25 Linen](traceability/25-linen.md) | 21 | 0 | 14 | 3 | 4 | 0 | 14 |
 | [26 Maintenance](traceability/26-maintenance.md) | 20 | 0 | 12 | 4 | 4 | 0 | 14 |
 | [27 Fixed assets](traceability/27-fixed-assets.md) | 20 | 0 | 10 | 6 | 4 | 0 | 13 |
-| **Total** | **1604** | **30** | **912** | **39** | **619** | **4** | **418** |
+| **Total** | **1604** | **30** | **910** | **39** | **621** | **4** | **418** |

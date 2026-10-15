@@ -7,7 +7,7 @@ Test title = `<TC ID> <Scenario Name> [<file> | Steps | rows a-b | <TC ID>]`; an
 | TC ID | Journey ID | Scenario | Type | Prio | Steps rows | Journeys row | Spec | User / branch | Disposition | Reason |
 |---|---|---|---|---|---|---|---|---|---|---|
 | TC-APP017-001 | JRN-APP017-001 | Running a payroll batch for an employee | Positive | Critical | rows 2-6 | 2 | `tests/e2e/17-payroll/batches.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
-| TC-APP017-002 | JRN-APP017-002 | Batch result for a base amount of 10000000 | Positive | Critical | rows 7-10 | 3 | `tests/e2e/17-payroll/hub.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
+| TC-APP017-002 | JRN-APP017-002 | Batch result for a base amount of 10000000 | Positive | Critical | rows 7-10 | 3 | `tests/e2e/17-payroll/hub.spec.ts` | U1 / Podomoro | fixme | Blocker 37 (found by automation, docs/qa/blockers-found.md): The 12 salary components of the workbook are not on the site, and no screen makes them |
 | TC-APP017-003 | JRN-APP017-003 | Batch result for another base amount | Positive | High | rows 11-14 | 4 | `tests/e2e/17-payroll/hub.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP017-004 | JRN-APP017-004 | Payroll batch list: columns, order and paging | Positive | High | rows 15-17 | 5 | `tests/e2e/17-payroll/batches.spec.ts` | U1 / Podomoro | automate (read-only) |  |
 | TC-APP017-005 | JRN-APP017-005 | Payroll officer working on "All branches" | Positive | High | rows 18-22 | 6 | `tests/e2e/17-payroll/batches.spec.ts` | U2 / All branches | fixme | Needs user U5 "Approvers and heads" (00-prerequisites.xlsx \| Users \| row 9: To create) |
@@ -16,7 +16,7 @@ Test title = `<TC ID> <Scenario Name> [<file> | Steps | rows a-b | <TC ID>]`; an
 | TC-APP017-008 | JRN-APP017-008 | A batch does not show whom, for when and how much | Negative | Critical | rows 28-30 | 9 | `tests/e2e/17-payroll/batches.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP017-009 | JRN-APP017-009 | Payslip | Negative | Critical | rows 31-32 | 10 | `tests/e2e/17-payroll/hub.spec.ts` | U1 / Podomoro | fixme | 17-payroll.xlsx \| Journeys \| row 10: Automation Candidate = Needs Evaluation / Needs user U7 "User linked to an employee" (00-prerequisites.xlsx \| Users \| row 11: To prepare: link an account) |
 | TC-APP017-010 | JRN-APP017-010 | Base amount typed by hand, and basic salary counted twice | Other | Critical | rows 33-35 | 11 | `tests/e2e/17-payroll/batches.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
-| TC-APP017-011 | JRN-APP017-011 | Provident fund and other percentage components | Security | Critical | rows 36-37 | 12 | `tests/e2e/17-payroll/hub.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
+| TC-APP017-011 | JRN-APP017-011 | Provident fund and other percentage components | Security | Critical | rows 36-37 | 12 | `tests/e2e/17-payroll/hub.spec.ts` | U1 / Podomoro | fixme | Blocker 37 (found by automation, docs/qa/blockers-found.md): The 12 salary components of the workbook are not on the site, and no screen makes them |
 | TC-APP017-012 | JRN-APP017-012 | Base amount empty, zero or negative | Boundary | Critical | rows 38-41 | 13 | `tests/e2e/17-payroll/hub.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP017-013 | JRN-APP017-013 | Same employee and period run twice | Other | Critical | rows 42-43 | 14 | `tests/e2e/17-payroll/hub.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP017-014 | JRN-APP017-014 | Period typed as free text | Negative | High | rows 44-48 | 15 | `tests/e2e/17-payroll/hub.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
@@ -79,8 +79,8 @@ Test title = `<TC ID> <Scenario Name> [<file> | Steps | rows a-b | <TC ID>]`; an
 ## Counts
 
 - automate (read-only): 1
-- automate (saves; needs QA_ALLOW_WRITES): 27
+- automate (saves; needs QA_ALLOW_WRITES): 25
 - automate (chain; needs a record from another app): 1
-- fixme: 40
+- fixme: 42
 - skip: 0
 - test cases with a "TBD" step (asserted partially): 32
