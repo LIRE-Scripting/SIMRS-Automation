@@ -109,6 +109,13 @@ Row-level lists (TBD steps, discrepancies, …): [_generated-open-items.md](_gen
 - Branding (043 … 045), the colour and the dashboard widget (046) are put back to what they were at the end of each test. Holidays are made on Sundays three or four weeks ahead (DR-1 of 02 works Monday to Friday) and set inactive at the end; 053 step 3 (a day with appointments) is not run.
 - Saving the rights of a role answers HTTP 500 (found blocker 38). /tenants and /entitlements answer HTTP 500 ("This page couldn't load"): TC-APP018-062 and 088 fail.
 
+**Q31. 19 Finance data** (applied, change if you want others):
+- Accounts carry a token ("QA-1010-<token>") and are set inactive at the end of their test; "QA-3010" has no name or kind in the workbook and is made as "QA Akun Uji 3010", Equity. Posting rules of BR-A (Podomoro) are put back as they were.
+- FY-NEXT "QA-FY-NEXT" is made once and reused (a year can be neither changed nor deleted). TC-APP019-001 and 020 step 5 add a new year after the latest on every run, so the years run ahead by about two per run. TC-APP019-021 step 4 locks FY-NEXT, not the open year, so other modules keep posting.
+- The configuration of Daan Mogot is saved by 035 (year 2026, back-dated days 3, validity 90, Cash/Patient cash/Patient control 1101 Kas, Bank/Patient bank a test bank account, Revenue 4101). "Add user" adds no line, and the configuration is saved without users and with an unfinished imprest row (036 fails at step 3).
+- Account maps: a QA tax code (18) is mapped instead of the seed PPN; the salary component GAPOK (Expenditure) is mapped to a test expense account. Tariff mapping uses 1101 Kas and 4101 Pendapatan as debit and credit (Podomoro has no finance configuration). The currency "XTS" is saved again by every run (three letters leave no room for a token); IDR is put back if a test renames it.
+- Journals, documents, payments, bill adjustment with advances and the steps that need them need U5 and are not run.
+
 ## Environment
 
 - **E1 (done).** `node_modules` was installed on another OS (no Linux TypeScript binary, `.bin` files without exec bit). Reinstalled with `npm ci`; `npm run typecheck` works.
