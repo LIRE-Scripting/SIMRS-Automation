@@ -425,6 +425,33 @@ export const FOUND_BLOCKERS: FoundBlocker[] = [
     howFound: 'Seen on the site (automation of 18 Settings)',
     testCases: [{ id: 'TC-APP018-039', steps: [3] }],
   },
+  {
+    no: 39,
+    blocker: 'A tender cannot be created: "Create tender" answers HTTP 500 for every approved purchase request',
+    category: 'Function',
+    scope: '23 Sourcing\nTenders, /sourcing/tenders, "Create tender" (Document = id of an approved purchase request)',
+    cause:
+      'With a category, the type "open", a close date and the internal id of an approved purchase request of Procurement ' +
+      '(/procurement/requests: the requests of 09 and the seed requests PO-001 and PO-USG), "Save" posts and gets HTTP 500, toast ' +
+      '"Minified React error #441" (seen 2026-10-15). Without a tender no bid, agreement or deposit can be recorded.',
+    fix: '1. Fix the creation of a tender from an approved purchase request.\n2. Run TC-APP023-005, 006, 008 … 010, 012 … 014, 016 … 018 and 020 again.',
+    who: 'Development',
+    howFound: 'Seen on the site (automation of 23 Sourcing)',
+    testCases: [
+      { id: 'TC-APP023-005', steps: [3, 4, 5, 6] },
+      { id: 'TC-APP023-006', steps: [6, 7] },
+      { id: 'TC-APP023-008' },
+      { id: 'TC-APP023-009' },
+      { id: 'TC-APP023-010' },
+      { id: 'TC-APP023-012' },
+      { id: 'TC-APP023-013' },
+      { id: 'TC-APP023-014' },
+      { id: 'TC-APP023-016' },
+      { id: 'TC-APP023-017' },
+      { id: 'TC-APP023-018', steps: [1, 2, 3] },
+      { id: 'TC-APP023-020', steps: [2, 3, 4, 5, 6] },
+    ],
+  },
 ];
 
 export function foundBlocker(no: number): FoundBlocker {

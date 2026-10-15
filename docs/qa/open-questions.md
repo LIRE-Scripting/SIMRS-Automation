@@ -124,6 +124,8 @@ Row-level lists (TBD steps, discrepancies, …): [_generated-open-items.md](_gen
 
 **Q34. 22 Services data** (applied, change if you want others): categories, items, requests and orders carry a token; "Service center" keeps the dialog's "CSSD" and the purchase request's store "CSSD" (the workbook says "of the branch"). Refusals show "Minified React error #441"; the server text of the workbook is recorded next to it. A service purchase order is saved with "Document" empty (TC-APP022-013 fails at step 2). Receipts and bills need approvers (U5) and stay fixme; the "All branches" cases need U2.
 
+**Q35. 23 Sourcing data** (applied, change if you want others): masters carry a token; a tender takes the internal id of an approved purchase request of Procurement (/procurement/requests). Every such tender is refused with HTTP 500, the seed requests too (found blocker 39), so bids, agreements and deposits cannot be run. The tests that need an accepted bid were written to close the tender yesterday (a typed past date is accepted), to be run once blocker 39 is fixed.
+
 ## Environment
 
 - **E1 (done).** `node_modules` was installed on another OS (no Linux TypeScript binary, `.bin` files without exec bit). Reinstalled with `npm ci`; `npm run typecheck` works.
