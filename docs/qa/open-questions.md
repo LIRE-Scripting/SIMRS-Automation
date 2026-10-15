@@ -126,6 +126,8 @@ Row-level lists (TBD steps, discrepancies, …): [_generated-open-items.md](_gen
 
 **Q35. 23 Sourcing data** (applied, change if you want others): masters carry a token; a tender takes the internal id of an approved purchase request of Procurement (/procurement/requests). Every such tender is refused with HTTP 500, the seed requests too (found blocker 39), so bids, agreements and deposits cannot be run. The tests that need an accepted bid were written to close the tender yesterday (a typed past date is accepted), to be run once blocker 39 is fixed.
 
+**Q36. 24 Housekeeping data** (applied, change if you want others): locations, contracts, logs and bills carry a token; the service center of a location is QA-UNIT-1 "QA Ruang Tindakan" (01). The contract runs 2026-11-01 to 2027-10-31 as in the workbook; each bill books a Finance voucher (go-ahead in the precondition). TC-APP024-013 uses the logs of one day for "the logs of a month". A shift is saved for a location code that does not exist (TC-APP024-002 fails at step 5).
+
 ## Environment
 
 - **E1 (done).** `node_modules` was installed on another OS (no Linux TypeScript binary, `.bin` files without exec bit). Reinstalled with `npm ci`; `npm run typecheck` works.
