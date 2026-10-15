@@ -120,6 +120,8 @@ Row-level lists (TBD steps, discrepancies, …): [_generated-open-items.md](_gen
 - Books, heads, utilisation types, projects and checklist questions carry a token ("QA-OPS-<token>", …); heads take the open year of Finance. The tenant's default book is never moved: TC-APP020-002 step 2 runs only when the list marks a default book.
 - Circulars, internal budgets, requests, allocations, releases, withdrawals, sanctions, utilisations and transfers need approvers (U5) and are not run; TC-APP020-042 is not run (TBD with the product owner, needs a budget line).
 
+**Q33. 21 CSSD data** (applied, change if you want others): masters (autoclave, cycle, packing, indicator, test name, result type) carry a token; the autoclave number is typed in small letters ("qa-a2-<token>"). The sterilization loop (requests, receipts, cycles, Bowie Dick, issues, sterile receipts, sets) needs approvers (U5) and stays fixme, so Pack Trace is checked without a pack. /cssd/issues/new answers HTTP 500 (TC-APP021-043 fails).
+
 ## Environment
 
 - **E1 (done).** `node_modules` was installed on another OS (no Linux TypeScript binary, `.bin` files without exec bit). Reinstalled with `npm ci`; `npm run typecheck` works.
