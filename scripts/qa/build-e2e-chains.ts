@@ -156,7 +156,9 @@ function evaluate(chain: Chain, results: Map<string, SourceStep[]>): ChainStepRe
     const passed = st.filter((x) => x === 'Passed').length;
     const ss = stopping.map((x) => x.status);
     const ran = passed > 0 || off.some((x) => causeOf(s.tc, x) === 'DEVIATION');
-    const status: Status = !stopping.length && ran ? 'Passed' : ss.includes('Blocked') ? 'Blocked' : ss.includes('Failed') ? 'Failed' : 'Not Run';
+    // A chain step either lets the flow through or is blocked; the cause names the blocker.
+    const status: Status = !stopping.length && ran ? 'Passed' : 'Blocked';
+    void ss;
     const counts = `${passed}/${st.length} steps passed`;
     const first = stopping[0] ?? off[0];
     const notes = off.filter((x) => NON_STOPPING.has(causeOf(s.tc, x))).map((x) => `step ${x.step} ${causeOf(s.tc, x).toLowerCase()}: ${firstSentence(x.actual)}`);
@@ -298,7 +300,7 @@ async function main(): Promise<void> {
   for (const { chain, steps: cs } of evaluated) {
     const breakAt = cs.find((s) => s.status !== 'Passed');
     const causes = [...new Set(cs.flatMap((s) => s.causes))];
-    const status = !breakAt ? 'Ready' : cs.every((s) => s.status !== 'Passed') ? 'Blocked' : 'Partly runnable';
+    const status = !breakAt ? 'Ready' : `Blocked at step ${breakAt.n}`;
     journeys.addRow([
       chain.id,
       'E2E',
@@ -323,7 +325,7 @@ async function main(): Promise<void> {
       chain.steps.map((s) => s.tc).join(', '),
       [...new Set(chain.steps.map((s) => `reports/e2e/${fileOf(s.tc)}`))].join(', '),
       breakAt ? 'Needs Review' : 'Ready',
-      `${status}. Steps Passed ${cs.filter((s) => s.status === 'Passed').length}, Failed ${cs.filter((s) => s.status === 'Failed').length}, Blocked ${cs.filter((s) => s.status === 'Blocked').length}, Not Run ${cs.filter((s) => s.status === 'Not Run').length}. Blockers: ${causes.join('; ') || 'none'}.`,
+      `${status}. Steps Passed ${cs.filter((s) => s.status === 'Passed').length}, Blocked ${cs.filter((s) => s.status === 'Blocked').length}. Blockers: ${causes.filter((c) => !NON_STOPPING.has(c)).join('; ') || 'none'}. Notes: ${causes.filter((c) => NON_STOPPING.has(c)).join('; ') || 'none'}.`,
       chain.data,
       'As in the source test cases.',
       null,
@@ -364,11 +366,11 @@ async function main(): Promise<void> {
   add('Purpose', 'Possible end-to-end (cross-application) happy paths, composed only from test cases that already exist in the 27 module workbooks, with the status each step had in its run and the blocker that stops it.');
   add('Built', `${new Date().toISOString().slice(0, 10)} by npm run qa:e2e-chains (scripts/qa/build-e2e-chains.ts) from lib/qa-data/e2e-chains.ts and the result workbooks reports/e2e/*.xlsx.`);
   add('Sheets', 'Journeys: one row per chain. Steps: one row per chain step, each pointing to its source test case (file, rows). Blockers: every blocker a chain meets, with its cause and fix.');
-  add('Step status', 'Passed: the flow goes through the source test case (its steps passed; a deviation from the wording, or a check that another step of the chain makes, is noted but does not stop the flow). Failed: the site broke the flow. Blocked: a known blocker. Not Run: a missing user, or a journey that needs evaluation.');
+  add('Step status', 'Passed: the flow goes through the source test case (its steps passed; a deviation from the wording, or a check that another step of the chain makes, is noted but does not stop the flow). Blocked: anything else; Defect Reference names the blocker (see sheet Blockers).');
   add('Blocker IDs', '"Blocker N": checklist blockers 1-16 (00-blockers-checklist-linked.xlsx) and blockers found while automating (17 and up, docs/qa/blockers-found.md). "User Ux": a user of 00-prerequisites.xlsx that does not exist yet. DEVIATION, SITE-DEFECT, NEEDS-EVALUATION, NEEDS-OTHER-RUN, STATE-CASHIER: see sheet Blockers.');
   add('Note', 'Each source test case was run on its own (with its own data). A chain is "Ready" when all its steps passed; running it as one test passing the records on is the next step.');
   add();
-  const head = add('Chain', 'Name', 'Steps', 'Passed', 'Failed', 'Blocked', 'Not Run', 'Status', 'First stop', 'Blockers that stop the flow', 'Notes that do not stop it');
+  const head = add('Chain', 'Name', 'Applications', 'Steps', 'Passed', 'Blocked', 'Status', 'First stop', 'Blockers that stop the flow', 'Notes that do not stop it');
   head.font = { bold: true };
   for (const { chain, steps: cs } of evaluated) {
     const breakAt = cs.find((s) => s.status !== 'Passed');
@@ -376,18 +378,17 @@ async function main(): Promise<void> {
     add(
       chain.id,
       chain.name,
+      [...new Set(chain.steps.map((x) => x.tc.slice(7, 9)))].join(', '),
       cs.length,
       n('Passed'),
-      n('Failed'),
       n('Blocked'),
-      n('Not Run'),
-      !breakAt ? 'Ready' : n('Passed') ? 'Partly runnable' : 'Blocked',
+      !breakAt ? 'Ready' : `Blocked at step ${breakAt.n}`,
       breakAt ? `Step ${breakAt.n} ${breakAt.tc} (${breakAt.status}): ${breakAt.causes.filter((c) => !NON_STOPPING.has(c)).join('; ')}` : '—',
       [...new Set(cs.flatMap((s) => (s.status === 'Passed' ? [] : s.causes.filter((c) => !NON_STOPPING.has(c)))))].join('; ') || 'none',
       [...new Set(cs.flatMap((s) => s.causes.filter((c) => NON_STOPPING.has(c))))].join('; ') || 'none',
     );
   }
-  summary.columns.forEach((c, i) => (c.width = [12, 52, 7, 8, 8, 8, 8, 16, 44, 44, 30][i] ?? 12));
+  summary.columns.forEach((c, i) => (c.width = [12, 52, 18, 7, 8, 8, 18, 44, 44, 30][i] ?? 12));
   summary.eachRow((r) => (r.alignment = { wrapText: true, vertical: 'top' }));
 
   fs.mkdirSync(OUT_DIR, { recursive: true });
