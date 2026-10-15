@@ -200,6 +200,47 @@ export const FOUND_BLOCKERS: FoundBlocker[] = [
       { id: 'TC-APP006-072', steps: [3] },
     ],
   },
+  {
+    no: 26,
+    blocker: 'No store can be made, and "Branch and stores" cannot save',
+    category: 'Data + Function',
+    scope:
+      '07 Inventory\nStores, /inventory/stores (no "Add"); Branch and stores, /inventory/setup (Save answers HTTP 500)\n' +
+      '00-test-data.xlsx | Catalogue: ST-1 "QA Gudang Farmasi", ST-OFF, ST-B (07); ST-OP, ST-IP (05)',
+    cause:
+      'The Stores screen lists the seed stores and has no button to add one; Settings has no store screen either. The three forms of ' +
+      '"Branch and stores" (category, store, lane) answer HTTP 500 ("Minified React error #441", seen 2026-10-15). The QA stores of the ' +
+      'catalogue, an inactive store and the stores "X-ST1"/"X-ST2" of the setup journeys cannot be made. On Store documents an ' +
+      'opening stock is saved, but an indent, a departmental or an inter-branch request between two stores answers HTTP 500 too ' +
+      '(no lane can be saved between them; whether a lane is required is TBD in the workbook).',
+    fix: '1. Name the screen that makes a store, or add one; fix the saves of "Branch and stores".\n2. Make the catalogue stores and run the 07 journeys again.',
+    who: 'Development; Site administrator for the stores',
+    howFound: 'Seen on the site (automation of 07 Inventory)',
+    testCases: [
+      { id: 'TC-APP007-020', steps: [4] },
+      { id: 'TC-APP007-039', steps: [2, 3, 4] },
+      { id: 'TC-APP007-040', steps: [1, 2] },
+      { id: 'TC-APP007-041', steps: [1] },
+      { id: 'TC-APP007-045', steps: [1, 2, 3, 4] },
+      { id: 'TC-APP007-046', steps: [1, 2] },
+      { id: 'TC-APP007-047', steps: [1, 2] },
+      { id: 'TC-APP007-048', steps: [1, 2] },
+      { id: 'TC-APP007-050', steps: [1] },
+    ],
+  },
+  {
+    no: 27,
+    blocker: 'Saving a kit answers HTTP 500',
+    category: 'Function',
+    scope: '07 Inventory\nItem Master, dialog "Edit Item", section "Kit components" (Save kit)',
+    cause:
+      'With two components picked from the list and quantities 1 and 2, "Save kit" answers HTTP 500 ("Minified React error #441", seen ' +
+      '2026-10-15). No item can be made a kit, so IT-KIT (07) and QA-KIT (05) cannot exist.',
+    fix: '1. Fix the kit save.\n2. Run TC-APP007-007 and TC-APP005-010 again.',
+    who: 'Development',
+    howFound: 'Seen on the site (automation of 07 Inventory)',
+    testCases: [{ id: 'TC-APP007-007', steps: [3, 4] }],
+  },
 ];
 
 export function foundBlocker(no: number): FoundBlocker {

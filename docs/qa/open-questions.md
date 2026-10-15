@@ -59,6 +59,8 @@ Row-level lists (TBD steps, discrepancies, …): [_generated-open-items.md](_gen
 
 **Q21. 06 Transfusion Medicine.** No unit can be made screened and available here: bags are numbered on Donors (HTTP 500, checklist blocker 2) and released by a second user (U4). Every step that needs UNIT-1/UNIT-2/UNIT-F, a collected bag or an issued unit is "Blocked" with blocker 2; tests whose steps are all blocked are skipped with that reason. The group chart rows of the catalogue name only the group (O Positive, A Positive); the reaction strengths typed for TC-APP006-072 (0 / 4) are an assumption. DEP-1 "QA Bangsal Dalam" is made once (code QA-DEP-BB1, Q14).
 
+**Q22. 07 Inventory stores.** No store can be made (Stores has no "Add"; "Branch and stores" answers HTTP 500, found blocker 26). Seed stores of Podomoro stand in: FI01-00-00 "GUDANG FARMASI RUMAH SAKIT" for ST-1 / "X-ST1", FI01-01-01 "FARMASI REGULER" for "X-ST2"; each test notes it. TC-APP007-010 changes the stand-in's visit types and sets them back. Steps that need an inactive store (ST-OFF) or a store of BR-B are blocked. Is using these seed stores acceptable, or should the stores be made by an administrator first?
+
 ## Environment
 
 - **E1 (done).** `node_modules` was installed on another OS (no Linux TypeScript binary, `.bin` files without exec bit). Reinstalled with `npm ci`; `npm run typecheck` works.
