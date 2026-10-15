@@ -79,6 +79,10 @@ Row-level lists (TBD steps, discrepancies, …): [_generated-open-items.md](_gen
 - TC-APP010-028 step 4 is "not run": it needs USR-1 and a user linked to EMP-2; linking the admin accounts U1/U2 to a test employee would change real accounts. TC-APP010-023 step 3 needs more than 200 employees in a branch.
 - Year balance (TC-APP010-047/048): the balance of the precondition is set with the action "Year balance" (data of TC-APP010-043: type "QA-Tahunan", 2027, 12 days).
 
+**Q26. 11 Laboratory and 12 RIS data** (applied, change if you want others):
+- 11: each order carries the workbook result type plus a token ("QA Hemoglobin <token>"); the Sample workflow lists only the ten newest orders by sample ID (or the first 8 characters of the order id), so each test uses orders it has just made. "Hematologi Lengkap from a consultation" (TC-APP011-020) is an accepted order of the test.
+- 12: orders carry a token in the study text, reference and accession number. "Schedule and report" lists only the first 20 orders (dated ones first, latest first), so the orders of those tests get the study date tomorrow 23:00. "Start" takes an ISO time in UTC; tomorrow 09:00 WIB is typed as 02:00Z.
+
 ## Environment
 
 - **E1 (done).** `node_modules` was installed on another OS (no Linux TypeScript binary, `.bin` files without exec bit). Reinstalled with `npm ci`; `npm run typecheck` works.
