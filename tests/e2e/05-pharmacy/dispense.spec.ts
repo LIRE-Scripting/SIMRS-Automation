@@ -347,12 +347,10 @@ qaTest('TC-APP005-015', async ({ page, qa }) => {
   await qa.step(2, async () => {
     await w.goNext('Drug order alerts');
     await w.goNext('Confirm');
-    const toasts = await confirm(page, w);
-    qa.note(2, `toast "${toasts.join(' / ')}"`);
-    expect(toasts).not.toContain(CONFIRMED);
+    expect(await confirm(page, w)).toContain(CONFIRMED);
   });
-  qa.blocked(2, 28);
-  qa.blocked(3, 28);
+
+  qa.notRun(3, 'the RX- invoice of a sale with a 10% discount is read at the cashier in TC-APP014-034');
 });
 
 qaTest('TC-APP005-021', async ({ page, qa }) => {
@@ -391,11 +389,10 @@ qaTest('TC-APP005-021', async ({ page, qa }) => {
     const mark = await toastMark(page);
     await w.confirm.dblclick();
     const toasts = await toastsAfter(page, mark, 20_000);
-    qa.note(4, `toasts after the double click: "${toasts.join(' / ')}"`);
-    expect(toasts.filter((t) => t === CONFIRMED).length).toBeLessThanOrEqual(1);
+    expect(toasts.filter((t) => t === CONFIRMED)).toHaveLength(1);
   });
-  qa.blocked(4, 28);
-  expect(total(await stockOf(page, para.code))).toBe(total(before));
+
+  expect(total(before) - total(await stockOf(page, para.code))).toBe(3);
 });
 
 qaTest('TC-APP005-026', async ({ page, qa }) => {

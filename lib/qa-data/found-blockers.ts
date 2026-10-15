@@ -244,25 +244,8 @@ export const FOUND_BLOCKERS: FoundBlocker[] = [
     howFound: 'Seen on the site (automation of 07 Inventory)',
     testCases: [{ id: 'TC-APP007-007', steps: [3, 4] }, { id: 'TC-APP005-010' }],
   },
-  {
-    no: 28,
-    blocker: 'A counter sale with a line discount answers HTTP 500',
-    category: 'Data + Function',
-    scope:
-      '05 Pharmacy\nDispense, /pharmacy/dispense, "Set quantities" column "Discount %", then "Confirm dispense"\n' +
-      '00-test-data.xlsx | Catalogue, 05 row "Rules for BR-A" ("Maximum line discount (%)" 10, approval chain for billing discounts)',
-    cause:
-      'With "Discount %" 5 or 10 on a line, "Confirm dispense" answers HTTP 500 ("Minified React error #441", seen 2026-10-15). The same ' +
-      'sale without a discount, with Generic ticked or with Issued below Requested is confirmed. Whether the cashier rule "Maximum line ' +
-      'discount (%)" is unset on BR-A, and where it is set, is not known.',
-    fix: '1. Fix the discounted dispense (or set the BR-A discount rule and name the screen).\n2. Run TC-APP005-015 and 021 again.',
-    who: 'Development; Site administrator for the discount rule',
-    howFound: 'Seen on the site (automation of 05 Pharmacy)',
-    testCases: [
-      { id: 'TC-APP005-015', steps: [2, 3] },
-      { id: 'TC-APP005-021', steps: [4] },
-    ],
-  },
+  // 28 was withdrawn on 2026-10-15: the discounted dispense answered HTTP 500 only because "Maximum line
+  // discount (%)" of the 05 catalogue ("Rules for BR-A") had not been set; the tests now set it first.
   {
     no: 29,
     blocker: 'A dispense opened from an order cannot change Issued, Requested or Generic',
@@ -331,6 +314,43 @@ export const FOUND_BLOCKERS: FoundBlocker[] = [
     who: 'Development',
     howFound: 'Seen on the site (automation of 08 Operation Theater)',
     testCases: [{ id: 'TC-APP008-039', steps: [3] }],
+  },
+  {
+    no: 33,
+    blocker: 'The insured patient PT-BPJS is not on the site and no screen can prepare one',
+    category: 'Data',
+    scope:
+      '14 Hospital Accounts\nFast Cashier, /billing/cashier, panel "Insurance / BPJS" (Check eligibility, Submit claim, Check SEP)\n' +
+      '00-test-data.xlsx | Catalogue, 14 row "PT-BPJS" ("Both must be prepared as data; the screens cannot create them")',
+    cause:
+      '"Check eligibility" offers no patient "QA-HAC Pasien BPJS" (seen 2026-10-15): no approved pre-authorisation and no referral with ' +
+      'SEP QA-SEP-0001 exist, and the panel can only search existing ones (TC-APP014-046).',
+    fix: '1. Load PT-BPJS with its pre-authorisation (approved, 2,000,000) and its referral (SEP QA-SEP-0001).\n2. Run TC-APP014-017, 041 to 044 again.',
+    who: 'Site administrator (data load)',
+    howFound: 'Seen on the site (automation of 14 Hospital Accounts)',
+    testCases: [
+      { id: 'TC-APP014-017', steps: [3, 4, 5, 6, 7, 8, 9] },
+      { id: 'TC-APP014-041', steps: [3, 4, 5] },
+      { id: 'TC-APP014-042' },
+      { id: 'TC-APP014-043', steps: [3] },
+      { id: 'TC-APP014-044' },
+    ],
+  },
+  {
+    no: 34,
+    blocker: 'A discount above the cashier cap answers HTTP 500 instead of waiting for approval',
+    category: 'Data + Function',
+    scope:
+      '14 Hospital Accounts\nFast Cashier, /billing/cashier, "Apply discount" above "Discount cap (IDR)"\n' +
+      '00-test-data.xlsx | Catalogue, 14 row "Approval chain" (billing discount chain with one step, approver Head cashier)',
+    cause:
+      'With the counter settings of the catalogue (cap 50,000), a discount of 60,000 answers HTTP 500 ("Minified React error #441", seen ' +
+      '2026-10-15); the sale stays Draft and no approval starts. No billing discount chain is set up, and none can be checked from the ' +
+      'cashier screens. A sale cannot be brought to "Waiting for approval".',
+    fix: '1. Set up the billing discount chain (or fix the request that starts it).\n2. Run TC-APP014-029 again.',
+    who: 'Site administrator (Workflow), then Development',
+    howFound: 'Seen on the site (automation of 14 Hospital Accounts)',
+    testCases: [{ id: 'TC-APP014-029' }],
   },
 ];
 

@@ -34,7 +34,7 @@ Test title = `<TC ID> <Scenario Name> [<file> | Steps | rows a-b | <TC ID>]`; an
 | TC-APP014-026 | JRN-APP014-026 | Cash rules: missing identity document and the cash limit | Boundary | High | rows 93-96 | 27 | `tests/e2e/14-hospital-accounts/cashier.spec.ts` | U1 / Podomoro | fixme | 14-hospital-accounts.xlsx \| Journeys \| row 27: Automation Candidate = Needs Evaluation / Needs user U5 "Approvers and heads" (00-prerequisites.xlsx \| Users \| row 9: To create) |
 | TC-APP014-027 | JRN-APP014-027 | Discount larger than the charge | Boundary | High | rows 97-98 | 28 | `tests/e2e/14-hospital-accounts/cashier.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP014-028 | JRN-APP014-028 | The wrong person tries to approve | Boundary | Critical | rows 99-101 | 29 | `tests/e2e/14-hospital-accounts/cashier.spec.ts` | U1 / Podomoro | fixme | 14-hospital-accounts.xlsx \| Journeys \| row 29: Automation Candidate = Needs Evaluation / Needs user U4 "Second user of the same role" (00-prerequisites.xlsx \| Users \| row 8: To create) / Needs user U5 "Approvers and heads" (00-prerequisites.xlsx \| Users \| row 9: To create) |
-| TC-APP014-029 | JRN-APP014-029 | A sale is locked while it waits for approval | Negative | Critical | rows 102-105 | 30 | `tests/e2e/14-hospital-accounts/cashier.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
+| TC-APP014-029 | JRN-APP014-029 | A sale is locked while it waits for approval | Negative | Critical | rows 102-105 | 30 | `tests/e2e/14-hospital-accounts/cashier.spec.ts` | U1 / Podomoro | fixme | Blocker 34 (found by automation, docs/qa/blockers-found.md): A discount above the cashier cap answers HTTP 500 instead of waiting for approval |
 | TC-APP014-030 | JRN-APP014-030 | Refund of more than was paid | Boundary | Critical | rows 106-107 | 31 | `tests/e2e/14-hospital-accounts/cashier.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP014-031 | JRN-APP014-031 | Refund of a card payment and the drawer total | Negative | High | rows 108-109 | 32 | `tests/e2e/14-hospital-accounts/cashier.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP014-032 | JRN-APP014-032 | Full refund of a paid sale | Negative | High | rows 110-111 | 33 | `tests/e2e/14-hospital-accounts/cashier.spec.ts` | U1 / Podomoro | fixme | 14-hospital-accounts.xlsx \| Journeys \| row 33: Automation Candidate = Needs Evaluation / Needs user U5 "Approvers and heads" (00-prerequisites.xlsx \| Users \| row 9: To create) |
@@ -47,9 +47,9 @@ Test title = `<TC ID> <Scenario Name> [<file> | Steps | rows a-b | <TC ID>]`; an
 | TC-APP014-039 | JRN-APP014-039 | Invalid counter settings | Negative | High | rows 124-126 | 40 | `tests/e2e/14-hospital-accounts/cashier.spec.ts` | U1 / Podomoro | fixme | Needs user U5 "Approvers and heads" (00-prerequisites.xlsx \| Users \| row 9: To create) |
 | TC-APP014-040 | JRN-APP014-040 | Giving the patient a receipt | Negative | High | rows 127-129 | 41 | `tests/e2e/14-hospital-accounts/cashier.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP014-041 | JRN-APP014-041 | Insurance: steps that are refused | Negative | High | rows 130-134 | 42 | `tests/e2e/14-hospital-accounts/cashier.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
-| TC-APP014-042 | JRN-APP014-042 | Insurance patient pays only the co-pay | Negative | Critical | rows 135-136 | 43 | `tests/e2e/14-hospital-accounts/cashier.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
+| TC-APP014-042 | JRN-APP014-042 | Insurance patient pays only the co-pay | Negative | Critical | rows 135-136 | 43 | `tests/e2e/14-hospital-accounts/cashier.spec.ts` | U1 / Podomoro | fixme | Blocker 33 (found by automation, docs/qa/blockers-found.md): The insured patient PT-BPJS is not on the site and no screen can prepare one |
 | TC-APP014-043 | JRN-APP014-043 | Insurance amounts taken from the wrong charge | Negative | Critical | rows 137-139 | 44 | `tests/e2e/14-hospital-accounts/cashier.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
-| TC-APP014-044 | JRN-APP014-044 | Reopening a sale after its claim was sent | Negative | High | rows 140-141 | 45 | `tests/e2e/14-hospital-accounts/cashier.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
+| TC-APP014-044 | JRN-APP014-044 | Reopening a sale after its claim was sent | Negative | High | rows 140-141 | 45 | `tests/e2e/14-hospital-accounts/cashier.spec.ts` | U1 / Podomoro | fixme | Blocker 33 (found by automation, docs/qa/blockers-found.md): The insured patient PT-BPJS is not on the site and no screen can prepare one |
 | TC-APP014-045 | JRN-APP014-045 | Sponsor shares that do not add up | Negative | High | rows 142-144 | 46 | `tests/e2e/14-hospital-accounts/cashier.spec.ts` | U1 / Two branches | fixme | Needs user U6 "User at a second branch only" (00-prerequisites.xlsx \| Users \| row 10: To create) |
 | TC-APP014-046 | JRN-APP014-046 | Preparing an insured patient from the screens | Negative | High | rows 145-146 | 47 | `tests/e2e/14-hospital-accounts/cashier.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP014-047 | JRN-APP014-047 | User without cashier rights tries to take money | Security | Critical | rows 147-149 | 48 | `tests/e2e/14-hospital-accounts/cashier.spec.ts` | U1 / Podomoro | fixme | Needs user U3 "User without write rights ("Staff")" (00-prerequisites.xlsx \| Users \| row 7: To create) |
@@ -95,8 +95,8 @@ Test title = `<TC ID> <Scenario Name> [<file> | Steps | rows a-b | <TC ID>]`; an
 ## Counts
 
 - automate (read-only): 0
-- automate (saves; needs QA_ALLOW_WRITES): 56
+- automate (saves; needs QA_ALLOW_WRITES): 53
 - automate (chain; needs a record from another app): 0
-- fixme: 29
+- fixme: 32
 - skip: 0
 - test cases with a "TBD" step (asserted partially): 25

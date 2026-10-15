@@ -7,6 +7,7 @@ import { closeDialog, ensurePharmacyItems, PHARMACY, PHARMACY_STORE, receive, ty
 import { ItemMasterPage } from '../../../pages/inventory/InventoryE2EPages';
 import { ConsultationPage } from '../../../pages/clinical/ConsultationPage';
 import { DispenseWizard } from '../../../pages/pharmacy/PharmacyE2EPages';
+import { ensureSettings } from '../14-hospital-accounts/helpers';
 
 /**
  * Shared steps of 05-pharmacy.xlsx. Patients are registered per test (name +
@@ -33,9 +34,17 @@ export async function patient(page: Page, qa: Qa, excelName: string = PHARMACY.p
   return registerPatient(page, excelName, token);
 }
 
+/**
+ * "Rules for BR-A" of the 05 catalogue are set on the Fast Cashier screen
+ * (outpatient price margin 25% and tax 11%, "Maximum line discount (%)" 10):
+ * without the maximum line discount, a sale with a discount answers HTTP 500.
+ */
+export { ensureSettings as ensureBranchRules } from '../14-hospital-accounts/helpers';
+
 /** The items exist and the test's batches are in the stand-in store (BT-1 and BT-2 for QA-PARA, one batch of 20 for the others). */
 export async function stock(page: Page, qa: Qa, items: PharmacyItem[] = [PHARMACY.para]): Promise<string[]> {
   await ensurePharmacyItems(page);
+  await ensureSettings(page);
   const batches: string[] = [];
   for (const it of items) {
     if (it.code === PHARMACY.para.code) {
