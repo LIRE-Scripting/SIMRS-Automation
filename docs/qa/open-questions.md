@@ -90,6 +90,12 @@ Row-level lists (TBD steps, discrepancies, …): [_generated-open-items.md](_gen
 - A cashier closes a day once: TC-APP014-011 closes the U1 counter, after which the cashier tests cannot run until 07:00 WIB the next day (they skip themselves). TC-APP014-012 and 037 (other closes) and the second-tab steps of 036 are "not run". TC-APP014-002 failed on 2026-10-15 because the test could not find the new RX- invoice in the capped search list; the lookup is fixed and the case must be run again once the counter is open.
 - PT-BPJS cannot be made (found blocker 33); Cashier 2 and Head cashier (U4/U5) are not made.
 
+**Q28. 16 MRD data** (applied, change if you want others):
+- Document numbers and patients carry a token ("QA-REQ-001-<token>", "QA-MRD Pasien Satu <token>"); PT-1/PT-2 are registered per test on Registered patients.
+- A file request needs a "Request type" on the site (required list); where the workbook names none, the first active type is chosen.
+- Patient Records lists loans only; the steps that expect a register of files, a borrower, a due date, a link between request and issue, search or sort are recorded as deviations, not failures.
+- TC-APP016-040 steps 2 … 4 are "not run": which document makes a visit leave the list is TBD.
+
 ## Environment
 
 - **E1 (done).** `node_modules` was installed on another OS (no Linux TypeScript binary, `.bin` files without exec bit). Reinstalled with `npm ci`; `npm run typecheck` works.
