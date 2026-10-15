@@ -59,7 +59,7 @@ export class CashierPage {
   /** Values of the lines under "2. Payment": Gross, Discount, Tax, Patient net. */
   async lines(): Promise<Record<string, string>> {
     const out: Record<string, string> = {};
-    for (const t of ['Gross', 'Discount', 'Tax', 'Patient net']) out[t] = (await this.value(t).innerText()).trim();
+    for (const t of ['Gross', 'Discount', 'Tax', 'Patient net']) out[t] = norm(await this.value(t).innerText());
     return out;
   }
 
@@ -68,7 +68,7 @@ export class CashierPage {
   }
 
   async receiptValue(term: 'Invoice' | 'Tender' | 'Paid' | 'Remaining due' | 'Status'): Promise<string> {
-    return (await this.receipt().getByRole('term').filter({ hasText: new RegExp(`^${term}$`) }).locator('xpath=following-sibling::*[1]').innerText()).trim();
+    return norm(await this.receipt().getByRole('term').filter({ hasText: new RegExp(`^${term}$`) }).locator('xpath=following-sibling::*[1]').innerText());
   }
 
   async systemCash(): Promise<number> {
@@ -77,12 +77,18 @@ export class CashierPage {
 
   /** The red message of the screen (an alert that holds text). */
   error(): Locator {
-    return this.page.getByRole('alert').filter({ hasText: /\S/ });
+    // The route announcer of the app is an alert too; it is left out.
+    return this.page.locator('[role="alert"]:not(#__next-route-announcer__)').filter({ hasText: /\S/ });
   }
 
   closedBanner(): Locator {
     return this.page.getByText('Your counter is closed for today.');
   }
+}
+
+/** Amounts on the screen use a non-breaking space ("Rp\u00a0166.500"); compared with a plain space. */
+export function norm(text: string): string {
+  return text.replace(/\s+/g, ' ').trim();
 }
 
 /** "Rp 166.500" -> 166500; "-Rp 3.000" or "Rp -3.000" -> -3000 */

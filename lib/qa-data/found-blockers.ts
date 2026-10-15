@@ -352,6 +352,46 @@ export const FOUND_BLOCKERS: FoundBlocker[] = [
     howFound: 'Seen on the site (automation of 14 Hospital Accounts)',
     testCases: [{ id: 'TC-APP014-029' }],
   },
+  {
+    no: 35,
+    blocker: 'The item price of a branch (margin and tax) cannot be saved',
+    category: 'Function',
+    scope:
+      '14 Hospital Accounts\nFast Cashier, /billing/cashier, section "Item price" (Save price)\n' +
+      '00-test-data.xlsx | Catalogue, 05 row "Rules for BR-A" (outpatient price: site margin 25%, tax 11%)',
+    cause:
+      '"Save price" with Visit Outpatient, Method "Cost plus margin", Site margin 25 and Tax 11 answers HTTP 500 ("Minified React error ' +
+      '#441", seen 2026-10-15); the fields go back to 0 and 0. Pharmacy sales are priced at the last cost with no tax (QA-PARA x 10 is ' +
+      'Rp 10.000 instead of the reference 13,875.00).',
+    fix: '1. Fix the item price save.\n2. Run TC-APP014-002 and 033 again.',
+    who: 'Development',
+    howFound: 'Seen on the site (automation of 14 Hospital Accounts)',
+    testCases: [
+      { id: 'TC-APP014-002', steps: [1, 2] },
+      { id: 'TC-APP014-033' },
+    ],
+  },
+  {
+    no: 36,
+    blocker: 'Patient ledger cannot show a chosen invoice: "Find patient" shows no rows, the list holds 22 invoices',
+    category: 'Function',
+    scope: '14 Hospital Accounts\nPatient ledger, /billing/ledger, "Find patient" and the button "Use" of a row',
+    cause:
+      '"Find patient" with a patient id gets the invoices back from the server ("QA-RI-… charge 300000 deposit 0 refund 0") but the ' +
+      'table reads "No rows yet." (seen 2026-10-15). Without a search the table shows only the first 22 invoices by number, so an ' +
+      'invoice made today is not on it and cannot be chosen with "Use" for a deposit move or a failed card.',
+    fix: '1. Show the rows of "Find patient" (and page or search the list).\n2. Run TC-APP014-061, 063, 065, 066, 068 and 069 again.',
+    who: 'Development',
+    howFound: 'Seen on the site (automation of 14 Hospital Accounts)',
+    testCases: [
+      { id: 'TC-APP014-061', steps: [5] },
+      { id: 'TC-APP014-063', steps: [3] },
+      { id: 'TC-APP014-065' },
+      { id: 'TC-APP014-066', steps: [2, 3, 4, 5] },
+      { id: 'TC-APP014-068' },
+      { id: 'TC-APP014-069', steps: [1, 2, 4] },
+    ],
+  },
 ];
 
 export function foundBlocker(no: number): FoundBlocker {

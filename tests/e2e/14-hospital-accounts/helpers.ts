@@ -34,6 +34,7 @@ export async function ensureSettings(page: Page): Promise<void> {
     await page.getByRole('combobox', { name: 'Method' }).selectOption({ label: 'Cost plus margin' });
     await margin.fill(BILLING.itemPrice.margin);
     await tax.fill(BILLING.itemPrice.tax);
+    // "Save price" answers HTTP 500 (found blocker 35); the price stays at cost with no tax.
     await c.button('Save price').click();
   }
   await c.open();

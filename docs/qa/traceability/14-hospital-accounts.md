@@ -38,7 +38,7 @@ Test title = `<TC ID> <Scenario Name> [<file> | Steps | rows a-b | <TC ID>]`; an
 | TC-APP014-030 | JRN-APP014-030 | Refund of more than was paid | Boundary | Critical | rows 106-107 | 31 | `tests/e2e/14-hospital-accounts/cashier.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP014-031 | JRN-APP014-031 | Refund of a card payment and the drawer total | Negative | High | rows 108-109 | 32 | `tests/e2e/14-hospital-accounts/cashier.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP014-032 | JRN-APP014-032 | Full refund of a paid sale | Negative | High | rows 110-111 | 33 | `tests/e2e/14-hospital-accounts/cashier.spec.ts` | U1 / Podomoro | fixme | 14-hospital-accounts.xlsx \| Journeys \| row 33: Automation Candidate = Needs Evaluation / Needs user U5 "Approvers and heads" (00-prerequisites.xlsx \| Users \| row 9: To create) |
-| TC-APP014-033 | JRN-APP014-033 | Pharmacy bill discounted at the cashier | Negative | Critical | row 112 | 34 | `tests/e2e/14-hospital-accounts/cashier.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
+| TC-APP014-033 | JRN-APP014-033 | Pharmacy bill discounted at the cashier | Negative | Critical | row 112 | 34 | `tests/e2e/14-hospital-accounts/cashier.spec.ts` | U1 / Podomoro | fixme | Blocker 35 (found by automation, docs/qa/blockers-found.md): The item price of a branch (margin and tax) cannot be saved |
 | TC-APP014-034 | JRN-APP014-034 | A bill with cents | Negative | High | rows 113-114 | 35 | `tests/e2e/14-hospital-accounts/cashier.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP014-035 | JRN-APP014-035 | Finding a patient's bill by name or MRN | Negative | Critical | rows 115-116 | 36 | `tests/e2e/14-hospital-accounts/cashier.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP014-036 | JRN-APP014-036 | Working after the counter is closed | Negative | Critical | rows 117-120 | 37 | `tests/e2e/14-hospital-accounts/cashier.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
@@ -70,10 +70,10 @@ Test title = `<TC ID> <Scenario Name> [<file> | Steps | rows a-b | <TC ID>]`; an
 | TC-APP014-062 | JRN-APP014-055 | Inpatient bill the server refuses | Negative | Critical | rows 203-206 | 56 | `tests/e2e/14-hospital-accounts/ledger.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) | TBD in step(s) 1, 2, 3, 4: stated part only (Q8) |
 | TC-APP014-063 | JRN-APP014-055 | Inpatient bill that should not go through | Negative | Critical | rows 207-210 | 56 | `tests/e2e/14-hospital-accounts/ledger.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) | TBD in step(s) 1, 2, 3, 4: stated part only (Q8) |
 | TC-APP014-064 | JRN-APP014-055 | Saving with "All branches" | Negative | Critical | rows 211-212 | 56 | `tests/e2e/14-hospital-accounts/ledger.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) | TBD in step(s) 1, 2: stated part only (Q8) |
-| TC-APP014-065 | JRN-APP014-056 | Patient ledger: moving a deposit from one invoice to another | Positive | Critical | rows 213-217 | 57 | `tests/e2e/14-hospital-accounts/ledger.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) | TBD in step(s) 5: stated part only (Q8) |
+| TC-APP014-065 | JRN-APP014-056 | Patient ledger: moving a deposit from one invoice to another | Positive | Critical | rows 213-217 | 57 | `tests/e2e/14-hospital-accounts/ledger.spec.ts` | U1 / Podomoro | fixme | Blocker 36 (found by automation, docs/qa/blockers-found.md): Patient ledger cannot show a chosen invoice: "Find patient" shows no rows, the list holds 22 invoices / TBD in step(s) 5: stated part only (Q8) |
 | TC-APP014-066 | JRN-APP014-056 | Deposit move the server refuses | Negative | Critical | rows 218-224 | 57 | `tests/e2e/14-hospital-accounts/ledger.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) | TBD in step(s) 1, 2, 3, 4, 5, 6, 7: stated part only (Q8) |
 | TC-APP014-067 | JRN-APP014-056 | Two officers move the same deposit | Negative | Critical | row 225 | 57 | `tests/e2e/14-hospital-accounts/ledger.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) | TBD in step(s) 1: stated part only (Q8) |
-| TC-APP014-068 | JRN-APP014-057 | Patient ledger: recording a failed card payment | Positive | High | rows 226-229 | 58 | `tests/e2e/14-hospital-accounts/ledger.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) | TBD in step(s) 4: stated part only (Q8) |
+| TC-APP014-068 | JRN-APP014-057 | Patient ledger: recording a failed card payment | Positive | High | rows 226-229 | 58 | `tests/e2e/14-hospital-accounts/ledger.spec.ts` | U1 / Podomoro | fixme | Blocker 36 (found by automation, docs/qa/blockers-found.md): Patient ledger cannot show a chosen invoice: "Find patient" shows no rows, the list holds 22 invoices / TBD in step(s) 4: stated part only (Q8) |
 | TC-APP014-069 | JRN-APP014-057 | Failed card the server refuses | Negative | High | rows 230-233 | 58 | `tests/e2e/14-hospital-accounts/ledger.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) | TBD in step(s) 1, 2, 3, 4: stated part only (Q8) |
 | TC-APP014-070 | JRN-APP014-058 | Cashier decides on a pharmacy discount above the maximum | Integration | High | rows 234-237 | 59 | `tests/e2e/14-hospital-accounts/cashier.spec.ts` | U1 / Podomoro | fixme | Needs user U5 "Approvers and heads" (00-prerequisites.xlsx \| Users \| row 9: To create) / TBD in step(s) 4: stated part only (Q8) |
 | TC-APP014-071 | JRN-APP014-058 | Decisions that should be refused | Negative | High | rows 238-240 | 59 | `tests/e2e/14-hospital-accounts/cashier.spec.ts` | U1 / Podomoro | fixme | Needs user U5 "Approvers and heads" (00-prerequisites.xlsx \| Users \| row 9: To create) / TBD in step(s) 1, 2, 3: stated part only (Q8) |
@@ -95,8 +95,8 @@ Test title = `<TC ID> <Scenario Name> [<file> | Steps | rows a-b | <TC ID>]`; an
 ## Counts
 
 - automate (read-only): 0
-- automate (saves; needs QA_ALLOW_WRITES): 53
+- automate (saves; needs QA_ALLOW_WRITES): 50
 - automate (chain; needs a record from another app): 0
-- fixme: 32
+- fixme: 35
 - skip: 0
 - test cases with a "TBD" step (asserted partially): 25

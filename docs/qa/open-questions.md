@@ -84,6 +84,12 @@ Row-level lists (TBD steps, discrepancies, …): [_generated-open-items.md](_gen
 - 11: each order carries the workbook result type plus a token ("QA Hemoglobin <token>"); the Sample workflow lists only the ten newest orders by sample ID (or the first 8 characters of the order id), so each test uses orders it has just made. "Hematologi Lengkap from a consultation" (TC-APP011-020) is an accepted order of the test.
 - 12: orders carry a token in the study text, reference and accession number. "Schedule and report" lists only the first 20 orders (dated ones first, latest first), so the orders of those tests get the study date tomorrow 23:00. "Start" takes an ISO time in UTC; tomorrow 09:00 WIB is typed as 02:00Z.
 
+**Q27. 14 Hospital Accounts** (applied, change if you want others):
+- "Counter settings BR-A" (tax 11%, discount cap 50,000, rounding 1, refund limit 100,000) and the 05 "Rules for BR-A" were not set on the site; the tests set them once on Fast Cashier (they are settings of the branch). The item price (margin 25%, tax 11%) cannot be saved (found blocker 35), so pharmacy bills are priced at cost.
+- "The internal id of a registered test patient" is shown on no screen; the plan and ledger tests read it from the answer of the patient search on Registered patients.
+- A cashier closes a day once: TC-APP014-011 closes the U1 counter, after which the cashier tests cannot run until 07:00 WIB the next day (they skip themselves). TC-APP014-012 and 037 (other closes) and the second-tab steps of 036 are "not run". TC-APP014-002 failed on 2026-10-15 because the test could not find the new RX- invoice in the capped search list; the lookup is fixed and the case must be run again once the counter is open.
+- PT-BPJS cannot be made (found blocker 33); Cashier 2 and Head cashier (U4/U5) are not made.
+
 ## Environment
 
 - **E1 (done).** `node_modules` was installed on another OS (no Linux TypeScript binary, `.bin` files without exec bit). Reinstalled with `npm ci`; `npm run typecheck` works.
