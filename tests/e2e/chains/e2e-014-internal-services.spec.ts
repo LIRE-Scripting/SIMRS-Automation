@@ -1,9 +1,9 @@
 import { chainTest } from '../../../fixtures/chain';
 import { installToastRecorder } from '../../../lib/assertions';
-import { TC_APP022_001, TC_APP022_003, TC_APP022_005, TC_APP022_009, TC_APP022_012 } from '../22-services/cases';
+import { TC_APP022_001, TC_APP022_003, TC_APP022_005, TC_APP022_009, TC_APP022_012 } from '../../modules/22-services/cases';
 
 /**
- * E2E-014: Internal services: request to vendor bill. Each step runs its source test case (tests/e2e/<module>/cases.ts)
+ * E2E-014: Internal services: request to vendor bill. Each step runs its source test case (tests/modules/<NN-module>/cases.ts)
  * with its own records: 1. Service category; 2. Service item with its accounts; 3. Service request created, sent, approved and completed; 4. Service purchase request approved; 5. Service purchase order approved; 6. Service receipt confirms the delivery. The chain stops at the first step a blocker stops; the cause is recorded by the run.
  */
 chainTest('E2E-014', async ({ page, chain }) => {

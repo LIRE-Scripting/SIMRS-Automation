@@ -1,7 +1,7 @@
 import { chainTest, expect } from '../../../fixtures/chain';
 import { installToastRecorder, toastLocator } from '../../../lib/assertions';
-import { newType, REQUEST, Requests, Ward } from '../04-inpatient/helpers';
-import { admitSteps, newBed } from './inpatient-steps';
+import { newType, REQUEST, Requests, Ward } from '../../modules/04-inpatient/helpers';
+import { admitSteps, newBed } from './steps/inpatient-steps';
 
 /**
  * E2E-004: a patient is put on the admission waiting list, the request is

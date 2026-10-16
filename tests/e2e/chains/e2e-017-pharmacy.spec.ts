@@ -6,7 +6,7 @@ import { PHARMACY } from '../../../lib/pharmacy-data';
 import { RegisteredPatientsPage } from '../../../pages/ambulatory/RegisteredPatientsPage';
 import { ItemMasterPage } from '../../../pages/inventory/InventoryE2EPages';
 import { DispenseWizard } from '../../../pages/pharmacy/PharmacyE2EPages';
-import { CONFIRMED, confirm, patient, stock, toastsAfter } from '../05-pharmacy/helpers';
+import { CONFIRMED, confirm, patient, stock, toastsAfter } from '../../modules/05-pharmacy/helpers';
 
 /**
  * E2E-017: stock is received into the pharmacy store, items are found by

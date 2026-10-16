@@ -43,16 +43,31 @@ const KIND_TEXT: Record<Kind, string> = {
   SKIP: 'skip',
 };
 
-function featureFile(feature: string): string {
-  const route = feature.match(/\((\/[^)]*)\)/)?.[1] ?? (feature.startsWith('/') ? feature : null);
-  if (route) {
-    const parts = route.replace(/^\/|\/$/g, '').split('/');
-    return parts.length > 1 ? parts.slice(1).join('-') : 'hub';
+// --------------------------------------------------------- per module matrix
+/**
+ * The spec file that declares each test case: the module folder's spec that
+ * holds the quoted id ('TC-APP…' in qaTest, or in a case map). Read from the
+ * code, so the docs name the file that runs the test.
+ */
+const SPEC_OF = new Map<string, string>();
+for (const m of modules()) {
+  const dir = path.join(ROOT, 'tests', 'modules', m.slug);
+  if (!fs.existsSync(dir)) continue;
+  for (const f of fs.readdirSync(dir).filter((x) => x.endsWith('.spec.ts')).sort()) {
+    for (const id of fs.readFileSync(path.join(dir, f), 'utf8').matchAll(/'(TC-APP\d{3}-\d{3})'/g)) {
+      if (!SPEC_OF.has(id[1])) SPEC_OF.set(id[1], `tests/modules/${m.slug}/${f}`);
+    }
   }
-  return feature.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+}
+/** Module folder of a test case ("TC-APP011-001" -> tests/modules/11-laboratory); its not-automated spec declares the fixme and skip cases. */
+function specOf(id: string): string {
+  const hit = SPEC_OF.get(id);
+  if (hit) return `\`${hit}\``;
+  const dir = fs.readdirSync(path.join(ROOT, 'tests', 'modules')).find((d) => d.startsWith(`${id.slice(7, 9)}-`));
+  const na = dir && `tests/modules/${dir}/not-automated.spec.ts`;
+  return na && fs.existsSync(path.join(ROOT, na)) ? `\`${na}\`` : '`(not declared)`';
 }
 
-// --------------------------------------------------------- per module matrix
 const totals: Record<Kind, number> = { RO: 0, WRITE: 0, CHAIN: 0, FIXME: 0, SKIP: 0 };
 const perModule: { slug: string; app: string; tcs: number; counts: Record<Kind, number>; partial: number }[] = [];
 const tbdRows: unknown[][] = [];
@@ -74,7 +89,7 @@ for (const m of modules()) {
     rows.push([
       tc.id, tc.journeyId, tc.scenario, tc.testType, tc.priority,
       traceTag(ref).replace(/^\[|\]$/g, '').split(' | ')[2], ref.journey.row,
-      `\`tests/e2e/${m.slug}/${featureFile(tc.feature)}.spec.ts\``,
+      specOf(tc.id),
       `${plan.user ?? 'signed out'} / ${plan.branch}`,
       KIND_TEXT[k],
       [...plan.reasons, ...(plan.partialSteps.length ? [`TBD in step(s) ${plan.partialSteps.join(', ')}: stated part only (Q8)`] : [])].join(' / '),
@@ -196,7 +211,7 @@ o.push(
   '',
   '## 5. Plan per test case',
   '',
-  '- Specs: `tests/e2e/<NN-module>/<feature-route>.spec.ts`, one `qaTest(<TC ID>)` per test case (`fixtures/e2e.ts`); Excel steps become `qa.step(n)`; assertions follow the Expected Result column, adjusted to the live site where the workbook contradicts it (C2).',
+  '- Specs: `tests/modules/<NN-module>/<feature>.spec.ts`, one `qaTest(<TC ID>)` per test case (`fixtures/e2e.ts`); the file of each case is in its row above; Excel steps become `qa.step(n)`; assertions follow the Expected Result column, adjusted to the live site where the workbook contradicts it (C2).',
   '- User: U2 when the journey needs U2 or its Branch is "All branches", otherwise U1 (Podomoro); signed out for "None (not signed in)".',
   '- Tags: `@<module>`, `@<test type>`, `@<priority>`, `@regression`, `@smoke` (Critical + Positive), `@u<n>`.',
   '- Disposition (lib/qa-data/plan.ts): skip = Automation Candidate No; fixme = specific blocker (5 only for "All branches" journeys), Needs Evaluation, or a user U3–U10 not prepared; otherwise automate. Saving test cases run only with `QA_ALLOW_WRITES=1` (Q1).',

@@ -2,7 +2,7 @@ import { chainTest, expect } from '../../../fixtures/chain';
 import { installToastRecorder, toastLocator } from '../../../lib/assertions';
 import { todayWib } from '../../../lib/dates';
 import { RegisteredPatientsPage } from '../../../pages/ambulatory/RegisteredPatientsPage';
-import { admitTypedSteps, dischargeSteps, newBed, transferSteps } from './inpatient-steps';
+import { admitTypedSteps, dischargeSteps, newBed, transferSteps } from './steps/inpatient-steps';
 
 /**
  * E2E-026: the newborn of a registered mother (PT-MOM, registered first as

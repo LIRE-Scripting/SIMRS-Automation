@@ -29,10 +29,3 @@ export function journeyById(id: string): Journey {
   return found;
 }
 
-/** Journeys whose PHA-JRN number falls in [from, to], in workbook order. */
-export function journeysInRange(from: number, to: number): Journey[] {
-  return journeys.filter((j) => {
-    const n = Number(j.id.match(/(\d+)$/)?.[1]);
-    return n >= from && n <= to;
-  });
-}

@@ -1,8 +1,8 @@
 import { chainTest } from '../../../fixtures/chain';
 import { installToastRecorder } from '../../../lib/assertions';
-import { TC_APP018_052 } from '../18-settings/cases';
-import { CASES } from '../shared/appointment-cases';
-import { bookSettingsReady, SCHEDULE } from './outpatient-steps';
+import { TC_APP018_052 } from '../../modules/18-settings/cases';
+import { CASES } from '../../modules/shared/appointment-cases';
+import { bookSettingsReady, SCHEDULE } from './steps/outpatient-steps';
 
 /**
  * E2E-049: a holiday is added and the book settings (types, daily quota, open

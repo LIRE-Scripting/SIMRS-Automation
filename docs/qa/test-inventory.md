@@ -428,7 +428,7 @@ Journey IDs are shortened: `001-003` = `JRN-APP001-003`.
 
 ## 5. Plan per test case
 
-- Specs: `tests/e2e/<NN-module>/<feature-route>.spec.ts`, one `qaTest(<TC ID>)` per test case (`fixtures/e2e.ts`); Excel steps become `qa.step(n)`; assertions follow the Expected Result column, adjusted to the live site where the workbook contradicts it (C2).
+- Specs: `tests/modules/<NN-module>/<feature>.spec.ts`, one `qaTest(<TC ID>)` per test case (`fixtures/e2e.ts`); the file of each case is in its row above; Excel steps become `qa.step(n)`; assertions follow the Expected Result column, adjusted to the live site where the workbook contradicts it (C2).
 - User: U2 when the journey needs U2 or its Branch is "All branches", otherwise U1 (Podomoro); signed out for "None (not signed in)".
 - Tags: `@<module>`, `@<test type>`, `@<priority>`, `@regression`, `@smoke` (Critical + Positive), `@u<n>`.
 - Disposition (lib/qa-data/plan.ts): skip = Automation Candidate No; fixme = specific blocker (5 only for "All branches" journeys), Needs Evaluation, or a user U3–U10 not prepared; otherwise automate. Saving test cases run only with `QA_ALLOW_WRITES=1` (Q1).

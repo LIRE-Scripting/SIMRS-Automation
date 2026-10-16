@@ -7,7 +7,7 @@ import { ArrivalPage } from '../../../pages/ambulatory/ArrivalPage';
 import { RegisteredPatientsPage } from '../../../pages/ambulatory/RegisteredPatientsPage';
 import { BOOKING_LIST, TypeListPage } from '../../../pages/appointment/TypeListPage';
 import { ConsultationPage } from '../../../pages/clinical/ConsultationPage';
-import { FollowUps } from '../03-patient-care/helpers';
+import { FollowUps } from '../../modules/03-patient-care/helpers';
 
 /**
  * E2E-020: one pre-registered patient becomes a patient, is booked with DR-1

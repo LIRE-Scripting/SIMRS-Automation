@@ -1,7 +1,7 @@
 import { chainTest } from '../../../fixtures/chain';
 import { releaseWeek } from '../../../lib/ambulatory-data';
 import { installToastRecorder } from '../../../lib/assertions';
-import { arriveSteps, bookSettingsReady, bookSteps, consultSteps, registerSteps } from './outpatient-steps';
+import { arriveSteps, bookSettingsReady, bookSteps, consultSteps, registerSteps } from './steps/outpatient-steps';
 
 /**
  * E2E-001: a new outpatient is registered, booked with DR-1, arrives and is

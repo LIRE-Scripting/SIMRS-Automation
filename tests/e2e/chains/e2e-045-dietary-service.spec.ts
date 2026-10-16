@@ -1,7 +1,7 @@
 import { chainTest, expect } from '../../../fixtures/chain';
 import { installToastRecorder } from '../../../lib/assertions';
-import { TC_APP013_034, TC_APP013_040 } from '../13-dietary/cases';
-import { catalogue, click } from '../13-dietary/helpers';
+import { TC_APP013_034, TC_APP013_040 } from '../../modules/13-dietary/cases';
+import { catalogue, click } from '../../modules/13-dietary/helpers';
 
 /**
  * E2E-045: the diet catalogue (nutrient, session, menu), the body rule with

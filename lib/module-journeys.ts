@@ -73,7 +73,3 @@ export function moduleJourneyById(id: string): ModuleJourney {
   return found;
 }
 
-/** Journeys of one module prefix (e.g. "INV"), in workbook order. */
-export function moduleJourneysByPrefix(prefix: string): ModuleJourney[] {
-  return all.filter((j) => j.id.startsWith(`${prefix}-JRN-`));
-}

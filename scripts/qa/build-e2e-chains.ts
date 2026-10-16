@@ -264,7 +264,7 @@ function defineBlocker(id: string, defects: Map<string, string[]>, deviations: M
 function chainSpecs(): Map<string, string> {
   const dir = 'tests/e2e/chains';
   const m = new Map<string, string>();
-  for (const f of fs.existsSync(dir) ? fs.readdirSync(dir) : []) {
+  for (const f of fs.existsSync(dir) ? fs.readdirSync(dir).filter((x) => x.endsWith('.spec.ts')) : []) {
     for (const id of fs.readFileSync(path.join(dir, f), 'utf8').matchAll(/chainTest\('(E2E-\d{3})'/g)) m.set(id[1], `${dir}/${f}`);
   }
   return m;

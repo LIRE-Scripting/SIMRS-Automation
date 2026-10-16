@@ -12,7 +12,7 @@
  *
  * Usage (one JSON report per module run; every reports/e2e/results-*.json is read):
  *   PLAYWRIGHT_JSON_OUTPUT_NAME=reports/e2e/results-02-appointment.json \
- *     npx playwright test --project=e2e tests/e2e/02-appointment/ --reporter=list,json
+ *     npx playwright test --project=e2e-modules tests/modules/02-appointment/ --reporter=list,json
  *   npm run qa:e2e-workbook [-- <report.json> ...]
  *
  * Step status rules (docs/qa/open-questions.md, answers C2 and Q8):
@@ -237,7 +237,7 @@ async function main(): Promise<void> {
     if (summary) {
       const start = summary.rowCount + 2;
       const lines: [string, string][] = [
-        ['E2E run', `${runDate}, Playwright project "e2e" (tests/e2e/${m.slug}/), report ${files.join(', ')}`],
+        ['E2E run', `${runDate}, Playwright project "e2e-modules" (tests/modules/${m.slug}/), report ${files.join(', ')}`],
         ['E2E steps', `Passed ${count.Passed}, Failed ${count.Failed}, Blocked ${count.Blocked}, Not Run ${count['Not Run']}`],
         ['E2E test cases in the run', `${tcs.length} of ${m.testCases.length}`],
         ['E2E rules', 'Failed = the Expected Result was not met (also when the test asserts the site\'s current behaviour). Blocked = docs/qa/blockers-found.md or 00-blockers-checklist-linked.xlsx.'],

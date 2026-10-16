@@ -1,11 +1,11 @@
 import { chainTest } from '../../../fixtures/chain';
 import { installToastRecorder } from '../../../lib/assertions';
-import { TC_APP010_001, TC_APP010_008, TC_APP010_009 } from '../10-hr/cases';
-import { TC_APP017_001 } from '../17-payroll/cases';
-import { ensureLeaveTypes } from '../10-hr/helpers';
+import { TC_APP010_001, TC_APP010_008, TC_APP010_009 } from '../../modules/10-hr/cases';
+import { TC_APP017_001 } from '../../modules/17-payroll/cases';
+import { ensureLeaveTypes } from '../../modules/10-hr/helpers';
 
 /**
- * E2E-010: People: employee to payslip and Finance. Each step runs its source test case (tests/e2e/<module>/cases.ts)
+ * E2E-010: People: employee to payslip and Finance. Each step runs its source test case (tests/modules/<NN-module>/cases.ts)
  * with its own records: 1. Employee created; 2. Leave submitted; 3. Leave approved; 4. Payroll batch run for the employee; 5. Batch figures match the salary components. The chain stops at the first step a blocker stops; the cause is recorded by the run.
  */
 chainTest('E2E-010', async ({ page, chain }) => {

@@ -2,7 +2,7 @@ import { chainTest, expect } from '../../../fixtures/chain';
 import { installToastRecorder, toastMark } from '../../../lib/assertions';
 import { OT } from '../../../lib/ot-data';
 import { OtDeskPage, OtRequestsPage } from '../../../pages/ot/OtPages';
-import { act, cellsOf, dossier, full, toastsAfter } from '../08-operation-theater/helpers';
+import { act, cellsOf, dossier, full, toastsAfter } from '../../modules/08-operation-theater/helpers';
 
 /**
  * E2E-006: one operation request (patient, room, tomorrow 08:00-09:00, chief

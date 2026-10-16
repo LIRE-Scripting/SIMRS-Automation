@@ -4,7 +4,7 @@ import { expect, type Locator, type Page } from '@playwright/test';
 import { AppointmentsPage } from '../pages/ambulatory/AppointmentsPage';
 import { RegisteredPatientsPage } from '../pages/ambulatory/RegisteredPatientsPage';
 import { MasterListPage } from '../pages/settings/MasterListPage';
-import { toastLocator, toastMark, toastsSince } from './assertions';
+import { toastMark, toastsSince } from './assertions';
 import { PASSWORD } from './config';
 import { addDays, nextWeekday, todayWib } from './dates';
 import { catalogueOf } from './qa-data';

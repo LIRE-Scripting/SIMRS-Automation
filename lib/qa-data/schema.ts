@@ -7,7 +7,6 @@ import { z } from 'zod';
  */
 
 const text = z.string().nullable();
-const num = z.number().nullable();
 const row = z.number().int().positive();
 
 export const UserSchema = z

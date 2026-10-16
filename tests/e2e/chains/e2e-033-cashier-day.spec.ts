@@ -1,8 +1,8 @@
 import { chainTest, expect } from '../../../fixtures/chain';
 import { installToastRecorder } from '../../../lib/assertions';
 import { CashierPage } from '../../../pages/billing/CashierPage';
-import { TC_APP014_005, TC_APP014_006, TC_APP014_008, TC_APP014_011 } from '../14-hospital-accounts/cases';
-import { counterClosed, ensureSettings, pay } from '../14-hospital-accounts/helpers';
+import { TC_APP014_005, TC_APP014_006, TC_APP014_008, TC_APP014_011 } from '../../modules/14-hospital-accounts/cases';
+import { counterClosed, ensureSettings, pay } from '../../modules/14-hospital-accounts/helpers';
 
 /**
  * E2E-033: a cashier day of U1: a walk-in charge paid in cash, a card payment,

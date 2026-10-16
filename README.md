@@ -1,96 +1,86 @@
-# KlikMed HMIS — Playwright Test Suite
+# KlikMed HMIS — Playwright test suite
 
-Suites in one project:
-
-- **Pharmacy** (`tests/pharmacy/`) — generated from `pharmacy-test-journeys-QA.xlsx`
-  (50 journeys / 213 steps, kept verbatim in `data/journeys.json`). Runs as
-  `klikmed.superadmin`.
-- **Ambulatory Care** (`tests/ambulatory-care/`) — sub-modul `registration/` (Registered Patients, Priority rules, Patient flags), `appointment/` (Appointments), `queue/` (Arrival). Jalankan: `npm run test:ambulatory-care`.
-- **Flows** (`tests/flows/`) — per-module feature E2E (2 per module).
-- **Suites** (`tests/suites/`) — pharmacy-style journeys per module
-  (`data/module-journeys/*.json`, workbook `module-journeys-QA.xlsx`). Runs as `rs.admin`.
-
-## Workbook-driven E2E (`tests/e2e/`)
-
-Source of truth: the workbooks in `reference/` (never edited by the tests).
-
-```bash
-cp .env.example .env          # set QA_PASSWORD
-npm run qa:data               # reference/*.xlsx -> test-data/reference/*.json (fails on changed columns)
-npm run qa:inventory          # docs/qa/test-inventory.md + traceability/ + generated open items
-npm run test:e2e              # sign in U1/U2 once, then the specs
-npx playwright test --project=e2e --grep @smoke
-QA_ALLOW_WRITES=1 npm run test:e2e   # also the test cases that save data (needs a go-ahead)
-npm run typecheck
-
-# E2E result workbooks: reference workbook copies with Steps -> Execution Status / Actual Result / Defect Reference
-PLAYWRIGHT_JSON_OUTPUT_NAME=reports/e2e/results-02-appointment.json \
-  npx playwright test --project=e2e tests/e2e/02-appointment/ --reporter=list,json
-npm run qa:e2e-workbook       # reads every reports/e2e/results-*.json -> reports/e2e/<NN-module>.xlsx
-```
-
-- `lib/qa-data/`: zod-validated loader, per-test-case plan (user, branch, fixme/skip reasons, tags), "QA-" names.
-- `fixtures/e2e.ts`: `qaTest('TC-APP001-003', async ({ page, qa }) => { await qa.step(1, ...) })`. Title, traceability tag, tags, session and fixme/skip come from the workbook.
-- Users: U1 `rs.admin2` (Podomoro), U2 `rs.admin` (All branches), sessions in `.auth/U1.json`, `.auth/U2.json`.
-- Plan and open points: `docs/qa/test-inventory.md`, `docs/qa/open-questions.md`; blockers found while automating: `docs/qa/blockers-found.md` (source `lib/qa-data/found-blockers.ts`).
-- Step annotations in the report: `deviation` (site differs from the Expected Result; the test asserts the site), `blocker`, `not-run`, `note`, `partial-expected`.
-- 01 Ambulatory Care shared data (`lib/ambulatory-data.ts`): departments, service center and doctor users are found or created once and reused; patients, bookings and arrivals are new every run. Appointment tests each claim a free Monday ("D-day"); the next one to try is kept in `.qa-state/d-day.json` (git-ignored, safe to delete).
-
-## How it works
-
-- **Login once, encapsulated.** The `setup` project (`tests/auth/auth.setup.ts`) signs in
-  with `klikmed.superadmin` and saves the session to `.auth/state.json`. Every pharmacy test
-  reuses it through `storageState` — no test ever logs in again. If staging drops the session
-  mid-run, the pages re-authenticate transparently.
-- **Redirect fallback.** On this environment the sign-in button sometimes does nothing
-  (the page stays on `/login` even though the session was created). When that happens the
-  login helper redirects to `https://rs.showcase.atklik.xyz/` itself.
-- **Screenshot at the end.** An auto fixture takes a full-page screenshot after every test
-  (pass or fail) into `screenshots/`, and attaches it to the report.
-- **Sequential journeys.** Journeys share branch state (stock, invoices), so they run in
-  workbook order with one worker.
-
-## Run
-
-```bash
-npm install
-npx playwright install chromium
-npm test                # setup (login) + all pharmacy journeys
-npm run test:modules    # login rs.admin (shared setup for module suites)
-npm run test:suites     # pharmacy-style journeys per module
-```
-
-Useful variants:
-
-```bash
-npm run setup                 # login only, refresh .auth/state.json
-npm run test:headed           # watch the browser
-npx playwright test --grep "PHA-JRN-001"   # a single journey
-npm run report                # open the HTML report
-```
-
-Credentials and URL can be overridden with env vars: `BASE_URL`, `KLIKMED_USERNAME`,
-`KLIKMED_PASSWORD`.
+End-to-end tests for the KlikMed HMIS (`https://rs.showcase.atklik.xyz/`). The
+workbooks in `reference/` are the source of truth; they are read, never edited.
 
 ## Layout
 
 ```
-playwright.config.ts      projects: setup -> pharmacy (storageState)
-data/journeys.json        all 50 journeys + 213 steps from the workbook
-lib/config.ts             base URL, credentials, output paths
-lib/journeys.ts           typed loader for the workbook data
-lib/auth.ts               ensureSignedIn() - transparent re-login guard
-pages/                    AppHeader, LoginPage, PharmacyHubPage, OrdersPage,
-                          DispensePage, IssueLinesPage
-fixtures/pharmacy.ts      page objects + end-of-test screenshot fixture
-tests/auth/               the single encapsulated login
-tests/pharmacy/           one spec per 10 journeys (PHA-JRN-001..050)
-screenshots/              end-of-test screenshots
+fixtures/
+  e2e.ts            qaTest(): one workbook test case (title, tags, session, fixme/skip, steps)
+  chain.ts          chainTest(): one end-to-end chain (records handed on, stops at a blocker)
+lib/                workbook data (lib/qa-data), shared data, dates, assertions
+pages/              page objects, one file per application
+tests/
+  auth/             login for the legacy suites (klikmed.superadmin)
+  e2e/              end-to-end chains across modules (50 chains)
+    auth.setup.ts   login of U1 and U2 for the workbook tests
+    chains/         one spec per chain; steps/ holds the shared chain steps
+  modules/          per-module workbook tests, one folder per module (01 … 27)
+    shared/         helpers used by several modules
+  pharmacy/ flows/ suites/   legacy suites (see below)
+scripts/qa/         generators for the docs and the result workbooks
+docs/qa/            test inventory, traceability per module, open questions
+reports/            generated result workbooks (reports/e2e, reports/e2e-chains)
 ```
 
-## Notes on the journeys
+Per-module specs: `tests/modules/<NN-module>/<feature>.spec.ts`, one `qaTest('TC-APP…')`
+per test case. Each module folder has `cases.ts` where a test case is shared with a chain,
+and `not-automated.spec.ts`, which declares the fixme and skip cases of the module.
 
-Steps that depend on seeded branch data (patients `QA-PHA …`, orders `OR-…`, items `QA-PARA`
-…) are guarded: when the data is not present in the environment the journey is **skipped**
-with an explicit reason instead of failing noisily. Structural checks (screens, wizard
-steps, tables, search behaviour, toasts) always run.
+## Projects
+
+| Project | Specs | Session |
+|---|---|---|
+| `e2e-setup` | `tests/e2e/auth.setup.ts` | signs in U1 and U2 |
+| `e2e-modules` | `tests/modules/**` | U1 (per test: U2 when the workbook needs it) |
+| `e2e` | `tests/e2e/chains/**` | U1 |
+| `setup`, `pharmacy` | `tests/auth/`, `tests/pharmacy/` | `klikmed.superadmin` (legacy) |
+| `modules-setup`, `flows`, `suites` | `tests/flows/`, `tests/suites/` | `MODULES_USERNAME` (legacy) |
+
+Users: U1 `rs.admin2` (Podomoro), U2 `rs.admin` (All branches). Passwords come from `.env`
+(`QA_PASSWORD`); never hard-code them.
+
+## Commands
+
+```bash
+cp .env.example .env              # set QA_PASSWORD
+npm run qa:data                   # reference/*.xlsx -> test-data (fails on changed columns)
+npm run qa:inventory              # docs/qa: inventory, traceability per module, open questions
+
+npm run test:e2e-modules          # per-module workbook tests
+npm run test:e2e                  # end-to-end chains
+QA_ALLOW_WRITES=1 npm run test:e2e-modules   # also the cases that save data (needs a go-ahead)
+npx playwright test --project=e2e-modules --grep @smoke
+
+# result workbooks (one JSON report per run; every reports/e2e/results*.json is read)
+PLAYWRIGHT_JSON_OUTPUT_NAME=reports/e2e/results-02-appointment.json \
+  npx playwright test --project=e2e-modules tests/modules/02-appointment/ --reporter=list,json
+npm run qa:e2e-workbook           # -> reports/e2e/<NN-module>.xlsx
+
+PLAYWRIGHT_JSON_OUTPUT_NAME=reports/e2e-chains/results-chains.json \
+  npx playwright test --project=e2e tests/e2e/chains/ --reporter=list,json
+npm run qa:e2e-chains             # -> reports/e2e-chains/e2e-journeys.xlsx
+
+npm run typecheck
+```
+
+Run the chains with `--workers=1`. A chain shares the records of its run, and E2E-033 closes
+the U1 cashier day until 07:00 WIB the next day, so it runs last.
+
+## Conventions
+
+- Test titles carry the traceability tag `[<workbook> | <sheet> | row n | <case id>]`.
+- Locators by role, label or test id; no `waitForTimeout`; no `force: true` without a comment.
+- Records made by a test carry the `QA-` prefix and a token, so they are unique per run.
+- A step the site does not match is recorded with `qa.deviation(...)`; a step a blocker stops
+  is `qa.blocked(step, n)` (blocker list: `docs/qa/blockers-found.md`); the workbook's open
+  points are in `docs/qa/open-questions.md`.
+- Healthcare data: only the synthetic data of the workbooks; no real patient identifiers in
+  specs, reports or console output.
+
+## Legacy suites
+
+`tests/pharmacy/`, `tests/flows/` and `tests/suites/` are the earlier suites, generated from
+the pharmacy and module journey workbooks. They are kept until their cases are covered by
+`tests/modules/` and `tests/e2e/chains/`; then they can be removed.

@@ -1,7 +1,7 @@
 import { chainTest, expect } from '../../../fixtures/chain';
 import { installToastRecorder } from '../../../lib/assertions';
 import { todayWib } from '../../../lib/dates';
-import { Desk, SAVED } from '../shared/desk';
+import { Desk, SAVED } from '../../modules/shared/desk';
 
 /**
  * E2E-013: the location of the test (with its shifts and activity), a vendor

@@ -5,8 +5,6 @@
  */
 export const BRANCH_TZ = 'Asia/Jakarta';
 
-export const WEEKDAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'] as const;
-
 /** Today (plus `offsetDays`) in the branch's time zone. */
 export function todayWib(offsetDays = 0): string {
   const d = new Date(Date.now() + offsetDays * 86_400_000);
@@ -35,7 +33,3 @@ export function nextWeekday(iso: string, weekday: number): string {
   return addDays(iso, diff);
 }
 
-/** The Sunday that starts the week of `iso` (the Calendar tab shows Sunday to Saturday). */
-export function sundayOf(iso: string): string {
-  return addDays(iso, -weekdayOf(iso));
-}

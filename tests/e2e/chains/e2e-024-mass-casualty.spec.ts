@@ -2,8 +2,8 @@ import { chainTest, expect } from '../../../fixtures/chain';
 import { installToastRecorder, toastLocator, toastMark } from '../../../lib/assertions';
 import { RegisteredPatientsPage } from '../../../pages/ambulatory/RegisteredPatientsPage';
 import { AdmissionsPage, BedsPage } from '../../../pages/inpatient/InpatientPages';
-import { toastsAfter, VisitsPage } from '../15-emergency/helpers';
-import { bedWithId, patientIdOf } from '../shared/internal-ids';
+import { toastsAfter, VisitsPage } from '../../modules/15-emergency/helpers';
+import { bedWithId, patientIdOf } from '../../modules/shared/internal-ids';
 
 /**
  * E2E-024: three victims are registered as one disaster batch; each gets an

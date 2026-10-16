@@ -98,7 +98,3 @@ export function rupiah(text: string): number {
   return neg ? -n : n;
 }
 
-/** 166500 -> "Rp 166.500" */
-export function rp(n: number): string {
-  return `Rp ${Math.round(n).toLocaleString('id-ID')}`;
-}

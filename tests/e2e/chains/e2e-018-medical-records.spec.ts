@@ -4,7 +4,7 @@ import { installToastRecorder, toastLocator } from '../../../lib/assertions';
 import { todayWib } from '../../../lib/dates';
 import { ArrivalPage } from '../../../pages/ambulatory/ArrivalPage';
 import { RegisteredPatientsPage } from '../../../pages/ambulatory/RegisteredPatientsPage';
-import { createRequest, docNo, hits, issue, records, requests } from '../16-mrd/helpers';
+import { createRequest, docNo, hits, issue, records, requests } from '../../modules/16-mrd/helpers';
 
 /**
  * E2E-018: the patient registered in step 1 arrives in DEP-1 (precondition of

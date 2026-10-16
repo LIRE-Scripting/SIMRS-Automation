@@ -1,11 +1,11 @@
 import { chainTest, expect } from '../../../fixtures/chain';
 import { installToastRecorder } from '../../../lib/assertions';
-import { TC_APP014_003, TC_APP014_053, TC_APP014_057, TC_APP014_061 } from '../14-hospital-accounts/cases';
-import { TC_APP019_062 } from '../19-finance/cases';
-import { counterClosed, ensureSettings } from '../14-hospital-accounts/helpers';
+import { TC_APP014_003, TC_APP014_053, TC_APP014_057, TC_APP014_061 } from '../../modules/14-hospital-accounts/cases';
+import { TC_APP019_062 } from '../../modules/19-finance/cases';
+import { counterClosed, ensureSettings } from '../../modules/14-hospital-accounts/helpers';
 
 /**
- * E2E-032: Insurance revenue cycle. Each step runs its source test case (tests/e2e/<module>/cases.ts)
+ * E2E-032: Insurance revenue cycle. Each step runs its source test case (tests/modules/<NN-module>/cases.ts)
  * with its own records: 1. Patient plan and eligibility check; 2. Tariff group and service price; 3. Tariff mapped to accounts; 4. Deposit taken; 5. Inpatient service billed on the ledger. The chain stops at the first step a blocker stops; the cause is recorded by the run.
  */
 chainTest('E2E-032', async ({ page, chain }) => {

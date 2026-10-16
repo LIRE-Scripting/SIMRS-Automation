@@ -4,7 +4,7 @@ import { installToastRecorder, toastLocator } from '../../../lib/assertions';
 import { CLINICAL, PT1_DATE_OF_BIRTH } from '../../../lib/clinical-data';
 import { addDays, todayWib } from '../../../lib/dates';
 import { ConsultationPage } from '../../../pages/clinical/ConsultationPage';
-import { RadOrdersPage, StudiesPage } from '../12-ris/helpers';
+import { RadOrdersPage, StudiesPage } from '../../modules/12-ris/helpers';
 
 /** E2E-003: the radiology order written in the consultation of a new patient is scheduled, accepted and reported in RIS. */
 chainTest('E2E-003', async ({ page, chain }) => {

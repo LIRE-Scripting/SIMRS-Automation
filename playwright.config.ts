@@ -50,12 +50,6 @@ export default defineConfig({
       use: { ...devices['Desktop Chrome'], storageState: undefined },
     },
     {
-      name: 'modules',
-      testMatch: /tests[\\/]modules[\\/].*\.spec\.ts/,
-      dependencies: ['modules-setup'],
-      use: { ...devices['Desktop Chrome'], storageState: AUTH_MODULES_FILE },
-    },
-    {
       name: 'flows',
       testMatch: /tests[\\/]flows[\\/].*\.spec\.ts/,
       dependencies: ['modules-setup'],
@@ -74,7 +68,14 @@ export default defineConfig({
       use: { ...devices['Desktop Chrome'], storageState: undefined },
     },
     {
-      // Specs generated from reference/*.xlsx; each test picks its user's session.
+      // Per-module specs generated from reference/*.xlsx (tests/modules/<NN-module>/).
+      name: 'e2e-modules',
+      testMatch: /tests[\\/]modules[\\/]\d\d-.*\.spec\.ts/,
+      dependencies: ['e2e-setup'],
+      use: { ...devices['Desktop Chrome'], storageState: authFileOf('U1') },
+    },
+    {
+      // End-to-end chains across modules (tests/e2e/chains/); each test picks its user's session.
       name: 'e2e',
       testMatch: /tests[\\/]e2e[\\/].*\.spec\.ts/,
       dependencies: ['e2e-setup'],
