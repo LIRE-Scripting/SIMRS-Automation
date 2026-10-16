@@ -42,14 +42,6 @@ interface SourceStep {
 
 /** Cause ids that are not in a blocker list: defined here. */
 const STATES: Record<string, { title: string; cause: string; fix: string; who: string }> = {
-  'STATE-CASHIER': {
-    title: 'The cashier day of U1 is closed',
-    cause:
-      'TC-APP014-011 closes the U1 counter for the day (a counter closes once a day). Until 07:00 WIB the next day no payment can be taken; ' +
-      'the run of 2026-10-15 also could not find the new RX- invoice in the capped cashier search (the lookup was fixed afterwards).',
-    fix: 'Run TC-APP014-002 again after 07:00 WIB with the fixed lookup.',
-    who: 'QA',
-  },
   'NEEDS-EVALUATION': {
     title: 'The journey is marked "Needs Evaluation" in its workbook',
     cause: 'Column "Automation Candidate" of the journey reads "Needs Evaluation", so the test case was declared fixme and not run.',
@@ -79,8 +71,7 @@ const NON_STOPPING = new Set(['DEVIATION', 'NEEDS-OTHER-RUN']);
 const VERIFICATION: Record<Status, string> = { Passed: 'UI Verified', Failed: 'Discrepancy Found', Blocked: 'Blocked', 'Not Run': 'Not Verified' };
 
 /** The cause id of a step that did not pass. */
-function causeOf(tc: string, s: SourceStep): string {
-  if (tc === 'TC-APP014-002' && s.status !== 'Passed') return 'STATE-CASHIER';
+function causeOf(s: SourceStep): string {
   if (s.defect && /Blocker \d+/.test(s.defect)) return s.defect.match(/Blocker \d+/)![0];
   // A step that did its work but differs from the workbook's wording or detail does not stop the flow.
   if (s.status === 'Failed') return /Excel expects|Expected Result not met/.test(s.actual) ? 'DEVIATION' : 'SITE-DEFECT';
@@ -150,18 +141,18 @@ function evaluate(chain: Chain, results: Map<string, SourceStep[]>): ChainStepRe
     const source = s.steps ? all.filter((x) => s.steps!.includes(x.step)) : all;
     const st = source.map((x) => x.status);
     const off = source.filter((x) => x.status !== 'Passed');
-    const causes = [...new Set(off.map((x) => causeOf(s.tc, x)))];
+    const causes = [...new Set(off.map((x) => causeOf(x)))];
     // The flow goes on when what is left is a deviation or a check that another step of the chain makes.
-    const stopping = off.filter((x) => !NON_STOPPING.has(causeOf(s.tc, x)));
+    const stopping = off.filter((x) => !NON_STOPPING.has(causeOf(x)));
     const passed = st.filter((x) => x === 'Passed').length;
     const ss = stopping.map((x) => x.status);
-    const ran = passed > 0 || off.some((x) => causeOf(s.tc, x) === 'DEVIATION');
+    const ran = passed > 0 || off.some((x) => causeOf(x) === 'DEVIATION');
     // A chain step either lets the flow through or is blocked; the cause names the blocker.
     const status: Status = !stopping.length && ran ? 'Passed' : 'Blocked';
     void ss;
     const counts = `${passed}/${st.length} steps passed`;
     const first = stopping[0] ?? off[0];
-    const notes = off.filter((x) => NON_STOPPING.has(causeOf(s.tc, x))).map((x) => `step ${x.step} ${causeOf(s.tc, x).toLowerCase()}: ${firstSentence(x.actual)}`);
+    const notes = off.filter((x) => NON_STOPPING.has(causeOf(x))).map((x) => `step ${x.step} ${causeOf(x).toLowerCase()}: ${firstSentence(x.actual)}`);
     const actual =
       status === 'Passed'
         ? `${counts}.${notes.length ? ` The flow goes on; ${notes.join(' / ')}` : ''}`
@@ -262,7 +253,7 @@ async function main(): Promise<void> {
     for (const s of cs) {
       for (const c of s.causes) (usedBy.get(c) ?? usedBy.set(c, new Set()).get(c)!).add(`${chain.id} step ${s.n} (${s.tc})`);
       for (const [cause, map] of [['SITE-DEFECT', defects], ['DEVIATION', deviations]] as const) {
-        const hit = s.source.filter((x) => x.status !== 'Passed' && causeOf(s.tc, x) === cause);
+        const hit = s.source.filter((x) => x.status !== 'Passed' && causeOf(x) === cause);
         if (hit.length) map.set(s.tc, hit.map((x) => `step ${x.step}: ${firstSentence(x.actual)}`));
       }
       const src = s.source;
@@ -367,7 +358,7 @@ async function main(): Promise<void> {
   add('Built', `${new Date().toISOString().slice(0, 10)} by npm run qa:e2e-chains (scripts/qa/build-e2e-chains.ts) from lib/qa-data/e2e-chains.ts and the result workbooks reports/e2e/*.xlsx.`);
   add('Sheets', 'Journeys: one row per chain. Steps: one row per chain step, each pointing to its source test case (file, rows). Blockers: every blocker a chain meets, with its cause and fix.');
   add('Step status', 'Passed: the flow goes through the source test case (its steps passed; a deviation from the wording, or a check that another step of the chain makes, is noted but does not stop the flow). Blocked: anything else; Defect Reference names the blocker (see sheet Blockers).');
-  add('Blocker IDs', '"Blocker N": checklist blockers 1-16 (00-blockers-checklist-linked.xlsx) and blockers found while automating (17 and up, docs/qa/blockers-found.md). "User Ux": a user of 00-prerequisites.xlsx that does not exist yet. DEVIATION, SITE-DEFECT, NEEDS-EVALUATION, NEEDS-OTHER-RUN, STATE-CASHIER: see sheet Blockers.');
+  add('Blocker IDs', '"Blocker N": checklist blockers 1-16 (00-blockers-checklist-linked.xlsx) and blockers found while automating (17 and up, docs/qa/blockers-found.md). "User Ux": a user of 00-prerequisites.xlsx that does not exist yet. DEVIATION, SITE-DEFECT, NEEDS-EVALUATION, NEEDS-OTHER-RUN: see sheet Blockers.');
   add('Chain design', 'The chains follow the usual hospital-system flows: outpatient, emergency, inpatient and surgical pathways; order-to-result; closed-loop medication; vein-to-vein blood; revenue cycle and cash control; procure-to-pay with three-way match; inventory control; budget commitment control; hire-to-pay; record-to-report; asset, maintenance and support services. Column "Hospital-system practice checked" names the practice of each chain.');
   add('Note', 'Each source test case was run on its own (with its own data). A chain is "Ready" when all its steps passed; running it as one test passing the records on is the next step.');
   add();
