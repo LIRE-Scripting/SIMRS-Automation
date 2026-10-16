@@ -18,6 +18,7 @@ import {
   units,
   type Mdm,
 } from './helpers';
+import { addHoliday, BR_A, chosen, department, retireHolidays, sundayAhead, TC_APP018_004, TC_APP018_006, TC_APP018_052 } from './cases';
 
 /**
  * 18-settings.xlsx: the Settings directory and the master data screens
@@ -37,12 +38,6 @@ test.beforeEach(async ({ page }) => {
 test.afterEach(async ({ page }) => {
   await backToEnglish(page);
 });
-
-const BR_A = 'Podomoro';
-
-/** The text of the chosen option of a list. */
-const chosen = (box: import('@playwright/test').Locator) =>
-  box.evaluate((e) => (e.tagName === 'SELECT' ? ((e as HTMLSelectElement).selectedOptions[0]?.textContent ?? '') : (e as HTMLInputElement).value).trim());
 const GROUPS = ['Organization', 'Reference', 'Access', 'Appearance', 'Workflow', 'Trail'];
 
 async function directory(page: Page): Promise<void> {
@@ -181,47 +176,7 @@ qaTest('TC-APP018-003', async ({ page, qa }) => {
   }
 });
 
-/** A department of BR-A made by a test; returns code and name. */
-async function department(page: Page, qa: Qa, base = 'QA-DEP-01', name = 'QA Poli Uji'): Promise<{ code: string; name: string }> {
-  const d = { code: qa.code(base), name: qa.name(name) };
-  expect(await departments(page).add({ 'Department code': d.code, 'Department name': d.name })).toContain('Department added.');
-  return d;
-}
-
-qaTest('TC-APP018-004', async ({ page, qa }) => {
-  const d = departments(page);
-  const code = qa.code('QA-DEP-01');
-  const name = qa.name('QA Poli Uji');
-  await qa.step(1, async () => {
-    await page.goto('/en/settings');
-    await page.getByRole('main').getByRole('link', { name: /^Departments\b/ }).click();
-    await expect(d.main.getByRole('heading', { level: 1, name: 'Departments' })).toBeVisible();
-    await expect(d.main.getByText('Department on one branch.', { exact: true })).toBeVisible();
-    await expect(d.search).toBeVisible();
-    await expect(d.status).toBeVisible();
-    await expect(d.main.getByRole('button', { name: 'Add Department' })).toBeVisible();
-  });
-  await qa.step(2, async () => {
-    await d.main.getByRole('button', { name: 'Add Department' }).click();
-    await expect(d.dialog).toHaveAccessibleName('Add Department');
-    for (const f of ['Department code', 'Department name']) await expect(d.dialog.getByRole('textbox', { name: f })).toBeVisible();
-    const site = d.dialog.getByRole('combobox', { name: 'Site' });
-    await expect(site).toBeDisabled();
-    expect(await chosen(site)).toContain(BR_A);
-  });
-  await qa.step(3, async () => {
-    await d.advanced();
-    await expect(d.dialog.getByRole('textbox', { name: 'Description' })).toBeVisible();
-    await expect(d.dialog.getByRole('checkbox', { name: 'Active' })).toBeChecked();
-  });
-  await qa.step(4, async () => {
-    await d.fill({ 'Department code': code, 'Department name': name, Description: 'QA Departemen untuk uji' });
-    expect(await d.save()).toContain('Department added.');
-  });
-  await qa.step(5, async () => {
-    expect((await d.cells(await d.row(code))).slice(0, 4)).toEqual([code, name, BR_A, 'Active']);
-  });
-});
+qaTest('TC-APP018-004', TC_APP018_004);
 
 qaTest('TC-APP018-005', async ({ page, qa }) => {
   const d = departments(page);
@@ -250,46 +205,7 @@ qaTest('TC-APP018-005', async ({ page, qa }) => {
   });
 });
 
-qaTest('TC-APP018-006', async ({ page, qa }) => {
-  const sc = serviceCenters(page);
-  const dep = await department(page, qa);
-  const code = qa.code('QA-SC-01');
-  const name = qa.name('QA Loket Uji');
-  await qa.step(1, async () => {
-    await page.goto('/en/settings');
-    await page.getByRole('main').getByRole('link', { name: /^Service centers\b/ }).click();
-    await expect(sc.main.getByRole('heading', { level: 1, name: 'Service Centers' })).toBeVisible();
-    await expect(sc.main.getByText('Service center on a branch, optionally under a department.', { exact: true })).toBeVisible();
-    await expect(sc.main.getByRole('button', { name: 'Add Service Center' })).toBeVisible();
-  });
-  await qa.step(2, async () => {
-    await sc.main.getByRole('button', { name: 'Add Service Center' }).click();
-    await expect(sc.dialog).toHaveAccessibleName('Add Service Center');
-    for (const f of ['Service center code', 'Service center name']) await expect(sc.dialog.getByRole('textbox', { name: f })).toBeVisible();
-    await expect(sc.dialog.getByRole('combobox', { name: 'Site' })).toBeDisabled();
-    expect(await chosen(sc.dialog.getByRole('combobox', { name: 'Site' }))).toContain(BR_A);
-    await expect(sc.dialog.getByRole('combobox', { name: 'Department' })).toBeVisible();
-  });
-  await qa.step(3, async () => {
-    await sc.fill({ 'Service center code': code, 'Service center name': name });
-    const box = sc.dialog.getByRole('combobox', { name: 'Department' });
-    const tag = await box.evaluate((e) => e.tagName);
-    if (tag === 'SELECT') await box.selectOption({ label: (await box.locator('option').allInnerTexts()).find((o) => o.includes(dep.name))! });
-    else {
-      await box.fill(dep.name);
-      await page.getByRole('option', { name: new RegExp(dep.name) }).first().click();
-    }
-    qa.note(3, `the department was found by its name "${dep.name}" (the workbook types "QA Poli")`);
-    await expect(box).toHaveValue(new RegExp(dep.code + '|' + dep.name));
-  });
-  await qa.step(4, async () => {
-    expect(await sc.save()).toContain('Service center added.');
-  });
-  await qa.step(5, async () => {
-    const c = await sc.cells(await sc.row(code));
-    expect(c.slice(0, 5)).toEqual([code, name, BR_A, dep.name, 'Active']);
-  });
-});
+qaTest('TC-APP018-006', TC_APP018_006);
 
 qaTest('TC-APP018-007', async ({ page, qa }) => {
   const c = countries(page);
@@ -688,74 +604,7 @@ qaTest('TC-APP018-029', async ({ page, qa }) => {
   }
 });
 
-/** A Sunday about three weeks ahead (DR-1 of the appointment tests works Monday to Friday). */
-function sundayAhead(weeks = 3): string {
-  const d = addDays(todayWib(), weeks * 7);
-  return addDays(d, (7 - weekdayOf(d)) % 7);
-}
-
-async function addHoliday(page: Page, occasion: string, date: string): Promise<string[]> {
-  const h = holidays(page);
-  await h.openAdd();
-  await h.dialog.getByRole('textbox', { name: 'Occasion' }).fill(occasion);
-  await h.dialog.getByRole('textbox', { name: 'Date' }).fill(date);
-  return h.save();
-}
-
-/** Sets every active holiday of an occasion inactive (end of a test). */
-async function retireHolidays(page: Page, occasion: string): Promise<void> {
-  const h = holidays(page);
-  for (let i = 0; i < 5; i++) {
-    await h.open();
-    const row = h.rows().filter({ hasText: occasion }).filter({ has: page.getByRole('cell', { name: 'Yes', exact: true }) }).first();
-    if (!(await row.count())) return;
-    await row.getByRole('button', { name: 'Edit' }).click();
-    await h.dialog.getByRole('checkbox', { name: 'Active' }).uncheck();
-    await h.save();
-  }
-}
-
-qaTest('TC-APP018-052', async ({ page, qa }) => {
-  const h = holidays(page);
-  const occasion = qa.name('X Libur uji');
-  const date = sundayAhead();
-  try {
-    await qa.step(1, async () => {
-      await page.goto('/en/settings');
-      await page.getByRole('main').getByRole('link', { name: /^Holidays\b/ }).click();
-      await expect(h.main.getByRole('heading', { level: 1, name: 'Holidays' })).toBeVisible();
-      await expect(h.main.getByText('A day the clinic is closed. Blank site means every site.', { exact: true })).toBeVisible();
-      await expect(h.main.getByRole('button', { name: 'Add holiday' })).toBeVisible();
-      await expect(h.main.getByRole('columnheader')).toHaveText(['Date', 'Occasion', 'Active', '']);
-    });
-    await qa.step(2, async () => {
-      await h.main.getByRole('button', { name: 'Add holiday' }).click();
-      await expect(h.dialog).toHaveAccessibleName('Add holiday');
-      await expect(h.dialog.getByText('Applies to every site.')).toBeVisible();
-      for (const f of ['Occasion', 'Date']) await expect(h.dialog.getByRole('textbox', { name: f })).toBeVisible();
-      await expect(h.dialog.getByRole('checkbox', { name: 'Active' })).toBeChecked();
-      for (const b of ['Cancel', 'Save']) await expect(h.dialog.getByRole('button', { name: b })).toBeVisible();
-      await h.dialog.getByRole('button', { name: 'Cancel' }).click();
-    });
-    await qa.step(3, async () => {
-      expect(await addHoliday(page, occasion, date)).toContain('Holiday saved.');
-      await h.open();
-      const row = h.rows().filter({ hasText: occasion });
-      expect((await h.cells(row)).slice(0, 3)).toEqual([date, occasion, 'Yes']);
-    });
-    qa.notRun(4, `TBD: booking on ${date} needs the appointment flow of 02 on a day DR-1 does not work (Sunday, chosen so the shared appointment Mondays stay open)`);
-    await qa.step(5, async () => {
-      await h.open();
-      await h.rows().filter({ hasText: occasion }).getByRole('button', { name: 'Edit' }).click();
-      await h.dialog.getByRole('checkbox', { name: 'Active' }).uncheck();
-      expect(await h.save()).toContain('Holiday saved.');
-      await h.open();
-      expect((await h.cells(h.rows().filter({ hasText: occasion })))[2]).toBe('No');
-    });
-  } finally {
-    await retireHolidays(page, occasion);
-  }
-});
+qaTest('TC-APP018-052', TC_APP018_052);
 
 qaTest('TC-APP018-053', async ({ page, qa }) => {
   const h = holidays(page);

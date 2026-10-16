@@ -2,7 +2,7 @@ import { expect, type Page } from '@playwright/test';
 import type { Qa } from '../../../fixtures/e2e';
 import { toastMark, toastsSince } from '../../../lib/assertions';
 import { LAB } from '../../../lib/lab-data';
-import { WorklistPage, type LabStep } from '../../../pages/lab/LabPages';
+import { SampleWorkflowPage, WorklistPage, workLabel, type LabStep, type WorkAction } from '../../../pages/lab/LabPages';
 
 /**
  * Shared steps of 11-laboratory.xlsx. Every order of a test carries the
@@ -82,4 +82,66 @@ export async function resulted(page: Page, qa: Qa): Promise<string> {
 export async function cellsOf(page: Page, type: string): Promise<string[]> {
   const w = new WorklistPage(page);
   return w.cells(await w.row(type));
+}
+
+/** The label of an order of this test on the Sample workflow. */
+export async function labelOf(page: Page, type: string): Promise<string> {
+  return workLabel(await new WorklistPage(page).orderOf(type));
+}
+
+/** Chooses the order on the Sample workflow, fills the inputs and clicks an action; returns the toasts and the order's line. */
+export async function work(page: Page, label: string, action: WorkAction, inputs: Partial<Record<'Reason' | 'Culture note' | 'External lab', string>> = {}): Promise<{ toasts: string[]; line: string }> {
+  const s = new SampleWorkflowPage(page);
+  await s.open();
+  await s.order.selectOption({ label });
+  for (const [k, v] of Object.entries(inputs)) await s.input(k as 'Reason').fill(v);
+  const mark = await toastMark(page);
+  await s.button(action).click();
+  const toasts = await toastsAfter(page, mark);
+  await s.open();
+  const line = (await s.line(label).innerText().catch(() => '')).trim();
+  return { toasts, line };
+}
+
+/** Specimens and tests: the kind list (labelled "Name"), Code, Name, Save; Test, Low, High, Unit, Save. */
+export function catalogue(page: Page) {
+  const main = page.getByRole('main');
+  return {
+    main,
+    kind: main.getByRole('combobox', { name: 'Name' }),
+    code: main.getByRole('textbox', { name: 'Code', exact: true }),
+    name: main.getByRole('textbox', { name: 'Name', exact: true }),
+    test: main.getByRole('textbox', { name: 'Test', exact: true }),
+    low: main.getByRole('textbox', { name: 'Low', exact: true }),
+    high: main.getByRole('textbox', { name: 'High', exact: true }),
+    unit: main.getByRole('textbox', { name: 'Unit', exact: true }),
+    saveMaster: main.getByRole('button', { name: 'Save' }).first(),
+    saveRange: main.getByRole('button', { name: 'Save' }).last(),
+  };
+}
+
+export async function press(page: Page, button: import('@playwright/test').Locator): Promise<string[]> {
+  const mark = await toastMark(page);
+  await button.click();
+  return toastsAfter(page, mark);
+}
+
+/** An order with a result, reviewed and certified on the Sample workflow; returns its label. */
+export async function certified(page: Page, qa: Qa): Promise<string> {
+  const type = await resulted(page, qa);
+  const label = await labelOf(page, type);
+  for (const a of ['Review', 'Certify'] as const) expect((await work(page, label, a)).toasts).toContain('Saved');
+  return label;
+}
+
+/** The Daily QC block: its lines (a table under the heading) and the inputs Test, Value and Save at the end of the screen. */
+export function qc(page: Page) {
+  const main = page.getByRole('main');
+  return {
+    block: main.getByRole('heading', { level: 2, name: 'Daily QC' }).locator('xpath=following-sibling::*[1]'),
+    rows: main.getByRole('table').last().getByRole('row'),
+    test: main.getByRole('textbox', { name: 'Test', exact: true }),
+    value: main.getByRole('textbox', { name: 'Value', exact: true }),
+    save: main.getByRole('button', { name: 'Save', exact: true }),
+  };
 }

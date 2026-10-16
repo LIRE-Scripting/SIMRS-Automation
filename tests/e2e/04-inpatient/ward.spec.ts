@@ -1,7 +1,8 @@
-import type { Locator, Page } from '@playwright/test';
+import type { Page } from '@playwright/test';
 import { expect, qaTest, test, type Qa } from '../../../fixtures/e2e';
 import { installToastRecorder, toastLocator, toastMark, toastsSince } from '../../../lib/assertions';
 import { AdmissionsPage, BedsPage } from '../../../pages/inpatient/InpatientPages';
+import { Ward } from './helpers';
 
 /**
  * 04-inpatient.xlsx, feature "Ward care (/adt/ward)". Every test admits its own
@@ -14,34 +15,6 @@ test.beforeEach(async ({ page }) => {
   test.slow();
   await installToastRecorder(page);
 });
-
-class Ward {
-  readonly main: Locator;
-  readonly heading: Locator;
-  readonly stays: Locator;
-  constructor(readonly page: Page) {
-    this.main = page.getByRole('main');
-    this.heading = this.main.getByRole('heading', { level: 1, name: 'Ward care' });
-    this.stays = this.main.getByRole('combobox', { name: 'Ward care' });
-  }
-
-  async open() {
-    await this.page.goto('/en/adt/ward');
-    await expect(this.heading).toBeVisible();
-  }
-
-  /** Chooses the stay whose option contains `name`; false when the list does not offer it. */
-  async choose(name: string): Promise<boolean> {
-    const label = (await this.stays.locator('option').allInnerTexts()).find((o) => o.includes(name));
-    if (!label) return false;
-    await this.stays.selectOption({ label });
-    return true;
-  }
-
-  control(name: string): Locator {
-    return this.main.getByRole('button', { name, exact: true });
-  }
-}
 
 /** A stay of this test on a new bed; returns the patient name and bed number. */
 async function admitted(page: Page, qa: Qa, excelName: string, excelBed = 'QA-101'): Promise<{ name: string; bed: string }> {

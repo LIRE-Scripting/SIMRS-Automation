@@ -7,24 +7,12 @@ import { authFileOf, PASSWORD } from '../../../lib/config';
 import { userLogin } from '../../../lib/qa-data';
 import { ConsultationPage, type DrugOrder } from '../../../pages/clinical/ConsultationPage';
 import { LoginPage } from '../../../pages/LoginPage';
-
-/**
- * 03-patient-care.xlsx, feature "Consultation (/clinical/consultation)".
- * Every test registers its own PT-1 ("QA-PCR Pasien Satu" + a new token) and
- * works on that patient only. Orders placed here stay in the pharmacy queue
- * (no cancel on the site; Cleanup Requirements).
- */
-
-type Patient = { mrn: string; fullName: string };
+import { addLine, newPt1, Patient, TC_APP003_005 } from './cases';
 
 test.beforeEach(async ({ page }) => {
   test.slow();
   await installToastRecorder(page);
 });
-
-async function newPt1(page: Page, qa: Qa): Promise<Patient> {
-  return registerPatient(page, CLINICAL.pt1.name, qa.token(), PT1_DATE_OF_BIRTH);
-}
 
 /** Toasts shown after `mark`, waiting up to 8 s for the first ([] when none came). */
 async function toastsAfter(page: Page, mark: number): Promise<string[]> {
@@ -34,14 +22,6 @@ async function toastsAfter(page: Page, mark: number): Promise<string[]> {
     // no toast
   }
   return toastsSince(page, mark);
-}
-
-/** Adds one prescription line (the formulary is filled, then "Add"). */
-async function addLine(c: ConsultationPage, o: DrugOrder): Promise<void> {
-  await c.fillOrder(o);
-  await expect(c.addLine()).toBeEnabled();
-  await c.addLine().click();
-  await expect(c.panel.getByText(o.Drug).first()).toBeVisible();
 }
 
 /** A page signed in afresh as U1 in a new context (no sign-out of the shared session). */
@@ -90,37 +70,7 @@ qaTest('TC-APP003-001', async ({ page, qa }) => {
   });
 });
 
-qaTest('TC-APP003-005', async ({ page, qa }) => {
-  const c = new ConsultationPage(page);
-  const [a, b] = CLINICAL.warningPair;
-  await c.openFor(await newPt1(page, qa));
-  await c.showTab('Prescription');
-
-  const warning = c.panel.getByText(`Soft warning (sandbox): ${a} with ${b} — acknowledge to continue.`);
-  await addLine(c, orderFor(a));
-  await addLine(c, orderFor(b));
-  await c.checkInteractions().click();
-  if (!(await warning.isVisible())) {
-    // The pair is not on the site (found blocker 22): no warning, nothing to acknowledge.
-    qa.blocked(1, 22);
-    qa.blocked(2, 22);
-  } else {
-    await qa.step(1, async () => {
-      await expect(c.panel.getByRole('button', { name: 'Acknowledge' })).toBeVisible();
-      await expect(c.submitPrescription()).toBeDisabled();
-    });
-    await qa.step(2, async () => {
-      await c.panel.getByRole('button', { name: 'Acknowledge' }).click();
-      await expect(c.panel.getByText('Acknowledged')).toBeVisible();
-      await expect(c.submitPrescription()).toBeEnabled();
-    });
-  }
-
-  await qa.step(3, async () => {
-    await c.submitPrescription().click();
-    await expect(toastLocator(page, /^Prescription order placed\.$/)).toBeVisible();
-  });
-});
+qaTest('TC-APP003-005', TC_APP003_005);
 
 qaTest('TC-APP003-008', async ({ page, qa }) => {
   const c = new ConsultationPage(page);

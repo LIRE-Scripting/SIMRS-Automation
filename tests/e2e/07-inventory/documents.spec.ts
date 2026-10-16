@@ -5,6 +5,7 @@ import { authFileOf } from '../../../lib/config';
 import { addDays, todayWib } from '../../../lib/dates';
 import { STAND_IN_STORE, STAND_IN_STORE_2 } from '../../../lib/inventory-data';
 import { ItemMasterPage, StoreFormsPage } from '../../../pages/inventory/InventoryE2EPages';
+import { click, indentOrBlock, isServerError, lastId, newItem, opening, TC_APP007_042, TC_APP007_045, toastsAfter } from './cases';
 
 /**
  * 07-inventory.xlsx, features "Branch and stores (/inventory/setup)", "Store
@@ -19,47 +20,6 @@ test.beforeEach(async ({ page }) => {
   test.slow();
   await installToastRecorder(page);
 });
-
-async function toastsAfter(page: Page, mark: number): Promise<string[]> {
-  try {
-    await expect.poll(async () => (await toastsSince(page, mark)).length, { timeout: 8_000 }).toBeGreaterThan(0);
-  } catch {
-    // no toast
-  }
-  return toastsSince(page, mark);
-}
-
-async function click(f: StoreFormsPage, name: string): Promise<string[]> {
-  const mark = await toastMark(f.page);
-  await f.button(name).click();
-  return toastsAfter(f.page, mark);
-}
-
-/** Item "X-ITM1" of this test, made on Item Master. */
-async function newItem(page: Page, qa: Qa): Promise<string> {
-  const items = new ItemMasterPage(page);
-  const code = qa.code('X-ITM1');
-  await items.open();
-  const d = await items.openAdd();
-  await items.fill(d, { code, name: qa.name('X Barang uji') });
-  await d.getByRole('button', { name: 'Save' }).click();
-  await expect(d).toBeHidden();
-  return code;
-}
-
-const isServerError = (toasts: string[]) => toasts.some((t) => /React error #441/.test(t));
-
-/** Saves an indent between the two stand-in stores; on HTTP 500 the given steps are blocked (blocker 26) and the test is skipped. */
-async function indentOrBlock(f: StoreFormsPage, qa: Qa, item: string, steps: number[]): Promise<string> {
-  await f.fill({ Store: STAND_IN_STORE_2.code, 'To store': STAND_IN_STORE.code, Item: item, Quantity: '10', Document: '' });
-  const toasts = await click(f, 'indent');
-  if (isServerError(toasts)) {
-    for (const s of steps) qa.blocked(s, 26);
-    test.skip(true, 'Blocker 26 (found by automation, docs/qa/blockers-found.md): an indent between two stores answers HTTP 500');
-  }
-  expect(toasts).toContain('Saved.');
-  return lastId(f, 'indent', item);
-}
 
 // --------------------------------------------------------- branch and stores
 
@@ -123,52 +83,7 @@ qaTest('TC-APP007-041', async ({ page, qa }) => {
     });
 });
 
-// ------------------------------------------------------------ store documents
-
-/** Opening stock of a new item's batch in the first stand-in store; returns item and batch. */
-async function opening(page: Page, qa: Qa) {
-  const item = await newItem(page, qa);
-  const batch = qa.code('X-B01');
-  const f = new StoreFormsPage(page);
-  await f.open('documents', 'Store documents');
-  await f.fill({ Store: STAND_IN_STORE.code, 'To store': '', Item: item, Batch: batch, Expiry: addDays(todayWib(), 365), Quantity: '100', Department: '', 'Other branch': '', Document: '' });
-  const toasts = await click(f, 'opening');
-  return { f, item, batch, toasts };
-}
-
-/** The id shown on the newest line of a kind ("indent open <item> <id>"). */
-async function lastId(f: StoreFormsPage, kind: string, item: string): Promise<string> {
-  const text = await f.main.innerText();
-  const m = [...text.matchAll(new RegExp(`${kind}\\s+\\w+\\s+${item}\\s+([0-9a-f-]{36})`, 'g'))].pop();
-  if (!m) throw new Error(`No "${kind}" line for ${item}`);
-  return m[1];
-}
-
-qaTest('TC-APP007-042', async ({ page, qa }) => {
-  const f = new StoreFormsPage(page);
-  const item = await newItem(page, qa);
-  const batch = qa.code('X-B01');
-  qa.note(2, `stores "X-ST1"/"X-ST2" cannot be made (found blocker 26); the seed store ${STAND_IN_STORE.code} stands in`);
-
-  await qa.step(1, async () => {
-    await f.open('documents', 'Store documents');
-    for (const n of ['Store', 'To store', 'Item', 'Batch', 'Expiry', 'Quantity', 'Department', 'Other branch', 'Document']) await expect(f.input(n)).toBeVisible();
-    for (const b of ['opening', 'indent', 'issue', 'receipt', 'return', 'transfer', 'inter_branch', 'departmental', 'convert']) await expect(f.button(b)).toBeVisible();
-  });
-
-  await qa.step(2, async () => {
-    await f.fill({ Store: STAND_IN_STORE.code, Item: item, Batch: batch, Expiry: addDays(todayWib(), 365), Quantity: '100' });
-    expect(await click(f, 'opening')).toContain('Saved.');
-    await expect(f.main).toContainText(new RegExp(`opening\\s+posted\\s+${item}`));
-  });
-
-  await qa.step(3, async () => {
-    const items = new ItemMasterPage(page);
-    await items.open();
-    const shown = await (await items.openEdit({ code: item })).getByText(batch).count();
-    qa.note(3, `the opening batch ${shown ? 'shows' : 'does not show'} under "Stock on hand" (TBD in the workbook)`);
-  });
-});
+qaTest('TC-APP007-042', TC_APP007_042);
 
 qaTest('TC-APP007-043', async ({ page, qa }) => {
   const f = new StoreFormsPage(page);
@@ -206,27 +121,7 @@ qaTest('TC-APP007-044', async ({ browser, qa }) => {
   await context.close();
 });
 
-qaTest('TC-APP007-045', async ({ page, qa }) => {
-  const { f, item, batch, toasts } = await opening(page, qa);
-  expect(toasts).toContain('Saved.');
-  const ids: Record<string, string> = {};
-  ids.indent = await indentOrBlock(f, qa, item, [1, 2, 3, 4]);
-  qa.note(1, 'the indent is saved before the steps run (step 1 is its check)');
-
-  const doc = async (step: number, kind: string, values: Record<string, string>, line: RegExp) => {
-    await qa.step(step, async () => {
-      await f.fill(values);
-      expect(await click(f, kind)).toContain('Saved.');
-      await expect(f.main).toContainText(line);
-      ids[kind] = await lastId(f, kind, item);
-    });
-  };
-  await qa.step(1, () => expect(f.main).toContainText(new RegExp(`indent\\s+open\\s+${item}`)));
-  await doc(2, 'issue', { Document: ids.indent ?? '', Batch: batch, Quantity: '10' }, new RegExp(`issue\\s+\\w+\\s+${item}`));
-  await doc(3, 'receipt', { Document: ids.issue ?? '' }, new RegExp(`receipt\\s+\\w+\\s+${item}`));
-  await doc(4, 'return', { Document: ids.receipt ?? '' }, new RegExp(`return\\s+\\w+\\s+${item}`));
-  qa.notRun(5, 'the workbook leaves the stock per store TBD; no screen shows stock per store and batch besides Item Master');
-});
+qaTest('TC-APP007-045', TC_APP007_045);
 
 qaTest('TC-APP007-046', async ({ page, qa }) => {
   const { f, item, batch } = await opening(page, qa);

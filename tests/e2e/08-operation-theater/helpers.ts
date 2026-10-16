@@ -2,7 +2,8 @@ import { expect, type Locator, type Page } from '@playwright/test';
 import type { Qa } from '../../../fixtures/e2e';
 import { toastMark, toastsSince } from '../../../lib/assertions';
 import { OT } from '../../../lib/ot-data';
-import { OtRequestsPage, type OtRequest, type RowAction } from '../../../pages/ot/OtPages';
+import { todayWib } from '../../../lib/dates';
+import { OtDeskPage, OtRequestsPage, type OtRequest, type RowAction } from '../../../pages/ot/OtPages';
 
 /**
  * Shared steps of 08-operation-theater.xlsx. Every request of a test carries
@@ -65,4 +66,36 @@ export async function cellsOf(page: Page, procedureText: string): Promise<string
 /** Tomorrow (WIB) at hh:mm as a datetime-local value. */
 export function tomorrowAt(isoDate: string, hhmm: string): string {
   return `${isoDate}T${hhmm}`;
+}
+
+/** A full request of the journey data: procedure, patient, room, tomorrow 08:00–09:00, chief surgeon. */
+export function full(qa: Qa) {
+  const day = todayWib(1);
+  return {
+    procedure: procedure(qa, qa.prefix('X Apendektomi')),
+    patient: qa.name('X Pasien OT 01'),
+    room: qa.code('X-OK1'),
+    start: `${day}T08:00`,
+    end: `${day}T09:00`,
+    surgeon: qa.name('X dr. Bedah'),
+    day,
+  };
+}
+
+/** A dossier of this test (name + item), made on /ot/dossiers; returns its id as listed. */
+export async function dossier(page: Page, qa: Qa): Promise<{ name: string; id: string }> {
+  const desk = new OtDeskPage(page);
+  const name = qa.name('X Set apendektomi');
+  await desk.open('dossiers', 'Dossiers');
+  await desk.main.getByRole('button', { name: 'Save', exact: true }).click();
+  const d = desk.dialog();
+  await d.getByRole('textbox', { name: 'Name' }).fill(name);
+  await d.getByRole('textbox', { name: 'Item' }).fill(qa.prefix('X Kasa steril'));
+  const mark = await toastMark(page);
+  await d.getByRole('button', { name: 'Save' }).click();
+  expect(await toastsAfter(page, mark)).toContain('Saved');
+  const line = desk.main.getByRole('listitem').filter({ hasText: name });
+  await expect(line).toHaveCount(1);
+  const id = (await line.innerText()).match(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/)![0];
+  return { name, id };
 }

@@ -4,6 +4,7 @@ import { authFileOf } from '../../../lib/config';
 import { installToastRecorder, toastMark } from '../../../lib/assertions';
 import { png } from './png';
 import { createUser, fillUser, invalidFields, newPassword, pick, roles, signInAs, toastsAfter, users, type NewUser } from './helpers';
+import { pickRole, roleName, TC_APP018_037, TC_APP018_039 } from './cases';
 
 /**
  * 18-settings.xlsx: Users, Roles, Rights, Branch map, Sign-in log, Brand,
@@ -281,61 +282,7 @@ qaTest('TC-APP018-036', async ({ page, qa }) => {
   }
 });
 
-/** Picks a role on User Rights by typing its name. */
-async function pickRole(page: Page, name: string): Promise<void> {
-  const box = page.getByRole('main').getByRole('combobox', { name: 'Role' });
-  if ((await box.evaluate((e) => e.tagName)) === 'SELECT') {
-    await box.selectOption({ label: name });
-    return;
-  }
-  await pick(box, name);
-}
-
-const roleName = (qa: Qa) => `qa_uji_${qa.token().toLowerCase()}`;
-
-qaTest('TC-APP018-037', async ({ page, qa }) => {
-  const r = roles(page);
-  const name = roleName(qa);
-  const description = qa.name('X Peran uji');
-  await qa.step(1, async () => {
-    await page.goto('/en/settings');
-    await page.getByRole('main').getByRole('link', { name: /^Roles\b/ }).click();
-    await expect(r.main.getByRole('heading', { level: 1, name: 'Roles' })).toBeVisible();
-    await expect(r.main.getByText('Roles used to grant access.', { exact: true })).toBeVisible();
-    await expect(r.search).toBeVisible();
-    await expect(r.status).toBeVisible();
-    await expect(r.main.getByRole('columnheader')).toHaveText(['Name', 'Description', 'Status', 'Actions']);
-  });
-  await qa.step(2, async () => {
-    await r.main.getByRole('button', { name: 'Add Role' }).click();
-    await expect(r.dialog).toHaveAccessibleName('Add Role');
-    await expect(r.dialog.getByText('Role master — name, description, and active flag.')).toBeVisible();
-    for (const f of ['Role name', 'Description']) await expect(r.dialog.getByRole('textbox', { name: f })).toBeVisible();
-    await expect(r.dialog.getByRole('checkbox', { name: 'Active' })).toBeChecked();
-  });
-  await qa.step(3, async () => {
-    await r.fill({ 'Role name': name, Description: description });
-    expect(await r.save()).toContain('Role added.');
-    expect((await r.cells(await r.row(name))).slice(0, 3)).toEqual([name, description, 'Active']);
-  });
-  await qa.step(4, async () => {
-    await page.goto('/en/identity/rights');
-    await pickRole(page, name);
-    await expect(page.getByRole('main').getByText(/^0 \/ \d+$/)).toBeVisible();
-    expect(await page.getByRole('main').getByRole('checkbox', { checked: true }).count()).toBe(0);
-  });
-  await qa.step(5, async () => {
-    await r.edit(name);
-    await r.fill({ Active: false });
-    expect(await r.save()).toContain('Role updated.');
-    expect((await r.cells(await r.row(name)))[2]).toBe('Inactive');
-  });
-  await qa.step(6, async () => {
-    await users(page).openAdd();
-    const offered = await page.getByRole('dialog').getByRole('checkbox', { name, exact: true }).count();
-    qa.note(6, `the inactive role is ${offered ? '' : 'not '}offered in "Add User"`);
-  });
-});
+qaTest('TC-APP018-037', TC_APP018_037);
 
 qaTest('TC-APP018-038', async ({ page, qa }) => {
   const r = roles(page);
@@ -352,54 +299,7 @@ qaTest('TC-APP018-038', async ({ page, qa }) => {
   qa.notRun(3, 'setting the role admin inactive would take the rights of every administrator, U1 and U2 among them');
 });
 
-qaTest('TC-APP018-039', async ({ page, qa }) => {
-  const r = roles(page);
-  const main = page.getByRole('main');
-  const name = roleName(qa);
-  expect(await r.add({ 'Role name': name, Description: qa.name('X Peran uji') })).toContain('Role added.');
-  try {
-    await qa.step(1, async () => {
-      await page.goto('/en/settings');
-      await main.getByRole('link', { name: /^Rights\b/ }).click();
-      await expect(main.getByRole('heading', { level: 1, name: 'User Rights' })).toBeVisible();
-      await expect(main.getByText('Privileges granted to each role.', { exact: true })).toBeVisible();
-      await expect(main.getByRole('combobox', { name: 'Role' })).toBeVisible();
-      await expect(main.getByRole('heading', { level: 2, name: 'Privileges' })).toBeVisible();
-      await expect(main.getByRole('button', { name: 'Save rights' })).toBeVisible();
-    });
-    await qa.step(2, async () => {
-      await pickRole(page, name);
-      await expect(main.getByText(/^0 \/ \d+$/)).toBeVisible();
-    });
-    await qa.step(3, async () => {
-      await main.getByRole('checkbox', { name: /^DIET_WRITE\b/ }).check();
-      const mark = await toastMark(page);
-      await main.getByRole('button', { name: 'Save rights' }).click();
-      const toasts = await toastsAfter(page, mark);
-      if (toasts.includes('Failed to save rights.')) {
-        qa.blocked(3, 38);
-        return;
-      }
-      expect(toasts).toContain('Rights updated.');
-      await page.reload();
-      await pickRole(page, name);
-      await expect(main.getByText(/^1 \/ \d+$/)).toBeVisible();
-    });
-    qa.notRun(4, 'a diet request needs an admitted patient and the 13 Dietary flow as the test user');
-    qa.notRun(5, 'see step 4');
-    await qa.step(6, async () => {
-      const names = await main.getByRole('checkbox').evaluateAll((es) => es.map((e) => e.getAttribute('aria-label') ?? (e as HTMLInputElement).labels?.[0]?.textContent ?? ''));
-      const box = main.getByRole('checkbox', { name: /^DIET_WRITE\b/ });
-      const label = (await box.locator('xpath=..').innerText()).replace(/\s+/g, ' ').trim();
-      qa.note(6, `${names.length} privileges; DIET_WRITE reads "${label}"`);
-      expect(label).toBe('DIET_WRITE DIET_WRITE');
-    });
-  } finally {
-    await r.edit(name);
-    await r.fill({ Active: false });
-    await r.save();
-  }
-});
+qaTest('TC-APP018-039', TC_APP018_039);
 
 qaTest('TC-APP018-040', async ({ page, qa }) => {
   const main = page.getByRole('main');

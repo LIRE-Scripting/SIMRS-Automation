@@ -1,8 +1,7 @@
 import { expect, qaTest, test, type Qa } from '../../../fixtures/e2e';
 import { installToastRecorder, toastMark } from '../../../lib/assertions';
-import { todayWib } from '../../../lib/dates';
 import { OtDeskPage, OtRequestsPage } from '../../../pages/ot/OtPages';
-import { act, cellsOf, procedure, request, toastsAfter } from './helpers';
+import { act, cellsOf, dossier, full, procedure, request, toastsAfter } from './helpers';
 
 /**
  * 08-operation-theater.xlsx, the surgical case on a request: patient, room
@@ -19,20 +18,6 @@ test.beforeEach(async ({ page }) => {
 const SERVER_ERROR = /React error #441/;
 const NOTE = 'X Operasi selesai tanpa penyulit';
 const REASON = 'X pasien demam';
-
-/** A full request of the journey data: procedure, patient, room, tomorrow 08:00–09:00, chief surgeon. */
-function full(qa: Qa) {
-  const day = todayWib(1);
-  return {
-    procedure: procedure(qa, qa.prefix('X Apendektomi')),
-    patient: qa.name('X Pasien OT 01'),
-    room: qa.code('X-OK1'),
-    start: `${day}T08:00`,
-    end: `${day}T09:00`,
-    surgeon: qa.name('X dr. Bedah'),
-    day,
-  };
-}
 
 /** A refusal: the status is unchanged; the text shown is recorded. */
 async function refused(qa: Qa, step: number, page: import('@playwright/test').Page, p: string, before: string, toasts: string[], serverText: string) {
@@ -238,24 +223,6 @@ qaTest('TC-APP008-032', async ({ page, qa }) => {
   });
 });
 
-/** A dossier of this test (name + item), made on /ot/dossiers; returns its id as listed. */
-async function dossier(page: import('@playwright/test').Page, qa: Qa): Promise<{ name: string; id: string }> {
-  const desk = new OtDeskPage(page);
-  const name = qa.name('X Set apendektomi');
-  await desk.open('dossiers', 'Dossiers');
-  await desk.main.getByRole('button', { name: 'Save', exact: true }).click();
-  const d = desk.dialog();
-  await d.getByRole('textbox', { name: 'Name' }).fill(name);
-  await d.getByRole('textbox', { name: 'Item' }).fill(qa.prefix('X Kasa steril'));
-  const mark = await toastMark(page);
-  await d.getByRole('button', { name: 'Save' }).click();
-  expect(await toastsAfter(page, mark)).toContain('Saved');
-  const line = desk.main.getByRole('listitem').filter({ hasText: name });
-  await expect(line).toHaveCount(1);
-  const id = (await line.innerText()).match(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/)![0];
-  return { name, id };
-}
-
 qaTest('TC-APP008-033', async ({ page, qa }) => {
   const ot = new OtRequestsPage(page);
   const p = procedure(qa, qa.prefix('X Apendektomi'));
@@ -297,5 +264,4 @@ qaTest('TC-APP008-034', async ({ page, qa }) => {
     await refused(qa, 2, page, p, 'pending', await act(page, p, 'Record dossier'), 'patient name required');
   });
 });
-
 

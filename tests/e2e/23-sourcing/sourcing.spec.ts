@@ -4,6 +4,7 @@ import { installToastRecorder, toastMark } from '../../../lib/assertions';
 import { addDays, todayWib } from '../../../lib/dates';
 import { screenOpens } from '../shared/screen-opens';
 import { toastsAfter } from '../18-settings/helpers';
+import { TC_APP023_020 } from './cases';
 
 /**
  * 23-sourcing.xlsx: masters, tenders, bids, agreements and deposits. Every
@@ -334,11 +335,7 @@ qaTest('TC-APP023-019', async ({ qa }) => {
   qa.notRun(2, 'see step 1');
 });
 
-qaTest('TC-APP023-020', async ({ qa }) => {
-  qa.notRun(1, 'the approval of a purchase request is the 09 Procurement flow');
-  for (const st of [2, 3, 4, 5, 6]) qa.blocked(st, 39);
-  qa.notRun(7, 'TBD: the purchase order of the request is the 09 Procurement flow');
-});
+qaTest('TC-APP023-020', TC_APP023_020);
 
 const ROUTES: [string, string, string][] = [
   ['TC-APP023-022', '/sourcing', 'Sourcing'],

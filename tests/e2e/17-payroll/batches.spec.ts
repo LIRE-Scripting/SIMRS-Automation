@@ -5,6 +5,7 @@ import { HR } from '../../../lib/hr-data';
 import { backToEnglish, switchLanguage } from '../shared/language';
 import { screenOpens } from '../shared/screen-opens';
 import { Batches, Desk, RAN, SAVED, payrollEmployee } from './helpers';
+import { BASE, TC_APP017_001 } from './cases';
 
 /**
  * 17-payroll.xlsx: Payroll batches (/payroll/batches), hub and screens. The
@@ -24,54 +25,7 @@ test.afterEach(async ({ page }) => {
   await backToEnglish(page);
 });
 
-const BASE = '10000000';
-
-qaTest('TC-APP017-001', async ({ page, qa }) => {
-  const b = new Batches(page);
-  const e = await payrollEmployee(page, qa);
-  let head = '';
-  await qa.step(1, async () => {
-    await page.goto('/en/apps');
-    await page.getByRole('link', { name: /^Payroll\b/ }).first().click();
-    await page.getByRole('main').getByRole('link', { name: 'Batches' }).click();
-    await expect(page.getByRole('heading', { level: 1, name: 'Payroll batches' })).toBeVisible();
-    await expect(page.getByText('Back-office payroll batch register — run applies salary-component agents.', { exact: true })).toBeVisible();
-    await expect(b.employee).toBeVisible();
-    await expect(b.period).toHaveValue(todayWib().slice(0, 7));
-    await expect(b.currency).toHaveValue('IDR');
-    await expect(b.base).toHaveValue(BASE);
-    await expect(b.run).toBeVisible();
-    await expect(page.getByRole('table')).toBeVisible();
-    await expect(page.getByRole('combobox', { name: 'Branch' })).toHaveCount(0);
-  });
-  await qa.step(2, async () => {
-    await b.pick(e.no);
-    await expect(b.employee).toHaveValue(`${e.no} ${e.name}`);
-  });
-  await qa.step(3, async () => {
-    await b.period.fill('2027-03');
-    const toasts = await b.submit();
-    qa.note(3, `toasts "${toasts.join(' / ')}"`);
-    if (!toasts.includes(RAN)) qa.deviation(3, 'Toast "Payroll batch run"', toasts.length ? `toast "${toasts.join(' / ')}"` : 'no toast; "Batch result" opens');
-  });
-  await qa.step(4, async () => {
-    const r = await b.result();
-    head = r.head;
-    expect(r.head).toMatch(/^#\d+ · COMPLETED$/);
-    expect(r.gross).toMatch(/^IDR [\d.]+,\d{2}$/);
-    expect(r.net).toMatch(/^IDR [\d.]+,\d{2}$/);
-    expect(r.lines.length).toBeGreaterThan(0);
-    qa.note(4, `${r.head}; Gross ${r.gross}; Net ${r.net}; lines ${r.lines.join('; ')}`);
-  });
-  await qa.step(5, async () => {
-    await b.close();
-    const c = await b.cells(b.rows().first());
-    expect(c[0]).toBe(head.match(/^#(\d+)/)![1]);
-    expect(c[1]).toBe('COMPLETED');
-    expect(c[2]).toBe('0');
-    expect(c[3]).toMatch(/^[0-9a-f]{8}$/);
-  });
-});
+qaTest('TC-APP017-001', TC_APP017_001);
 
 qaTest('TC-APP017-003', async ({ page, qa }) => {
   const b = new Batches(page);

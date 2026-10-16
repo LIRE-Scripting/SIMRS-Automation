@@ -1,10 +1,9 @@
-import type { Page } from '@playwright/test';
-import { expect, qaTest, test, type Qa } from '../../../fixtures/e2e';
-import { installToastRecorder, toastMark } from '../../../lib/assertions';
-import { SampleWorkflowPage, WorklistPage, workLabel, type WorkAction } from '../../../pages/lab/LabPages';
+import { expect, qaTest, test } from '../../../fixtures/e2e';
+import { installToastRecorder } from '../../../lib/assertions';
+import { SampleWorkflowPage, WorklistPage } from '../../../pages/lab/LabPages';
 import { backToEnglish, switchLanguage } from '../shared/language';
 import { screenOpens } from '../shared/screen-opens';
-import { cellsOf, order, resulted, toastsAfter } from './helpers';
+import { catalogue, cellsOf, certified, labelOf, order, press, qc, resulted, work } from './helpers';
 
 /**
  * 11-laboratory.xlsx: hub and language (010), Specimens and tests (030 … 032),
@@ -24,25 +23,6 @@ test.beforeEach(async ({ page }) => {
 test.afterEach(async ({ page }) => {
   await backToEnglish(page);
 });
-
-/** The label of an order of this test on the Sample workflow. */
-async function labelOf(page: Page, type: string): Promise<string> {
-  return workLabel(await new WorklistPage(page).orderOf(type));
-}
-
-/** Chooses the order on the Sample workflow, fills the inputs and clicks an action; returns the toasts and the order's line. */
-async function work(page: Page, label: string, action: WorkAction, inputs: Partial<Record<'Reason' | 'Culture note' | 'External lab', string>> = {}): Promise<{ toasts: string[]; line: string }> {
-  const s = new SampleWorkflowPage(page);
-  await s.open();
-  await s.order.selectOption({ label });
-  for (const [k, v] of Object.entries(inputs)) await s.input(k as 'Reason').fill(v);
-  const mark = await toastMark(page);
-  await s.button(action).click();
-  const toasts = await toastsAfter(page, mark);
-  await s.open();
-  const line = (await s.line(label).innerText().catch(() => '')).trim();
-  return { toasts, line };
-}
 
 qaTest('TC-APP011-010', async ({ page, qa }) => {
   const main = page.getByRole('main');
@@ -78,29 +58,6 @@ qaTest('TC-APP011-010', async ({ page, qa }) => {
     if (h1 === 'Lab order worklist' || buttons.includes('New lab order')) qa.deviation(3, 'Headings, field names, buttons and toasts are Indonesian ("Worklist order lab", "Order lab baru", …)', `English: heading "${h1}"`);
   });
 });
-
-/** Specimens and tests: the kind list (labelled "Name"), Code, Name, Save; Test, Low, High, Unit, Save. */
-function catalogue(page: Page) {
-  const main = page.getByRole('main');
-  return {
-    main,
-    kind: main.getByRole('combobox', { name: 'Name' }),
-    code: main.getByRole('textbox', { name: 'Code', exact: true }),
-    name: main.getByRole('textbox', { name: 'Name', exact: true }),
-    test: main.getByRole('textbox', { name: 'Test', exact: true }),
-    low: main.getByRole('textbox', { name: 'Low', exact: true }),
-    high: main.getByRole('textbox', { name: 'High', exact: true }),
-    unit: main.getByRole('textbox', { name: 'Unit', exact: true }),
-    saveMaster: main.getByRole('button', { name: 'Save' }).first(),
-    saveRange: main.getByRole('button', { name: 'Save' }).last(),
-  };
-}
-
-async function press(page: Page, button: import('@playwright/test').Locator): Promise<string[]> {
-  const mark = await toastMark(page);
-  await button.click();
-  return toastsAfter(page, mark);
-}
 
 qaTest('TC-APP011-030', async ({ page, qa }) => {
   const c = catalogue(page);
@@ -254,14 +211,6 @@ qaTest('TC-APP011-036', async ({ page, qa }) => {
   });
 });
 
-/** An order with a result, reviewed and certified on the Sample workflow; returns its label. */
-async function certified(page: Page, qa: Qa): Promise<string> {
-  const type = await resulted(page, qa);
-  const label = await labelOf(page, type);
-  for (const a of ['Review', 'Certify'] as const) expect((await work(page, label, a)).toasts).toContain('Saved');
-  return label;
-}
-
 qaTest('TC-APP011-037', async ({ page, qa }) => {
   await qa.step(1, async () => {
     const r = await work(page, await certified(page, qa), 'Rectify');
@@ -333,18 +282,6 @@ qaTest('TC-APP011-041', async ({ page, qa }) => {
     qa.note(1, `line after the revert: "${r.line}"; worklist Result status "${(await cellsOf(page, type))[5]}"`);
   });
 });
-
-/** The Daily QC block: its lines (a table under the heading) and the inputs Test, Value and Save at the end of the screen. */
-function qc(page: Page) {
-  const main = page.getByRole('main');
-  return {
-    block: main.getByRole('heading', { level: 2, name: 'Daily QC' }).locator('xpath=following-sibling::*[1]'),
-    rows: main.getByRole('table').last().getByRole('row'),
-    test: main.getByRole('textbox', { name: 'Test', exact: true }),
-    value: main.getByRole('textbox', { name: 'Value', exact: true }),
-    save: main.getByRole('button', { name: 'Save', exact: true }),
-  };
-}
 
 qaTest('TC-APP011-042', async ({ page, qa }) => {
   const q = qc(page);

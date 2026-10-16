@@ -7,6 +7,7 @@ import { CashierPage, rupiah } from '../../../pages/billing/CashierPage';
 import { patient, sell, stock } from '../05-pharmacy/helpers';
 import { backToEnglish, switchLanguage } from '../shared/language';
 import { counterClosed, ensureSettings, paidSale, pay, sale, select } from './helpers';
+import { TC_APP014_003, TC_APP014_005, TC_APP014_006, TC_APP014_008 } from './cases';
 
 /**
  * 14-hospital-accounts.xlsx, Fast Cashier (/billing/cashier): sales, deposits,
@@ -151,34 +152,7 @@ qaTest('TC-APP014-002', async ({ page, qa }) => {
   });
 });
 
-qaTest('TC-APP014-003', async ({ page, qa }) => {
-  const invoice = await sale(page);
-  const c = new CashierPage(page);
-  const cash0 = await c.systemCash();
-
-  await qa.step(1, async () => {
-    await c.field('Deposits').fill('50000');
-    await c.button('Take deposit').click();
-    await expect.poll(() => c.barValue('Deposits')).toBe('Rp 50.000');
-    expect([await c.barValue('Available'), await c.barValue('Amount due')]).toEqual(['Rp 50.000', 'Rp 116.500']);
-    expect((await c.barState()).status).toBe('Draft');
-    await expect(c.receipt().getByRole('term')).toHaveCount(0);
-  });
-  await qa.step(2, async () => {
-    await expect(c.field('Cash amount (IDR)')).toHaveValue('116500');
-  });
-  await qa.step(3, async () => {
-    await c.button('New sale').click();
-    await select(page, invoice);
-    expect([await c.barValue('Available'), await c.barValue('Amount due'), await c.barValue('Deposits')]).toEqual(['Rp 50.000', 'Rp 116.500', 'Rp 50.000']);
-  });
-  await qa.step(4, async () => {
-    await pay(page);
-    expect((await c.barState()).status).toBe('Paid');
-    expect([await c.receiptValue('Paid'), await c.receiptValue('Remaining due')]).toEqual(['Rp 116.500', 'Rp 0']);
-  });
-  await expect.poll(() => c.systemCash()).toBe(cash0 + 166500);
-});
+qaTest('TC-APP014-003', TC_APP014_003);
 
 qaTest('TC-APP014-004', async ({ page, qa }) => {
   const invoice = await sale(page);
@@ -202,71 +176,11 @@ qaTest('TC-APP014-004', async ({ page, qa }) => {
   expect(await c.systemCash()).toBe(cash0);
 });
 
-qaTest('TC-APP014-005', async ({ page, qa }) => {
-  await sale(page);
-  const c = new CashierPage(page);
-  const cash0 = await c.systemCash();
+qaTest('TC-APP014-005', TC_APP014_005);
 
-  await qa.step(1, async () => {
-    await c.tender().selectOption({ label: 'Card' });
-    await expect(c.field('EDC terminal')).toBeVisible();
-    await expect(c.field('EDC approval')).toBeVisible();
-    await expect(c.button('Cancel EDC')).toBeVisible();
-  });
-  await qa.step(2, async () => {
-    await c.field('EDC terminal').fill('QA-EDC-01');
-    await c.field('EDC approval').fill('123456');
-    await pay(page);
-    expect((await c.barState()).status).toBe('Paid');
-    expect((await c.receiptValue('Tender')).toUpperCase()).toBe('CARD');
-    expect(await c.receiptValue('Paid')).toBe('Rp 166.500');
-  });
-  await qa.step(3, async () => {
-    expect(await c.systemCash()).toBe(cash0);
-  });
-});
+qaTest('TC-APP014-006', TC_APP014_006);
 
-qaTest('TC-APP014-006', async ({ page, qa }) => {
-  await sale(page);
-  const c = new CashierPage(page);
-  await qa.step(1, async () => {
-    await c.field('Discount (IDR)').fill('20000');
-    await c.button('Apply discount').click();
-    await expect.poll(async () => (await c.lines()).Discount).toBe('Rp 20.000');
-    expect(await c.lines()).toEqual({ Gross: 'Rp 150.000', Discount: 'Rp 20.000', Tax: 'Rp 14.300', 'Patient net': 'Rp 144.300' });
-    expect(await c.barValue('Amount due')).toBe('Rp 144.300');
-    expect((await c.barState()).status).toBe('Draft');
-  });
-  await qa.step(2, async () => {
-    await pay(page);
-    expect((await c.barState()).status).toBe('Paid');
-    expect(await c.receiptValue('Paid')).toBe('Rp 144.300');
-  });
-});
-
-qaTest('TC-APP014-008', async ({ page, qa }) => {
-  const invoice = await paidSale(page);
-  const c = new CashierPage(page);
-  let cash0 = 0;
-
-  await qa.step(1, async () => {
-    await select(page, invoice);
-    cash0 = await c.systemCash();
-    for (const b of ['Take deposit', 'Pay', 'Apply discount']) await expect(c.button(b)).toBeDisabled();
-    await expect(c.field('Refund (IDR)')).toBeEnabled();
-    await expect(c.button('Refund payment')).toBeEnabled();
-  });
-  await qa.step(2, async () => {
-    await c.field('Refund (IDR)').fill('50000');
-    await c.button('Refund payment').click();
-    await expect.poll(() => c.barValue('Available')).toBe('Rp 116.500');
-    expect(await c.barValue('Amount due')).toBe('Rp 50.000');
-    expect((await c.barState()).status).toBe('Draft');
-  });
-  await qa.step(3, async () => {
-    await expect.poll(() => c.systemCash()).toBe(cash0 - 50000);
-  });
-});
+qaTest('TC-APP014-008', TC_APP014_008);
 
 qaTest('TC-APP014-010', async ({ page, qa }) => {
   const invoice = await paidSale(page);

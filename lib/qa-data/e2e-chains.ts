@@ -2,10 +2,12 @@
  * Cross-application end-to-end chains (happy path), composed from test cases
  * that already exist in the 27 module workbooks. Nothing here is new test
  * content: every chain step points to a test case (and optionally some of its
- * steps) of reference/<NN-module>.xlsx; its status, actual result and blocker
- * are read from the run results (reports/e2e/<NN-module>.xlsx).
+ * steps) of reference/<NN-module>.xlsx. Each chain is one test in
+ * tests/e2e/chains/ (fixtures/chain.ts); the status, actual result and blocker
+ * of every step come from the chain runs (reports/e2e-chains/results*.json).
+ * Choices made for the chains: docs/qa/open-questions.md, Q40.
  *
- * Built into reports/e2e-chains/e2e-chains.xlsx by `npm run qa:e2e-chains`.
+ * Built into reports/e2e-chains/e2e-journeys.xlsx by `npm run qa:e2e-chains`.
  */
 
 export interface ChainStep {
@@ -108,7 +110,7 @@ export const CHAINS: Chain[] = [
     practice: 'Inpatient pathway: admission from a confirmed request, ward care with medication and diet, bill cleared before discharge, coded discharge.',
     steps: [
       { tc: 'TC-APP004-058', role: 'Patient put on the admission waiting list' },
-      { tc: 'TC-APP004-062', role: 'Admission request confirmed' },
+      { tc: 'TC-APP004-062', steps: [1], role: 'Admission request confirmed' },
       { tc: 'TC-APP004-004', role: 'Patient admitted into a vacant bed' },
       { tc: 'TC-APP004-065', role: 'Patient received on the ward' },
       { tc: 'TC-APP003-007', role: 'Doctor orders medicine for the inpatient' },
@@ -134,7 +136,7 @@ export const CHAINS: Chain[] = [
     practice: 'Emergency pathway: triage within target time, bed and consultant assigned, admission handover.',
     steps: [
       { tc: 'TC-APP015-035', role: 'Walk-in registered and received' },
-      { tc: 'TC-APP015-037', role: 'Triage assessment' },
+      { tc: 'TC-APP015-037', steps: [1, 2], role: 'Triage assessment' },
       { tc: 'TC-APP015-040', role: 'Bed and consultant assigned' },
       { tc: 'TC-APP015-044', role: 'Outcome: admission to a ward' },
       { tc: 'TC-APP004-062', role: 'Admission request confirmed' },
@@ -415,8 +417,9 @@ export const CHAINS: Chain[] = [
     practice: 'Medical records: every visit documented, file loans with chain of custody.',
     steps: [
       { tc: 'TC-APP001-001', role: 'Patient registered' },
+      { tc: 'TC-APP016-040', steps: [1, 2, 3], role: 'The arrived visit is listed as pending a document' },
       { tc: 'TC-APP001-078', role: 'Document recorded on the visit' },
-      { tc: 'TC-APP016-040', role: 'Visits without a document' },
+      { tc: 'TC-APP016-040', steps: [4], role: 'Visits without a document read again' },
       { tc: 'TC-APP016-001', role: 'File request created' },
       { tc: 'TC-APP016-002', role: 'Patient record issued' },
       { tc: 'TC-APP016-032', role: 'Movement of the file: from and to on issue and on return' },
@@ -460,10 +463,10 @@ export const CHAINS: Chain[] = [
       { tc: 'TC-APP002-019', role: 'Referral type available' },
       { tc: 'TC-APP002-002', role: 'Appointment booked with the consultant' },
       { tc: 'TC-APP002-006', role: 'Appointment rescheduled' },
-      { tc: 'TC-APP001-019', role: 'Arrival: number issued and patient called' },
+      { tc: 'TC-APP001-019', steps: [1, 2, 4], role: 'Arrival: number issued and patient called' },
       { tc: 'TC-APP003-001', role: 'Consultation opened' },
       { tc: 'TC-APP003-009', role: 'SOAP note saved' },
-      { tc: 'TC-APP003-046', role: 'Allergy recorded on the patient' },
+      { tc: 'TC-APP003-046', steps: [1, 2], role: 'Allergy recorded on the patient' },
       { tc: 'TC-APP003-052', role: 'Follow-up added' },
       { tc: 'TC-APP001-080', role: 'Encounter started and the visit closed' },
     ],
@@ -481,7 +484,7 @@ export const CHAINS: Chain[] = [
     practice: 'Computerised physician order entry: allergy and interaction checks at the point of ordering, every order traceable to the consultation (closed loop to the receiving department).',
     steps: [
       { tc: 'TC-APP003-001', role: 'Consultation opened' },
-      { tc: 'TC-APP003-046', role: 'Allergy recorded' },
+      { tc: 'TC-APP003-046', steps: [1, 2], role: 'Allergy recorded' },
       { tc: 'TC-APP003-005', role: 'Prescription with a warning the doctor acknowledges' },
       { tc: 'TC-APP003-008', role: 'Combination, mixture and vaccine orders' },
       { tc: 'TC-APP003-002', role: 'Medication order reaches the pharmacy' },
@@ -527,8 +530,8 @@ export const CHAINS: Chain[] = [
     practice: 'Time-critical pathway: triage, decision to operate and admission recorded in order; the theatre slot and the bed follow the same patient.',
     steps: [
       { tc: 'TC-APP015-035', role: 'Walk-in registered and received' },
-      { tc: 'TC-APP015-037', role: 'Triage assessment' },
-      { tc: 'TC-APP015-044', role: 'Outcome: admission to a ward' },
+      { tc: 'TC-APP015-037', steps: [1, 2], role: 'Triage assessment' },
+      { tc: 'TC-APP015-044', steps: [1, 2, 3], role: 'Outcome: admission to a ward' },
       { tc: 'TC-APP008-001', role: 'OT request created' },
       { tc: 'TC-APP008-025', role: 'Request placed on the calendar with room, times and surgeon' },
       { tc: 'TC-APP008-027', role: 'Surgical case from validation to completion' },
@@ -569,7 +572,7 @@ export const CHAINS: Chain[] = [
     practice: 'Medico-legal: flag the case, keep evidence with the encounter, keep a chain of custody of the record.',
     steps: [
       { tc: 'TC-APP015-035', role: 'Walk-in registered and received' },
-      { tc: 'TC-APP001-077', role: 'Arrival flagged as a medico-legal case' },
+      { tc: 'TC-APP001-077', steps: [1, 2, 3], role: 'Arrival flagged as a medico-legal case' },
       { tc: 'TC-APP015-051', role: 'File attached to the encounter' },
       { tc: 'TC-APP016-001', role: 'File request created' },
       { tc: 'TC-APP016-002', role: 'Patient record issued' },
@@ -612,13 +615,13 @@ export const CHAINS: Chain[] = [
       { tc: 'TC-APP011-003', role: 'Sample sent and accepted' },
       { tc: 'TC-APP011-004', role: 'Result captured' },
       { tc: 'TC-APP011-044', role: 'Report certified and handed over' },
-      { tc: 'TC-APP012-002', role: 'Radiology order with the study' },
-      { tc: 'TC-APP012-025', role: 'Study reported' },
       { tc: 'TC-APP013-038', role: 'BMI and energy calculation' },
       { tc: 'TC-APP013-001', role: 'Diet request created' },
       { tc: 'TC-APP013-004', role: 'TPN composition calculated' },
       { tc: 'TC-APP013-005', role: 'TPN saved on the patient' },
       { tc: 'TC-APP005-062', role: 'TPN price linked to Billing' },
+      { tc: 'TC-APP012-002', role: 'Radiology order with the study' },
+      { tc: 'TC-APP012-025', role: 'Study reported' },
     ],
   },
   {
@@ -657,8 +660,8 @@ export const CHAINS: Chain[] = [
     practice: 'Bed turnover: census accurate in real time, cleaning logged before the bed is offered again.',
     steps: [
       { tc: 'TC-APP004-001', role: 'Bed added' },
-      { tc: 'TC-APP004-003', role: 'Bed list: vacant filter' },
       { tc: 'TC-APP004-004', role: 'Patient admitted' },
+      { tc: 'TC-APP004-003', role: 'Bed list: the occupied bed and the vacant filter' },
       { tc: 'TC-APP004-010', role: 'Patient transferred to another bed' },
       { tc: 'TC-APP004-012', role: 'Patient discharged' },
       { tc: 'TC-APP024-007', role: 'Cleaning of the room logged and approved' },
@@ -1018,9 +1021,9 @@ export const CHAINS: Chain[] = [
       { tc: 'TC-APP011-042', role: 'Daily QC value' },
       { tc: 'TC-APP011-001', role: 'Lab order created' },
       { tc: 'TC-APP011-035', role: 'Sample rejected' },
+      { tc: 'TC-APP011-033', role: 'Result reviewed and certified' },
       { tc: 'TC-APP011-037', role: 'Rectify, retest, recollect and panic value' },
       { tc: 'TC-APP011-039', role: 'Culture note and external laboratory' },
-      { tc: 'TC-APP011-033', role: 'Result reviewed and certified' },
     ],
   },
   {

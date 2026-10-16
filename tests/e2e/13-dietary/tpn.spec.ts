@@ -1,7 +1,7 @@
 import { expect, qaTest, test, type Qa } from '../../../fixtures/e2e';
 import { installToastRecorder } from '../../../lib/assertions';
 import { DIET } from '../../../lib/diet-data';
-import { click, TpnPage, TPN_A, type TpnInputs } from './helpers';
+import { click, TpnPage, TPN_A, TPN_A_RESULTS, type TpnInputs } from './helpers';
 
 /**
  * 13-dietary.xlsx, feature "Total parenteral nutrition (/diet/tpn)". Patient
@@ -18,20 +18,6 @@ test.beforeEach(async ({ page }) => {
 const SAVED = 'TPN saved on the patient.';
 const BASE: TpnInputs = { 'Energy (kcal)': '2000', 'Protein (g/kg)': '1', 'Fluid (mL/kg)': '30', lipid: '20' };
 const patientName = (qa: Qa) => `${DIET.tpn.patient} ${qa.token()}`;
-
-/** The expected results of TPN-A (TC-APP013-004, steps 5 to 7). */
-const TPN_A_RESULTS: Record<string, string> = {
-  BMI: '24.22 · Normal',
-  Protein: '70 g / 280 kcal',
-  Dextrose: '388.24 g / 1320 kcal',
-  Lipid: '200 mL / 40 g / 400 kcal',
-  'Max dextrose': '504 g',
-  'Dextrose rate': '3.85 mg/kg/min',
-  Volume: '2.1 L',
-  'Per litre': 'P 33.33 · D 184.88 · L 19.05',
-  Electrolytes: 'Na 84 · K 42 · Ca 10.5 · Mg 8.4 · PO4 21',
-  Additives: 'MVI 21 · Trace 2.1 · Heparin 0 · Insulin 0',
-};
 
 async function calculate(t: TpnPage, v: TpnInputs): Promise<Record<string, string>> {
   await t.open();

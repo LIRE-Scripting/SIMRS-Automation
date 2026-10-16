@@ -5,6 +5,7 @@ import { HR, SC_STAND_IN } from '../../../lib/hr-data';
 import { STAND_IN_STORE } from '../../../lib/inventory-data';
 import { EmployeesPage, STEPS } from '../../../pages/hr/HrPages';
 import { createEmployee, employee, employeeData, toastsAfter } from './helpers';
+import { ROWS, TC_APP010_001, TC_APP010_002, TC_APP010_005 } from './cases';
 
 /** 10-hr.xlsx, feature "Employees (/hr/employees)". Employees are made per test. */
 
@@ -13,106 +14,9 @@ test.beforeEach(async ({ page }) => {
   await installToastRecorder(page);
 });
 
-const ROWS = {
-  Dependents: { 'Date of birth': '2015-06-01', Relation: 'Anak', Gender: 'Laki-laki' },
-  Contacts: { Type: 'Rumah', Address: 'QA Jl. Uji 1', Country: 'Indonesia', State: 'QA Provinsi', District: 'QA Kabupaten', City: 'QA Kota' },
-  Qualifications: { Qualification: 'QA S1 Keperawatan' },
-  Employment: { Organisation: 'QA RS Lama' },
-  Licences: { 'Licensing authority': 'QA Majelis', 'Valid till': '2028-12-31' },
-};
+qaTest('TC-APP010-001', TC_APP010_001);
 
-qaTest('TC-APP010-001', async ({ page, qa }) => {
-  const p = new EmployeesPage(page);
-  const e = employeeData(qa);
-  const d = p.dialog('Create employee');
-
-  await qa.step(1, async () => {
-    await page.goto('/en/apps');
-    await page.getByRole('link', { name: /^HR\b/ }).first().click();
-    await page.getByRole('main').getByRole('link', { name: 'Employees', exact: true }).click();
-    await expect(p.heading).toBeVisible();
-    await expect(p.search).toBeVisible();
-    for (const b of ['Search', 'Download', 'New employee']) await expect(page.getByRole('button', { name: b, exact: true })).toBeVisible();
-    await expect(p.table).toBeVisible();
-  });
-
-  await qa.step(2, async () => {
-    await p.openNew();
-    await expect(d.getByRole('list', { name: 'Wizard steps' }).getByRole('listitem')).toHaveText(STEPS.map((s, i) => new RegExp(`${i + 1}\\s*${s}`)));
-    await expect(p.next(d)).toBeDisabled();
-    await expect(d.getByRole('textbox', { name: 'Branch' }).or(d.getByRole('combobox', { name: 'Branch' }))).toHaveCount(0);
-  });
-
-  await qa.step(3, async () => {
-    await p.fill(d, { no: e.no, name: e.name, category: e.category, gender: e.gender, designation: e.designation, dob: e.dob });
-    await expect(d.getByRole('combobox', { name: 'Employment status' })).toHaveValue(/Active/i);
-    await expect(p.text(d, 'Name')).toHaveValue(e.name);
-  });
-
-  await qa.step(4, async () => {
-    await p.fill(d, { department: HR.depA });
-    await expect(d.getByRole('combobox', { name: 'Department' })).toHaveValue(new RegExp(HR.depA));
-    await expect(p.next(d)).toBeEnabled();
-  });
-
-  await qa.step(5, async () => {
-    await p.walk(d);
-    await expect(p.save(d)).toBeVisible();
-  });
-
-  await qa.step(6, async () => {
-    const mark = await toastMark(page);
-    await p.save(d).click();
-    expect(await toastsAfter(page, mark)).toContain('Employee saved');
-    await expect(d).toBeHidden();
-  });
-
-  await qa.step(7, async () => {
-    await p.open();
-    await p.find(e.no);
-    await expect(p.row(e.no)).toContainText(e.name);
-    await expect(p.row(e.no).getByRole('button', { name: 'Edit' })).toBeVisible();
-  });
-});
-
-qaTest('TC-APP010-002', async ({ page, qa }) => {
-  const p = new EmployeesPage(page);
-  const emp = await employee(page, qa);
-  let d = p.dialog('Edit employee');
-
-  await qa.step(1, async () => {
-    d = await p.openEdit(emp.no);
-    await expect(p.text(d, 'Name')).toHaveValue(emp.name);
-  });
-
-  await qa.step(2, async () => {
-    await p.next(d).click();
-    await p.addRow(d, ROWS.Dependents);
-    await expect(p.next(d)).toBeEnabled();
-  });
-
-  await qa.step(3, async () => {
-    for (const step of ['Contacts', 'Qualifications', 'Employment', 'Licences'] as const) {
-      await p.next(d).click();
-      await p.addRow(d, ROWS[step]);
-      if (step !== 'Licences') await expect(p.next(d)).toBeEnabled();
-    }
-  });
-
-  await qa.step(4, async () => {
-    const mark = await toastMark(page);
-    await p.save(d).click();
-    expect(await toastsAfter(page, mark)).toContain('Employee updated');
-  });
-
-  await qa.step(5, async () => {
-    d = await p.openEdit(emp.no);
-    for (const step of ['Dependents', 'Contacts', 'Qualifications', 'Employment', 'Licences'] as const) {
-      await p.next(d).click();
-      for (const [label, value] of Object.entries(ROWS[step])) await expect(d.getByLabel(label, { exact: true }).last()).toHaveValue(value);
-    }
-  });
-});
+qaTest('TC-APP010-002', TC_APP010_002);
 
 qaTest('TC-APP010-003', async ({ page, qa }) => {
   const p = new EmployeesPage(page);
@@ -139,38 +43,7 @@ qaTest('TC-APP010-003', async ({ page, qa }) => {
   });
 });
 
-qaTest('TC-APP010-005', async ({ page, qa }) => {
-  const p = new EmployeesPage(page);
-  const emp = await employee(page, qa);
-  let d = p.dialog('Edit employee');
-  qa.note(1, `SC-A "${HR.scA}" and ST-A "${HR.stA}" are not on the site (stores cannot be made, found blocker 26); ${SC_STAND_IN.code} "${SC_STAND_IN.name}" and ${STAND_IN_STORE.code} stand in`);
-
-  await qa.step(1, async () => {
-    d = await p.openEdit(emp.no);
-    await p.fill(d, { serviceCenter: SC_STAND_IN.name });
-    await expect(d.getByRole('combobox', { name: 'Service center' })).toHaveValue(new RegExp(SC_STAND_IN.code));
-  });
-
-  await qa.step(2, async () => {
-    await p.fill(d, { store: STAND_IN_STORE.name });
-    await expect(d.getByRole('combobox', { name: 'Store' })).toHaveValue(new RegExp(STAND_IN_STORE.code));
-  });
-
-  await qa.step(3, async () => {
-    await p.fill(d, { allocationFrom: '2027-01-01' });
-    await p.walk(d);
-    const mark = await toastMark(page);
-    await p.save(d).click();
-    expect(await toastsAfter(page, mark)).toContain('Employee updated');
-  });
-
-  await qa.step(4, async () => {
-    d = await p.openEdit(emp.no);
-    await expect(d.getByRole('combobox', { name: 'Service center' })).toHaveValue(new RegExp(SC_STAND_IN.code));
-    await expect(d.getByRole('combobox', { name: 'Store' })).toHaveValue(new RegExp(STAND_IN_STORE.code));
-    qa.note(4, `"Allocation from" after reopening: "${await p.text(d, 'Allocation from').inputValue()}"`);
-  });
-});
+qaTest('TC-APP010-005', TC_APP010_005);
 
 qaTest('TC-APP010-006', async ({ page, qa }) => {
   const p = new EmployeesPage(page);

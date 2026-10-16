@@ -3,6 +3,7 @@ import { installToastRecorder, toastMark } from '../../../lib/assertions';
 import { OT } from '../../../lib/ot-data';
 import { OtRequestsPage } from '../../../pages/ot/OtPages';
 import { act, cellsOf, create, procedure, request, toastsAfter } from './helpers';
+import { TC_APP008_002 } from './cases';
 
 /**
  * 08-operation-theater.xlsx, feature "OT requests (/ot/requests)": the
@@ -63,15 +64,7 @@ qaTest('TC-APP008-001', async ({ page, qa }) => {
   });
 });
 
-qaTest('TC-APP008-002', async ({ page, qa }) => {
-  const p = procedure(qa);
-  await qa.step(1, async () => {
-    expect(await create(page, { procedure: p, amount: OT.amount })).toContain('Request created');
-  });
-  await qa.step(2, async () => {
-    expect((await cellsOf(page, p))[3]).toBe('5,000,000');
-  });
-});
+qaTest('TC-APP008-002', TC_APP008_002);
 
 qaTest('TC-APP008-003', async ({ page, qa }) => {
   const ot = new OtRequestsPage(page);

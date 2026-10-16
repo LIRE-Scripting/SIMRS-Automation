@@ -5,6 +5,7 @@ import { ensureBloodbankDepartment } from '../../../lib/bloodbank-data';
 import { authFileOf } from '../../../lib/config';
 import { INVENTORY, STAND_IN_STORE } from '../../../lib/inventory-data';
 import { StockRequestsPage, StoresPage } from '../../../pages/inventory/InventoryE2EPages';
+import { TC_APP007_010 } from './cases';
 
 /**
  * 07-inventory.xlsx, features "Stores (/inventory/stores)" and "Stock
@@ -50,53 +51,7 @@ async function createRequest(sr: StockRequestsPage, v: { docNo: string; remarks?
   return toastsAfter(sr.page, mark);
 }
 
-qaTest('TC-APP007-010', async ({ page, qa }) => {
-  const stores = new StoresPage(page);
-  // The dialog has no accessible name; it is found by its title text.
-  const d = page.getByRole('dialog').filter({ hasText: 'Visit types' });
-  qa.note(1, `ST-1 cannot be made (found blocker 26); the seed store ${STAND_IN_STORE.code} stands in and is set back to both visit types afterwards`);
-
-  try {
-    await qa.step(1, async () => {
-      await page.goto('/en/inventory');
-      await page.getByRole('main').getByRole('link', { name: 'Stores', exact: true }).click();
-      await expect(stores.heading).toBeVisible();
-      await expect(stores.main.getByText('Warehouses on this branch.')).toBeVisible();
-      await expect(stores.table.getByRole('columnheader')).toHaveText(['Code', 'Name', 'Branch', 'Description', 'Dispense for', 'Status']);
-    });
-
-    await qa.step(2, async () => {
-      // The button reads the store's visit types ("Outpatient, Inpatient", in either order).
-      const button = stores.row(STAND_IN_STORE.code).getByRole('cell').nth(4).getByRole('button');
-      await expect(button).toHaveText(/^(Outpatient, Inpatient|Inpatient, Outpatient)$/);
-      await button.click();
-      await expect(d).toBeVisible();
-      await expect(d).toContainText(STAND_IN_STORE.code);
-      for (const v of ['Outpatient', 'Inpatient']) await expect(d.getByRole('checkbox', { name: v })).toBeChecked();
-    });
-
-    await qa.step(3, async () => {
-      await d.getByRole('checkbox', { name: 'Outpatient' }).uncheck();
-      await d.getByRole('button', { name: 'Save' }).click();
-      await expect(toastLocator(page, /^Visit types saved\.$/)).toBeVisible();
-      await expect(stores.row(STAND_IN_STORE.code).getByRole('cell').nth(4).getByRole('button')).toHaveText('Inpatient');
-    });
-
-    qa.notRun(4, 'checked in 05 Pharmacy (outpatient dispense store list)');
-  } finally {
-    // Back to both visit types, whatever the steps left.
-    await stores.open();
-    await stores.row(STAND_IN_STORE.code).getByRole('cell').nth(4).getByRole('button').click();
-    const both = (await d.getByRole('checkbox', { name: 'Outpatient' }).isChecked()) && (await d.getByRole('checkbox', { name: 'Inpatient' }).isChecked());
-    if (both) await d.getByRole('button', { name: 'Cancel' }).click();
-    else {
-      await d.getByRole('checkbox', { name: 'Outpatient' }).check();
-      await d.getByRole('checkbox', { name: 'Inpatient' }).check();
-      await d.getByRole('button', { name: 'Save' }).click();
-      await expect(toastLocator(page, /^Visit types saved\.$/)).toBeVisible();
-    }
-  }
-});
+qaTest('TC-APP007-010', TC_APP007_010);
 
 qaTest('TC-APP007-011', async ({ page, qa }) => {
   const sr = new StockRequestsPage(page);

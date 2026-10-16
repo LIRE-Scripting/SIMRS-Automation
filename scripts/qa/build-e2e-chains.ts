@@ -1,120 +1,155 @@
 /**
- * Builds reports/e2e-chains/e2e-chains.xlsx: the cross-application end-to-end
- * chains of lib/qa-data/e2e-chains.ts (happy paths composed from existing
- * test cases), in the layout of the reference workbooks (sheets Summary,
- * Journeys and Steps with the same headers, lists and widths; the template is
- * reference/14-hospital-accounts.xlsx, which is only read), plus a sheet
- * Blockers that defines every blocker a chain meets.
+ * Builds reports/e2e-chains/e2e-journeys.xlsx: the cross-application
+ * end-to-end chains of lib/qa-data/e2e-chains.ts, in the layout of the
+ * reference workbooks (sheets Summary, Journeys and Steps with the same
+ * headers, lists and widths; the template is reference/14-hospital-accounts.xlsx,
+ * which is only read), plus a sheet Blockers that defines every blocker a chain meets.
  *
- * Each chain step takes the status of its source test case from the result
- * workbooks (reports/e2e/<NN-module>.xlsx, built by `npm run qa:e2e-workbook`):
- *   Passed   every source step passed
- *   Blocked  a source step is blocked (Defect Reference "Blocker N")
- *   Failed   a source step failed (the site did not do what the workbook says)
- *   Not Run  a source step was not run (missing user, needs evaluation, …)
+ * Each chain is one test (tests/e2e/chains/, fixtures/chain.ts) that hands the
+ * records of a step on to the next. The result columns of sheet Steps come
+ * from the Playwright JSON of the chain runs (reports/e2e-chains/results*.json,
+ * a later file wins for a chain):
+ *   Passed   the chain step ran (a deviation from the workbook's wording is noted)
+ *   Failed   the chain step ran and the site did not do what the step needs
+ *   Blocked  the chain stopped at this step or before it (Defect Reference names the cause)
+ *   Not Run  the chain was not run
  *
- * Usage: npm run qa:e2e-chains
+ * Usage:
+ *   PLAYWRIGHT_JSON_OUTPUT_NAME=reports/e2e-chains/results-chains.json \
+ *     npx playwright test --project=e2e tests/e2e/chains/ --reporter=list,json
+ *   npm run qa:e2e-chains
  */
 import fs from 'node:fs';
+import path from 'node:path';
 import ExcelJS from 'exceljs';
 import { CHAINS, type Chain } from '../../lib/qa-data/e2e-chains';
 import { FOUND_BLOCKERS } from '../../lib/qa-data/found-blockers';
-import { blockers, prerequisites } from '../../lib/qa-data';
+import { blockers, prerequisites, testCaseRef, type TestCaseRef } from '../../lib/qa-data';
 
 const TEMPLATE = 'reference/14-hospital-accounts.xlsx';
-const RESULTS = 'reports/e2e';
 const OUT_DIR = 'reports/e2e-chains';
-const OUT = `${OUT_DIR}/e2e-chains.xlsx`;
+const OUT = `${OUT_DIR}/e2e-journeys.xlsx`;
 
 type Status = 'Passed' | 'Failed' | 'Blocked' | 'Not Run';
-interface SourceStep {
-  row: number;
-  step: number;
-  feature: string;
-  scenario: string;
-  testData: string;
-  action: string;
-  expected: string;
-  status: Status;
-  actual: string;
-  defect: string;
-}
 
 /** Cause ids that are not in a blocker list: defined here. */
 const STATES: Record<string, { title: string; cause: string; fix: string; who: string }> = {
   'NEEDS-EVALUATION': {
     title: 'The journey is marked "Needs Evaluation" in its workbook',
-    cause: 'Column "Automation Candidate" of the journey reads "Needs Evaluation", so the test case was declared fixme and not run.',
-    fix: 'Decide whether the journey can be automated (or run it by hand) and set "Automation Candidate" to Yes.',
+    cause: 'Column "Automation Candidate" of the journey reads "Needs Evaluation"; the chain does not run a journey that is not cleared for automation.',
+    fix: 'Decide whether the journey can be automated and set "Automation Candidate" to Yes.',
     who: 'QA / Product owner',
   },
-  'NEEDS-OTHER-RUN': {
-    title: 'Needs a record or a check of another application',
-    cause: 'The step starts from a record that another test case makes (an order, an approved document), or checks the result in another application; in the standalone module run it was not run.',
-    fix: 'Run the chain in order, passing the record of the earlier step on.',
+  'STEP-NOT-RUN': {
+    title: 'A step of the source test case cannot be run',
+    cause: 'The source test case leaves a step out (its reason is in the Actual Result: another user, a second window, a record no screen shows).',
+    fix: 'Provide what the reason names, then run the chain again.',
+    who: 'QA',
+  },
+  'NOT-RUN': {
+    title: 'The chain has not been run yet',
+    cause: 'No result of this chain in reports/e2e-chains/results*.json.',
+    fix: 'Run the chain (tests/e2e/chains/).',
     who: 'QA',
   },
 };
 
-/** The reason of a result, without the date prefix and the generic opening words. */
-const firstSentence = (s: string) =>
-  s
-    .replace(/^\d{4}-\d{2}-\d{2} E2E:?\s*/, '')
-    .replace(/^(not run[.;]?|Expected Result not met\.)\s*/i, '')
-    .replace(/\s+/g, ' ')
-    .slice(0, 260);
-
 /** Causes that do not stop the flow of a chain. */
-const NON_STOPPING = new Set(['DEVIATION', 'NEEDS-OTHER-RUN']);
+const NON_STOPPING = new Set(['DEVIATION']);
 
 /** The values of the template's lists (sheet Journeys and Steps). */
 const VERIFICATION: Record<Status, string> = { Passed: 'UI Verified', Failed: 'Discrepancy Found', Blocked: 'Blocked', 'Not Run': 'Not Verified' };
 
-/** The cause id of a step that did not pass. */
-function causeOf(s: SourceStep): string {
-  if (s.defect && /Blocker \d+/.test(s.defect)) return s.defect.match(/Blocker \d+/)![0];
-  // A step that did its work but differs from the workbook's wording or detail does not stop the flow.
-  if (s.status === 'Failed') return /Excel expects|Expected Result not met/.test(s.actual) ? 'DEVIATION' : 'SITE-DEFECT';
-  const a = s.actual;
-  const blocker = a.match(/[Bb]locker (\d+)/);
-  if (blocker) return `Blocker ${blocker[1]}`;
-  const user = a.match(/\b(U(?:10|[3-9]))\b/);
-  if (user) return `User ${user[1]}`;
-  if (/Needs Evaluation/.test(a)) return 'NEEDS-EVALUATION';
-  return 'NEEDS-OTHER-RUN';
+// ---------------------------------------------------------------- chain runs (Playwright JSON)
+interface PwStep {
+  title: string;
+  error?: { message?: string };
+  steps?: PwStep[];
+}
+interface PwResult {
+  status: string;
+  startTime: string;
+  steps?: PwStep[];
+  errors?: { message?: string }[];
+  annotations?: { type: string; description?: string }[];
+}
+interface PwSpec {
+  title: string;
+  tests: { annotations?: { type: string; description?: string }[]; results: PwResult[] }[];
+}
+interface PwSuite {
+  specs?: PwSpec[];
+  suites?: PwSuite[];
+}
+function* specsOf(suites: PwSuite[] = []): Generator<PwSpec> {
+  for (const s of suites) {
+    yield* s.specs ?? [];
+    yield* specsOf(s.suites);
+  }
+}
+const firstLine = (s = '') => s.replace(/\u001b\[[0-9;]*m/g, '').split('\n').find((l) => l.trim())?.trim() ?? '';
+
+interface ChainRun {
+  date: string;
+  status: string;
+  /** Top-level "Chain step k" test.steps of the run. */
+  steps: Map<number, PwStep>;
+  /** Annotations by type, then chain step. */
+  notes: (type: string) => Map<number, string[]>;
+  error: string;
 }
 
-async function loadResults(): Promise<Map<string, SourceStep[]>> {
-  const byTc = new Map<string, SourceStep[]>();
-  for (const f of fs.readdirSync(RESULTS).filter((x) => /^\d\d-.*\.xlsx$/.test(x)).sort()) {
-    const wb = new ExcelJS.Workbook();
-    await wb.xlsx.readFile(`${RESULTS}/${f}`);
-    const ws = wb.getWorksheet('Steps')!;
-    const head = (ws.getRow(1).values as unknown[]).map((v) => String(v ?? ''));
-    const c = (name: string) => head.indexOf(name);
-    const text = (v: unknown) => (v == null ? '' : typeof v === 'object' && 'richText' in (v as object) ? (v as { richText: { text: string }[] }).richText.map((r) => r.text).join('') : String(v));
-    ws.eachRow((r, i) => {
-      if (i === 1) return;
-      const v = r.values as unknown[];
-      const tc = text(v[c('Test Case ID')]);
-      if (!tc) return;
-      const list = byTc.get(tc) ?? [];
-      list.push({
-        row: i,
-        step: Number(text(v[c('Step Number')])),
-        feature: text(v[c('Module / Feature')]),
-        scenario: text(v[c('Scenario Name')]),
-        testData: text(v[c('Test Data')]),
-        action: text(v[c('Action')]),
-        expected: text(v[c('Expected Result')]),
-        status: (text(v[c('Execution Status')]) || 'Not Run') as Status,
-        actual: text(v[c('Actual Result')]),
-        defect: text(v[c('Defect Reference')]),
+function loadRuns(): Map<string, ChainRun> {
+  const runs = new Map<string, ChainRun>();
+  const files = fs.existsSync(OUT_DIR) ? fs.readdirSync(OUT_DIR).filter((f) => /^results.*\.json$/.test(f)).sort() : [];
+  for (const f of files) {
+    const report = JSON.parse(fs.readFileSync(path.join(OUT_DIR, f), 'utf8')) as { suites: PwSuite[] };
+    for (const spec of specsOf(report.suites)) {
+      const id = spec.title.match(/^(E2E-\d{3}) /)?.[1];
+      const t = spec.tests[0];
+      const r = t?.results[t.results.length - 1];
+      if (!id || !r) continue;
+      const seen = new Set<string>();
+      const all = [...(t.annotations ?? []), ...(r.annotations ?? [])].filter((a) => {
+        const key = `${a.type}\u0000${a.description ?? ''}`;
+        return !seen.has(key) && !!seen.add(key);
       });
-      byTc.set(tc, list);
-    });
+      const steps = new Map<number, PwStep>();
+      const walk = (list: PwStep[] = []) => {
+        for (const s of list) {
+          const k = Number(s.title.match(/^Chain step (\d+) \[/)?.[1]);
+          if (k) steps.set(k, s);
+          else walk(s.steps);
+        }
+      };
+      walk(r.steps);
+      runs.set(id, {
+        date: r.startTime.slice(0, 10),
+        status: r.status,
+        steps,
+        error: firstLine(r.errors?.[0]?.message),
+        notes: (type) => {
+          const m = new Map<number, string[]>();
+          for (const a of all.filter((x) => x.type === type)) {
+            const k = Number(a.description?.match(/^Step (\d+):/)?.[1]);
+            if (k) m.set(k, [...(m.get(k) ?? []), a.description!.replace(/^Step \d+: /, '')]);
+          }
+          return m;
+        },
+      });
+    }
   }
-  return byTc;
+  return runs;
+}
+
+/** The first error inside a step tree. */
+function errorOf(s: PwStep): string {
+  if (s.error?.message) return firstLine(s.error.message);
+  for (const c of s.steps ?? []) {
+    const e = errorOf(c);
+    if (e) return e;
+  }
+  return '';
 }
 
 const MODULE_FILES = fs.readdirSync('reference').filter((f) => /^\d\d-.*\.xlsx$/.test(f));
@@ -128,36 +163,47 @@ interface ChainStepResult {
   n: number;
   tc: string;
   role: string;
-  source: SourceStep[];
+  ref: TestCaseRef;
+  /** Source steps of the test case used by the chain step. */
+  source: TestCaseRef['testCase']['steps'];
   status: Status;
   causes: string[];
   actual: string;
 }
 
-function evaluate(chain: Chain, results: Map<string, SourceStep[]>): ChainStepResult[] {
+function evaluate(chain: Chain, run: ChainRun | undefined): ChainStepResult[] {
+  const stops = run?.notes('chain-stop') ?? new Map<number, string[]>();
+  const stopAt = Math.min(...[...stops.keys()], Infinity);
+  const stopCause = Number.isFinite(stopAt) ? stops.get(stopAt)![0].match(/^(Blocker \d+|User U\d+|NEEDS-EVALUATION|STEP-NOT-RUN)/)![1] : '';
+  let failedAt = 0;
   return chain.steps.map((s, i) => {
-    const all = results.get(s.tc);
-    if (!all) throw new Error(`${chain.id}: ${s.tc} has no result rows in ${RESULTS}`);
-    const source = s.steps ? all.filter((x) => s.steps!.includes(x.step)) : all;
-    const st = source.map((x) => x.status);
-    const off = source.filter((x) => x.status !== 'Passed');
-    const causes = [...new Set(off.map((x) => causeOf(x)))];
-    // The flow goes on when what is left is a deviation or a check that another step of the chain makes.
-    const stopping = off.filter((x) => !NON_STOPPING.has(causeOf(x)));
-    const passed = st.filter((x) => x === 'Passed').length;
-    const ss = stopping.map((x) => x.status);
-    const ran = passed > 0 || off.some((x) => causeOf(x) === 'DEVIATION');
-    // A chain step either lets the flow through or is blocked; the cause names the blocker.
-    const status: Status = !stopping.length && ran ? 'Passed' : 'Blocked';
-    void ss;
-    const counts = `${passed}/${st.length} steps passed`;
-    const first = stopping[0] ?? off[0];
-    const notes = off.filter((x) => NON_STOPPING.has(causeOf(x))).map((x) => `step ${x.step} ${causeOf(x).toLowerCase()}: ${firstSentence(x.actual)}`);
-    const actual =
-      status === 'Passed'
-        ? `${counts}.${notes.length ? ` The flow goes on; ${notes.join(' / ')}` : ''}`
-        : `${counts}; step ${first.step}: ${firstSentence(first.actual) || first.status}`;
-    return { n: i + 1, tc: s.tc, role: s.role, source, status, causes, actual };
+    const n = i + 1;
+    const ref = testCaseRef(s.tc);
+    const source = s.steps ? ref.testCase.steps.filter((x) => s.steps!.includes(x.step)) : ref.testCase.steps;
+    const base = { n, tc: s.tc, role: s.role, ref, source };
+    const date = run ? `${run.date} chain run: ` : '';
+    // A source test case that records its blocker and then skips (test.skip) leaves a skipped run with a stop: that run counts.
+    if (!run || (run.status === 'skipped' && !Number.isFinite(stopAt))) {
+      return { ...base, status: 'Not Run', causes: ['NOT-RUN'], actual: run ? `${date}skipped` : 'The chain has not been run yet.' };
+    }
+    if (n >= stopAt) {
+      const actual = n === stopAt ? `${date}the chain stops here: ${stops.get(n)!.join(' / ')}` : `${date}not reached: the chain stops at step ${stopAt} (${stopCause}).`;
+      return { ...base, status: 'Blocked', causes: [stopCause], actual };
+    }
+    if (failedAt) {
+      return { ...base, status: 'Blocked', causes: ['SITE-DEFECT'], actual: `${date}not reached: step ${failedAt} failed.` };
+    }
+    const ran = run.steps.get(n);
+    const err = ran ? errorOf(ran) : '';
+    if (!ran || err) {
+      failedAt = n;
+      const seen = run.notes('note').get(n) ?? [];
+      return { ...base, status: 'Failed', causes: ['SITE-DEFECT'], actual: `${date}${err || run.error || 'the step did not run'}${seen.length ? `. Seen: ${seen.join(' / ')}` : ''}` };
+    }
+    const devs = run.notes('deviation').get(n) ?? [];
+    const notes = run.notes('note').get(n) ?? [];
+    const actual = `${date}${source.length} source step(s) passed.${devs.length ? ` Deviation (the flow goes on): ${devs.join(' / ')}.` : ''}${notes.length ? ` Notes: ${notes.join(' / ')}` : ''}`;
+    return { ...base, status: 'Passed', causes: devs.length ? ['DEVIATION'] : [], actual };
   });
 }
 
@@ -214,9 +260,20 @@ function defineBlocker(id: string, defects: Map<string, string[]>, deviations: M
   return { id, type: 'Site state / test design', ...s };
 }
 
+/** The spec file of each chain (tests/e2e/chains/). */
+function chainSpecs(): Map<string, string> {
+  const dir = 'tests/e2e/chains';
+  const m = new Map<string, string>();
+  for (const f of fs.existsSync(dir) ? fs.readdirSync(dir) : []) {
+    for (const id of fs.readFileSync(path.join(dir, f), 'utf8').matchAll(/chainTest\('(E2E-\d{3})'/g)) m.set(id[1], `${dir}/${f}`);
+  }
+  return m;
+}
+
 async function main(): Promise<void> {
-  const results = await loadResults();
-  const evaluated = CHAINS.map((c) => ({ chain: c, steps: evaluate(c, results) }));
+  const runs = loadRuns();
+  const evaluated = CHAINS.map((c) => ({ chain: c, steps: evaluate(c, runs.get(c.id)) }));
+  const specOf = chainSpecs();
 
   const template = new ExcelJS.Workbook();
   await template.xlsx.readFile(TEMPLATE);
@@ -252,26 +309,25 @@ async function main(): Promise<void> {
   for (const { chain, steps: cs } of evaluated) {
     for (const s of cs) {
       for (const c of s.causes) (usedBy.get(c) ?? usedBy.set(c, new Set()).get(c)!).add(`${chain.id} step ${s.n} (${s.tc})`);
-      for (const [cause, map] of [['SITE-DEFECT', defects], ['DEVIATION', deviations]] as const) {
-        const hit = s.source.filter((x) => x.status !== 'Passed' && causeOf(x) === cause);
-        if (hit.length) map.set(s.tc, hit.map((x) => `step ${x.step}: ${firstSentence(x.actual)}`));
-      }
+      if (s.status === 'Failed') defects.set(`${chain.id} step ${s.n}`, [s.actual]);
+      if (s.causes.includes('DEVIATION')) deviations.set(`${chain.id} step ${s.n}`, [s.actual]);
       const src = s.source;
-      const rows = src.length ? `rows ${src[0].row}-${src[src.length - 1].row}` : '';
+      const rows = `rows ${src[0].row}-${src[src.length - 1].row}`;
+      const feature = s.ref.testCase.feature;
       steps.addRow([
         `TC-${chain.id}`,
         chain.id,
         [...new Set(chain.steps.map((x) => appOf(x.tc)))].join(', '),
-        `${appOf(s.tc)} / ${src[0]?.feature ?? ''}`,
+        `${appOf(s.tc)} / ${feature}`,
         chain.name,
         s.role,
         'Integration',
         chain.priority,
         s.n === 1 ? chain.preconditions : `Step ${s.n - 1} of ${chain.id} done (${chain.steps[s.n - 2].tc}).`,
-        src[0]?.testData ?? '',
+        s.ref.testCase.testData ?? '',
         s.n,
-        `${s.role}: run ${s.tc} "${src[0]?.scenario ?? ''}"${chain.steps[s.n - 1].steps ? `, steps ${chain.steps[s.n - 1].steps!.join(', ')}` : ''}.`,
-        src[src.length - 1]?.expected ?? '',
+        `${s.role}: run ${s.tc} "${s.ref.testCase.scenario}"${chain.steps[s.n - 1].steps ? `, steps ${chain.steps[s.n - 1].steps!.join(', ')}` : ''}.`,
+        src[src.length - 1].expected,
         null,
         s.n === cs.length ? chain.outcome : null,
         `${fileOf(s.tc)} | Steps | ${rows} | ${s.tc}`,
@@ -279,8 +335,8 @@ async function main(): Promise<void> {
         VERIFICATION[s.status],
         s.status,
         s.actual,
-        `${fileOf(s.tc)} | ${s.tc}`,
-        `reports/e2e/${fileOf(s.tc)}`,
+        specOf.get(chain.id) ?? 'no spec yet',
+        'reports/e2e-chains/results*.json (Playwright JSON of the chain run, with trace and final screenshot)',
         s.causes.join('; ') || null,
         'As in the source test case.',
       ]);
@@ -291,7 +347,7 @@ async function main(): Promise<void> {
   for (const { chain, steps: cs } of evaluated) {
     const breakAt = cs.find((s) => s.status !== 'Passed');
     const causes = [...new Set(cs.flatMap((s) => s.causes))];
-    const status = !breakAt ? 'Ready' : `Blocked at step ${breakAt.n}`;
+    const status = !breakAt ? 'Passed' : breakAt.status === 'Not Run' ? 'Not run yet' : `${breakAt.status} at step ${breakAt.n}`;
     journeys.addRow([
       chain.id,
       'E2E',
@@ -306,7 +362,7 @@ async function main(): Promise<void> {
       chain.outcome,
       breakAt
         ? `${breakAt.n === 1 ? 'Stops at the first step' : `Runs through step ${breakAt.n - 1} of ${cs.length}`}; step ${breakAt.n} (${breakAt.tc}) is ${breakAt.status}: ${breakAt.causes.filter((c) => !NON_STOPPING.has(c)).join('; ')}.`
-        : `The flow runs through all ${cs.length} steps in their module runs${causes.length ? ` (with ${causes.join('; ')})` : ''}.`,
+        : `The chain run went through all ${cs.length} steps${causes.length ? ` (with ${causes.join('; ')})` : ''}.`,
       'Each source test case keeps its own alternative paths (see its workbook).',
       'See the negative test cases of each source workbook.',
       [...new Set(chain.steps.map((s) => fileOf(s.tc)))].join(', '),
@@ -314,9 +370,9 @@ async function main(): Promise<void> {
       'Yes',
       breakAt ? VERIFICATION[breakAt.status] : 'UI Verified',
       chain.steps.map((s) => s.tc).join(', '),
-      [...new Set(chain.steps.map((s) => `reports/e2e/${fileOf(s.tc)}`))].join(', '),
+      specOf.get(chain.id) ?? 'no spec yet',
       breakAt ? 'Needs Review' : 'Ready',
-      `${chain.practice ? `Practice: ${chain.practice} ` : ''}${status}. Steps Passed ${cs.filter((s) => s.status === 'Passed').length}, Blocked ${cs.filter((s) => s.status === 'Blocked').length}. Blockers: ${causes.filter((c) => !NON_STOPPING.has(c)).join('; ') || 'none'}. Notes: ${causes.filter((c) => NON_STOPPING.has(c)).join('; ') || 'none'}.`,
+      `${chain.practice ? `Practice: ${chain.practice} ` : ''}${status}. Steps Passed ${cs.filter((s) => s.status === 'Passed').length}, Failed ${cs.filter((s) => s.status === 'Failed').length}, Blocked ${cs.filter((s) => s.status === 'Blocked').length}. Blockers: ${causes.filter((c) => !NON_STOPPING.has(c)).join('; ') || 'none'}. Notes: ${causes.filter((c) => NON_STOPPING.has(c)).join('; ') || 'none'}.`,
       chain.data,
       'As in the source test cases.',
       null,
@@ -354,15 +410,15 @@ async function main(): Promise<void> {
   const add = (...v: unknown[]) => summary.addRow(v);
   add('End-to-end chains across applications: happy paths and their blockers');
   summary.getRow(1).font = { bold: true, size: 14 };
-  add('Purpose', 'Possible end-to-end (cross-application) happy paths, composed only from test cases that already exist in the 27 module workbooks, with the status each step had in its run and the blocker that stops it.');
-  add('Built', `${new Date().toISOString().slice(0, 10)} by npm run qa:e2e-chains (scripts/qa/build-e2e-chains.ts) from lib/qa-data/e2e-chains.ts and the result workbooks reports/e2e/*.xlsx.`);
+  add('Purpose', 'End-to-end (cross-application) happy paths, composed only from test cases that already exist in the 27 module workbooks. Each chain is one automated test that hands the records of a step (patient, order, invoice, document) on to the next.');
+  add('Built', `${new Date().toISOString().slice(0, 10)} by npm run qa:e2e-chains (scripts/qa/build-e2e-chains.ts) from lib/qa-data/e2e-chains.ts and the chain runs reports/e2e-chains/results*.json (tests/e2e/chains/).`);
   add('Sheets', 'Journeys: one row per chain. Steps: one row per chain step, each pointing to its source test case (file, rows). Blockers: every blocker a chain meets, with its cause and fix.');
-  add('Step status', 'Passed: the flow goes through the source test case (its steps passed; a deviation from the wording, or a check that another step of the chain makes, is noted but does not stop the flow). Blocked: anything else; Defect Reference names the blocker (see sheet Blockers).');
-  add('Blocker IDs', '"Blocker N": checklist blockers 1-16 (00-blockers-checklist-linked.xlsx) and blockers found while automating (17 and up, docs/qa/blockers-found.md). "User Ux": a user of 00-prerequisites.xlsx that does not exist yet. DEVIATION, SITE-DEFECT, NEEDS-EVALUATION, NEEDS-OTHER-RUN: see sheet Blockers.');
+  add('Step status', 'Passed: the chain step ran on the record of the steps before it (a deviation from the wording is noted but does not stop the flow). Failed: the site did not do what the step needs. Blocked: the chain stops at this step or before it; Defect Reference names the cause (see sheet Blockers). Not Run: the chain has not been run.');
+  add('Blocker IDs', '"Blocker N": checklist blockers 1-16 (00-blockers-checklist-linked.xlsx) and blockers found while automating (17 and up, docs/qa/blockers-found.md). "User Ux": a user of 00-prerequisites.xlsx that does not exist yet. DEVIATION, SITE-DEFECT, NEEDS-EVALUATION, NOT-RUN: see sheet Blockers.');
   add('Chain design', 'The chains follow the usual hospital-system flows: outpatient, emergency, inpatient and surgical pathways; order-to-result; closed-loop medication; vein-to-vein blood; revenue cycle and cash control; procure-to-pay with three-way match; inventory control; budget commitment control; hire-to-pay; record-to-report; asset, maintenance and support services. Column "Hospital-system practice checked" names the practice of each chain.');
-  add('Note', 'Each source test case was run on its own (with its own data). A chain is "Ready" when all its steps passed; running it as one test passing the records on is the next step.');
+  add('Tests', 'tests/e2e/chains/ (one spec per chain, fixtures/chain.ts). A chain runs up to the first step that a blocker stops; the steps from there are Blocked with that cause.');
   add();
-  const head = add('Chain', 'Name', 'Applications', 'Steps', 'Passed', 'Blocked', 'Status', 'First stop', 'Blockers that stop the flow', 'Notes that do not stop it', 'Hospital-system practice checked');
+  const head = add('Chain', 'Name', 'Applications', 'Steps', 'Passed', 'Failed', 'Blocked', 'Not Run', 'Status', 'First stop', 'Blockers that stop the flow', 'Notes that do not stop it', 'Hospital-system practice checked');
   head.font = { bold: true };
   for (const { chain, steps: cs } of evaluated) {
     const breakAt = cs.find((s) => s.status !== 'Passed');
@@ -373,15 +429,17 @@ async function main(): Promise<void> {
       [...new Set(chain.steps.map((x) => x.tc.slice(7, 9)))].join(', '),
       cs.length,
       n('Passed'),
+      n('Failed'),
       n('Blocked'),
-      !breakAt ? 'Ready' : `Blocked at step ${breakAt.n}`,
+      n('Not Run'),
+      !breakAt ? 'Passed' : breakAt.status === 'Not Run' ? 'Not Run' : `${breakAt.status} at step ${breakAt.n}`,
       breakAt ? `Step ${breakAt.n} ${breakAt.tc} (${breakAt.status}): ${breakAt.causes.filter((c) => !NON_STOPPING.has(c)).join('; ')}` : '—',
       [...new Set(cs.flatMap((s) => (s.status === 'Passed' ? [] : s.causes.filter((c) => !NON_STOPPING.has(c)))))].join('; ') || 'none',
       [...new Set(cs.flatMap((s) => s.causes.filter((c) => NON_STOPPING.has(c))))].join('; ') || 'none',
       chain.practice ?? '',
     );
   }
-  summary.columns.forEach((c, i) => (c.width = [12, 52, 18, 7, 8, 8, 18, 44, 44, 30, 60][i] ?? 12));
+  summary.columns.forEach((c, i) => (c.width = [12, 52, 18, 7, 8, 8, 8, 8, 18, 44, 44, 30, 60][i] ?? 12));
   summary.eachRow((r) => (r.alignment = { wrapText: true, vertical: 'top' }));
 
   fs.mkdirSync(OUT_DIR, { recursive: true });

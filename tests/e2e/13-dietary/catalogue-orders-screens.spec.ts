@@ -4,7 +4,8 @@ import { installToastRecorder } from '../../../lib/assertions';
 import { addDays, todayWib } from '../../../lib/dates';
 import { backToEnglish, switchLanguage } from '../shared/language';
 import { screenOpens } from '../shared/screen-opens';
-import { click } from './helpers';
+import { catalogue, click } from './helpers';
+import { orders, TC_APP013_034, TC_APP013_040 } from './cases';
 
 /**
  * 13-dietary.xlsx: hub and language (011), Catalogue (034 … 039), Diet orders
@@ -55,73 +56,7 @@ qaTest('TC-APP013-011', async ({ page, qa }) => {
   });
 });
 
-/** Catalogue (/diet/catalogue): the line of saved entries, three small forms, the rule form and the calculation. */
-function catalogue(page: Page) {
-  const main = page.getByRole('main');
-  const saves = main.getByRole('button', { name: 'Save', exact: true });
-  const numbers = main.getByRole('textbox').filter({ hasNotText: /./ });
-  return {
-    main,
-    code: main.getByRole('textbox', { name: 'Code', exact: true }),
-    session: main.getByRole('textbox', { name: 'Session', exact: true }),
-    from: main.getByRole('textbox', { name: 'Session', exact: true }).locator('xpath=following::input[1]'),
-    to: main.getByRole('textbox', { name: 'Session', exact: true }).locator('xpath=following::input[2]'),
-    menu: main.getByRole('textbox', { name: 'Menu', exact: true }),
-    item: main.getByRole('textbox', { name: 'Item', exact: true }),
-    saveCode: saves.nth(0),
-    saveSession: saves.nth(1),
-    saveMenu: saves.nth(2),
-    gender: main.getByRole('combobox'),
-    formula: main.getByRole('button', { name: 'Formula', exact: true }),
-    weight: main.getByRole('button', { name: 'Formula', exact: true }).locator('xpath=following::input[1]'),
-    height: main.getByRole('button', { name: 'Formula', exact: true }).locator('xpath=following::input[2]'),
-    calculate: main.getByRole('button', { name: 'Calculate', exact: true }),
-    numbers,
-    async line(): Promise<string> {
-      return (await main.innerText()).split('\n')[1] ?? '';
-    },
-    async open(): Promise<void> {
-      await page.goto('/en/diet/catalogue');
-      await expect(main.getByRole('heading', { level: 1, name: 'Catalogue' })).toBeVisible();
-    },
-  };
-}
-
-qaTest('TC-APP013-034', async ({ page, qa }) => {
-  const c = catalogue(page);
-  const code = qa.code('X-NT1');
-  const session = qa.name('X pagi');
-  const menu = qa.name('X Diet DM');
-
-  await qa.step(1, async () => {
-    await page.goto('/en/diet');
-    await page.getByRole('complementary').getByRole('link', { name: 'Catalogue' }).first().click();
-    await expect(c.main.getByRole('heading', { level: 1, name: 'Catalogue' })).toBeVisible();
-    for (const l of [c.code, c.session, c.from, c.to, c.menu, c.item, c.gender, c.formula, c.weight, c.height, c.calculate]) await expect(l).toBeVisible();
-  });
-  await qa.step(2, async () => {
-    await c.code.fill(code);
-    expect(await click(page, c.saveCode)).toContain('Saved');
-    await expect(c.main).toContainText(code);
-  });
-  await qa.step(3, async () => {
-    await c.session.fill(session);
-    await expect(c.from).toHaveValue('06:00');
-    await expect(c.to).toHaveValue('07:00');
-    expect(await click(page, c.saveSession)).toContain('Saved');
-    await expect(c.main).toContainText(session);
-  });
-  await qa.step(4, async () => {
-    await c.menu.fill(menu);
-    await c.item.fill(qa.prefix('X Nasi tim'));
-    expect(await click(page, c.saveMenu)).toContain('Saved');
-    await expect(c.main).toContainText(menu);
-  });
-  await qa.step(5, async () => {
-    await c.open();
-    for (const t of [code, session, menu]) await expect(c.main).toContainText(t);
-  });
-});
+qaTest('TC-APP013-034', TC_APP013_034);
 
 qaTest('TC-APP013-035', async ({ page, qa }) => {
   const c = catalogue(page);
@@ -255,70 +190,7 @@ qaTest('TC-APP013-039', async ({ page, qa }) => {
   });
 });
 
-/** Diet orders (/diet/orders): the prescription lines, the name input, Save, Calculate, Menu, end date, Diet orders, Advice. */
-function orders(page: Page) {
-  const main = page.getByRole('main');
-  return {
-    main,
-    name: main.getByRole('textbox').first(),
-    save: main.getByRole('button', { name: 'Save', exact: true }),
-    calculate: main.getByRole('button', { name: 'Calculate', exact: true }),
-    menu: main.getByRole('textbox', { name: 'Menu', exact: true }),
-    end: main.locator('input[type="date"]'),
-    order: main.getByRole('button', { name: 'Diet orders', exact: true }),
-    advice: main.getByRole('textbox', { name: 'Advice', exact: true }),
-    adviceText: main.getByRole('textbox', { name: 'Advice', exact: true }).locator('xpath=following::input[1]'),
-    adviceButton: main.getByRole('button', { name: 'Advice', exact: true }),
-    line: (name: string) => main.getByRole('paragraph').filter({ hasText: name }),
-    lines: () => main.getByRole('paragraph'),
-    async open(): Promise<void> {
-      await page.goto('/en/diet/orders');
-      await expect(main.getByRole('heading', { level: 1, name: 'Diet orders' })).toBeVisible();
-    },
-  };
-}
-
-qaTest('TC-APP013-040', async ({ page, qa }) => {
-  const o = orders(page);
-  const name = qa.name('X Pasien Diet');
-
-  await qa.step(1, async () => {
-    await page.goto('/en/diet');
-    await page.getByRole('complementary').getByRole('link', { name: 'Orders' }).first().click();
-    await expect(o.main.getByRole('heading', { level: 1, name: 'Diet orders' })).toBeVisible();
-    for (const l of [o.name, o.save, o.menu, o.end, o.order, o.advice, o.adviceButton]) await expect(l).toBeVisible();
-    if (!(await o.main.getByRole('combobox').count())) qa.note(1, 'no branch list: U1 works on one branch');
-  });
-  await qa.step(2, async () => {
-    await o.name.fill(name);
-    expect(await click(page, o.save)).toContain('Saved');
-    await o.open();
-    await expect(o.line(name)).toContainText('pending');
-  });
-  await qa.step(3, async () => {
-    expect(await click(page, o.calculate)).toContain('Saved');
-    await o.open();
-    const first = (await o.lines().first().innerText()).trim();
-    qa.note(3, `first line after Calculate: "${first}"; this test's line: "${(await o.line(name).innerText()).trim()}"`);
-  });
-  await qa.step(4, async () => {
-    await o.menu.fill(qa.name('X Diet DM'));
-    await o.end.fill(addDays(todayWib(), 3));
-    expect(await click(page, o.order)).toContain('Saved');
-  });
-  await qa.step(5, async () => {
-    const title = qa.name('X Anjuran makan');
-    await o.advice.fill(title);
-    await o.adviceText.fill(qa.prefix('X Makan tiga kali'));
-    expect(await click(page, o.adviceButton)).toContain('Saved');
-    await o.open();
-    await expect(o.main.getByText(title)).toBeVisible();
-  });
-  await qa.step(6, async () => {
-    await o.open();
-    qa.note(6, `lines: ${(await o.lines().allInnerTexts()).slice(0, 6).join(' / ')}`);
-  });
-});
+qaTest('TC-APP013-040', TC_APP013_040);
 
 qaTest('TC-APP013-041', async ({ page, qa }) => {
   const o = orders(page);

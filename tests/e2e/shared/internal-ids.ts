@@ -50,13 +50,17 @@ function itemOf<T extends Record<string, unknown>>(body: string, key: string, va
 /** A registered test patient with its internal id. */
 export async function patientWithId(page: Page, excelName: string, token: string): Promise<{ id: string; fullName: string; mrn: string }> {
   const p = await registerPatient(page, excelName, token);
+  return { id: await patientIdOf(page, p.mrn), ...p };
+}
+
+/** The internal id of a registered patient, by MRN. */
+export async function patientIdOf(page: Page, mrn: string): Promise<string> {
   const reg = new RegisteredPatientsPage(page);
-  const body = await answerWith(page, `"mrn":"${p.mrn}"`, async () => {
+  const body = await answerWith(page, `"mrn":"${mrn}"`, async () => {
     await reg.open();
-    await reg.search(p.mrn);
+    await reg.search(mrn);
   });
-  const id = itemOf<{ id: string; mrn: string }>(body, 'mrn', p.mrn).id as string;
-  return { id, ...p };
+  return itemOf<{ id: string; mrn: string }>(body, 'mrn', mrn).id as string;
 }
 
 /** A new bed of Bed management (Inpatient) with its internal id. */

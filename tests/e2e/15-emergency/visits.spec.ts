@@ -1,8 +1,8 @@
-import type { Locator, Page } from '@playwright/test';
-import { expect, qaTest, test, type Qa } from '../../../fixtures/e2e';
-import { installToastRecorder, toastMark, toastsSince } from '../../../lib/assertions';
+import { expect, qaTest, test } from '../../../fixtures/e2e';
+import { installToastRecorder, toastMark } from '../../../lib/assertions';
 import { todayWib } from '../../../lib/dates';
-import { bedWithId, patientWithId } from '../shared/internal-ids';
+import { bedWithId } from '../shared/internal-ids';
+import { patient, toastsAfter, VisitsPage } from './helpers';
 
 /**
  * 15-emergency.xlsx, the old Visits screen (/emergency/visits): create a visit
@@ -18,78 +18,6 @@ test.beforeEach(async ({ page }) => {
   test.slow();
   await installToastRecorder(page);
 });
-
-async function toastsAfter(page: Page, mark: number, timeout = 8_000): Promise<string[]> {
-  try {
-    await expect.poll(async () => (await toastsSince(page, mark)).length, { timeout }).toBeGreaterThan(0);
-  } catch {
-    // no toast
-  }
-  return toastsSince(page, mark);
-}
-
-class VisitsPage {
-  readonly main: Locator;
-  readonly heading: Locator;
-  readonly table: Locator;
-  constructor(readonly page: Page) {
-    this.main = page.getByRole('main');
-    this.heading = this.main.getByRole('heading', { level: 1, name: 'Visits' });
-    this.table = this.main.getByRole('table');
-  }
-  async open(): Promise<void> {
-    await this.page.goto('/en/emergency/visits');
-    await expect(this.heading).toBeVisible();
-    await this.page.waitForLoadState('networkidle').catch(() => {});
-  }
-  rows(): Locator {
-    return this.table.getByRole('rowgroup').nth(1).getByRole('row');
-  }
-  /** Cells: Priority, Patient (first 8 characters of the id), Bed, Triage at, From, Status, Actions. */
-  async cells(row: Locator): Promise<string[]> {
-    return (await row.getByRole('cell').allInnerTexts()).map((t) => t.replace(/\s+/g, ' ').trim());
-  }
-  /** The row of a patient's visit (by the first 8 characters of the patient id), paging from page 1. */
-  async row(patientId: string): Promise<Locator> {
-    await this.open();
-    const match = () => this.rows().filter({ has: this.page.getByRole('cell', { name: new RegExp(`^${patientId.slice(0, 8)}…?$`) }) });
-    const next = this.main.getByRole('button', { name: 'Next page' });
-    for (let i = 0; i < 50; i++) {
-      if (await match().count()) return match();
-      if (!(await next.isVisible()) || (await next.isDisabled())) break;
-      const first = await this.rows().first().innerText();
-      await next.press('Enter');
-      await expect(this.rows().first()).not.toHaveText(first);
-    }
-    return match();
-  }
-  async create(patientId: string): Promise<string[]> {
-    await this.open();
-    await this.main.getByRole('button', { name: 'Create visit' }).click();
-    const d = this.page.getByRole('dialog', { name: 'Create visit' });
-    await d.getByRole('textbox', { name: 'Patient ID (UUID)' }).fill(patientId);
-    const mark = await toastMark(this.page);
-    await d.getByRole('button', { name: /^(Create|Saving…)$/ }).click();
-    return toastsAfter(this.page, mark);
-  }
-  async act(patientId: string, name: 'Triage' | 'Assign bay'): Promise<string[]> {
-    const row = await this.row(patientId);
-    const mark = await toastMark(this.page);
-    await row.getByRole('button', { name, exact: true }).press('Enter');
-    return toastsAfter(this.page, mark);
-  }
-  async assignBay(patientId: string, bedId: string): Promise<string[]> {
-    const row = await this.row(patientId);
-    await row.getByRole('button', { name: 'Assign bay', exact: true }).press('Enter');
-    const d = this.page.getByRole('dialog', { name: 'Assign bay' });
-    await d.getByRole('textbox', { name: 'Bed ID (UUID)' }).fill(bedId);
-    const mark = await toastMark(this.page);
-    await d.getByRole('button', { name: 'Assign bay' }).click();
-    return toastsAfter(this.page, mark);
-  }
-}
-
-const patient = (page: Page, qa: Qa, name = 'QA-EMG Pasien Satu') => patientWithId(page, name, qa.token());
 
 qaTest('TC-APP015-001', async ({ page, qa }) => {
   const v = new VisitsPage(page);

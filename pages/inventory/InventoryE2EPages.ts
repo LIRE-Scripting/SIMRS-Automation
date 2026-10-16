@@ -96,7 +96,9 @@ export class ItemMasterPage {
     await this.search.fill('');
     const next = this.main.getByRole('button', { name: 'Next page' });
     for (let i = 0; i < 40; i++) {
-      if (await this.row(code).count()) return this.row(code);
+      // The page renders twice after paging (154 items on 2026-10-16: an early read missed the item), so each page is given a moment.
+      await expect(this.rows().first()).toBeVisible();
+      if (await expect(this.row(code)).toHaveCount(1, { timeout: 3_000 }).then(() => true, () => false)) return this.row(code);
       if (!(await next.isVisible()) || (await next.isDisabled())) break;
       const first = await this.rows().first().innerText();
       await next.click();

@@ -143,3 +143,49 @@ export class TpnPage {
     return this.main.getByText(/^Showing \d+(–\d+)? of \d+$/);
   }
 }
+
+/** The expected results of TPN-A (TC-APP013-004, steps 5 to 7). */
+export const TPN_A_RESULTS: Record<string, string> = {
+  BMI: '24.22 · Normal',
+  Protein: '70 g / 280 kcal',
+  Dextrose: '388.24 g / 1320 kcal',
+  Lipid: '200 mL / 40 g / 400 kcal',
+  'Max dextrose': '504 g',
+  'Dextrose rate': '3.85 mg/kg/min',
+  Volume: '2.1 L',
+  'Per litre': 'P 33.33 · D 184.88 · L 19.05',
+  Electrolytes: 'Na 84 · K 42 · Ca 10.5 · Mg 8.4 · PO4 21',
+  Additives: 'MVI 21 · Trace 2.1 · Heparin 0 · Insulin 0',
+};
+
+/** Catalogue (/diet/catalogue): the line of saved entries, three small forms, the rule form and the calculation. */
+export function catalogue(page: Page) {
+  const main = page.getByRole('main');
+  const saves = main.getByRole('button', { name: 'Save', exact: true });
+  const numbers = main.getByRole('textbox').filter({ hasNotText: /./ });
+  return {
+    main,
+    code: main.getByRole('textbox', { name: 'Code', exact: true }),
+    session: main.getByRole('textbox', { name: 'Session', exact: true }),
+    from: main.getByRole('textbox', { name: 'Session', exact: true }).locator('xpath=following::input[1]'),
+    to: main.getByRole('textbox', { name: 'Session', exact: true }).locator('xpath=following::input[2]'),
+    menu: main.getByRole('textbox', { name: 'Menu', exact: true }),
+    item: main.getByRole('textbox', { name: 'Item', exact: true }),
+    saveCode: saves.nth(0),
+    saveSession: saves.nth(1),
+    saveMenu: saves.nth(2),
+    gender: main.getByRole('combobox'),
+    formula: main.getByRole('button', { name: 'Formula', exact: true }),
+    weight: main.getByRole('button', { name: 'Formula', exact: true }).locator('xpath=following::input[1]'),
+    height: main.getByRole('button', { name: 'Formula', exact: true }).locator('xpath=following::input[2]'),
+    calculate: main.getByRole('button', { name: 'Calculate', exact: true }),
+    numbers,
+    async line(): Promise<string> {
+      return (await main.innerText()).split('\n')[1] ?? '';
+    },
+    async open(): Promise<void> {
+      await page.goto('/en/diet/catalogue');
+      await expect(main.getByRole('heading', { level: 1, name: 'Catalogue' })).toBeVisible();
+    },
+  };
+}

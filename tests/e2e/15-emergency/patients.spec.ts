@@ -1,8 +1,9 @@
-import type { Locator, Page } from '@playwright/test';
+import type { Locator } from '@playwright/test';
 import { expect, qaTest, test, type Qa } from '../../../fixtures/e2e';
-import { installToastRecorder, toastMark, toastsSince } from '../../../lib/assertions';
+import { installToastRecorder } from '../../../lib/assertions';
 import { addDays, todayWib } from '../../../lib/dates';
 import { registerPatient } from '../../../lib/ambulatory-data';
+import { attach, encounter, Patients, pdf, WALKED_IN, walkInName } from './helpers';
 
 /**
  * 15-emergency.xlsx, Emergency Patients (/emergency/patients). A "received,
@@ -20,70 +21,6 @@ test.beforeEach(async ({ page }) => {
   test.slow();
   await installToastRecorder(page);
 });
-
-async function toastsAfter(page: Page, mark: number, timeout = 8_000): Promise<string[]> {
-  try {
-    await expect.poll(async () => (await toastsSince(page, mark)).length, { timeout }).toBeGreaterThan(0);
-  } catch {
-    // no toast
-  }
-  return toastsSince(page, mark);
-}
-
-class Patients {
-  readonly main: Locator;
-  readonly dialog: Locator;
-  constructor(readonly page: Page) {
-    this.main = page.getByRole('main');
-    this.dialog = page.getByRole('dialog');
-  }
-  async open(tab?: 'Emergency Patients' | 'Emergency OP Patients' | 'Emergency IP Patients'): Promise<void> {
-    await this.page.goto('/en/emergency/patients');
-    await expect(this.main.getByRole('heading', { level: 1, name: 'Emergency Patients' })).toBeVisible();
-    if (tab) await this.main.getByRole('tab', { name: tab }).click();
-    await this.page.waitForLoadState('networkidle').catch(() => {});
-  }
-  async row(name: string, tab?: 'Emergency Patients' | 'Emergency OP Patients' | 'Emergency IP Patients'): Promise<Locator> {
-    await this.open(tab);
-    await this.main.getByRole('searchbox', { name: 'Search' }).fill(name);
-    const row = this.main.getByRole('row').filter({ hasText: name });
-    await expect(row.first()).toBeVisible();
-    return row.first();
-  }
-  /** Opens a row dialog ("Triage", "Bed", "Consultant", "Outcome", "Attach file"). */
-  async openRow(name: string, button: string): Promise<Locator> {
-    const row = await this.row(name);
-    await row.getByRole('button', { name: button, exact: true }).click();
-    await expect(this.dialog).toBeVisible();
-    return this.dialog;
-  }
-  async click(button: Locator): Promise<string[]> {
-    const mark = await toastMark(this.page);
-    await button.click();
-    return toastsAfter(this.page, mark);
-  }
-  /** "Walk-in ER": registers and receives a patient at IGD; returns the toasts. */
-  async walkIn(name: string, age = '25', unit = 'QA-IGD 1'): Promise<string[]> {
-    await this.open();
-    await this.main.getByRole('button', { name: 'Walk-in ER', exact: true }).click();
-    const d = this.dialog;
-    await d.getByRole('textbox', { name: 'Name' }).fill(name);
-    await d.getByRole('spinbutton', { name: 'Estimated age (years)' }).fill(age);
-    await d.getByRole('combobox').selectOption({ label: 'IGD' });
-    await d.getByRole('combobox').locator('xpath=following::input[1]').fill(unit);
-    return this.click(d.getByRole('button', { name: 'Receive' }));
-  }
-}
-
-const WALKED_IN = 'Walk-in registered and received. Ready for triage.';
-const walkInName = (qa: Qa) => qa.name('X Pasien Walk-in');
-
-/** An open, received encounter of a walk-in patient of this test; returns the name. */
-async function encounter(p: Patients, qa: Qa): Promise<string> {
-  const name = walkInName(qa);
-  expect(await p.walkIn(name)).toContain(WALKED_IN);
-  return name;
-}
 
 /** The active triage category "Kuning IGD" of the seed data, or the first active one offered. */
 async function anyCategory(d: Locator): Promise<string> {
@@ -471,21 +408,6 @@ qaTest('TC-APP015-050', async ({ page, qa }) => {
   });
   qa.notRun(3, 'needs two windows; the second-window case is not run (one browser page per test)');
 });
-
-/** A PDF-like file of about `kb` kilobytes. */
-function pdf(kb: number, name: string) {
-  const head = '%PDF-1.4\n% QA test file\n';
-  return { name, mimeType: 'application/pdf', buffer: Buffer.concat([Buffer.from(head), Buffer.alloc(kb * 1024 - head.length, 32)]) };
-}
-
-async function attach(p: Patients, name: string, file: ReturnType<typeof pdf>, description: string): Promise<string[]> {
-  const d = await p.openRow(name, 'Attach file');
-  await d.getByRole('textbox', { name: 'Description' }).fill(description);
-  const chooser = p.page.waitForEvent('filechooser');
-  await d.getByRole('button', { name: 'File', exact: true }).click();
-  await (await chooser).setFiles(file);
-  return p.click(d.getByRole('button', { name: 'Attach file' }));
-}
 
 qaTest('TC-APP015-051', async ({ page, qa }) => {
   const p = new Patients(page);

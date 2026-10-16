@@ -4,6 +4,7 @@ import { installToastRecorder, toastLocator, toastMark, toastsSince } from '../.
 import { addDays, todayWib } from '../../../lib/dates';
 import { INVENTORY, STAND_IN_STORE } from '../../../lib/inventory-data';
 import { ItemMasterPage, type Item } from '../../../pages/inventory/InventoryE2EPages';
+import { TC_APP007_001, unique } from './cases';
 
 /**
  * 07-inventory.xlsx, feature "Item Master (/inventory/items)". Items are made
@@ -26,12 +27,6 @@ async function toastsAfter(page: Page, mark: number): Promise<string[]> {
   return toastsSince(page, mark);
 }
 
-/** An item of the catalogue made unique for this test. */
-function unique(qa: Qa, base: { code: string; name: string }): { code: string; name: string } {
-  const t = qa.token();
-  return { code: `${base.code}-${t}`, name: `${base.name} ${t}` };
-}
-
 async function addItem(page: Page, it: Item): Promise<void> {
   const items = new ItemMasterPage(page);
   await items.open();
@@ -45,47 +40,7 @@ async function addItem(page: Page, it: Item): Promise<void> {
 const storeNote = (qa: Qa, step: number) =>
   qa.note(step, `ST-1 "${INVENTORY.st1.name}" cannot be made (found blocker 26); the seed store ${STAND_IN_STORE.code} "${STAND_IN_STORE.name}" stands in`);
 
-qaTest('TC-APP007-001', async ({ page, qa }) => {
-  const items = new ItemMasterPage(page);
-  const it = unique(qa, INVENTORY.it1);
-  const d = items.dialog('Add Item');
-
-  await qa.step(1, async () => {
-    await page.goto('/en/apps');
-    await page.getByRole('link', { name: /^Inventory\b/ }).first().click();
-    await page.getByRole('main').getByRole('link', { name: 'Item Master' }).first().click();
-    await expect(items.heading).toBeVisible();
-    await expect(items.main.getByText('Drugs, consumables, and supplies.', { exact: true })).toBeVisible();
-    await expect(items.search).toBeVisible();
-    await expect(items.status).toBeVisible();
-    await expect(items.scan).toBeVisible();
-    await expect(items.main.getByRole('button', { name: 'Add Item' })).toBeVisible();
-  });
-
-  await qa.step(2, async () => {
-    await items.openAdd();
-    for (const f of ['Item code', 'Item name', 'Description']) await expect(d.getByRole('textbox', { name: f })).toBeVisible();
-    for (const f of ['Minimum stock', 'Maximum stock']) await expect(d.getByRole('spinbutton', { name: f })).toBeVisible();
-    await expect(d.getByText('Advanced settings')).toBeVisible();
-  });
-
-  await qa.step(3, async () => {
-    await items.fill(d, { ...it, min: '20', max: '500' });
-    await d.getByRole('button', { name: 'Save' }).click();
-    await expect(toastLocator(page, /^Item added\.$/)).toBeVisible();
-  });
-
-  await qa.step(4, async () => {
-    await items.open();
-    const row = await items.findRow(it.code);
-    await expect(row).toHaveCount(1);
-    await expect(row.getByRole('cell').nth(1)).toHaveText(it.name);
-    await expect(row.getByRole('cell').nth(2)).toHaveText('—');
-    await expect(row.getByRole('cell').nth(3)).toHaveText('—');
-    await expect(row.getByRole('cell').nth(4)).toHaveText('Active');
-    await expect(row.getByRole('button', { name: `Edit ${it.name}` })).toBeVisible();
-  });
-});
+qaTest('TC-APP007-001', TC_APP007_001);
 
 qaTest('TC-APP007-002', async ({ page, qa }) => {
   const items = new ItemMasterPage(page);

@@ -111,7 +111,7 @@ async function cashierCell(list: MasterListPage, row: import('@playwright/test')
   return row.getByRole('cell').nth(headers.indexOf(column));
 }
 
-const CASES = {
+export const CASES = {
   bookSettings: async ({ page, qa }, route) => {
     const appts = new AppointmentsPage(page, route);
     const s = bookSettings();

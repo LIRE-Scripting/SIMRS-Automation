@@ -2,6 +2,7 @@ import { expect, qaTest, test } from '../../../fixtures/e2e';
 import { installToastRecorder } from '../../../lib/assertions';
 import { CashierPage, rupiah } from '../../../pages/billing/CashierPage';
 import { counterClosed, ensureSettings, paidSale } from './helpers';
+import { TC_APP014_011 } from './cases';
 
 /**
  * 14-hospital-accounts.xlsx: closing the cashier's day (011, 012, 036, 037,
@@ -19,34 +20,7 @@ test.beforeEach(async ({ page }) => {
 
 const ONCE = "a cashier closes a day once; the U1 counter was closed by TC-APP014-011, and Cashier 2 / a second cashier account is not made";
 
-qaTest('TC-APP014-011', async ({ page, qa }) => {
-  const c = new CashierPage(page);
-  test.skip(await counterClosed(page), 'The U1 counter is already closed for today');
-  await ensureSettings(page);
-  await paidSale(page);
-  let system = 0;
-
-  await qa.step(1, async () => {
-    await c.open();
-    await expect.poll(() => c.systemCash()).toBeGreaterThan(0);
-    system = await c.systemCash();
-    qa.note(1, `System cash ${system}`);
-  });
-
-  await qa.step(2, async () => {
-    await c.field('Declared cash (IDR)').fill(String(system));
-    await c.button('Close my day').click();
-    await expect(c.closedBanner()).toBeVisible();
-    expect(rupiah((await c.value('Variance').innerText()).trim())).toBe(0);
-  });
-
-  await qa.step(3, async () => {
-    for (const b of ['Create charge', 'Close my day']) await expect(c.button(b)).toBeDisabled();
-    await expect(c.field('Declared cash (IDR)')).toBeDisabled();
-  });
-
-  qa.notRun(4, 'Cashier 2 is not made (00-prerequisites.xlsx | Users, U4 "Second user of the same role")');
-});
+qaTest('TC-APP014-011', TC_APP014_011);
 
 qaTest('TC-APP014-012', async ({ qa }) => {
   qa.notRun(1, ONCE);
