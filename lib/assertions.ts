@@ -17,11 +17,6 @@ export async function expectToast(page: Page, pattern: RegExp): Promise<void> {
   await expect(toastLocator(page, pattern)).toBeVisible({ timeout: 15_000 });
 }
 
-/** Expects no matching toast to be on screen. */
-export async function expectNoToast(page: Page, pattern: RegExp): Promise<void> {
-  await expect(toastLocator(page, pattern)).toBeHidden();
-}
-
 /**
  * Records every toast text the page shows (the app reuses one toast element,
  * so a repeated or quickly replaced message is easy to miss). Install before

@@ -12,13 +12,11 @@ fixtures/
 lib/                workbook data (lib/qa-data), shared data, dates, assertions
 pages/              page objects, one file per application
 tests/
-  auth/             login for the legacy suites (klikmed.superadmin)
   e2e/              end-to-end chains across modules (50 chains)
     auth.setup.ts   login of U1 and U2 for the workbook tests
     chains/         one spec per chain; steps/ holds the shared chain steps
   modules/          per-module workbook tests, one folder per module (01 … 27)
     shared/         helpers used by several modules
-  pharmacy/ flows/ suites/   legacy suites (see below)
 scripts/qa/         generators for the docs and the result workbooks
 docs/qa/            test inventory, traceability per module, open questions
 reports/            generated result workbooks (reports/e2e, reports/e2e-chains)
@@ -32,11 +30,9 @@ and `not-automated.spec.ts`, which declares the fixme and skip cases of the modu
 
 | Project | Specs | Session |
 |---|---|---|
-| `e2e-setup` | `tests/e2e/auth.setup.ts` | signs in U1 and U2 |
+| `e2e-setup` | `tests/e2e/auth.setup.ts` | signs in U1 and U2 once |
 | `e2e-modules` | `tests/modules/**` | U1 (per test: U2 when the workbook needs it) |
 | `e2e` | `tests/e2e/chains/**` | U1 |
-| `setup`, `pharmacy` | `tests/auth/`, `tests/pharmacy/` | `klikmed.superadmin` (legacy) |
-| `modules-setup`, `flows`, `suites` | `tests/flows/`, `tests/suites/` | `MODULES_USERNAME` (legacy) |
 
 Users: U1 `rs.admin2` (Podomoro), U2 `rs.admin` (All branches). Passwords come from `.env`
 (`QA_PASSWORD`); never hard-code them.
@@ -78,9 +74,3 @@ the U1 cashier day until 07:00 WIB the next day, so it runs last.
   points are in `docs/qa/open-questions.md`.
 - Healthcare data: only the synthetic data of the workbooks; no real patient identifiers in
   specs, reports or console output.
-
-## Legacy suites
-
-`tests/pharmacy/`, `tests/flows/` and `tests/suites/` are the earlier suites, generated from
-the pharmacy and module journey workbooks. They are kept until their cases are covered by
-`tests/modules/` and `tests/e2e/chains/`; then they can be removed.

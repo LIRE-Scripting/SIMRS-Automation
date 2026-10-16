@@ -19,7 +19,7 @@ Row-level lists (TBD steps, discrepancies, …): [_generated-open-items.md](_gen
 | Q14a | Shared master data of 01 (DEP-1/2, DR-1/2, UNIT-1) | "a, buat sekali lalu reuse" | `lib/ambulatory-data.ts` `ensureMasterData()`: found or created once, reused by every run; patients, bookings and arrivals stay unique per run. Each appointment test claims its own D-day (a free Monday; cursor in git-ignored `.qa-state/d-day.json`) |
 | Q15 | Blockers | "cek 00-blockers-checklist-linked.xlsx, kalau termasuk blocker mark as blocker" | The checklist links no 01 journey. Blockers found while automating are listed in [blockers-found.md](blockers-found.md) (numbered from 17, same columns); a whole test case → fixme, a step → `blocker` annotation (`qa.blocked`) |
 | Q16a | E2E workbook | "make excel the template like reference for e2e" | `npm run qa:e2e-workbook`: `reports/e2e/<module>.xlsx` = copy of the reference workbook with Steps → Execution Status / Actual Result / Defect Reference filled from the run |
-| Q9 | Existing suites | Migrate and adjust | Phase 3, per module: legacy specs/page objects move into `tests/modules/<NN-module>/`, mapped by the column Earlier ID; the legacy project is removed once its module is migrated |
+| Q9 | Existing suites | Migrate and adjust | Phase 3, per module: legacy specs/page objects move into `tests/modules/<NN-module>/`, mapped by the column Earlier ID; the legacy project is removed once its module is migrated (applied 2026-10-16: `tests/pharmacy`, `tests/flows`, `tests/suites`, their projects, data and tooling removed) |
 
 ## Still open
 

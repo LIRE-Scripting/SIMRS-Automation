@@ -5,12 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "playwright test",
-    "setup": "playwright test --project=setup",
     "test:headed": "playwright test --headed",
     "report": "playwright show-report",
     "test:e2e-modules": "playwright test --project=e2e-modules",
-    "test:flows": "playwright test --project=flows",
-    "test:suites": "playwright test --project=suites",
     "test:e2e": "playwright test --project=e2e",
     "qa:data": "tsx scripts/qa/build-test-data.ts",
     "qa:inventory": "tsx scripts/qa/build-inventory.ts",
