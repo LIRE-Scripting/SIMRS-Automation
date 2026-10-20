@@ -34,8 +34,8 @@
    "usedFor": "Negative journeys: a user without the right of the application cannot save. One account serves all applications.",
    "journeys": 80,
    "applications": 27,
-   "statusOnSite": "To create",
-   "prepared": "Open"
+   "statusOnSite": "Exists: qa.staff (role qa_staff, no privilege)",
+   "prepared": "Done"
   },
   {
    "row": 8,
@@ -46,8 +46,8 @@
    "usedFor": "Two sessions on one record, a second person who continues or checks the work.",
    "journeys": 53,
    "applications": 18,
-   "statusOnSite": "To create",
-   "prepared": "Open"
+   "statusOnSite": "Exists: qa.admin3 (admin)",
+   "prepared": "Done"
   },
   {
    "row": 9,
@@ -58,8 +58,8 @@
    "usedFor": "Approval steps, and that the maker cannot approve their own document.",
    "journeys": 85,
    "applications": 20,
-   "statusOnSite": "To create",
-   "prepared": "Open"
+   "statusOnSite": "Exists: qa.approver (finance, budget, cssd, procurement); FINANCE_APPROVE does not exist on the tenant; approval chains name steps only, no approver",
+   "prepared": "Done"
   },
   {
    "row": 10,
@@ -70,8 +70,8 @@
    "usedFor": "Checks that one branch does not see or change the data of another.",
    "journeys": 34,
    "applications": 18,
-   "statusOnSite": "To create",
-   "prepared": "Open"
+   "statusOnSite": "Exists: qa.kemayoran (admin at Kemayoran)",
+   "prepared": "Done"
   },
   {
    "row": 11,
@@ -82,8 +82,8 @@
    "usedFor": "HR Punch (own employee number), the employee's payslip.",
    "journeys": 9,
    "applications": 3,
-   "statusOnSite": "To prepare: link an account",
-   "prepared": "Open"
+   "statusOnSite": "Exists: qa.pegawai (hrd, payroll), linked to employee X-EMP-QA-PEGAWAI",
+   "prepared": "Done"
   },
   {
    "row": 12,
@@ -94,8 +94,8 @@
    "usedFor": "Proves that each role can do its own work and nothing else. Until these exist, a run with administrators shows that the flow works, not that rights are enforced.",
    "journeys": 1022,
    "applications": 27,
-   "statusOnSite": "To create or adjust: rs.<role> accounts exist, check their Branch (default is all branches)",
-   "prepared": "Open"
+   "statusOnSite": "Partly: 22 qa.<role> accounts at Podomoro (sheet Role accounts); 04, 18, 22 and 23 wait for blocker 38 (rights of a new role cannot be saved)",
+   "prepared": "Partly"
   },
   {
    "row": 13,
@@ -106,7 +106,7 @@
    "usedFor": "The screens Tenants and Entitlements of Settings.",
    "journeys": 1,
    "applications": 1,
-   "statusOnSite": "To create, if these screens are in scope",
+   "statusOnSite": "Not possible: the tenant has no privilege LICENSING_WRITE",
    "prepared": "Open"
   },
   {
@@ -130,8 +130,8 @@
    "writeRight": "REGISTRATION_WRITE",
    "journeys": 76,
    "branch": "Podomoro only",
-   "login": null,
-   "prepared": "Open"
+   "login": "qa.pendaftaran (role pendaftaran)",
+   "prepared": "Done"
   },
   {
    "row": 6,
@@ -140,8 +140,8 @@
    "writeRight": "REGISTRATION_WRITE",
    "journeys": 24,
    "branch": "Podomoro only",
-   "login": null,
-   "prepared": "Open"
+   "login": "qa.pendaftaran (role pendaftaran)",
+   "prepared": "Done"
   },
   {
    "row": 7,
@@ -150,8 +150,8 @@
    "writeRight": "CLINICAL_WRITE",
    "journeys": 49,
    "branch": "Podomoro only",
-   "login": null,
-   "prepared": "Open"
+   "login": "qa.dokter (role dokter)",
+   "prepared": "Done"
   },
   {
    "row": 8,
@@ -160,8 +160,8 @@
    "writeRight": "ADT_WRITE",
    "journeys": 68,
    "branch": "Podomoro only",
-   "login": null,
-   "prepared": "Open"
+   "login": "not made: role qa_rawat_inap has no rights (blocker 38)",
+   "prepared": "Blocked"
   },
   {
    "row": 9,
@@ -170,8 +170,8 @@
    "writeRight": "PHARMACY_WRITE",
    "journeys": 58,
    "branch": "Podomoro only",
-   "login": null,
-   "prepared": "Open"
+   "login": "qa.apoteker (role apoteker)",
+   "prepared": "Done"
   },
   {
    "row": 10,
@@ -180,8 +180,8 @@
    "writeRight": "BLOODBANK_WRITE",
    "journeys": 75,
    "branch": "Podomoro only",
-   "login": null,
-   "prepared": "Open"
+   "login": "qa.bankdarah (role bankdarah)",
+   "prepared": "Done"
   },
   {
    "row": 11,
@@ -190,8 +190,8 @@
    "writeRight": "INVENTORY_WRITE",
    "journeys": 49,
    "branch": "Podomoro only",
-   "login": null,
-   "prepared": "Open"
+   "login": "qa.gudang (role gudang)",
+   "prepared": "Done"
   },
   {
    "row": 12,
@@ -200,8 +200,8 @@
    "writeRight": "OT_WRITE",
    "journeys": 35,
    "branch": "Podomoro only",
-   "login": null,
-   "prepared": "Open"
+   "login": "qa.ok (role ok)",
+   "prepared": "Done"
   },
   {
    "row": 13,
@@ -210,8 +210,8 @@
    "writeRight": "PROC_WRITE",
    "journeys": 47,
    "branch": "Podomoro only",
-   "login": null,
-   "prepared": "Open"
+   "login": "qa.procurement (role procurement)",
+   "prepared": "Done"
   },
   {
    "row": 14,
@@ -220,8 +220,8 @@
    "writeRight": "HR_WRITE",
    "journeys": 49,
    "branch": "Podomoro only",
-   "login": null,
-   "prepared": "Open"
+   "login": "qa.hrd (role hrd)",
+   "prepared": "Done"
   },
   {
    "row": 15,
@@ -230,8 +230,8 @@
    "writeRight": "LABORATORY_WRITE",
    "journeys": 40,
    "branch": "Podomoro only",
-   "login": null,
-   "prepared": "Open"
+   "login": "qa.analis (role analis)",
+   "prepared": "Done"
   },
   {
    "row": 16,
@@ -240,8 +240,8 @@
    "writeRight": "RADIOLOGY_WRITE",
    "journeys": 29,
    "branch": "Podomoro only",
-   "login": null,
-   "prepared": "Open"
+   "login": "qa.radiografer (role radiografer)",
+   "prepared": "Done"
   },
   {
    "row": 17,
@@ -250,8 +250,8 @@
    "writeRight": "DIET_WRITE",
    "journeys": 42,
    "branch": "Podomoro only",
-   "login": null,
-   "prepared": "Open"
+   "login": "qa.gizi (role gizi)",
+   "prepared": "Done"
   },
   {
    "row": 18,
@@ -260,8 +260,8 @@
    "writeRight": "BILLING_WRITE",
    "journeys": 64,
    "branch": "Podomoro only",
-   "login": null,
-   "prepared": "Open"
+   "login": "qa.kasir (role kasir)",
+   "prepared": "Done"
   },
   {
    "row": 19,
@@ -270,8 +270,8 @@
    "writeRight": "EMERGENCY_WRITE",
    "journeys": 41,
    "branch": "Podomoro only",
-   "login": null,
-   "prepared": "Open"
+   "login": "qa.igd (role igd)",
+   "prepared": "Done"
   },
   {
    "row": 20,
@@ -280,8 +280,8 @@
    "writeRight": "MRD_WRITE",
    "journeys": 36,
    "branch": "Podomoro only",
-   "login": null,
-   "prepared": "Open"
+   "login": "qa.rekammedis (role rekammedis)",
+   "prepared": "Done"
   },
   {
    "row": 21,
@@ -290,8 +290,8 @@
    "writeRight": "PAYROLL_WRITE",
    "journeys": 40,
    "branch": "Podomoro only",
-   "login": null,
-   "prepared": "Open"
+   "login": "qa.payroll (role payroll)",
+   "prepared": "Done"
   },
   {
    "row": 22,
@@ -300,8 +300,8 @@
    "writeRight": "MDM_WRITE, IDENTITY_*_WRITE, WORKFLOW_WRITE",
    "journeys": 47,
    "branch": "Podomoro only",
-   "login": null,
-   "prepared": "Open"
+   "login": "not made: role qa_settings has no rights (blocker 38)",
+   "prepared": "Blocked"
   },
   {
    "row": 23,
@@ -310,8 +310,8 @@
    "writeRight": "FINANCE_WRITE, FINANCE_APPROVE",
    "journeys": 59,
    "branch": "Podomoro only",
-   "login": null,
-   "prepared": "Open"
+   "login": "qa.finance (role finance)",
+   "prepared": "Done"
   },
   {
    "row": 24,
@@ -320,8 +320,8 @@
    "writeRight": "BUDGET_WRITE, BUDGET_APPROVE",
    "journeys": 22,
    "branch": "Podomoro only",
-   "login": null,
-   "prepared": "Open"
+   "login": "qa.budget (role budget)",
+   "prepared": "Done"
   },
   {
    "row": 25,
@@ -330,8 +330,8 @@
    "writeRight": "CSSD_WRITE, CSSD_APPROVE",
    "journeys": 16,
    "branch": "Podomoro only",
-   "login": null,
-   "prepared": "Open"
+   "login": "qa.cssd (role cssd)",
+   "prepared": "Done"
   },
   {
    "row": 26,
@@ -340,8 +340,8 @@
    "writeRight": "SERVICES_WRITE",
    "journeys": 13,
    "branch": "Podomoro only",
-   "login": null,
-   "prepared": "Open"
+   "login": "not made: role qa_services has no rights (blocker 38)",
+   "prepared": "Blocked"
   },
   {
    "row": 27,
@@ -350,8 +350,8 @@
    "writeRight": "SOURCING_WRITE",
    "journeys": 12,
    "branch": "Podomoro only",
-   "login": null,
-   "prepared": "Open"
+   "login": "not made: role qa_sourcing has no rights (blocker 38)",
+   "prepared": "Blocked"
   },
   {
    "row": 28,
@@ -360,8 +360,8 @@
    "writeRight": "HOUSEKEEPING_WRITE",
    "journeys": 8,
    "branch": "Podomoro only",
-   "login": null,
-   "prepared": "Open"
+   "login": "qa.housekeeping (role housekeeping)",
+   "prepared": "Done"
   },
   {
    "row": 29,
@@ -370,8 +370,8 @@
    "writeRight": "LINEN_WRITE",
    "journeys": 7,
    "branch": "Podomoro only",
-   "login": null,
-   "prepared": "Open"
+   "login": "qa.linen (role linen)",
+   "prepared": "Done"
   },
   {
    "row": 30,
@@ -380,8 +380,8 @@
    "writeRight": "MAINTENANCE_WRITE",
    "journeys": 8,
    "branch": "Podomoro only",
-   "login": null,
-   "prepared": "Open"
+   "login": "qa.ipsrs (role ipsrs)",
+   "prepared": "Done"
   },
   {
    "row": 31,
@@ -390,8 +390,8 @@
    "writeRight": "FIXED_ASSET_WRITE",
    "journeys": 8,
    "branch": "Podomoro only",
-   "login": null,
-   "prepared": "Open"
+   "login": "qa.aset (role aset)",
+   "prepared": "Done"
   }
  ],
  "setup": [
@@ -402,9 +402,9 @@
    "applications": "All",
    "journeys": null,
    "why": "The site is shared; nothing may be saved without a go-ahead. The approval of 2026-10-08 is used up.",
-   "whatToPrepare": "A written go-ahead: which applications, branch Podomoro, test data with the prefix \"X \", and whether Finance vouchers, stock movements, budget holds and pay data may be created.",
+   "whatToPrepare": "A written go-ahead: which applications, branch Podomoro, test data with the prefix \"X \", and whether Finance vouchers, stock movements, budget holds and pay data may be created. — Go-ahead of 2026-10-20 for one run (used).",
    "who": "Requester",
-   "status": "Open"
+   "status": "Done"
   },
   {
    "row": 6,
@@ -435,7 +435,7 @@
    "applications": "03 Patient Care",
    "journeys": "JRN-APP003-042, JRN-APP003-047",
    "why": "The terminology search finds no code; no active code version (to be confirmed).",
-   "whatToPrepare": "Import and activate a diagnosis code version (API or seed; no screen does it).",
+   "whatToPrepare": "Import and activate a diagnosis code version (API or seed; no screen does it). — No screen (2026-10-20).",
    "who": "Site administrator",
    "status": "Open"
   },
@@ -446,9 +446,9 @@
    "applications": "09 Procurement",
    "journeys": "JRN-APP009-043",
    "why": "The Reorder list is empty for Podomoro.",
-   "whatToPrepare": "One item of a Podomoro store below its minimum stock.",
+   "whatToPrepare": "One item of a Podomoro store below its minimum stock. — Reorder of Podomoro lists items below their minimum (2026-10-20).",
    "who": "Tester (go-ahead)",
-   "status": "Open"
+   "status": "Done"
   },
   {
    "row": 10,
@@ -457,9 +457,9 @@
    "applications": "10 HR, 17 Payroll",
    "journeys": "JRN-APP010-044",
    "why": "Punch refuses a user who is not linked to an employee.",
-   "whatToPrepare": "\"Link me\" on My profile for the test user (U7).",
+   "whatToPrepare": "\"Link me\" on My profile for the test user (U7). — qa.pegawai (U7) linked to X-EMP-QA-PEGAWAI.",
    "who": "Tester (go-ahead)",
-   "status": "Open"
+   "status": "Done"
   },
   {
    "row": 11,
@@ -468,7 +468,7 @@
    "applications": "15 Emergency",
    "journeys": "JRN-APP015-025, JRN-APP015-026",
    "why": "The screen says \"Podomoro has no registration configuration for type 7\" (2026-10-13).",
-   "whatToPrepare": "A registration configuration for type 7 (emergency) at Podomoro.",
+   "whatToPrepare": "A registration configuration for type 7 (emergency) at Podomoro. — No screen makes a registration configuration (2026-10-20).",
    "who": "Site administrator",
    "status": "Open"
   },
@@ -479,9 +479,9 @@
    "applications": "19 Finance, and every application that books a voucher",
    "journeys": "JRN-APP019-045, JRN-APP019-055",
    "why": "Patient collections and Year end say \"This branch has no finance configuration.\" for Podomoro (2026-10-13).",
-   "whatToPrepare": "The finance configuration of Podomoro: control accounts (the screen offers \"Open configuration\"); a test financial year.",
+   "whatToPrepare": "The finance configuration of Podomoro: control accounts (the screen offers \"Open configuration\"); a test financial year. — HO Podomoro: year 2026, control accounts set (2026-10-20).",
    "who": "Site administrator",
-   "status": "Open"
+   "status": "Done"
   },
   {
    "row": 13,
@@ -490,9 +490,9 @@
    "applications": "20 Budget",
    "journeys": "JRN-APP020-010 to 012",
    "why": "Approvals are refused without a usable Budget posting rule of Finance; each document runs through its approval chain.",
-   "whatToPrepare": "A Budget posting rule for Podomoro; an approver (U5) in each approval chain of Settings, Process definitions.",
+   "whatToPrepare": "A Budget posting rule for Podomoro; an approver (U5) in each approval chain of Settings, Process definitions. — Allocation capital and operating rules of HO Podomoro Ready; approval chains have no approver field: U5 holds BUDGET_APPROVE.",
    "who": "Site administrator",
-   "status": "Open"
+   "status": "Done"
   },
   {
    "row": 14,
@@ -501,9 +501,9 @@
    "applications": "21 CSSD",
    "journeys": "JRN-APP021-003, JRN-APP021-006",
    "why": "The first cycle of the day waits for a passed Bowie Dick test; a set needs the drug form KIT and the item category KITS.",
-   "whatToPrepare": "A passed Bowie Dick test for the autoclave; KIT and KITS in Inventory.",
+   "whatToPrepare": "A passed Bowie Dick test for the autoclave; KIT and KITS in Inventory. — Bowie Dick passed 2026-10-20 (daily); category KITS made; drug form KIT has no screen.",
    "who": "Tester (go-ahead)",
-   "status": "Open"
+   "status": "Partly"
   },
   {
    "row": 15,

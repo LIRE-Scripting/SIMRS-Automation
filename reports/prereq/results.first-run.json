@@ -1,0 +1,842 @@
+{
+ "site": "https://rs.showcase.atklik.xyz",
+ "runAt": "2026-10-20T08:57:31.900Z",
+ "runBy": "U1 rs.admin2",
+ "items": [
+  {
+   "id": "S01",
+   "sheet": "Set-up and data",
+   "ref": "Set-up and data | 1",
+   "item": "Go-ahead to create data on the site",
+   "action": "Recorded",
+   "result": "Done",
+   "notes": [
+    "go-ahead given in the session of 2026-10-20 for one run: users, roles and the set-up of this sheet, branch Podomoro, test data with the prefix \"X \"/\"qa.\""
+   ],
+   "screenshots": [],
+   "at": "2026-10-20T08:50:02.884Z"
+  },
+  {
+   "id": "S02",
+   "sheet": "Set-up and data",
+   "ref": "Set-up and data | 2",
+   "item": "Patients for testing",
+   "action": "None",
+   "result": "Not done",
+   "notes": [
+    "needs the requester to confirm that the patients on the site are made up; the journeys make their own \"X \" patients"
+   ],
+   "screenshots": [],
+   "at": "2026-10-20T08:50:02.884Z"
+  },
+  {
+   "id": "U9",
+   "sheet": "Users",
+   "ref": "Users | U9",
+   "item": "Account with the licensing right",
+   "action": "Checked User Rights",
+   "result": "Not possible",
+   "notes": [
+    "the tenant offers no privilege LICENSING_WRITE on User Rights (40 privileges); a platform role is needed"
+   ],
+   "screenshots": [
+    "reports/screenshots/prereq/U9-1-rights-list.png"
+   ],
+   "at": "2026-10-20T08:50:02.884Z"
+  },
+  {
+   "id": "U10",
+   "sheet": "Users",
+   "ref": "Users | U10",
+   "item": "Second tenant, tenant without a licence, platform superadmin",
+   "action": "None",
+   "result": "Not done",
+   "notes": [
+    "deferred in the workbook: needs a decision and a second tenant"
+   ],
+   "screenshots": [],
+   "at": "2026-10-20T08:50:06.010Z"
+  },
+  {
+   "id": "R1",
+   "sheet": "Roles",
+   "ref": "Users | U3",
+   "item": "Role qa_staff",
+   "action": "Add Role, then Save rights",
+   "roles": "(no privilege)",
+   "result": "Done",
+   "notes": [
+    "Add Role: toast \"Role added.\"",
+    "privileges on User Rights: 0 / 40"
+   ],
+   "screenshots": [
+    "reports/screenshots/prereq/R1-1-rights.png"
+   ],
+   "at": "2026-10-20T08:50:06.249Z"
+  },
+  {
+   "id": "R2",
+   "sheet": "Roles",
+   "ref": "Role accounts | 04 Inpatient",
+   "item": "Role qa_rawat_inap",
+   "action": "Add Role, then Save rights",
+   "roles": "ADT_WRITE",
+   "result": "Blocked",
+   "notes": [
+    "Add Role: toast \"Role added.\"",
+    "Save rights (ADT_WRITE): toast \"Failed to save rights.\"",
+    "blocker 38: saving the rights of a role answers HTTP 500; the accounts of this role are not made",
+    "privileges on User Rights: 0 / 40"
+   ],
+   "screenshots": [
+    "reports/screenshots/prereq/R2-1-rights.png"
+   ],
+   "at": "2026-10-20T08:50:15.893Z"
+  },
+  {
+   "id": "R3",
+   "sheet": "Roles",
+   "ref": "Role accounts | 18 Settings",
+   "item": "Role qa_settings",
+   "action": "Add Role, then Save rights",
+   "roles": "MDM_WRITE, IDENTITY_ROLES_READ, IDENTITY_ROLES_WRITE, IDENTITY_ROLE_PRIVILEGES_WRITE, IDENTITY_USERS_READ, IDENTITY_USERS_WRITE, WORKFLOW_WRITE",
+   "result": "Blocked",
+   "notes": [
+    "Add Role: toast \"Role added.\"",
+    "Save rights (MDM_WRITE, IDENTITY_ROLES_READ, IDENTITY_ROLES_WRITE, IDENTITY_ROLE_PRIVILEGES_WRITE, IDENTITY_USERS_READ, IDENTITY_USERS_WRITE, WORKFLOW_WRITE): toast \"Failed to save rights.\"",
+    "blocker 38: saving the rights of a role answers HTTP 500; the accounts of this role are not made",
+    "privileges on User Rights: 0 / 40"
+   ],
+   "screenshots": [
+    "reports/screenshots/prereq/R3-1-rights.png"
+   ],
+   "at": "2026-10-20T08:50:27.008Z"
+  },
+  {
+   "id": "R4",
+   "sheet": "Roles",
+   "ref": "Role accounts | 22 Services",
+   "item": "Role qa_services",
+   "action": "Add Role, then Save rights",
+   "roles": "SERVICES_WRITE",
+   "result": "Blocked",
+   "notes": [
+    "Add Role: toast \"Role added.\"",
+    "Save rights (SERVICES_WRITE): toast \"Failed to save rights.\"",
+    "blocker 38: saving the rights of a role answers HTTP 500; the accounts of this role are not made",
+    "privileges on User Rights: 0 / 40"
+   ],
+   "screenshots": [
+    "reports/screenshots/prereq/R4-1-rights.png"
+   ],
+   "at": "2026-10-20T08:50:39.424Z"
+  },
+  {
+   "id": "R5",
+   "sheet": "Roles",
+   "ref": "Role accounts | 23 Sourcing",
+   "item": "Role qa_sourcing",
+   "action": "Add Role, then Save rights",
+   "roles": "SOURCING_WRITE",
+   "result": "Blocked",
+   "notes": [
+    "Add Role: toast \"Role added.\"",
+    "Save rights (SOURCING_WRITE): toast \"Failed to save rights.\"",
+    "blocker 38: saving the rights of a role answers HTTP 500; the accounts of this role are not made",
+    "privileges on User Rights: 0 / 40"
+   ],
+   "screenshots": [
+    "reports/screenshots/prereq/R5-1-rights.png"
+   ],
+   "at": "2026-10-20T08:50:51.682Z"
+  },
+  {
+   "id": "U3",
+   "sheet": "Users",
+   "ref": "Users | U3",
+   "item": "X QA Staff Tanpa Hak Tulis",
+   "action": "Add User, sign in, My profile",
+   "login": "qa.staff",
+   "roles": "qa_staff",
+   "branch": "Podomoro",
+   "result": "Failed",
+   "notes": [
+    "error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).not.\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed"
+   ],
+   "screenshots": [
+    "reports/screenshots/prereq/U3-1-error.png"
+   ],
+   "at": "2026-10-20T08:51:04.712Z"
+  },
+  {
+   "id": "U4",
+   "sheet": "Users",
+   "ref": "Users | U4",
+   "item": "X QA Admin Kedua",
+   "action": "Add User, sign in, My profile",
+   "login": "qa.admin3",
+   "roles": "admin",
+   "branch": "Podomoro",
+   "result": "Failed",
+   "notes": [
+    "error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).not.\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed"
+   ],
+   "screenshots": [
+    "reports/screenshots/prereq/U4-1-error.png"
+   ],
+   "at": "2026-10-20T08:51:18.132Z"
+  },
+  {
+   "id": "U5",
+   "sheet": "Users",
+   "ref": "Users | U5",
+   "item": "X QA Approver",
+   "action": "Add User, sign in, My profile",
+   "login": "qa.approver",
+   "roles": "finance, budget, cssd, procurement",
+   "branch": "Podomoro",
+   "result": "Failed",
+   "notes": [
+    "error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).not.\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed"
+   ],
+   "screenshots": [
+    "reports/screenshots/prereq/U5-1-error.png"
+   ],
+   "at": "2026-10-20T08:51:30.649Z"
+  },
+  {
+   "id": "U6",
+   "sheet": "Users",
+   "ref": "Users | U6",
+   "item": "X QA Admin Kemayoran",
+   "action": "Add User, sign in, My profile",
+   "login": "qa.kemayoran",
+   "roles": "admin",
+   "branch": "Kemayoran",
+   "result": "Failed",
+   "notes": [
+    "error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).not.\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed"
+   ],
+   "screenshots": [
+    "reports/screenshots/prereq/U6-1-error.png"
+   ],
+   "at": "2026-10-20T08:51:43.403Z"
+  },
+  {
+   "id": "U7",
+   "sheet": "Users",
+   "ref": "Users | U7",
+   "item": "X QA Pegawai",
+   "action": "Add User, sign in, My profile",
+   "login": "qa.pegawai",
+   "roles": "hrd, payroll",
+   "branch": "Podomoro",
+   "result": "Failed",
+   "notes": [
+    "error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).not.\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed"
+   ],
+   "screenshots": [
+    "reports/screenshots/prereq/U7-1-error.png"
+   ],
+   "at": "2026-10-20T08:51:56.415Z"
+  },
+  {
+   "id": "U8-01",
+   "sheet": "Role accounts",
+   "ref": "Role accounts | 01 Ambulatory Care, 02 Appointment",
+   "item": "X QA Petugas Pendaftaran",
+   "action": "Add User, sign in, My profile",
+   "login": "qa.pendaftaran",
+   "roles": "pendaftaran",
+   "branch": "Podomoro",
+   "result": "Failed",
+   "notes": [
+    "error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).not.\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed"
+   ],
+   "screenshots": [
+    "reports/screenshots/prereq/U8-01-1-error.png"
+   ],
+   "at": "2026-10-20T08:52:09.884Z"
+  },
+  {
+   "id": "U8-02",
+   "sheet": "Role accounts",
+   "ref": "Role accounts | 03 Patient Care",
+   "item": "X QA Dokter",
+   "action": "Add User, sign in, My profile",
+   "login": "qa.dokter",
+   "roles": "dokter",
+   "branch": "Podomoro",
+   "result": "Failed",
+   "notes": [
+    "error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).not.\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed"
+   ],
+   "screenshots": [
+    "reports/screenshots/prereq/U8-02-1-error.png"
+   ],
+   "at": "2026-10-20T08:52:22.812Z"
+  },
+  {
+   "id": "U8-03",
+   "sheet": "Role accounts",
+   "ref": "Role accounts | 04 Inpatient",
+   "item": "X QA Perawat Rawat Inap",
+   "action": "Add User, sign in, My profile",
+   "login": "qa.perawat.ri",
+   "roles": "qa_rawat_inap",
+   "branch": "Podomoro",
+   "result": "Blocked",
+   "notes": [
+    "not made: the role qa_rawat_inap has no usable rights (see sheet Roles)"
+   ],
+   "screenshots": [],
+   "at": "2026-10-20T08:52:35.864Z"
+  },
+  {
+   "id": "U8-04",
+   "sheet": "Role accounts",
+   "ref": "Role accounts | 05 Pharmacy",
+   "item": "X QA Apoteker",
+   "action": "Add User, sign in, My profile",
+   "login": "qa.apoteker",
+   "roles": "apoteker",
+   "branch": "Podomoro",
+   "result": "Failed",
+   "notes": [
+    "error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).not.\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed"
+   ],
+   "screenshots": [
+    "reports/screenshots/prereq/U8-04-1-error.png"
+   ],
+   "at": "2026-10-20T08:52:35.864Z"
+  },
+  {
+   "id": "U8-05",
+   "sheet": "Role accounts",
+   "ref": "Role accounts | 06 Transfusion Medicine",
+   "item": "X QA Petugas Bank Darah",
+   "action": "Add User, sign in, My profile",
+   "login": "qa.bankdarah",
+   "roles": "bankdarah",
+   "branch": "Podomoro",
+   "result": "Failed",
+   "notes": [
+    "error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).not.\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed"
+   ],
+   "screenshots": [
+    "reports/screenshots/prereq/U8-05-1-error.png"
+   ],
+   "at": "2026-10-20T08:52:48.479Z"
+  },
+  {
+   "id": "U8-06",
+   "sheet": "Role accounts",
+   "ref": "Role accounts | 07 Inventory",
+   "item": "X QA Petugas Gudang",
+   "action": "Add User, sign in, My profile",
+   "login": "qa.gudang",
+   "roles": "gudang",
+   "branch": "Podomoro",
+   "result": "Failed",
+   "notes": [
+    "error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).not.\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed"
+   ],
+   "screenshots": [
+    "reports/screenshots/prereq/U8-06-1-error.png"
+   ],
+   "at": "2026-10-20T08:53:01.095Z"
+  },
+  {
+   "id": "U8-07",
+   "sheet": "Role accounts",
+   "ref": "Role accounts | 08 Operation Theater",
+   "item": "X QA Perawat Kamar Operasi",
+   "action": "Add User, sign in, My profile",
+   "login": "qa.ok",
+   "roles": "ok",
+   "branch": "Podomoro",
+   "result": "Failed",
+   "notes": [
+    "error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).not.\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed"
+   ],
+   "screenshots": [
+    "reports/screenshots/prereq/U8-07-1-error.png"
+   ],
+   "at": "2026-10-20T08:53:14.176Z"
+  },
+  {
+   "id": "U8-08",
+   "sheet": "Role accounts",
+   "ref": "Role accounts | 09 Procurement",
+   "item": "X QA Petugas Pengadaan",
+   "action": "Add User, sign in, My profile",
+   "login": "qa.procurement",
+   "roles": "procurement",
+   "branch": "Podomoro",
+   "result": "Failed",
+   "notes": [
+    "error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).not.\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed"
+   ],
+   "screenshots": [
+    "reports/screenshots/prereq/U8-08-1-error.png"
+   ],
+   "at": "2026-10-20T08:53:26.961Z"
+  },
+  {
+   "id": "U8-09",
+   "sheet": "Role accounts",
+   "ref": "Role accounts | 10 HR",
+   "item": "X QA Admin HR",
+   "action": "Add User, sign in, My profile",
+   "login": "qa.hrd",
+   "roles": "hrd",
+   "branch": "Podomoro",
+   "result": "Failed",
+   "notes": [
+    "error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).not.\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed"
+   ],
+   "screenshots": [
+    "reports/screenshots/prereq/U8-09-1-error.png"
+   ],
+   "at": "2026-10-20T08:53:39.613Z"
+  },
+  {
+   "id": "U8-10",
+   "sheet": "Role accounts",
+   "ref": "Role accounts | 11 Laboratory",
+   "item": "X QA Analis Lab",
+   "action": "Add User, sign in, My profile",
+   "login": "qa.analis",
+   "roles": "analis",
+   "branch": "Podomoro",
+   "result": "Failed",
+   "notes": [
+    "error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).not.\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed"
+   ],
+   "screenshots": [
+    "reports/screenshots/prereq/U8-10-1-error.png"
+   ],
+   "at": "2026-10-20T08:53:52.342Z"
+  },
+  {
+   "id": "U8-11",
+   "sheet": "Role accounts",
+   "ref": "Role accounts | 12 RIS",
+   "item": "X QA Radiografer",
+   "action": "Add User, sign in, My profile",
+   "login": "qa.radiografer",
+   "roles": "radiografer",
+   "branch": "Podomoro",
+   "result": "Failed",
+   "notes": [
+    "error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).not.\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed"
+   ],
+   "screenshots": [
+    "reports/screenshots/prereq/U8-11-1-error.png"
+   ],
+   "at": "2026-10-20T08:54:04.926Z"
+  },
+  {
+   "id": "U8-12",
+   "sheet": "Role accounts",
+   "ref": "Role accounts | 13 Dietary",
+   "item": "X QA Ahli Gizi",
+   "action": "Add User, sign in, My profile",
+   "login": "qa.gizi",
+   "roles": "gizi",
+   "branch": "Podomoro",
+   "result": "Failed",
+   "notes": [
+    "error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).not.\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed"
+   ],
+   "screenshots": [
+    "reports/screenshots/prereq/U8-12-1-error.png"
+   ],
+   "at": "2026-10-20T08:54:17.707Z"
+  },
+  {
+   "id": "U8-13",
+   "sheet": "Role accounts",
+   "ref": "Role accounts | 14 Hospital Accounts",
+   "item": "X QA Kasir",
+   "action": "Add User, sign in, My profile",
+   "login": "qa.kasir",
+   "roles": "kasir",
+   "branch": "Podomoro",
+   "result": "Failed",
+   "notes": [
+    "error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).not.\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed"
+   ],
+   "screenshots": [
+    "reports/screenshots/prereq/U8-13-1-error.png"
+   ],
+   "at": "2026-10-20T08:54:30.311Z"
+  },
+  {
+   "id": "U8-14",
+   "sheet": "Role accounts",
+   "ref": "Role accounts | 15 Emergency",
+   "item": "X QA Perawat IGD",
+   "action": "Add User, sign in, My profile",
+   "login": "qa.igd",
+   "roles": "igd",
+   "branch": "Podomoro",
+   "result": "Failed",
+   "notes": [
+    "error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).not.\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed"
+   ],
+   "screenshots": [
+    "reports/screenshots/prereq/U8-14-1-error.png"
+   ],
+   "at": "2026-10-20T08:54:42.908Z"
+  },
+  {
+   "id": "U8-15",
+   "sheet": "Role accounts",
+   "ref": "Role accounts | 16 MRD",
+   "item": "X QA Petugas Rekam Medis",
+   "action": "Add User, sign in, My profile",
+   "login": "qa.rekammedis",
+   "roles": "rekammedis",
+   "branch": "Podomoro",
+   "result": "Failed",
+   "notes": [
+    "error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).not.\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed"
+   ],
+   "screenshots": [
+    "reports/screenshots/prereq/U8-15-1-error.png"
+   ],
+   "at": "2026-10-20T08:54:57.059Z"
+  },
+  {
+   "id": "U8-16",
+   "sheet": "Role accounts",
+   "ref": "Role accounts | 17 Payroll",
+   "item": "X QA Petugas Payroll",
+   "action": "Add User, sign in, My profile",
+   "login": "qa.payroll",
+   "roles": "payroll",
+   "branch": "Podomoro",
+   "result": "Failed",
+   "notes": [
+    "error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).not.\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed"
+   ],
+   "screenshots": [
+    "reports/screenshots/prereq/U8-16-1-error.png"
+   ],
+   "at": "2026-10-20T08:55:10.375Z"
+  },
+  {
+   "id": "U8-17",
+   "sheet": "Role accounts",
+   "ref": "Role accounts | 18 Settings",
+   "item": "X QA Admin Settings",
+   "action": "Add User, sign in, My profile",
+   "login": "qa.settings",
+   "roles": "qa_settings",
+   "branch": "Podomoro",
+   "result": "Blocked",
+   "notes": [
+    "not made: the role qa_settings has no usable rights (see sheet Roles)"
+   ],
+   "screenshots": [],
+   "at": "2026-10-20T08:55:23.822Z"
+  },
+  {
+   "id": "U8-18",
+   "sheet": "Role accounts",
+   "ref": "Role accounts | 19 Finance",
+   "item": "X QA Akuntan",
+   "action": "Add User, sign in, My profile",
+   "login": "qa.finance",
+   "roles": "finance",
+   "branch": "Podomoro",
+   "result": "Failed",
+   "notes": [
+    "error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).not.\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed"
+   ],
+   "screenshots": [
+    "reports/screenshots/prereq/U8-18-1-error.png"
+   ],
+   "at": "2026-10-20T08:55:23.822Z"
+  },
+  {
+   "id": "U8-19",
+   "sheet": "Role accounts",
+   "ref": "Role accounts | 20 Budget",
+   "item": "X QA Petugas Anggaran",
+   "action": "Add User, sign in, My profile",
+   "login": "qa.budget",
+   "roles": "budget",
+   "branch": "Podomoro",
+   "result": "Failed",
+   "notes": [
+    "error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).not.\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed"
+   ],
+   "screenshots": [
+    "reports/screenshots/prereq/U8-19-1-error.png"
+   ],
+   "at": "2026-10-20T08:55:37.221Z"
+  },
+  {
+   "id": "U8-20",
+   "sheet": "Role accounts",
+   "ref": "Role accounts | 21 CSSD",
+   "item": "X QA Petugas CSSD",
+   "action": "Add User, sign in, My profile",
+   "login": "qa.cssd",
+   "roles": "cssd",
+   "branch": "Podomoro",
+   "result": "Failed",
+   "notes": [
+    "error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).not.\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed"
+   ],
+   "screenshots": [
+    "reports/screenshots/prereq/U8-20-1-error.png"
+   ],
+   "at": "2026-10-20T08:55:50.305Z"
+  },
+  {
+   "id": "U8-21",
+   "sheet": "Role accounts",
+   "ref": "Role accounts | 22 Services",
+   "item": "X QA Petugas Services",
+   "action": "Add User, sign in, My profile",
+   "login": "qa.services",
+   "roles": "qa_services",
+   "branch": "Podomoro",
+   "result": "Blocked",
+   "notes": [
+    "not made: the role qa_services has no usable rights (see sheet Roles)"
+   ],
+   "screenshots": [],
+   "at": "2026-10-20T08:56:03.423Z"
+  },
+  {
+   "id": "U8-22",
+   "sheet": "Role accounts",
+   "ref": "Role accounts | 23 Sourcing",
+   "item": "X QA Petugas Sourcing",
+   "action": "Add User, sign in, My profile",
+   "login": "qa.sourcing",
+   "roles": "qa_sourcing",
+   "branch": "Podomoro",
+   "result": "Blocked",
+   "notes": [
+    "not made: the role qa_sourcing has no usable rights (see sheet Roles)"
+   ],
+   "screenshots": [],
+   "at": "2026-10-20T08:56:03.423Z"
+  },
+  {
+   "id": "U8-23",
+   "sheet": "Role accounts",
+   "ref": "Role accounts | 24 Housekeeping",
+   "item": "X QA Supervisor Housekeeping",
+   "action": "Add User, sign in, My profile",
+   "login": "qa.housekeeping",
+   "roles": "housekeeping",
+   "branch": "Podomoro",
+   "result": "Failed",
+   "notes": [
+    "error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).not.\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed"
+   ],
+   "screenshots": [
+    "reports/screenshots/prereq/U8-23-1-error.png"
+   ],
+   "at": "2026-10-20T08:56:03.423Z"
+  },
+  {
+   "id": "U8-24",
+   "sheet": "Role accounts",
+   "ref": "Role accounts | 25 Linen",
+   "item": "X QA Supervisor Linen",
+   "action": "Add User, sign in, My profile",
+   "login": "qa.linen",
+   "roles": "linen",
+   "branch": "Podomoro",
+   "result": "Failed",
+   "notes": [
+    "error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).not.\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed"
+   ],
+   "screenshots": [
+    "reports/screenshots/prereq/U8-24-1-error.png"
+   ],
+   "at": "2026-10-20T08:56:16.171Z"
+  },
+  {
+   "id": "U8-25",
+   "sheet": "Role accounts",
+   "ref": "Role accounts | 26 Maintenance",
+   "item": "X QA Petugas IPSRS",
+   "action": "Add User, sign in, My profile",
+   "login": "qa.ipsrs",
+   "roles": "ipsrs",
+   "branch": "Podomoro",
+   "result": "Failed",
+   "notes": [
+    "error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).not.\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed"
+   ],
+   "screenshots": [
+    "reports/screenshots/prereq/U8-25-1-error.png"
+   ],
+   "at": "2026-10-20T08:56:28.820Z"
+  },
+  {
+   "id": "U8-26",
+   "sheet": "Role accounts",
+   "ref": "Role accounts | 27 Fixed assets",
+   "item": "X QA Admin Aset",
+   "action": "Add User, sign in, My profile",
+   "login": "qa.aset",
+   "roles": "aset",
+   "branch": "Podomoro",
+   "result": "Failed",
+   "notes": [
+    "error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).not.\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed"
+   ],
+   "screenshots": [
+    "reports/screenshots/prereq/U8-26-1-error.png"
+   ],
+   "at": "2026-10-20T08:56:42.586Z"
+  },
+  {
+   "id": "S04",
+   "sheet": "Set-up and data",
+   "ref": "Set-up and data | 4",
+   "item": "Diagnosis code version",
+   "action": "None",
+   "result": "Not possible",
+   "notes": [
+    "no screen imports or activates a code version (API or seed by the site administrator)"
+   ],
+   "screenshots": [],
+   "at": "2026-10-20T08:56:56.643Z"
+  },
+  {
+   "id": "S05",
+   "sheet": "Set-up and data",
+   "ref": "Set-up and data | 5",
+   "item": "Item below its minimum stock (Reorder, Podomoro)",
+   "action": "Checked Reorder",
+   "result": "Already present",
+   "notes": [
+    "Reorder lists 29+ items below their minimum (e.g. QA-INV-PARA-MV8QXF17701 0 · QA-INV-PARA-MV8R29KG10F 0 · QA-INV-PARA-MV8R3KGV20Q 0 ·); nothing saved"
+   ],
+   "screenshots": [
+    "reports/screenshots/prereq/S05-1-reorder.png"
+   ],
+   "at": "2026-10-20T08:56:56.643Z"
+  },
+  {
+   "id": "S06",
+   "sheet": "Set-up and data",
+   "ref": "Set-up and data | 6",
+   "item": "User linked to an employee",
+   "action": "See U7",
+   "result": "Failed",
+   "notes": [
+    "done with U7 (qa.pegawai): "
+   ],
+   "screenshots": [],
+   "at": "2026-10-20T08:56:59.353Z"
+  },
+  {
+   "id": "S07",
+   "sheet": "Set-up and data",
+   "ref": "Set-up and data | 7",
+   "item": "Emergency registration configuration (type 7, Podomoro)",
+   "action": "Checked the screen",
+   "result": "Not possible",
+   "notes": [
+    "\"Podomoro has no registration configuration for type 7.\"; no screen of Settings or Registration makes a registration configuration (site administrator)"
+   ],
+   "screenshots": [
+    "reports/screenshots/prereq/S07-1-emergency-registration.png"
+   ],
+   "at": "2026-10-20T08:56:59.353Z"
+  },
+  {
+   "id": "S08",
+   "sheet": "Set-up and data",
+   "ref": "Set-up and data | 8",
+   "item": "Finance configuration of Podomoro",
+   "action": "Finance configuration, Save",
+   "result": "Done",
+   "notes": [
+    "before: \"This branch has no finance configuration.\"",
+    "year 2026; back-dated 3 days; instrument validity 90 days; Cash: 1101 · Kas; Bank: QA-1010-MVDHF9E56815 · QA Bank Uji MVDHF9E56816; Patient cash: 1101 · Kas; Patient bank: QA-1010-MVDHF9E56815 · QA Bank Uji MVDHF9E56816; Patient control: 1101 · Kas; Revenue: 4101 · Pendapatan; Surplus / deficit: QA-3010-MVDHF9E5680Z · QA Akun Uji 3010 MVDHF9E56810",
+    "user allowed to transact: admin2 · rs.admin2",
+    "Save: toast \"Configuration saved.\"",
+    "Patient collections (Podomoro): no longer says the branch has no finance configuration"
+   ],
+   "screenshots": [
+    "reports/screenshots/prereq/S08-1-finance-configuration.png",
+    "reports/screenshots/prereq/S08-2-patient-collections.png"
+   ],
+   "at": "2026-10-20T08:57:01.428Z"
+  },
+  {
+   "id": "S09",
+   "sheet": "Set-up and data",
+   "ref": "Set-up and data | 9",
+   "item": "Budget posting rules of Podomoro and approvers",
+   "action": "Budget posting rules, Save; read Process definitions",
+   "result": "Failed",
+   "notes": [
+    "Allocation — capital: debit QA-1501-MVDHF9E57408 · QA Aset alkes uji MVDHF9E57409, credit QA-3010-MVDHF9E5680Z · QA Akun Uji 3010 MVDHF9E56810: toast \"Allocation — capital rule saved.\"",
+    "Allocation — operating: debit QA-5010-MVDHF9E5710K · QA Beban Uji MVDHF9E5710L, credit QA-3010-MVDHF9E5680Z · QA Akun Uji 3010 MVDHF9E56810: toast \"Choose the debit and credit accounts.\"",
+    "Process definitions: each budget chain has 1 step (\"Persetujuan\"); the chain editor names steps only and has no field for an approver, so the approver is whoever holds BUDGET_APPROVE (U5 qa.approver, U8 qa.budget)"
+   ],
+   "screenshots": [
+    "reports/screenshots/prereq/S09-1-posting-rules.png",
+    "reports/screenshots/prereq/S09-2-process-definitions.png"
+   ],
+   "at": "2026-10-20T08:57:11.354Z"
+  },
+  {
+   "id": "S10",
+   "sheet": "Set-up and data",
+   "ref": "Set-up and data | 10",
+   "item": "CSSD: passed Bowie Dick today, category KITS, drug form KIT",
+   "action": "Bowie Dick, Save; Inventory set-up, category",
+   "result": "Failed",
+   "notes": [
+    "Bowie Dick 2026-10-20, Autoklaf 1 CSSD, indicator indikator kelas 5, Pass: toast \"Bowie Dick test saved.\" (valid for today only; the first cycle of each later day needs its own test)",
+    "item category KITS: toast \"Saved.\"",
+    "drug form KIT: no screen of Inventory or Pharmacy keeps drug forms; left to the site administrator"
+   ],
+   "screenshots": [
+    "reports/screenshots/prereq/S10-1-bowie-dick.png",
+    "reports/screenshots/prereq/S10-2-inventory-setup.png"
+   ],
+   "at": "2026-10-20T08:57:22.351Z"
+  },
+  {
+   "id": "S11",
+   "sheet": "Set-up and data",
+   "ref": "Set-up and data | 11",
+   "item": "Records made in another application",
+   "action": "None",
+   "result": "Not done",
+   "notes": [
+    "made by the feeding journeys themselves (E2E chains, npm run test:e2e), not by this set-up run"
+   ],
+   "screenshots": [],
+   "at": "2026-10-20T08:57:31.799Z"
+  },
+  {
+   "id": "S12",
+   "sheet": "Set-up and data",
+   "ref": "Set-up and data | 12",
+   "item": "Defects that stop journeys",
+   "action": "None",
+   "result": "Not possible",
+   "notes": [
+    "for Development; see 00-blockers-checklist-linked.xlsx"
+   ],
+   "screenshots": [],
+   "at": "2026-10-20T08:57:31.799Z"
+  }
+ ]
+}

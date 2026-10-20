@@ -12,6 +12,7 @@ process.env.QA_RUN_ID ??= Date.now().toString(36).toUpperCase();
  * Project "e2e-setup"   - signs in U1 and U2 once and saves each session (tests/e2e/auth.setup.ts).
  * Project "e2e-modules" - per-module test cases (tests/modules/<NN-module>/), session U1.
  * Project "e2e"         - end-to-end chains across modules (tests/e2e/chains/), session U1.
+ * Project "prereq"      - one-time set-up of 00-prerequisites.xlsx (tests/prereq/), session U1.
  *
  * Tests save data on the shared site and share branch state, so they run with one worker.
  */
@@ -46,6 +47,12 @@ export default defineConfig({
     {
       name: 'e2e',
       testMatch: /tests[\\/]e2e[\\/].*\.spec\.ts/,
+      dependencies: ['e2e-setup'],
+      use: { ...devices['Desktop Chrome'], storageState: authFileOf('U1') },
+    },
+    {
+      name: 'prereq',
+      testMatch: /tests[\\/]prereq[\\/].*\.spec\.ts/,
       dependencies: ['e2e-setup'],
       use: { ...devices['Desktop Chrome'], storageState: authFileOf('U1') },
     },

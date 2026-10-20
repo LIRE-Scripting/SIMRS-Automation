@@ -5,9 +5,11 @@ import { LoginPage } from '../../pages/LoginPage';
 
 /**
  * One sign-in per prepared workbook user (00-prerequisites.xlsx | Users,
- * Prepared = Done): U1 rs.admin2 (Podomoro only) and U2 rs.admin (All
- * branches). Each session is saved to .auth/<key>.json and reused by the
- * specs through storageState; no spec signs in again.
+ * Prepared = Done; the login is the first word after "Exists:" in "Status
+ * on the site"): U1 rs.admin2 (Podomoro only), U2 rs.admin (All branches)
+ * and U3 to U7, the qa.* accounts of the prerequisite run of 2026-10-20.
+ * Each session is saved to .auth/<key>.json and reused by the specs through
+ * storageState; no spec signs in again.
  */
 const prepared = prerequisites().users.filter((u) => u.prepared === 'Done');
 

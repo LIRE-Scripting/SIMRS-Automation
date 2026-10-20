@@ -1,0 +1,989 @@
+{
+ "site": "https://rs.showcase.atklik.xyz",
+ "runAt": "2026-10-20T09:04:16.666Z",
+ "runBy": "U1 rs.admin2",
+ "items": [
+  {
+   "id": "S01",
+   "sheet": "Set-up and data",
+   "ref": "Set-up and data | 1",
+   "item": "Go-ahead to create data on the site",
+   "action": "Recorded",
+   "result": "Done",
+   "notes": [
+    "go-ahead given in the session of 2026-10-20 for one run: users, roles and the set-up of this sheet, branch Podomoro, test data with the prefix \"X \"/\"qa.\""
+   ],
+   "screenshots": [],
+   "at": "2026-10-20T08:50:02.884Z"
+  },
+  {
+   "id": "S02",
+   "sheet": "Set-up and data",
+   "ref": "Set-up and data | 2",
+   "item": "Patients for testing",
+   "action": "None",
+   "result": "Not done",
+   "notes": [
+    "needs the requester to confirm that the patients on the site are made up; the journeys make their own \"X \" patients"
+   ],
+   "screenshots": [],
+   "at": "2026-10-20T08:50:02.884Z"
+  },
+  {
+   "id": "U9",
+   "sheet": "Users",
+   "ref": "Users | U9",
+   "item": "Account with the licensing right",
+   "action": "Checked User Rights",
+   "result": "Not possible",
+   "notes": [
+    "the tenant offers no privilege LICENSING_WRITE on User Rights (40 privileges); a platform role is needed"
+   ],
+   "screenshots": [
+    "reports/screenshots/prereq/U9-1-rights-list.png"
+   ],
+   "at": "2026-10-20T08:50:02.884Z"
+  },
+  {
+   "id": "U10",
+   "sheet": "Users",
+   "ref": "Users | U10",
+   "item": "Second tenant, tenant without a licence, platform superadmin",
+   "action": "None",
+   "result": "Not done",
+   "notes": [
+    "deferred in the workbook: needs a decision and a second tenant"
+   ],
+   "screenshots": [],
+   "at": "2026-10-20T08:50:06.010Z"
+  },
+  {
+   "id": "R1",
+   "sheet": "Roles",
+   "ref": "Users | U3",
+   "item": "Role qa_staff",
+   "action": "Add Role, then Save rights",
+   "roles": "(no privilege)",
+   "result": "Done",
+   "notes": [
+    "Add Role: toast \"Role added.\"",
+    "privileges on User Rights: 0 / 40"
+   ],
+   "screenshots": [
+    "reports/screenshots/prereq/R1-1-rights.png"
+   ],
+   "at": "2026-10-20T08:50:06.249Z"
+  },
+  {
+   "id": "R2",
+   "sheet": "Roles",
+   "ref": "Role accounts | 04 Inpatient",
+   "item": "Role qa_rawat_inap",
+   "action": "Add Role, then Save rights",
+   "roles": "ADT_WRITE",
+   "result": "Blocked",
+   "notes": [
+    "Add Role: toast \"Role added.\"",
+    "Save rights (ADT_WRITE): toast \"Failed to save rights.\"",
+    "blocker 38: saving the rights of a role answers HTTP 500; the accounts of this role are not made",
+    "privileges on User Rights: 0 / 40"
+   ],
+   "screenshots": [
+    "reports/screenshots/prereq/R2-1-rights.png"
+   ],
+   "at": "2026-10-20T08:50:15.893Z"
+  },
+  {
+   "id": "R3",
+   "sheet": "Roles",
+   "ref": "Role accounts | 18 Settings",
+   "item": "Role qa_settings",
+   "action": "Add Role, then Save rights",
+   "roles": "MDM_WRITE, IDENTITY_ROLES_READ, IDENTITY_ROLES_WRITE, IDENTITY_ROLE_PRIVILEGES_WRITE, IDENTITY_USERS_READ, IDENTITY_USERS_WRITE, WORKFLOW_WRITE",
+   "result": "Blocked",
+   "notes": [
+    "Add Role: toast \"Role added.\"",
+    "Save rights (MDM_WRITE, IDENTITY_ROLES_READ, IDENTITY_ROLES_WRITE, IDENTITY_ROLE_PRIVILEGES_WRITE, IDENTITY_USERS_READ, IDENTITY_USERS_WRITE, WORKFLOW_WRITE): toast \"Failed to save rights.\"",
+    "blocker 38: saving the rights of a role answers HTTP 500; the accounts of this role are not made",
+    "privileges on User Rights: 0 / 40"
+   ],
+   "screenshots": [
+    "reports/screenshots/prereq/R3-1-rights.png"
+   ],
+   "at": "2026-10-20T08:50:27.008Z"
+  },
+  {
+   "id": "R4",
+   "sheet": "Roles",
+   "ref": "Role accounts | 22 Services",
+   "item": "Role qa_services",
+   "action": "Add Role, then Save rights",
+   "roles": "SERVICES_WRITE",
+   "result": "Blocked",
+   "notes": [
+    "Add Role: toast \"Role added.\"",
+    "Save rights (SERVICES_WRITE): toast \"Failed to save rights.\"",
+    "blocker 38: saving the rights of a role answers HTTP 500; the accounts of this role are not made",
+    "privileges on User Rights: 0 / 40"
+   ],
+   "screenshots": [
+    "reports/screenshots/prereq/R4-1-rights.png"
+   ],
+   "at": "2026-10-20T08:50:39.424Z"
+  },
+  {
+   "id": "R5",
+   "sheet": "Roles",
+   "ref": "Role accounts | 23 Sourcing",
+   "item": "Role qa_sourcing",
+   "action": "Add Role, then Save rights",
+   "roles": "SOURCING_WRITE",
+   "result": "Blocked",
+   "notes": [
+    "Add Role: toast \"Role added.\"",
+    "Save rights (SOURCING_WRITE): toast \"Failed to save rights.\"",
+    "blocker 38: saving the rights of a role answers HTTP 500; the accounts of this role are not made",
+    "privileges on User Rights: 0 / 40"
+   ],
+   "screenshots": [
+    "reports/screenshots/prereq/R5-1-rights.png"
+   ],
+   "at": "2026-10-20T08:50:51.682Z"
+  },
+  {
+   "id": "U3",
+   "sheet": "Users",
+   "ref": "Users | U3",
+   "item": "X QA Staff Tanpa Hak Tulis",
+   "action": "Add User, sign in, My profile",
+   "login": "qa.staff",
+   "roles": "qa_staff",
+   "branch": "Podomoro",
+   "result": "Done",
+   "notes": [
+    "first run 2026-10-20T08:51: Failed (error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).not.\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed); run again",
+    "Add User (branch Podomoro, roles qa_staff): toast \"User added.\"",
+    "sign-in OK; My profile: roles \"qa_staff\", active branch \"\u2014\"",
+    "active branch on My profile is \"\u2014\": a new account has not chosen its branch yet (Preferences); Branch map maps its roles to Podomoro (checked on 2026-10-20 for qa.admin3, qa.approver, qa.dokter, qa.kasir, qa.kemayoran)"
+   ],
+   "screenshots": [
+    "reports/screenshots/prereq/U3-1-error.png",
+    "reports/screenshots/prereq/U3-2-users-list.png",
+    "reports/screenshots/prereq/U3-3-my-profile.png"
+   ],
+   "at": "2026-10-20T08:59:10.619Z"
+  },
+  {
+   "id": "U4",
+   "sheet": "Users",
+   "ref": "Users | U4",
+   "item": "X QA Admin Kedua",
+   "action": "Add User, sign in, My profile",
+   "login": "qa.admin3",
+   "roles": "admin",
+   "branch": "Podomoro",
+   "result": "Done",
+   "notes": [
+    "first run 2026-10-20T08:51: Failed (error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).not.\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed); run again",
+    "Add User (branch Podomoro, roles admin): toast \"User added.\"",
+    "sign-in OK; My profile: roles \"admin\", active branch \"\u2014\"",
+    "active branch on My profile is \"\u2014\": a new account has not chosen its branch yet (Preferences); Branch map maps its roles to Podomoro (checked on 2026-10-20 for qa.admin3, qa.approver, qa.dokter, qa.kasir, qa.kemayoran)"
+   ],
+   "screenshots": [
+    "reports/screenshots/prereq/U4-1-error.png",
+    "reports/screenshots/prereq/U4-2-users-list.png",
+    "reports/screenshots/prereq/U4-3-my-profile.png"
+   ],
+   "at": "2026-10-20T08:59:20.851Z"
+  },
+  {
+   "id": "U5",
+   "sheet": "Users",
+   "ref": "Users | U5",
+   "item": "X QA Approver",
+   "action": "Add User, sign in, My profile",
+   "login": "qa.approver",
+   "roles": "finance, budget, cssd, procurement",
+   "branch": "Podomoro",
+   "result": "Done",
+   "notes": [
+    "first run 2026-10-20T08:51: Failed (error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).not.\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed); run again",
+    "Add User (branch Podomoro, roles finance, budget, cssd, procurement): toast \"User added.\"",
+    "sign-in OK; My profile: roles \"budget cssd finance procurement\", active branch \"\u2014\"",
+    "active branch on My profile is \"\u2014\": a new account has not chosen its branch yet (Preferences); Branch map maps its roles to Podomoro (checked on 2026-10-20 for qa.admin3, qa.approver, qa.dokter, qa.kasir, qa.kemayoran)"
+   ],
+   "screenshots": [
+    "reports/screenshots/prereq/U5-1-error.png",
+    "reports/screenshots/prereq/U5-2-users-list.png",
+    "reports/screenshots/prereq/U5-3-my-profile.png"
+   ],
+   "at": "2026-10-20T08:59:30.157Z"
+  },
+  {
+   "id": "U6",
+   "sheet": "Users",
+   "ref": "Users | U6",
+   "item": "X QA Admin Kemayoran",
+   "action": "Add User, sign in, My profile",
+   "login": "qa.kemayoran",
+   "roles": "admin",
+   "branch": "Kemayoran",
+   "result": "Done",
+   "notes": [
+    "first run 2026-10-20T08:51: Failed (error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).not.\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed); run again",
+    "Add User (branch Kemayoran, roles admin): toast \"User added.\"",
+    "sign-in OK; My profile: roles \"admin\", active branch \"\u2014\"",
+    "active branch on My profile is \"\u2014\": a new account has not chosen its branch yet (Preferences); Branch map maps its roles to Kemayoran (checked on 2026-10-20 for qa.admin3, qa.approver, qa.dokter, qa.kasir, qa.kemayoran)"
+   ],
+   "screenshots": [
+    "reports/screenshots/prereq/U6-1-error.png",
+    "reports/screenshots/prereq/U6-2-users-list.png",
+    "reports/screenshots/prereq/U6-3-my-profile.png"
+   ],
+   "at": "2026-10-20T08:59:39.778Z"
+  },
+  {
+   "id": "U7",
+   "sheet": "Users",
+   "ref": "Users | U7",
+   "item": "X QA Pegawai",
+   "action": "Add User, sign in, My profile",
+   "login": "qa.pegawai",
+   "roles": "hrd, payroll",
+   "branch": "Podomoro",
+   "result": "Done",
+   "notes": [
+    "first run 2026-10-20T08:51: Failed (error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).not.\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed); run again",
+    "Add User (branch Podomoro, roles hrd, payroll): toast \"User added.\"",
+    "sign-in OK; My profile: roles \"hrd payroll\", active branch \"\u2014\"",
+    "active branch on My profile is \"\u2014\": a new account has not chosen its branch yet (Preferences); Branch map maps its roles to Podomoro (checked on 2026-10-20 for qa.admin3, qa.approver, qa.dokter, qa.kasir, qa.kemayoran)",
+    "employee X-EMP-QA-PEGAWAI: toast \"Saved. / Saved.\"",
+    "Link me: toast \"Saved. / Saved.\""
+   ],
+   "screenshots": [
+    "reports/screenshots/prereq/U7-1-error.png",
+    "reports/screenshots/prereq/U7-2-users-list.png",
+    "reports/screenshots/prereq/U7-3-my-profile.png",
+    "reports/screenshots/prereq/U7-4-hr-desk-linked.png",
+    "reports/screenshots/prereq/U7-5-punch-screen.png"
+   ],
+   "at": "2026-10-20T08:59:50.618Z"
+  },
+  {
+   "id": "U8-01",
+   "sheet": "Role accounts",
+   "ref": "Role accounts | 01 Ambulatory Care, 02 Appointment",
+   "item": "X QA Petugas Pendaftaran",
+   "action": "Add User, sign in, My profile",
+   "login": "qa.pendaftaran",
+   "roles": "pendaftaran",
+   "branch": "Podomoro",
+   "result": "Done",
+   "notes": [
+    "first run 2026-10-20T08:52: Failed (error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).not.\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed); run again",
+    "Add User (branch Podomoro, roles pendaftaran): toast \"User added.\"",
+    "sign-in OK; My profile: roles \"pendaftaran\", active branch \"\u2014\"",
+    "active branch on My profile is \"\u2014\": a new account has not chosen its branch yet (Preferences); Branch map maps its roles to Podomoro (checked on 2026-10-20 for qa.admin3, qa.approver, qa.dokter, qa.kasir, qa.kemayoran)"
+   ],
+   "screenshots": [
+    "reports/screenshots/prereq/U8-01-1-error.png",
+    "reports/screenshots/prereq/U8-01-2-users-list.png",
+    "reports/screenshots/prereq/U8-01-3-my-profile.png"
+   ],
+   "at": "2026-10-20T09:00:22.335Z"
+  },
+  {
+   "id": "U8-02",
+   "sheet": "Role accounts",
+   "ref": "Role accounts | 03 Patient Care",
+   "item": "X QA Dokter",
+   "action": "Add User, sign in, My profile",
+   "login": "qa.dokter",
+   "roles": "dokter",
+   "branch": "Podomoro",
+   "result": "Done",
+   "notes": [
+    "first run 2026-10-20T08:52: Failed (error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).not.\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed); run again",
+    "Add User (branch Podomoro, roles dokter): toast \"User added.\"",
+    "sign-in OK; My profile: roles \"dokter\", active branch \"\u2014\"",
+    "active branch on My profile is \"\u2014\": a new account has not chosen its branch yet (Preferences); Branch map maps its roles to Podomoro (checked on 2026-10-20 for qa.admin3, qa.approver, qa.dokter, qa.kasir, qa.kemayoran)"
+   ],
+   "screenshots": [
+    "reports/screenshots/prereq/U8-02-1-error.png",
+    "reports/screenshots/prereq/U8-02-2-users-list.png",
+    "reports/screenshots/prereq/U8-02-3-my-profile.png"
+   ],
+   "at": "2026-10-20T09:00:32.584Z"
+  },
+  {
+   "id": "U8-03",
+   "sheet": "Role accounts",
+   "ref": "Role accounts | 04 Inpatient",
+   "item": "X QA Perawat Rawat Inap",
+   "action": "Add User, sign in, My profile",
+   "login": "qa.perawat.ri",
+   "roles": "qa_rawat_inap",
+   "branch": "Podomoro",
+   "result": "Blocked",
+   "notes": [
+    "not made: the role qa_rawat_inap has no usable rights (see sheet Roles)"
+   ],
+   "screenshots": [],
+   "at": "2026-10-20T08:52:35.864Z"
+  },
+  {
+   "id": "U8-04",
+   "sheet": "Role accounts",
+   "ref": "Role accounts | 05 Pharmacy",
+   "item": "X QA Apoteker",
+   "action": "Add User, sign in, My profile",
+   "login": "qa.apoteker",
+   "roles": "apoteker",
+   "branch": "Podomoro",
+   "result": "Done",
+   "notes": [
+    "first run 2026-10-20T08:52: Failed (error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).not.\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed); run again",
+    "Add User (branch Podomoro, roles apoteker): toast \"User added.\"",
+    "sign-in OK; My profile: roles \"apoteker\", active branch \"\u2014\"",
+    "active branch on My profile is \"\u2014\": a new account has not chosen its branch yet (Preferences); Branch map maps its roles to Podomoro (checked on 2026-10-20 for qa.admin3, qa.approver, qa.dokter, qa.kasir, qa.kemayoran)"
+   ],
+   "screenshots": [
+    "reports/screenshots/prereq/U8-04-1-error.png",
+    "reports/screenshots/prereq/U8-04-2-users-list.png",
+    "reports/screenshots/prereq/U8-04-3-my-profile.png"
+   ],
+   "at": "2026-10-20T09:00:42.536Z"
+  },
+  {
+   "id": "U8-05",
+   "sheet": "Role accounts",
+   "ref": "Role accounts | 06 Transfusion Medicine",
+   "item": "X QA Petugas Bank Darah",
+   "action": "Add User, sign in, My profile",
+   "login": "qa.bankdarah",
+   "roles": "bankdarah",
+   "branch": "Podomoro",
+   "result": "Done",
+   "notes": [
+    "first run 2026-10-20T08:52: Failed (error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).not.\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed); run again",
+    "Add User (branch Podomoro, roles bankdarah): toast \"User added.\"",
+    "sign-in OK; My profile: roles \"bankdarah\", active branch \"\u2014\"",
+    "active branch on My profile is \"\u2014\": a new account has not chosen its branch yet (Preferences); Branch map maps its roles to Podomoro (checked on 2026-10-20 for qa.admin3, qa.approver, qa.dokter, qa.kasir, qa.kemayoran)"
+   ],
+   "screenshots": [
+    "reports/screenshots/prereq/U8-05-1-error.png",
+    "reports/screenshots/prereq/U8-05-2-users-list.png",
+    "reports/screenshots/prereq/U8-05-3-my-profile.png"
+   ],
+   "at": "2026-10-20T09:00:52.412Z"
+  },
+  {
+   "id": "U8-06",
+   "sheet": "Role accounts",
+   "ref": "Role accounts | 07 Inventory",
+   "item": "X QA Petugas Gudang",
+   "action": "Add User, sign in, My profile",
+   "login": "qa.gudang",
+   "roles": "gudang",
+   "branch": "Podomoro",
+   "result": "Done",
+   "notes": [
+    "first run 2026-10-20T08:53: Failed (error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).not.\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed); run again",
+    "Add User (branch Podomoro, roles gudang): toast \"User added.\"",
+    "sign-in OK; My profile: roles \"gudang\", active branch \"\u2014\"",
+    "active branch on My profile is \"\u2014\": a new account has not chosen its branch yet (Preferences); Branch map maps its roles to Podomoro (checked on 2026-10-20 for qa.admin3, qa.approver, qa.dokter, qa.kasir, qa.kemayoran)"
+   ],
+   "screenshots": [
+    "reports/screenshots/prereq/U8-06-1-error.png",
+    "reports/screenshots/prereq/U8-06-2-users-list.png",
+    "reports/screenshots/prereq/U8-06-3-my-profile.png"
+   ],
+   "at": "2026-10-20T09:01:02.497Z"
+  },
+  {
+   "id": "U8-07",
+   "sheet": "Role accounts",
+   "ref": "Role accounts | 08 Operation Theater",
+   "item": "X QA Perawat Kamar Operasi",
+   "action": "Add User, sign in, My profile",
+   "login": "qa.ok",
+   "roles": "ok",
+   "branch": "Podomoro",
+   "result": "Done",
+   "notes": [
+    "first run 2026-10-20T08:53: Failed (error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).not.\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed); run again",
+    "Add User (branch Podomoro, roles ok): toast \"User added.\"",
+    "sign-in OK; My profile: roles \"ok\", active branch \"\u2014\"",
+    "active branch on My profile is \"\u2014\": a new account has not chosen its branch yet (Preferences); Branch map maps its roles to Podomoro (checked on 2026-10-20 for qa.admin3, qa.approver, qa.dokter, qa.kasir, qa.kemayoran)"
+   ],
+   "screenshots": [
+    "reports/screenshots/prereq/U8-07-1-error.png",
+    "reports/screenshots/prereq/U8-07-2-users-list.png",
+    "reports/screenshots/prereq/U8-07-3-my-profile.png"
+   ],
+   "at": "2026-10-20T09:01:12.313Z"
+  },
+  {
+   "id": "U8-08",
+   "sheet": "Role accounts",
+   "ref": "Role accounts | 09 Procurement",
+   "item": "X QA Petugas Pengadaan",
+   "action": "Add User, sign in, My profile",
+   "login": "qa.procurement",
+   "roles": "procurement",
+   "branch": "Podomoro",
+   "result": "Done",
+   "notes": [
+    "first run 2026-10-20T08:53: Failed (error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).not.\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed); run again",
+    "Add User (branch Podomoro, roles procurement): toast \"User added.\"",
+    "sign-in OK; My profile: roles \"procurement\", active branch \"\u2014\"",
+    "active branch on My profile is \"\u2014\": a new account has not chosen its branch yet (Preferences); Branch map maps its roles to Podomoro (checked on 2026-10-20 for qa.admin3, qa.approver, qa.dokter, qa.kasir, qa.kemayoran)"
+   ],
+   "screenshots": [
+    "reports/screenshots/prereq/U8-08-1-error.png",
+    "reports/screenshots/prereq/U8-08-2-users-list.png",
+    "reports/screenshots/prereq/U8-08-3-my-profile.png"
+   ],
+   "at": "2026-10-20T09:01:21.582Z"
+  },
+  {
+   "id": "U8-09",
+   "sheet": "Role accounts",
+   "ref": "Role accounts | 10 HR",
+   "item": "X QA Admin HR",
+   "action": "Add User, sign in, My profile",
+   "login": "qa.hrd",
+   "roles": "hrd",
+   "branch": "Podomoro",
+   "result": "Done",
+   "notes": [
+    "first run 2026-10-20T08:53: Failed (error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).not.\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed); run again",
+    "Add User (branch Podomoro, roles hrd): toast \"User added.\"",
+    "sign-in OK; My profile: roles \"hrd\", active branch \"\u2014\"",
+    "active branch on My profile is \"\u2014\": a new account has not chosen its branch yet (Preferences); Branch map maps its roles to Podomoro (checked on 2026-10-20 for qa.admin3, qa.approver, qa.dokter, qa.kasir, qa.kemayoran)"
+   ],
+   "screenshots": [
+    "reports/screenshots/prereq/U8-09-1-error.png",
+    "reports/screenshots/prereq/U8-09-2-users-list.png",
+    "reports/screenshots/prereq/U8-09-3-my-profile.png"
+   ],
+   "at": "2026-10-20T09:01:31.448Z"
+  },
+  {
+   "id": "U8-10",
+   "sheet": "Role accounts",
+   "ref": "Role accounts | 11 Laboratory",
+   "item": "X QA Analis Lab",
+   "action": "Add User, sign in, My profile",
+   "login": "qa.analis",
+   "roles": "analis",
+   "branch": "Podomoro",
+   "result": "Done",
+   "notes": [
+    "first run 2026-10-20T08:53: Failed (error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).not.\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed); run again",
+    "Add User (branch Podomoro, roles analis): toast \"User added.\"",
+    "sign-in OK; My profile: roles \"analis\", active branch \"\u2014\"",
+    "active branch on My profile is \"\u2014\": a new account has not chosen its branch yet (Preferences); Branch map maps its roles to Podomoro (checked on 2026-10-20 for qa.admin3, qa.approver, qa.dokter, qa.kasir, qa.kemayoran)"
+   ],
+   "screenshots": [
+    "reports/screenshots/prereq/U8-10-1-error.png",
+    "reports/screenshots/prereq/U8-10-2-users-list.png",
+    "reports/screenshots/prereq/U8-10-3-my-profile.png"
+   ],
+   "at": "2026-10-20T09:01:41.630Z"
+  },
+  {
+   "id": "U8-11",
+   "sheet": "Role accounts",
+   "ref": "Role accounts | 12 RIS",
+   "item": "X QA Radiografer",
+   "action": "Add User, sign in, My profile",
+   "login": "qa.radiografer",
+   "roles": "radiografer",
+   "branch": "Podomoro",
+   "result": "Done",
+   "notes": [
+    "first run 2026-10-20T08:54: Failed (error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).not.\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed); run again",
+    "Add User (branch Podomoro, roles radiografer): toast \"User added.\"",
+    "sign-in OK; My profile: roles \"radiografer\", active branch \"\u2014\"",
+    "active branch on My profile is \"\u2014\": a new account has not chosen its branch yet (Preferences); Branch map maps its roles to Podomoro (checked on 2026-10-20 for qa.admin3, qa.approver, qa.dokter, qa.kasir, qa.kemayoran)"
+   ],
+   "screenshots": [
+    "reports/screenshots/prereq/U8-11-1-error.png",
+    "reports/screenshots/prereq/U8-11-2-users-list.png",
+    "reports/screenshots/prereq/U8-11-3-my-profile.png"
+   ],
+   "at": "2026-10-20T09:01:51.916Z"
+  },
+  {
+   "id": "U8-12",
+   "sheet": "Role accounts",
+   "ref": "Role accounts | 13 Dietary",
+   "item": "X QA Ahli Gizi",
+   "action": "Add User, sign in, My profile",
+   "login": "qa.gizi",
+   "roles": "gizi",
+   "branch": "Podomoro",
+   "result": "Done",
+   "notes": [
+    "first run 2026-10-20T08:54: Failed (error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).not.\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed); run again",
+    "Add User (branch Podomoro, roles gizi): toast \"User added.\"",
+    "sign-in OK; My profile: roles \"gizi\", active branch \"\u2014\"",
+    "active branch on My profile is \"\u2014\": a new account has not chosen its branch yet (Preferences); Branch map maps its roles to Podomoro (checked on 2026-10-20 for qa.admin3, qa.approver, qa.dokter, qa.kasir, qa.kemayoran)"
+   ],
+   "screenshots": [
+    "reports/screenshots/prereq/U8-12-1-error.png",
+    "reports/screenshots/prereq/U8-12-2-users-list.png",
+    "reports/screenshots/prereq/U8-12-3-my-profile.png"
+   ],
+   "at": "2026-10-20T09:02:01.598Z"
+  },
+  {
+   "id": "U8-13",
+   "sheet": "Role accounts",
+   "ref": "Role accounts | 14 Hospital Accounts",
+   "item": "X QA Kasir",
+   "action": "Add User, sign in, My profile",
+   "login": "qa.kasir",
+   "roles": "kasir",
+   "branch": "Podomoro",
+   "result": "Done",
+   "notes": [
+    "first run 2026-10-20T08:54: Failed (error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).not.\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed); run again",
+    "Add User (branch Podomoro, roles kasir): toast \"User added.\"",
+    "sign-in OK; My profile: roles \"kasir\", active branch \"\u2014\"",
+    "active branch on My profile is \"\u2014\": a new account has not chosen its branch yet (Preferences); Branch map maps its roles to Podomoro (checked on 2026-10-20 for qa.admin3, qa.approver, qa.dokter, qa.kasir, qa.kemayoran)"
+   ],
+   "screenshots": [
+    "reports/screenshots/prereq/U8-13-1-error.png",
+    "reports/screenshots/prereq/U8-13-2-users-list.png",
+    "reports/screenshots/prereq/U8-13-3-my-profile.png"
+   ],
+   "at": "2026-10-20T09:02:11.420Z"
+  },
+  {
+   "id": "U8-14",
+   "sheet": "Role accounts",
+   "ref": "Role accounts | 15 Emergency",
+   "item": "X QA Perawat IGD",
+   "action": "Add User, sign in, My profile",
+   "login": "qa.igd",
+   "roles": "igd",
+   "branch": "Podomoro",
+   "result": "Done",
+   "notes": [
+    "first run 2026-10-20T08:54: Failed (error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).not.\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed); run again",
+    "Add User (branch Podomoro, roles igd): toast \"User added.\"",
+    "sign-in OK; My profile: roles \"igd\", active branch \"\u2014\"",
+    "active branch on My profile is \"\u2014\": a new account has not chosen its branch yet (Preferences); Branch map maps its roles to Podomoro (checked on 2026-10-20 for qa.admin3, qa.approver, qa.dokter, qa.kasir, qa.kemayoran)"
+   ],
+   "screenshots": [
+    "reports/screenshots/prereq/U8-14-1-error.png",
+    "reports/screenshots/prereq/U8-14-2-users-list.png",
+    "reports/screenshots/prereq/U8-14-3-my-profile.png"
+   ],
+   "at": "2026-10-20T09:02:21.597Z"
+  },
+  {
+   "id": "U8-15",
+   "sheet": "Role accounts",
+   "ref": "Role accounts | 16 MRD",
+   "item": "X QA Petugas Rekam Medis",
+   "action": "Add User, sign in, My profile",
+   "login": "qa.rekammedis",
+   "roles": "rekammedis",
+   "branch": "Podomoro",
+   "result": "Done",
+   "notes": [
+    "first run 2026-10-20T08:54: Failed (error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).not.\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed); run again",
+    "Add User (branch Podomoro, roles rekammedis): toast \"User added.\"",
+    "sign-in OK; My profile: roles \"rekammedis\", active branch \"\u2014\"",
+    "active branch on My profile is \"\u2014\": a new account has not chosen its branch yet (Preferences); Branch map maps its roles to Podomoro (checked on 2026-10-20 for qa.admin3, qa.approver, qa.dokter, qa.kasir, qa.kemayoran)"
+   ],
+   "screenshots": [
+    "reports/screenshots/prereq/U8-15-1-error.png",
+    "reports/screenshots/prereq/U8-15-2-users-list.png",
+    "reports/screenshots/prereq/U8-15-3-my-profile.png"
+   ],
+   "at": "2026-10-20T09:02:30.855Z"
+  },
+  {
+   "id": "U8-16",
+   "sheet": "Role accounts",
+   "ref": "Role accounts | 17 Payroll",
+   "item": "X QA Petugas Payroll",
+   "action": "Add User, sign in, My profile",
+   "login": "qa.payroll",
+   "roles": "payroll",
+   "branch": "Podomoro",
+   "result": "Done",
+   "notes": [
+    "first run 2026-10-20T08:55: Failed (error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).not.\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed); run again",
+    "Add User (branch Podomoro, roles payroll): toast \"User added.\"",
+    "sign-in OK; My profile: roles \"payroll\", active branch \"\u2014\"",
+    "active branch on My profile is \"\u2014\": a new account has not chosen its branch yet (Preferences); Branch map maps its roles to Podomoro (checked on 2026-10-20 for qa.admin3, qa.approver, qa.dokter, qa.kasir, qa.kemayoran)"
+   ],
+   "screenshots": [
+    "reports/screenshots/prereq/U8-16-1-error.png",
+    "reports/screenshots/prereq/U8-16-2-users-list.png",
+    "reports/screenshots/prereq/U8-16-3-my-profile.png"
+   ],
+   "at": "2026-10-20T09:02:40.336Z"
+  },
+  {
+   "id": "U8-17",
+   "sheet": "Role accounts",
+   "ref": "Role accounts | 18 Settings",
+   "item": "X QA Admin Settings",
+   "action": "Add User, sign in, My profile",
+   "login": "qa.settings",
+   "roles": "qa_settings",
+   "branch": "Podomoro",
+   "result": "Blocked",
+   "notes": [
+    "not made: the role qa_settings has no usable rights (see sheet Roles)"
+   ],
+   "screenshots": [],
+   "at": "2026-10-20T08:55:23.822Z"
+  },
+  {
+   "id": "U8-18",
+   "sheet": "Role accounts",
+   "ref": "Role accounts | 19 Finance",
+   "item": "X QA Akuntan",
+   "action": "Add User, sign in, My profile",
+   "login": "qa.finance",
+   "roles": "finance",
+   "branch": "Podomoro",
+   "result": "Done",
+   "notes": [
+    "first run 2026-10-20T08:55: Failed (error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).not.\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed); run again",
+    "Add User (branch Podomoro, roles finance): toast \"User added.\"",
+    "sign-in OK; My profile: roles \"finance\", active branch \"\u2014\"",
+    "active branch on My profile is \"\u2014\": a new account has not chosen its branch yet (Preferences); Branch map maps its roles to Podomoro (checked on 2026-10-20 for qa.admin3, qa.approver, qa.dokter, qa.kasir, qa.kemayoran)"
+   ],
+   "screenshots": [
+    "reports/screenshots/prereq/U8-18-1-error.png",
+    "reports/screenshots/prereq/U8-18-2-users-list.png",
+    "reports/screenshots/prereq/U8-18-3-my-profile.png"
+   ],
+   "at": "2026-10-20T09:02:50.269Z"
+  },
+  {
+   "id": "U8-19",
+   "sheet": "Role accounts",
+   "ref": "Role accounts | 20 Budget",
+   "item": "X QA Petugas Anggaran",
+   "action": "Add User, sign in, My profile",
+   "login": "qa.budget",
+   "roles": "budget",
+   "branch": "Podomoro",
+   "result": "Done",
+   "notes": [
+    "first run 2026-10-20T08:55: Failed (error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).not.\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed); run again",
+    "Add User (branch Podomoro, roles budget): toast \"User added.\"",
+    "sign-in OK; My profile: roles \"budget\", active branch \"\u2014\"",
+    "active branch on My profile is \"\u2014\": a new account has not chosen its branch yet (Preferences); Branch map maps its roles to Podomoro (checked on 2026-10-20 for qa.admin3, qa.approver, qa.dokter, qa.kasir, qa.kemayoran)"
+   ],
+   "screenshots": [
+    "reports/screenshots/prereq/U8-19-1-error.png",
+    "reports/screenshots/prereq/U8-19-2-users-list.png",
+    "reports/screenshots/prereq/U8-19-3-my-profile.png"
+   ],
+   "at": "2026-10-20T09:02:59.475Z"
+  },
+  {
+   "id": "U8-20",
+   "sheet": "Role accounts",
+   "ref": "Role accounts | 21 CSSD",
+   "item": "X QA Petugas CSSD",
+   "action": "Add User, sign in, My profile",
+   "login": "qa.cssd",
+   "roles": "cssd",
+   "branch": "Podomoro",
+   "result": "Done",
+   "notes": [
+    "first run 2026-10-20T08:55: Failed (error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).not.\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed); run again",
+    "Add User (branch Podomoro, roles cssd): toast \"User added.\"",
+    "sign-in OK; My profile: roles \"cssd\", active branch \"\u2014\"",
+    "active branch on My profile is \"\u2014\": a new account has not chosen its branch yet (Preferences); Branch map maps its roles to Podomoro (checked on 2026-10-20 for qa.admin3, qa.approver, qa.dokter, qa.kasir, qa.kemayoran)"
+   ],
+   "screenshots": [
+    "reports/screenshots/prereq/U8-20-1-error.png",
+    "reports/screenshots/prereq/U8-20-2-users-list.png",
+    "reports/screenshots/prereq/U8-20-3-my-profile.png"
+   ],
+   "at": "2026-10-20T09:03:10.982Z"
+  },
+  {
+   "id": "U8-21",
+   "sheet": "Role accounts",
+   "ref": "Role accounts | 22 Services",
+   "item": "X QA Petugas Services",
+   "action": "Add User, sign in, My profile",
+   "login": "qa.services",
+   "roles": "qa_services",
+   "branch": "Podomoro",
+   "result": "Blocked",
+   "notes": [
+    "not made: the role qa_services has no usable rights (see sheet Roles)"
+   ],
+   "screenshots": [],
+   "at": "2026-10-20T08:56:03.423Z"
+  },
+  {
+   "id": "U8-22",
+   "sheet": "Role accounts",
+   "ref": "Role accounts | 23 Sourcing",
+   "item": "X QA Petugas Sourcing",
+   "action": "Add User, sign in, My profile",
+   "login": "qa.sourcing",
+   "roles": "qa_sourcing",
+   "branch": "Podomoro",
+   "result": "Blocked",
+   "notes": [
+    "not made: the role qa_sourcing has no usable rights (see sheet Roles)"
+   ],
+   "screenshots": [],
+   "at": "2026-10-20T08:56:03.423Z"
+  },
+  {
+   "id": "U8-23",
+   "sheet": "Role accounts",
+   "ref": "Role accounts | 24 Housekeeping",
+   "item": "X QA Supervisor Housekeeping",
+   "action": "Add User, sign in, My profile",
+   "login": "qa.housekeeping",
+   "roles": "housekeeping",
+   "branch": "Podomoro",
+   "result": "Done",
+   "notes": [
+    "first run 2026-10-20T08:56: Failed (error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).not.\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed); run again",
+    "Add User (branch Podomoro, roles housekeeping): toast \"User added.\"",
+    "sign-in OK; My profile: roles \"housekeeping\", active branch \"\u2014\"",
+    "active branch on My profile is \"\u2014\": a new account has not chosen its branch yet (Preferences); Branch map maps its roles to Podomoro (checked on 2026-10-20 for qa.admin3, qa.approver, qa.dokter, qa.kasir, qa.kemayoran)"
+   ],
+   "screenshots": [
+    "reports/screenshots/prereq/U8-23-1-error.png",
+    "reports/screenshots/prereq/U8-23-2-users-list.png",
+    "reports/screenshots/prereq/U8-23-3-my-profile.png"
+   ],
+   "at": "2026-10-20T09:03:20.893Z"
+  },
+  {
+   "id": "U8-24",
+   "sheet": "Role accounts",
+   "ref": "Role accounts | 25 Linen",
+   "item": "X QA Supervisor Linen",
+   "action": "Add User, sign in, My profile",
+   "login": "qa.linen",
+   "roles": "linen",
+   "branch": "Podomoro",
+   "result": "Done",
+   "notes": [
+    "first run 2026-10-20T08:56: Failed (error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).not.\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed); run again",
+    "Add User (branch Podomoro, roles linen): toast \"User added.\"",
+    "sign-in OK; My profile: roles \"linen\", active branch \"\u2014\"",
+    "active branch on My profile is \"\u2014\": a new account has not chosen its branch yet (Preferences); Branch map maps its roles to Podomoro (checked on 2026-10-20 for qa.admin3, qa.approver, qa.dokter, qa.kasir, qa.kemayoran)"
+   ],
+   "screenshots": [
+    "reports/screenshots/prereq/U8-24-1-error.png",
+    "reports/screenshots/prereq/U8-24-2-users-list.png",
+    "reports/screenshots/prereq/U8-24-3-my-profile.png"
+   ],
+   "at": "2026-10-20T09:03:30.694Z"
+  },
+  {
+   "id": "U8-25",
+   "sheet": "Role accounts",
+   "ref": "Role accounts | 26 Maintenance",
+   "item": "X QA Petugas IPSRS",
+   "action": "Add User, sign in, My profile",
+   "login": "qa.ipsrs",
+   "roles": "ipsrs",
+   "branch": "Podomoro",
+   "result": "Done",
+   "notes": [
+    "first run 2026-10-20T08:56: Failed (error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).not.\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed); run again",
+    "Add User (branch Podomoro, roles ipsrs): toast \"User added.\"",
+    "sign-in OK; My profile: roles \"ipsrs\", active branch \"\u2014\"",
+    "active branch on My profile is \"\u2014\": a new account has not chosen its branch yet (Preferences); Branch map maps its roles to Podomoro (checked on 2026-10-20 for qa.admin3, qa.approver, qa.dokter, qa.kasir, qa.kemayoran)"
+   ],
+   "screenshots": [
+    "reports/screenshots/prereq/U8-25-1-error.png",
+    "reports/screenshots/prereq/U8-25-2-users-list.png",
+    "reports/screenshots/prereq/U8-25-3-my-profile.png"
+   ],
+   "at": "2026-10-20T09:03:40.327Z"
+  },
+  {
+   "id": "U8-26",
+   "sheet": "Role accounts",
+   "ref": "Role accounts | 27 Fixed assets",
+   "item": "X QA Admin Aset",
+   "action": "Add User, sign in, My profile",
+   "login": "qa.aset",
+   "roles": "aset",
+   "branch": "Podomoro",
+   "result": "Done",
+   "notes": [
+    "first run 2026-10-20T08:56: Failed (error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).not.\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed); run again",
+    "Add User (branch Podomoro, roles aset): toast \"User added.\"",
+    "sign-in OK; My profile: roles \"aset\", active branch \"\u2014\"",
+    "active branch on My profile is \"\u2014\": a new account has not chosen its branch yet (Preferences); Branch map maps its roles to Podomoro (checked on 2026-10-20 for qa.admin3, qa.approver, qa.dokter, qa.kasir, qa.kemayoran)"
+   ],
+   "screenshots": [
+    "reports/screenshots/prereq/U8-26-1-error.png",
+    "reports/screenshots/prereq/U8-26-2-users-list.png",
+    "reports/screenshots/prereq/U8-26-3-my-profile.png"
+   ],
+   "at": "2026-10-20T09:03:49.358Z"
+  },
+  {
+   "id": "S04",
+   "sheet": "Set-up and data",
+   "ref": "Set-up and data | 4",
+   "item": "Diagnosis code version",
+   "action": "None",
+   "result": "Not possible",
+   "notes": [
+    "no screen imports or activates a code version (API or seed by the site administrator)"
+   ],
+   "screenshots": [],
+   "at": "2026-10-20T08:56:56.643Z"
+  },
+  {
+   "id": "S05",
+   "sheet": "Set-up and data",
+   "ref": "Set-up and data | 5",
+   "item": "Item below its minimum stock (Reorder, Podomoro)",
+   "action": "Checked Reorder",
+   "result": "Already present",
+   "notes": [
+    "Reorder lists 29+ items below their minimum (e.g. QA-INV-PARA-MV8QXF17701 0 \u00b7 QA-INV-PARA-MV8R29KG10F 0 \u00b7 QA-INV-PARA-MV8R3KGV20Q 0 \u00b7); nothing saved"
+   ],
+   "screenshots": [
+    "reports/screenshots/prereq/S05-1-reorder.png"
+   ],
+   "at": "2026-10-20T08:56:56.643Z"
+  },
+  {
+   "id": "S06",
+   "sheet": "Set-up and data",
+   "ref": "Set-up and data | 6",
+   "item": "User linked to an employee",
+   "action": "See U7",
+   "result": "Done",
+   "notes": [
+    "first run 2026-10-20T08:56: Failed (done with U7 (qa.pegawai): ); run again",
+    "done with U7 (qa.pegawai): employee X-EMP-QA-PEGAWAI: toast \"Saved. / Saved.\"; Link me: toast \"Saved. / Saved.\""
+   ],
+   "screenshots": [],
+   "at": "2026-10-20T09:03:58.864Z"
+  },
+  {
+   "id": "S07",
+   "sheet": "Set-up and data",
+   "ref": "Set-up and data | 7",
+   "item": "Emergency registration configuration (type 7, Podomoro)",
+   "action": "Checked the screen",
+   "result": "Not possible",
+   "notes": [
+    "\"Podomoro has no registration configuration for type 7.\"; no screen of Settings or Registration makes a registration configuration (site administrator)"
+   ],
+   "screenshots": [
+    "reports/screenshots/prereq/S07-1-emergency-registration.png"
+   ],
+   "at": "2026-10-20T08:56:59.353Z"
+  },
+  {
+   "id": "S08",
+   "sheet": "Set-up and data",
+   "ref": "Set-up and data | 8",
+   "item": "Finance configuration of Podomoro",
+   "action": "Finance configuration, Save",
+   "result": "Done",
+   "notes": [
+    "before: \"This branch has no finance configuration.\"",
+    "year 2026; back-dated 3 days; instrument validity 90 days; Cash: 1101 \u00b7 Kas; Bank: QA-1010-MVDHF9E56815 \u00b7 QA Bank Uji MVDHF9E56816; Patient cash: 1101 \u00b7 Kas; Patient bank: QA-1010-MVDHF9E56815 \u00b7 QA Bank Uji MVDHF9E56816; Patient control: 1101 \u00b7 Kas; Revenue: 4101 \u00b7 Pendapatan; Surplus / deficit: QA-3010-MVDHF9E5680Z \u00b7 QA Akun Uji 3010 MVDHF9E56810",
+    "user allowed to transact: admin2 \u00b7 rs.admin2",
+    "Save: toast \"Configuration saved.\"",
+    "Patient collections (Podomoro): no longer says the branch has no finance configuration"
+   ],
+   "screenshots": [
+    "reports/screenshots/prereq/S08-1-finance-configuration.png",
+    "reports/screenshots/prereq/S08-2-patient-collections.png"
+   ],
+   "at": "2026-10-20T08:57:01.428Z"
+  },
+  {
+   "id": "S09",
+   "sheet": "Set-up and data",
+   "ref": "Set-up and data | 9",
+   "item": "Budget posting rules of Podomoro and approvers",
+   "action": "Budget posting rules, Save; read Process definitions",
+   "result": "Done",
+   "notes": [
+    "first run 2026-10-20T08:57: Failed (Allocation \u2014 capital: debit QA-1501-MVDHF9E57408 \u00b7 QA Aset alkes uji MVDHF9E57409, credit QA-3010-MVDHF9E5680Z \u00b7 QA Akun Uji 3010 MVDHF9E56810: toast \"Allocation \u2014 capital rule saved.\"; Allocation \u2014 operating: debit QA-5010-MVDHF9E5710K \u00b7 QA Beban Uji MVDHF9E5710L, credit QA-3010-MVDHF9E5680Z \u00b7 QA Akun Uji 3010 MVDHF9E56810: toast \"Choose the debit and credit accounts.\"; Process definitions: each budget chain has 1 step (\"Persetujuan\"); the chain editor names steps only and has no field for an approver, so the approver is whoever holds BUDGET_APPROVE (U5 qa.approver, U8 qa.budget)); run again",
+    "Allocation \u2014 capital: already \"Ready\"",
+    "Allocation \u2014 operating: debit QA-5010-MVDHF9E5710K \u00b7 QA Beban Uji MVDHF9E5710L, credit QA-3010-MVDHF9E5680Z \u00b7 QA Akun Uji 3010 MVDHF9E56810: toast \"Allocation \u2014 operating rule saved.\"",
+    "Process definitions: each budget chain has 1 step (\"Persetujuan\"); the chain editor names steps only and has no field for an approver, so the approver is whoever holds BUDGET_APPROVE (U5 qa.approver, U8 qa.budget)"
+   ],
+   "screenshots": [
+    "reports/screenshots/prereq/S09-1-posting-rules.png",
+    "reports/screenshots/prereq/S09-2-process-definitions.png",
+    "reports/screenshots/prereq/S09-3-posting-rules.png",
+    "reports/screenshots/prereq/S09-4-process-definitions.png"
+   ],
+   "at": "2026-10-20T09:03:58.864Z"
+  },
+  {
+   "id": "S10",
+   "sheet": "Set-up and data",
+   "ref": "Set-up and data | 10",
+   "item": "CSSD: passed Bowie Dick today, category KITS, drug form KIT",
+   "action": "Bowie Dick, Save; Inventory set-up, category",
+   "result": "Done",
+   "notes": [
+    "first run 2026-10-20T08:57: Failed (Bowie Dick 2026-10-20, Autoklaf 1 CSSD, indicator indikator kelas 5, Pass: toast \"Bowie Dick test saved.\" (valid for today only; the first cycle of each later day needs its own test); item category KITS: toast \"Saved.\"; drug form KIT: no screen of Inventory or Pharmacy keeps drug forms; left to the site administrator); run again",
+    "Bowie Dick: Autoklaf 1 CSSD already passed on 2026-10-20",
+    "item category KITS already on Inventory set-up",
+    "drug form KIT: no screen of Inventory or Pharmacy keeps drug forms; left to the site administrator",
+    "partly done: drug form KIT open"
+   ],
+   "screenshots": [
+    "reports/screenshots/prereq/S10-1-bowie-dick.png",
+    "reports/screenshots/prereq/S10-2-inventory-setup.png",
+    "reports/screenshots/prereq/S10-3-bowie-dick.png",
+    "reports/screenshots/prereq/S10-4-inventory-setup.png"
+   ],
+   "at": "2026-10-20T09:04:11.893Z"
+  },
+  {
+   "id": "S11",
+   "sheet": "Set-up and data",
+   "ref": "Set-up and data | 11",
+   "item": "Records made in another application",
+   "action": "None",
+   "result": "Not done",
+   "notes": [
+    "made by the feeding journeys themselves (E2E chains, npm run test:e2e), not by this set-up run"
+   ],
+   "screenshots": [],
+   "at": "2026-10-20T08:57:31.799Z"
+  },
+  {
+   "id": "S12",
+   "sheet": "Set-up and data",
+   "ref": "Set-up and data | 12",
+   "item": "Defects that stop journeys",
+   "action": "None",
+   "result": "Not possible",
+   "notes": [
+    "for Development; see 00-blockers-checklist-linked.xlsx"
+   ],
+   "screenshots": [],
+   "at": "2026-10-20T08:57:31.799Z"
+  }
+ ]
+}

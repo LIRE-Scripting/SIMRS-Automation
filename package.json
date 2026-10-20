@@ -13,7 +13,9 @@
     "qa:inventory": "tsx scripts/qa/build-inventory.ts",
     "typecheck": "tsc --noEmit -p .",
     "qa:e2e-workbook": "tsx scripts/qa/build-e2e-workbook.ts",
-    "qa:e2e-chains": "tsx scripts/qa/build-e2e-chains.ts"
+    "qa:e2e-chains": "tsx scripts/qa/build-e2e-chains.ts",
+    "test:prereq": "playwright test --project=prereq",
+    "qa:prereq-evidence": "tsx scripts/qa/build-prereq-evidence.ts"
   },
   "keywords": [],
   "author": "",
