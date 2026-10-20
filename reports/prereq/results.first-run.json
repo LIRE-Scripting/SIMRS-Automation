@@ -161,7 +161,7 @@
    "branch": "Podomoro",
    "result": "Failed",
    "notes": [
-    "error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).not.\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed"
+    "error: expect(locator).not.toHaveText(expected) failed"
    ],
    "screenshots": [
     "reports/screenshots/prereq/U3-1-error.png"
@@ -179,7 +179,7 @@
    "branch": "Podomoro",
    "result": "Failed",
    "notes": [
-    "error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).not.\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed"
+    "error: expect(locator).not.toHaveText(expected) failed"
    ],
    "screenshots": [
     "reports/screenshots/prereq/U4-1-error.png"
@@ -197,7 +197,7 @@
    "branch": "Podomoro",
    "result": "Failed",
    "notes": [
-    "error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).not.\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed"
+    "error: expect(locator).not.toHaveText(expected) failed"
    ],
    "screenshots": [
     "reports/screenshots/prereq/U5-1-error.png"
@@ -215,7 +215,7 @@
    "branch": "Kemayoran",
    "result": "Failed",
    "notes": [
-    "error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).not.\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed"
+    "error: expect(locator).not.toHaveText(expected) failed"
    ],
    "screenshots": [
     "reports/screenshots/prereq/U6-1-error.png"
@@ -233,7 +233,7 @@
    "branch": "Podomoro",
    "result": "Failed",
    "notes": [
-    "error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).not.\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed"
+    "error: expect(locator).not.toHaveText(expected) failed"
    ],
    "screenshots": [
     "reports/screenshots/prereq/U7-1-error.png"
@@ -251,7 +251,7 @@
    "branch": "Podomoro",
    "result": "Failed",
    "notes": [
-    "error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).not.\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed"
+    "error: expect(locator).not.toHaveText(expected) failed"
    ],
    "screenshots": [
     "reports/screenshots/prereq/U8-01-1-error.png"
@@ -269,7 +269,7 @@
    "branch": "Podomoro",
    "result": "Failed",
    "notes": [
-    "error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).not.\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed"
+    "error: expect(locator).not.toHaveText(expected) failed"
    ],
    "screenshots": [
     "reports/screenshots/prereq/U8-02-1-error.png"
@@ -303,7 +303,7 @@
    "branch": "Podomoro",
    "result": "Failed",
    "notes": [
-    "error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).not.\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed"
+    "error: expect(locator).not.toHaveText(expected) failed"
    ],
    "screenshots": [
     "reports/screenshots/prereq/U8-04-1-error.png"
@@ -321,7 +321,7 @@
    "branch": "Podomoro",
    "result": "Failed",
    "notes": [
-    "error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).not.\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed"
+    "error: expect(locator).not.toHaveText(expected) failed"
    ],
    "screenshots": [
     "reports/screenshots/prereq/U8-05-1-error.png"
@@ -339,7 +339,7 @@
    "branch": "Podomoro",
    "result": "Failed",
    "notes": [
-    "error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).not.\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed"
+    "error: expect(locator).not.toHaveText(expected) failed"
    ],
    "screenshots": [
     "reports/screenshots/prereq/U8-06-1-error.png"
@@ -357,7 +357,7 @@
    "branch": "Podomoro",
    "result": "Failed",
    "notes": [
-    "error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).not.\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed"
+    "error: expect(locator).not.toHaveText(expected) failed"
    ],
    "screenshots": [
     "reports/screenshots/prereq/U8-07-1-error.png"
@@ -375,7 +375,7 @@
    "branch": "Podomoro",
    "result": "Failed",
    "notes": [
-    "error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).not.\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed"
+    "error: expect(locator).not.toHaveText(expected) failed"
    ],
    "screenshots": [
     "reports/screenshots/prereq/U8-08-1-error.png"
@@ -393,7 +393,7 @@
    "branch": "Podomoro",
    "result": "Failed",
    "notes": [
-    "error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).not.\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed"
+    "error: expect(locator).not.toHaveText(expected) failed"
    ],
    "screenshots": [
     "reports/screenshots/prereq/U8-09-1-error.png"
@@ -411,7 +411,7 @@
    "branch": "Podomoro",
    "result": "Failed",
    "notes": [
-    "error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).not.\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed"
+    "error: expect(locator).not.toHaveText(expected) failed"
    ],
    "screenshots": [
     "reports/screenshots/prereq/U8-10-1-error.png"
@@ -429,7 +429,7 @@
    "branch": "Podomoro",
    "result": "Failed",
    "notes": [
-    "error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).not.\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed"
+    "error: expect(locator).not.toHaveText(expected) failed"
    ],
    "screenshots": [
     "reports/screenshots/prereq/U8-11-1-error.png"
@@ -447,7 +447,7 @@
    "branch": "Podomoro",
    "result": "Failed",
    "notes": [
-    "error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).not.\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed"
+    "error: expect(locator).not.toHaveText(expected) failed"
    ],
    "screenshots": [
     "reports/screenshots/prereq/U8-12-1-error.png"
@@ -465,7 +465,7 @@
    "branch": "Podomoro",
    "result": "Failed",
    "notes": [
-    "error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).not.\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed"
+    "error: expect(locator).not.toHaveText(expected) failed"
    ],
    "screenshots": [
     "reports/screenshots/prereq/U8-13-1-error.png"
@@ -483,7 +483,7 @@
    "branch": "Podomoro",
    "result": "Failed",
    "notes": [
-    "error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).not.\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed"
+    "error: expect(locator).not.toHaveText(expected) failed"
    ],
    "screenshots": [
     "reports/screenshots/prereq/U8-14-1-error.png"
@@ -501,7 +501,7 @@
    "branch": "Podomoro",
    "result": "Failed",
    "notes": [
-    "error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).not.\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed"
+    "error: expect(locator).not.toHaveText(expected) failed"
    ],
    "screenshots": [
     "reports/screenshots/prereq/U8-15-1-error.png"
@@ -519,7 +519,7 @@
    "branch": "Podomoro",
    "result": "Failed",
    "notes": [
-    "error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).not.\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed"
+    "error: expect(locator).not.toHaveText(expected) failed"
    ],
    "screenshots": [
     "reports/screenshots/prereq/U8-16-1-error.png"
@@ -553,7 +553,7 @@
    "branch": "Podomoro",
    "result": "Failed",
    "notes": [
-    "error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).not.\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed"
+    "error: expect(locator).not.toHaveText(expected) failed"
    ],
    "screenshots": [
     "reports/screenshots/prereq/U8-18-1-error.png"
@@ -571,7 +571,7 @@
    "branch": "Podomoro",
    "result": "Failed",
    "notes": [
-    "error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).not.\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed"
+    "error: expect(locator).not.toHaveText(expected) failed"
    ],
    "screenshots": [
     "reports/screenshots/prereq/U8-19-1-error.png"
@@ -589,7 +589,7 @@
    "branch": "Podomoro",
    "result": "Failed",
    "notes": [
-    "error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).not.\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed"
+    "error: expect(locator).not.toHaveText(expected) failed"
    ],
    "screenshots": [
     "reports/screenshots/prereq/U8-20-1-error.png"
@@ -639,7 +639,7 @@
    "branch": "Podomoro",
    "result": "Failed",
    "notes": [
-    "error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).not.\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed"
+    "error: expect(locator).not.toHaveText(expected) failed"
    ],
    "screenshots": [
     "reports/screenshots/prereq/U8-23-1-error.png"
@@ -657,7 +657,7 @@
    "branch": "Podomoro",
    "result": "Failed",
    "notes": [
-    "error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).not.\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed"
+    "error: expect(locator).not.toHaveText(expected) failed"
    ],
    "screenshots": [
     "reports/screenshots/prereq/U8-24-1-error.png"
@@ -675,7 +675,7 @@
    "branch": "Podomoro",
    "result": "Failed",
    "notes": [
-    "error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).not.\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed"
+    "error: expect(locator).not.toHaveText(expected) failed"
    ],
    "screenshots": [
     "reports/screenshots/prereq/U8-25-1-error.png"
@@ -693,7 +693,7 @@
    "branch": "Podomoro",
    "result": "Failed",
    "notes": [
-    "error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).not.\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed"
+    "error: expect(locator).not.toHaveText(expected) failed"
    ],
    "screenshots": [
     "reports/screenshots/prereq/U8-26-1-error.png"
@@ -721,7 +721,7 @@
    "action": "Checked Reorder",
    "result": "Already present",
    "notes": [
-    "Reorder lists 29+ items below their minimum (e.g. QA-INV-PARA-MV8QXF17701 0 · QA-INV-PARA-MV8R29KG10F 0 · QA-INV-PARA-MV8R3KGV20Q 0 ·); nothing saved"
+    "Reorder lists 29+ items below their minimum (e.g. QA-INV-PARA-MV8QXF17701 0 \u00b7 QA-INV-PARA-MV8R29KG10F 0 \u00b7 QA-INV-PARA-MV8R3KGV20Q 0 \u00b7); nothing saved"
    ],
    "screenshots": [
     "reports/screenshots/prereq/S05-1-reorder.png"
@@ -765,8 +765,8 @@
    "result": "Done",
    "notes": [
     "before: \"This branch has no finance configuration.\"",
-    "year 2026; back-dated 3 days; instrument validity 90 days; Cash: 1101 · Kas; Bank: QA-1010-MVDHF9E56815 · QA Bank Uji MVDHF9E56816; Patient cash: 1101 · Kas; Patient bank: QA-1010-MVDHF9E56815 · QA Bank Uji MVDHF9E56816; Patient control: 1101 · Kas; Revenue: 4101 · Pendapatan; Surplus / deficit: QA-3010-MVDHF9E5680Z · QA Akun Uji 3010 MVDHF9E56810",
-    "user allowed to transact: admin2 · rs.admin2",
+    "year 2026; back-dated 3 days; instrument validity 90 days; Cash: 1101 \u00b7 Kas; Bank: QA-1010-MVDHF9E56815 \u00b7 QA Bank Uji MVDHF9E56816; Patient cash: 1101 \u00b7 Kas; Patient bank: QA-1010-MVDHF9E56815 \u00b7 QA Bank Uji MVDHF9E56816; Patient control: 1101 \u00b7 Kas; Revenue: 4101 \u00b7 Pendapatan; Surplus / deficit: QA-3010-MVDHF9E5680Z \u00b7 QA Akun Uji 3010 MVDHF9E56810",
+    "user allowed to transact: admin2 \u00b7 rs.admin2",
     "Save: toast \"Configuration saved.\"",
     "Patient collections (Podomoro): no longer says the branch has no finance configuration"
    ],
@@ -784,8 +784,8 @@
    "action": "Budget posting rules, Save; read Process definitions",
    "result": "Failed",
    "notes": [
-    "Allocation — capital: debit QA-1501-MVDHF9E57408 · QA Aset alkes uji MVDHF9E57409, credit QA-3010-MVDHF9E5680Z · QA Akun Uji 3010 MVDHF9E56810: toast \"Allocation — capital rule saved.\"",
-    "Allocation — operating: debit QA-5010-MVDHF9E5710K · QA Beban Uji MVDHF9E5710L, credit QA-3010-MVDHF9E5680Z · QA Akun Uji 3010 MVDHF9E56810: toast \"Choose the debit and credit accounts.\"",
+    "Allocation \u2014 capital: debit QA-1501-MVDHF9E57408 \u00b7 QA Aset alkes uji MVDHF9E57409, credit QA-3010-MVDHF9E5680Z \u00b7 QA Akun Uji 3010 MVDHF9E56810: toast \"Allocation \u2014 capital rule saved.\"",
+    "Allocation \u2014 operating: debit QA-5010-MVDHF9E5710K \u00b7 QA Beban Uji MVDHF9E5710L, credit QA-3010-MVDHF9E5680Z \u00b7 QA Akun Uji 3010 MVDHF9E56810: toast \"Choose the debit and credit accounts.\"",
     "Process definitions: each budget chain has 1 step (\"Persetujuan\"); the chain editor names steps only and has no field for an approver, so the approver is whoever holds BUDGET_APPROVE (U5 qa.approver, U8 qa.budget)"
    ],
    "screenshots": [

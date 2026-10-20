@@ -13,8 +13,9 @@ import { BR_A, clickFor, PostingRules } from '../modules/19-finance/helpers';
  * accounts, Set-up and data), once: the go-ahead of 2026-10-20 covers one
  * run. A finished run leaves reports/prereq/results.json; while that file
  * exists the spec saves nothing, except with PREREQ_RETRY=1: then only the
- * items recorded as Failed run again (their earlier result stays in the
- * notes) and every other item keeps its record. Every item checks the site first and only
+ * items recorded as Failed run again (PREREQ_RETRY=blocked: Failed and
+ * Blocked; their earlier result stays in the notes) and every other item
+ * keeps its record. Every item checks the site first and only
  * saves what is missing. Each item records its result, notes and a
  * screenshot; npm run qa:prereq-evidence turns them into
  * reports/prereq/00-prerequisites-evidence.xlsx.
@@ -46,7 +47,8 @@ export type PrereqItem = {
 };
 
 const done: PrereqItem[] = [];
-const RETRY = process.env.PREREQ_RETRY === '1';
+const RETRY = process.env.PREREQ_RETRY === '1' || process.env.PREREQ_RETRY === 'blocked';
+const RETRIED: PrereqItem['result'][] = process.env.PREREQ_RETRY === 'blocked' ? ['Failed', 'Blocked'] : ['Failed'];
 const earlier = new Map<string, PrereqItem>(
   RETRY && fs.existsSync(RESULTS) ? (JSON.parse(fs.readFileSync(RESULTS, 'utf8')).items as PrereqItem[]).map((i) => [i.id, i]) : [],
 );
@@ -54,12 +56,12 @@ const earlier = new Map<string, PrereqItem>(
 /** Runs one item: records its result and notes; an error ends the item as Failed, not the run. On a retry only a Failed item runs again. */
 async function item(page: Page, base: Omit<PrereqItem, 'result' | 'notes' | 'screenshots' | 'at'>, fn: (r: PrereqItem) => Promise<void>): Promise<void> {
   const before = earlier.get(base.id);
-  if (before && before.result !== 'Failed') {
+  if (before && !RETRIED.includes(before.result)) {
     done.push(before);
     return;
   }
   const r: PrereqItem = { ...base, result: 'Done', notes: [], screenshots: [...(before?.screenshots ?? [])], at: new Date().toISOString() };
-  if (before) r.notes.push(`first run ${before.at.slice(0, 16)}: Failed (${before.notes.join('; ')}); run again`);
+  if (before) r.notes.push(`earlier run ${before.at.slice(0, 16)}: ${before.result} (${before.notes.filter((n) => !n.startsWith('earlier run') && !n.startsWith('first run')).join('; ')}); run again`);
   try {
     await fn(r);
   } catch (e) {
@@ -233,7 +235,7 @@ test.beforeAll(() => {
 
 test.beforeEach(async ({ page }) => {
   test.skip(process.env.QA_ALLOW_WRITES !== '1', 'needs the go-ahead: QA_ALLOW_WRITES=1');
-  test.skip(fs.existsSync(RESULTS) && !RETRY, `${RESULTS} exists: the one run allowed by the go-ahead is done (PREREQ_RETRY=1 runs its Failed items again)`);
+  test.skip(fs.existsSync(RESULTS) && !RETRY, `${RESULTS} exists: the one run allowed by the go-ahead is done (PREREQ_RETRY=1 runs its Failed items again, PREREQ_RETRY=blocked also the Blocked ones)`);
   await installToastRecorder(page);
 });
 
@@ -282,17 +284,25 @@ test('01 roles the site lacks', async ({ page }) => {
       }
       await pickRole(page, role.name);
       const main = page.getByRole('main');
-      if (role.rights.length) {
-        for (const right of role.rights) await main.getByRole('checkbox', { name: new RegExp(`^${right}\\b`) }).check();
+      const box = (right: string) => main.getByRole('checkbox', { name: new RegExp(`^${right}\\b`) });
+      const missing = [];
+      for (const right of role.rights) if (!(await box(right).isChecked())) missing.push(right);
+      if (role.rights.length && !missing.length) r.notes.push(`the role already holds ${role.rights.join(', ')}`);
+      if (missing.length) {
+        for (const right of missing) await box(right).check();
+        // The save is a server action posted to /identity/rights: its status and error digest are the evidence of a failure.
+        const answer = page.waitForResponse((res) => res.request().method() === 'POST' && res.url().includes('/identity/rights') && !!res.request().postData()?.includes('['), { timeout: 15_000 }).catch(() => null);
         const mark = await toastMark(page);
         await main.getByRole('button', { name: 'Save rights' }).click();
         const t = await toastsAfter(page, mark);
-        r.notes.push(`Save rights (${role.rights.join(', ')}): toast "${t.join(' / ')}"`);
+        const res = await answer;
+        const digest = res ? ((await res.text().catch(() => '')).match(/"digest":"(\d+)"/)?.[1] ?? '') : '';
+        r.notes.push(`Save rights (${missing.join(', ')}): toast "${t.join(' / ')}"; server answer HTTP ${res?.status() ?? '?'}${digest ? `, error digest ${digest}` : ''}; sent: the role id and ${missing.length} privilege id(s)`);
         if (!t.includes('Rights updated.')) {
           r.result = t.includes('Failed to save rights.') ? 'Blocked' : 'Failed';
-          if (r.result === 'Blocked') r.notes.push('blocker 38: saving the rights of a role answers HTTP 500; the accounts of this role are not made');
+          if (r.result === 'Blocked') r.notes.push('blocker 38: the request is well formed (role id of an existing role, privilege ids from the list) and the server fails on it; the accounts of this role are not made');
           unusableRoles.add(role.name);
-        }
+        } else if (r.result === 'Already present') r.result = 'Done';
         await pickRole(page, role.name);
       }
       const counter = await main.getByText(/^\d+ \/ \d+$/).innerText();

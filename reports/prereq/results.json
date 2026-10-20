@@ -1,6 +1,6 @@
 {
  "site": "https://rs.showcase.atklik.xyz",
- "runAt": "2026-10-20T09:04:16.666Z",
+ "runAt": "2026-10-20T09:13:30.340Z",
  "runBy": "U1 rs.admin2",
  "items": [
   {
@@ -83,15 +83,17 @@
    "roles": "ADT_WRITE",
    "result": "Blocked",
    "notes": [
-    "Add Role: toast \"Role added.\"",
-    "Save rights (ADT_WRITE): toast \"Failed to save rights.\"",
-    "blocker 38: saving the rights of a role answers HTTP 500; the accounts of this role are not made",
+    "earlier run 2026-10-20T08:50: Blocked (Add Role: toast \"Role added.\"; Save rights (ADT_WRITE): toast \"Failed to save rights.\"; blocker 38: saving the rights of a role answers HTTP 500; the accounts of this role are not made; privileges on User Rights: 0 / 40); run again",
+    "the role exists",
+    "Save rights (ADT_WRITE): toast \"Failed to save rights.\"; server answer HTTP 500, error digest 2696407390; sent: the role id and 1 privilege id(s)",
+    "blocker 38: the request is well formed (role id of an existing role, privilege ids from the list) and the server fails on it; the accounts of this role are not made",
     "privileges on User Rights: 0 / 40"
    ],
    "screenshots": [
-    "reports/screenshots/prereq/R2-1-rights.png"
+    "reports/screenshots/prereq/R2-1-rights.png",
+    "reports/screenshots/prereq/R2-2-rights.png"
    ],
-   "at": "2026-10-20T08:50:15.893Z"
+   "at": "2026-10-20T09:13:05.954Z"
   },
   {
    "id": "R3",
@@ -102,15 +104,17 @@
    "roles": "MDM_WRITE, IDENTITY_ROLES_READ, IDENTITY_ROLES_WRITE, IDENTITY_ROLE_PRIVILEGES_WRITE, IDENTITY_USERS_READ, IDENTITY_USERS_WRITE, WORKFLOW_WRITE",
    "result": "Blocked",
    "notes": [
-    "Add Role: toast \"Role added.\"",
-    "Save rights (MDM_WRITE, IDENTITY_ROLES_READ, IDENTITY_ROLES_WRITE, IDENTITY_ROLE_PRIVILEGES_WRITE, IDENTITY_USERS_READ, IDENTITY_USERS_WRITE, WORKFLOW_WRITE): toast \"Failed to save rights.\"",
-    "blocker 38: saving the rights of a role answers HTTP 500; the accounts of this role are not made",
+    "earlier run 2026-10-20T08:50: Blocked (Add Role: toast \"Role added.\"; Save rights (MDM_WRITE, IDENTITY_ROLES_READ, IDENTITY_ROLES_WRITE, IDENTITY_ROLE_PRIVILEGES_WRITE, IDENTITY_USERS_READ, IDENTITY_USERS_WRITE, WORKFLOW_WRITE): toast \"Failed to save rights.\"; blocker 38: saving the rights of a role answers HTTP 500; the accounts of this role are not made; privileges on User Rights: 0 / 40); run again",
+    "the role exists",
+    "Save rights (MDM_WRITE, IDENTITY_ROLES_READ, IDENTITY_ROLES_WRITE, IDENTITY_ROLE_PRIVILEGES_WRITE, IDENTITY_USERS_READ, IDENTITY_USERS_WRITE, WORKFLOW_WRITE): toast \"Failed to save rights.\"; server answer HTTP 500, error digest 2696407390; sent: the role id and 7 privilege id(s)",
+    "blocker 38: the request is well formed (role id of an existing role, privilege ids from the list) and the server fails on it; the accounts of this role are not made",
     "privileges on User Rights: 0 / 40"
    ],
    "screenshots": [
-    "reports/screenshots/prereq/R3-1-rights.png"
+    "reports/screenshots/prereq/R3-1-rights.png",
+    "reports/screenshots/prereq/R3-2-rights.png"
    ],
-   "at": "2026-10-20T08:50:27.008Z"
+   "at": "2026-10-20T09:13:12.356Z"
   },
   {
    "id": "R4",
@@ -121,15 +125,17 @@
    "roles": "SERVICES_WRITE",
    "result": "Blocked",
    "notes": [
-    "Add Role: toast \"Role added.\"",
-    "Save rights (SERVICES_WRITE): toast \"Failed to save rights.\"",
-    "blocker 38: saving the rights of a role answers HTTP 500; the accounts of this role are not made",
+    "earlier run 2026-10-20T08:50: Blocked (Add Role: toast \"Role added.\"; Save rights (SERVICES_WRITE): toast \"Failed to save rights.\"; blocker 38: saving the rights of a role answers HTTP 500; the accounts of this role are not made; privileges on User Rights: 0 / 40); run again",
+    "the role exists",
+    "Save rights (SERVICES_WRITE): toast \"Failed to save rights.\"; server answer HTTP 500, error digest 2696407390; sent: the role id and 1 privilege id(s)",
+    "blocker 38: the request is well formed (role id of an existing role, privilege ids from the list) and the server fails on it; the accounts of this role are not made",
     "privileges on User Rights: 0 / 40"
    ],
    "screenshots": [
-    "reports/screenshots/prereq/R4-1-rights.png"
+    "reports/screenshots/prereq/R4-1-rights.png",
+    "reports/screenshots/prereq/R4-2-rights.png"
    ],
-   "at": "2026-10-20T08:50:39.424Z"
+   "at": "2026-10-20T09:13:19.153Z"
   },
   {
    "id": "R5",
@@ -140,15 +146,17 @@
    "roles": "SOURCING_WRITE",
    "result": "Blocked",
    "notes": [
-    "Add Role: toast \"Role added.\"",
-    "Save rights (SOURCING_WRITE): toast \"Failed to save rights.\"",
-    "blocker 38: saving the rights of a role answers HTTP 500; the accounts of this role are not made",
+    "earlier run 2026-10-20T08:50: Blocked (Add Role: toast \"Role added.\"; Save rights (SOURCING_WRITE): toast \"Failed to save rights.\"; blocker 38: saving the rights of a role answers HTTP 500; the accounts of this role are not made; privileges on User Rights: 0 / 40); run again",
+    "the role exists",
+    "Save rights (SOURCING_WRITE): toast \"Failed to save rights.\"; server answer HTTP 500, error digest 2696407390; sent: the role id and 1 privilege id(s)",
+    "blocker 38: the request is well formed (role id of an existing role, privilege ids from the list) and the server fails on it; the accounts of this role are not made",
     "privileges on User Rights: 0 / 40"
    ],
    "screenshots": [
-    "reports/screenshots/prereq/R5-1-rights.png"
+    "reports/screenshots/prereq/R5-1-rights.png",
+    "reports/screenshots/prereq/R5-2-rights.png"
    ],
-   "at": "2026-10-20T08:50:51.682Z"
+   "at": "2026-10-20T09:13:24.805Z"
   },
   {
    "id": "U3",
@@ -161,7 +169,7 @@
    "branch": "Podomoro",
    "result": "Done",
    "notes": [
-    "first run 2026-10-20T08:51: Failed (error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).not.\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed); run again",
+    "first run 2026-10-20T08:51: Failed (error: expect(locator).not.toHaveText(expected) failed); run again",
     "Add User (branch Podomoro, roles qa_staff): toast \"User added.\"",
     "sign-in OK; My profile: roles \"qa_staff\", active branch \"\u2014\"",
     "active branch on My profile is \"\u2014\": a new account has not chosen its branch yet (Preferences); Branch map maps its roles to Podomoro (checked on 2026-10-20 for qa.admin3, qa.approver, qa.dokter, qa.kasir, qa.kemayoran)"
@@ -184,7 +192,7 @@
    "branch": "Podomoro",
    "result": "Done",
    "notes": [
-    "first run 2026-10-20T08:51: Failed (error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).not.\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed); run again",
+    "first run 2026-10-20T08:51: Failed (error: expect(locator).not.toHaveText(expected) failed); run again",
     "Add User (branch Podomoro, roles admin): toast \"User added.\"",
     "sign-in OK; My profile: roles \"admin\", active branch \"\u2014\"",
     "active branch on My profile is \"\u2014\": a new account has not chosen its branch yet (Preferences); Branch map maps its roles to Podomoro (checked on 2026-10-20 for qa.admin3, qa.approver, qa.dokter, qa.kasir, qa.kemayoran)"
@@ -207,7 +215,7 @@
    "branch": "Podomoro",
    "result": "Done",
    "notes": [
-    "first run 2026-10-20T08:51: Failed (error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).not.\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed); run again",
+    "first run 2026-10-20T08:51: Failed (error: expect(locator).not.toHaveText(expected) failed); run again",
     "Add User (branch Podomoro, roles finance, budget, cssd, procurement): toast \"User added.\"",
     "sign-in OK; My profile: roles \"budget cssd finance procurement\", active branch \"\u2014\"",
     "active branch on My profile is \"\u2014\": a new account has not chosen its branch yet (Preferences); Branch map maps its roles to Podomoro (checked on 2026-10-20 for qa.admin3, qa.approver, qa.dokter, qa.kasir, qa.kemayoran)"
@@ -230,7 +238,7 @@
    "branch": "Kemayoran",
    "result": "Done",
    "notes": [
-    "first run 2026-10-20T08:51: Failed (error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).not.\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed); run again",
+    "first run 2026-10-20T08:51: Failed (error: expect(locator).not.toHaveText(expected) failed); run again",
     "Add User (branch Kemayoran, roles admin): toast \"User added.\"",
     "sign-in OK; My profile: roles \"admin\", active branch \"\u2014\"",
     "active branch on My profile is \"\u2014\": a new account has not chosen its branch yet (Preferences); Branch map maps its roles to Kemayoran (checked on 2026-10-20 for qa.admin3, qa.approver, qa.dokter, qa.kasir, qa.kemayoran)"
@@ -253,7 +261,7 @@
    "branch": "Podomoro",
    "result": "Done",
    "notes": [
-    "first run 2026-10-20T08:51: Failed (error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).not.\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed); run again",
+    "first run 2026-10-20T08:51: Failed (error: expect(locator).not.toHaveText(expected) failed); run again",
     "Add User (branch Podomoro, roles hrd, payroll): toast \"User added.\"",
     "sign-in OK; My profile: roles \"hrd payroll\", active branch \"\u2014\"",
     "active branch on My profile is \"\u2014\": a new account has not chosen its branch yet (Preferences); Branch map maps its roles to Podomoro (checked on 2026-10-20 for qa.admin3, qa.approver, qa.dokter, qa.kasir, qa.kemayoran)",
@@ -280,7 +288,7 @@
    "branch": "Podomoro",
    "result": "Done",
    "notes": [
-    "first run 2026-10-20T08:52: Failed (error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).not.\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed); run again",
+    "first run 2026-10-20T08:52: Failed (error: expect(locator).not.toHaveText(expected) failed); run again",
     "Add User (branch Podomoro, roles pendaftaran): toast \"User added.\"",
     "sign-in OK; My profile: roles \"pendaftaran\", active branch \"\u2014\"",
     "active branch on My profile is \"\u2014\": a new account has not chosen its branch yet (Preferences); Branch map maps its roles to Podomoro (checked on 2026-10-20 for qa.admin3, qa.approver, qa.dokter, qa.kasir, qa.kemayoran)"
@@ -303,7 +311,7 @@
    "branch": "Podomoro",
    "result": "Done",
    "notes": [
-    "first run 2026-10-20T08:52: Failed (error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).not.\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed); run again",
+    "first run 2026-10-20T08:52: Failed (error: expect(locator).not.toHaveText(expected) failed); run again",
     "Add User (branch Podomoro, roles dokter): toast \"User added.\"",
     "sign-in OK; My profile: roles \"dokter\", active branch \"\u2014\"",
     "active branch on My profile is \"\u2014\": a new account has not chosen its branch yet (Preferences); Branch map maps its roles to Podomoro (checked on 2026-10-20 for qa.admin3, qa.approver, qa.dokter, qa.kasir, qa.kemayoran)"
@@ -326,10 +334,11 @@
    "branch": "Podomoro",
    "result": "Blocked",
    "notes": [
+    "earlier run 2026-10-20T08:52: Blocked (not made: the role qa_rawat_inap has no usable rights (see sheet Roles)); run again",
     "not made: the role qa_rawat_inap has no usable rights (see sheet Roles)"
    ],
    "screenshots": [],
-   "at": "2026-10-20T08:52:35.864Z"
+   "at": "2026-10-20T09:13:30.108Z"
   },
   {
    "id": "U8-04",
@@ -342,7 +351,7 @@
    "branch": "Podomoro",
    "result": "Done",
    "notes": [
-    "first run 2026-10-20T08:52: Failed (error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).not.\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed); run again",
+    "first run 2026-10-20T08:52: Failed (error: expect(locator).not.toHaveText(expected) failed); run again",
     "Add User (branch Podomoro, roles apoteker): toast \"User added.\"",
     "sign-in OK; My profile: roles \"apoteker\", active branch \"\u2014\"",
     "active branch on My profile is \"\u2014\": a new account has not chosen its branch yet (Preferences); Branch map maps its roles to Podomoro (checked on 2026-10-20 for qa.admin3, qa.approver, qa.dokter, qa.kasir, qa.kemayoran)"
@@ -365,7 +374,7 @@
    "branch": "Podomoro",
    "result": "Done",
    "notes": [
-    "first run 2026-10-20T08:52: Failed (error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).not.\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed); run again",
+    "first run 2026-10-20T08:52: Failed (error: expect(locator).not.toHaveText(expected) failed); run again",
     "Add User (branch Podomoro, roles bankdarah): toast \"User added.\"",
     "sign-in OK; My profile: roles \"bankdarah\", active branch \"\u2014\"",
     "active branch on My profile is \"\u2014\": a new account has not chosen its branch yet (Preferences); Branch map maps its roles to Podomoro (checked on 2026-10-20 for qa.admin3, qa.approver, qa.dokter, qa.kasir, qa.kemayoran)"
@@ -388,7 +397,7 @@
    "branch": "Podomoro",
    "result": "Done",
    "notes": [
-    "first run 2026-10-20T08:53: Failed (error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).not.\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed); run again",
+    "first run 2026-10-20T08:53: Failed (error: expect(locator).not.toHaveText(expected) failed); run again",
     "Add User (branch Podomoro, roles gudang): toast \"User added.\"",
     "sign-in OK; My profile: roles \"gudang\", active branch \"\u2014\"",
     "active branch on My profile is \"\u2014\": a new account has not chosen its branch yet (Preferences); Branch map maps its roles to Podomoro (checked on 2026-10-20 for qa.admin3, qa.approver, qa.dokter, qa.kasir, qa.kemayoran)"
@@ -411,7 +420,7 @@
    "branch": "Podomoro",
    "result": "Done",
    "notes": [
-    "first run 2026-10-20T08:53: Failed (error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).not.\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed); run again",
+    "first run 2026-10-20T08:53: Failed (error: expect(locator).not.toHaveText(expected) failed); run again",
     "Add User (branch Podomoro, roles ok): toast \"User added.\"",
     "sign-in OK; My profile: roles \"ok\", active branch \"\u2014\"",
     "active branch on My profile is \"\u2014\": a new account has not chosen its branch yet (Preferences); Branch map maps its roles to Podomoro (checked on 2026-10-20 for qa.admin3, qa.approver, qa.dokter, qa.kasir, qa.kemayoran)"
@@ -434,7 +443,7 @@
    "branch": "Podomoro",
    "result": "Done",
    "notes": [
-    "first run 2026-10-20T08:53: Failed (error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).not.\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed); run again",
+    "first run 2026-10-20T08:53: Failed (error: expect(locator).not.toHaveText(expected) failed); run again",
     "Add User (branch Podomoro, roles procurement): toast \"User added.\"",
     "sign-in OK; My profile: roles \"procurement\", active branch \"\u2014\"",
     "active branch on My profile is \"\u2014\": a new account has not chosen its branch yet (Preferences); Branch map maps its roles to Podomoro (checked on 2026-10-20 for qa.admin3, qa.approver, qa.dokter, qa.kasir, qa.kemayoran)"
@@ -457,7 +466,7 @@
    "branch": "Podomoro",
    "result": "Done",
    "notes": [
-    "first run 2026-10-20T08:53: Failed (error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).not.\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed); run again",
+    "first run 2026-10-20T08:53: Failed (error: expect(locator).not.toHaveText(expected) failed); run again",
     "Add User (branch Podomoro, roles hrd): toast \"User added.\"",
     "sign-in OK; My profile: roles \"hrd\", active branch \"\u2014\"",
     "active branch on My profile is \"\u2014\": a new account has not chosen its branch yet (Preferences); Branch map maps its roles to Podomoro (checked on 2026-10-20 for qa.admin3, qa.approver, qa.dokter, qa.kasir, qa.kemayoran)"
@@ -480,7 +489,7 @@
    "branch": "Podomoro",
    "result": "Done",
    "notes": [
-    "first run 2026-10-20T08:53: Failed (error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).not.\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed); run again",
+    "first run 2026-10-20T08:53: Failed (error: expect(locator).not.toHaveText(expected) failed); run again",
     "Add User (branch Podomoro, roles analis): toast \"User added.\"",
     "sign-in OK; My profile: roles \"analis\", active branch \"\u2014\"",
     "active branch on My profile is \"\u2014\": a new account has not chosen its branch yet (Preferences); Branch map maps its roles to Podomoro (checked on 2026-10-20 for qa.admin3, qa.approver, qa.dokter, qa.kasir, qa.kemayoran)"
@@ -503,7 +512,7 @@
    "branch": "Podomoro",
    "result": "Done",
    "notes": [
-    "first run 2026-10-20T08:54: Failed (error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).not.\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed); run again",
+    "first run 2026-10-20T08:54: Failed (error: expect(locator).not.toHaveText(expected) failed); run again",
     "Add User (branch Podomoro, roles radiografer): toast \"User added.\"",
     "sign-in OK; My profile: roles \"radiografer\", active branch \"\u2014\"",
     "active branch on My profile is \"\u2014\": a new account has not chosen its branch yet (Preferences); Branch map maps its roles to Podomoro (checked on 2026-10-20 for qa.admin3, qa.approver, qa.dokter, qa.kasir, qa.kemayoran)"
@@ -526,7 +535,7 @@
    "branch": "Podomoro",
    "result": "Done",
    "notes": [
-    "first run 2026-10-20T08:54: Failed (error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).not.\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed); run again",
+    "first run 2026-10-20T08:54: Failed (error: expect(locator).not.toHaveText(expected) failed); run again",
     "Add User (branch Podomoro, roles gizi): toast \"User added.\"",
     "sign-in OK; My profile: roles \"gizi\", active branch \"\u2014\"",
     "active branch on My profile is \"\u2014\": a new account has not chosen its branch yet (Preferences); Branch map maps its roles to Podomoro (checked on 2026-10-20 for qa.admin3, qa.approver, qa.dokter, qa.kasir, qa.kemayoran)"
@@ -549,7 +558,7 @@
    "branch": "Podomoro",
    "result": "Done",
    "notes": [
-    "first run 2026-10-20T08:54: Failed (error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).not.\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed); run again",
+    "first run 2026-10-20T08:54: Failed (error: expect(locator).not.toHaveText(expected) failed); run again",
     "Add User (branch Podomoro, roles kasir): toast \"User added.\"",
     "sign-in OK; My profile: roles \"kasir\", active branch \"\u2014\"",
     "active branch on My profile is \"\u2014\": a new account has not chosen its branch yet (Preferences); Branch map maps its roles to Podomoro (checked on 2026-10-20 for qa.admin3, qa.approver, qa.dokter, qa.kasir, qa.kemayoran)"
@@ -572,7 +581,7 @@
    "branch": "Podomoro",
    "result": "Done",
    "notes": [
-    "first run 2026-10-20T08:54: Failed (error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).not.\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed); run again",
+    "first run 2026-10-20T08:54: Failed (error: expect(locator).not.toHaveText(expected) failed); run again",
     "Add User (branch Podomoro, roles igd): toast \"User added.\"",
     "sign-in OK; My profile: roles \"igd\", active branch \"\u2014\"",
     "active branch on My profile is \"\u2014\": a new account has not chosen its branch yet (Preferences); Branch map maps its roles to Podomoro (checked on 2026-10-20 for qa.admin3, qa.approver, qa.dokter, qa.kasir, qa.kemayoran)"
@@ -595,7 +604,7 @@
    "branch": "Podomoro",
    "result": "Done",
    "notes": [
-    "first run 2026-10-20T08:54: Failed (error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).not.\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed); run again",
+    "first run 2026-10-20T08:54: Failed (error: expect(locator).not.toHaveText(expected) failed); run again",
     "Add User (branch Podomoro, roles rekammedis): toast \"User added.\"",
     "sign-in OK; My profile: roles \"rekammedis\", active branch \"\u2014\"",
     "active branch on My profile is \"\u2014\": a new account has not chosen its branch yet (Preferences); Branch map maps its roles to Podomoro (checked on 2026-10-20 for qa.admin3, qa.approver, qa.dokter, qa.kasir, qa.kemayoran)"
@@ -618,7 +627,7 @@
    "branch": "Podomoro",
    "result": "Done",
    "notes": [
-    "first run 2026-10-20T08:55: Failed (error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).not.\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed); run again",
+    "first run 2026-10-20T08:55: Failed (error: expect(locator).not.toHaveText(expected) failed); run again",
     "Add User (branch Podomoro, roles payroll): toast \"User added.\"",
     "sign-in OK; My profile: roles \"payroll\", active branch \"\u2014\"",
     "active branch on My profile is \"\u2014\": a new account has not chosen its branch yet (Preferences); Branch map maps its roles to Podomoro (checked on 2026-10-20 for qa.admin3, qa.approver, qa.dokter, qa.kasir, qa.kemayoran)"
@@ -641,10 +650,11 @@
    "branch": "Podomoro",
    "result": "Blocked",
    "notes": [
+    "earlier run 2026-10-20T08:55: Blocked (not made: the role qa_settings has no usable rights (see sheet Roles)); run again",
     "not made: the role qa_settings has no usable rights (see sheet Roles)"
    ],
    "screenshots": [],
-   "at": "2026-10-20T08:55:23.822Z"
+   "at": "2026-10-20T09:13:30.108Z"
   },
   {
    "id": "U8-18",
@@ -657,7 +667,7 @@
    "branch": "Podomoro",
    "result": "Done",
    "notes": [
-    "first run 2026-10-20T08:55: Failed (error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).not.\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed); run again",
+    "first run 2026-10-20T08:55: Failed (error: expect(locator).not.toHaveText(expected) failed); run again",
     "Add User (branch Podomoro, roles finance): toast \"User added.\"",
     "sign-in OK; My profile: roles \"finance\", active branch \"\u2014\"",
     "active branch on My profile is \"\u2014\": a new account has not chosen its branch yet (Preferences); Branch map maps its roles to Podomoro (checked on 2026-10-20 for qa.admin3, qa.approver, qa.dokter, qa.kasir, qa.kemayoran)"
@@ -680,7 +690,7 @@
    "branch": "Podomoro",
    "result": "Done",
    "notes": [
-    "first run 2026-10-20T08:55: Failed (error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).not.\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed); run again",
+    "first run 2026-10-20T08:55: Failed (error: expect(locator).not.toHaveText(expected) failed); run again",
     "Add User (branch Podomoro, roles budget): toast \"User added.\"",
     "sign-in OK; My profile: roles \"budget\", active branch \"\u2014\"",
     "active branch on My profile is \"\u2014\": a new account has not chosen its branch yet (Preferences); Branch map maps its roles to Podomoro (checked on 2026-10-20 for qa.admin3, qa.approver, qa.dokter, qa.kasir, qa.kemayoran)"
@@ -703,7 +713,7 @@
    "branch": "Podomoro",
    "result": "Done",
    "notes": [
-    "first run 2026-10-20T08:55: Failed (error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).not.\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed); run again",
+    "first run 2026-10-20T08:55: Failed (error: expect(locator).not.toHaveText(expected) failed); run again",
     "Add User (branch Podomoro, roles cssd): toast \"User added.\"",
     "sign-in OK; My profile: roles \"cssd\", active branch \"\u2014\"",
     "active branch on My profile is \"\u2014\": a new account has not chosen its branch yet (Preferences); Branch map maps its roles to Podomoro (checked on 2026-10-20 for qa.admin3, qa.approver, qa.dokter, qa.kasir, qa.kemayoran)"
@@ -726,10 +736,11 @@
    "branch": "Podomoro",
    "result": "Blocked",
    "notes": [
+    "earlier run 2026-10-20T08:56: Blocked (not made: the role qa_services has no usable rights (see sheet Roles)); run again",
     "not made: the role qa_services has no usable rights (see sheet Roles)"
    ],
    "screenshots": [],
-   "at": "2026-10-20T08:56:03.423Z"
+   "at": "2026-10-20T09:13:30.108Z"
   },
   {
    "id": "U8-22",
@@ -742,10 +753,11 @@
    "branch": "Podomoro",
    "result": "Blocked",
    "notes": [
+    "earlier run 2026-10-20T08:56: Blocked (not made: the role qa_sourcing has no usable rights (see sheet Roles)); run again",
     "not made: the role qa_sourcing has no usable rights (see sheet Roles)"
    ],
    "screenshots": [],
-   "at": "2026-10-20T08:56:03.423Z"
+   "at": "2026-10-20T09:13:30.108Z"
   },
   {
    "id": "U8-23",
@@ -758,7 +770,7 @@
    "branch": "Podomoro",
    "result": "Done",
    "notes": [
-    "first run 2026-10-20T08:56: Failed (error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).not.\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed); run again",
+    "first run 2026-10-20T08:56: Failed (error: expect(locator).not.toHaveText(expected) failed); run again",
     "Add User (branch Podomoro, roles housekeeping): toast \"User added.\"",
     "sign-in OK; My profile: roles \"housekeeping\", active branch \"\u2014\"",
     "active branch on My profile is \"\u2014\": a new account has not chosen its branch yet (Preferences); Branch map maps its roles to Podomoro (checked on 2026-10-20 for qa.admin3, qa.approver, qa.dokter, qa.kasir, qa.kemayoran)"
@@ -781,7 +793,7 @@
    "branch": "Podomoro",
    "result": "Done",
    "notes": [
-    "first run 2026-10-20T08:56: Failed (error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).not.\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed); run again",
+    "first run 2026-10-20T08:56: Failed (error: expect(locator).not.toHaveText(expected) failed); run again",
     "Add User (branch Podomoro, roles linen): toast \"User added.\"",
     "sign-in OK; My profile: roles \"linen\", active branch \"\u2014\"",
     "active branch on My profile is \"\u2014\": a new account has not chosen its branch yet (Preferences); Branch map maps its roles to Podomoro (checked on 2026-10-20 for qa.admin3, qa.approver, qa.dokter, qa.kasir, qa.kemayoran)"
@@ -804,7 +816,7 @@
    "branch": "Podomoro",
    "result": "Done",
    "notes": [
-    "first run 2026-10-20T08:56: Failed (error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).not.\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed); run again",
+    "first run 2026-10-20T08:56: Failed (error: expect(locator).not.toHaveText(expected) failed); run again",
     "Add User (branch Podomoro, roles ipsrs): toast \"User added.\"",
     "sign-in OK; My profile: roles \"ipsrs\", active branch \"\u2014\"",
     "active branch on My profile is \"\u2014\": a new account has not chosen its branch yet (Preferences); Branch map maps its roles to Podomoro (checked on 2026-10-20 for qa.admin3, qa.approver, qa.dokter, qa.kasir, qa.kemayoran)"
@@ -827,7 +839,7 @@
    "branch": "Podomoro",
    "result": "Done",
    "notes": [
-    "first run 2026-10-20T08:56: Failed (error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).not.\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed); run again",
+    "first run 2026-10-20T08:56: Failed (error: expect(locator).not.toHaveText(expected) failed); run again",
     "Add User (branch Podomoro, roles aset): toast \"User added.\"",
     "sign-in OK; My profile: roles \"aset\", active branch \"\u2014\"",
     "active branch on My profile is \"\u2014\": a new account has not chosen its branch yet (Preferences); Branch map maps its roles to Podomoro (checked on 2026-10-20 for qa.admin3, qa.approver, qa.dokter, qa.kasir, qa.kemayoran)"
