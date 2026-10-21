@@ -1,5 +1,6 @@
 import { expect, type Locator, type Page } from '@playwright/test';
 import { toastLocator } from '../../lib/assertions';
+import { pageToRow } from '../paging';
 
 /**
  * The list screens of Settings that share one layout: Departments
@@ -50,9 +51,10 @@ export class MasterListPage {
     await expect(table.getByRole('row').filter({ has: this.page.getByRole('cell') }).first()).toContainText(
       new RegExp(`${value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}|yet\\.`),
     );
-    return table
-      .getByRole('row')
-      .filter({ has: this.page.getByRole('cell').nth(i).getByText(value, { exact: true }) });
+    // The search filters only the page on screen (50 rows), so every page is looked at.
+    return pageToRow(this.main, () =>
+      table.getByRole('row').filter({ has: this.page.getByRole('cell').nth(i).getByText(value, { exact: true }) }),
+    );
   }
 
   async openAdd(): Promise<Locator> {

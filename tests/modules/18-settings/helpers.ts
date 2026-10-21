@@ -2,6 +2,7 @@ import { randomBytes } from 'node:crypto';
 import { expect, type Browser, type BrowserContext, type Locator, type Page } from '@playwright/test';
 import { installToastRecorder, toastMark, toastsSince } from '../../../lib/assertions';
 import { LoginPage } from '../../../pages/LoginPage';
+import { pageToRow } from '../../../pages/paging';
 
 /**
  * Shared steps of 18-settings.xlsx. Master data lists (/mdm/...) and the
@@ -59,17 +60,14 @@ export class Mdm {
   /** The row whose first cell is the code, searched by the code; pages on when the search covers one page only. */
   async row(code: string, search = code): Promise<Locator> {
     await this.open();
-    if (await this.search.count()) await this.search.fill(search);
-    const match = () => this.rows().filter({ has: this.page.getByRole('cell', { name: code, exact: true }) });
-    const next = this.main.getByRole('button', { name: 'Next page' });
-    for (let i = 0; i < 30; i++) {
-      if (await match().count()) return match();
-      if (!(await next.isVisible()) || (await next.isDisabled())) break;
-      const first = await this.rows().first().innerText();
-      await next.press('Enter');
-      await expect(this.rows().first()).not.toHaveText(first);
+    if (await this.search.count()) {
+      await this.search.fill(search);
+      // Wait until the list shows the search's result (a match or its empty text) before paging.
+      const text = search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      await expect(this.rows().first()).toContainText(new RegExp(`${text}|yet\\.|no .* match`, 'i')).catch(() => {});
     }
-    return match();
+    // The search filters only the page on screen, so every page is looked at.
+    return pageToRow(this.main, () => this.rows().filter({ has: this.page.getByRole('cell', { name: code, exact: true }) }));
   }
   async openAdd(): Promise<void> {
     await this.open();

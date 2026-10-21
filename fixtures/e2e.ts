@@ -49,7 +49,10 @@ export interface Qa {
   note(step: number, text: string): void;
 }
 
-type Fixtures = { qa: Qa; finalScreenshot: void };
+type Fixtures = { qa: Qa; finalScreenshot: void; serverErrors: void };
+
+/** Every HTTP 5xx answer of the site, one JSON line each (method, URL, request body, digest), for the run report. */
+const SERVER_ERRORS = process.env.QA_SERVER_ERRORS ?? '.qa-state/http-5xx.jsonl';
 
 const ANONYMOUS = { cookies: [], origins: [] };
 
@@ -121,6 +124,36 @@ const test = base.extend<Fixtures & { qaId: string }>({
       },
     });
   },
+
+  serverErrors: [
+    async ({ context }, use, testInfo) => {
+      const seen: Promise<void>[] = [];
+      context.on('response', (res) => {
+        if (res.status() < 500) return;
+        seen.push((async () => {
+          const req = res.request();
+          const body = await res.text().catch(() => '');
+          const entry = {
+            at: new Date().toISOString(),
+            test: testInfo.title,
+            status: res.status(),
+            method: req.method(),
+            url: res.url(),
+            action: req.headers()['next-action'],
+            request: (req.postData() ?? '').slice(0, 2000),
+            digest: body.match(/"digest":"?([\w-]+)/)?.[1],
+            response: body.slice(0, 500),
+          };
+          fs.mkdirSync(path.dirname(SERVER_ERRORS), { recursive: true });
+          fs.appendFileSync(SERVER_ERRORS, `${JSON.stringify(entry)}\n`);
+          testInfo.annotations.push({ type: 'http-5xx', description: `${entry.status} ${entry.method} ${new URL(entry.url).pathname}${entry.digest ? ` digest ${entry.digest}` : ''}` });
+        })());
+      });
+      await use();
+      await Promise.all(seen);
+    },
+    { auto: true },
+  ],
 
   finalScreenshot: [
     async ({ page }, use, testInfo) => {

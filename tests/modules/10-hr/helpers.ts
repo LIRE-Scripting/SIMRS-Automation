@@ -55,7 +55,10 @@ export async function ensureLeaveTypes(page: Page): Promise<void> {
   ]) {
     await l.open();
     const d = await l.openTypes();
-    const options = await d.getByRole('combobox', { name: 'Leave types' }).locator('option').allInnerTexts();
+    // The types load after the dialog opens; reading before that sees only "New type" and saves the type again.
+    const list = d.getByRole('combobox', { name: 'Leave types' }).locator('option');
+    await expect.poll(() => list.count(), { timeout: 10_000 }).toBeGreaterThan(1);
+    const options = await list.allInnerTexts();
     if (options.some((o) => o.trim().startsWith(`${t.name} ·`))) continue;
     await d.getByRole('textbox', { name: 'Name' }).fill(t.name);
     await d.getByRole('textbox', { name: 'Type' }).fill(t.type);
