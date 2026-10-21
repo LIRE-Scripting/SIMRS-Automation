@@ -75,13 +75,7 @@ export const TRIAGE: Record<string, Triage> = {
   'TC-APP011-041': SERVER_500('"Revert latest stamp" of a lab order'),
   'TC-APP013-040': SERVER_500('Diet order "Calculate" (assessment)'),
   ...group(['TC-APP014-004', 'TC-APP014-010'], SERVER_500('Cashier "Pay" of a bill already covered by deposits')),
-  ...group(['TC-APP024-010', 'TC-APP024-011', 'TC-APP024-012', 'TC-APP024-013'], SERVER_500('Saving a housekeeping contract')),
-  'TC-APP026-009': SERVER_500('Saving an AMC document'),
   // HTTP 500 on wrong input (negative tests).
-  'TC-APP022-013': REFUSED_500('Service order without a document'),
-  'TC-APP024-002': REFUSED_500('Shift for a location code that does not exist'),
-  'TC-APP026-005': REFUSED_500('Work order above the budget balance'),
-  'TC-APP026-008': REFUSED_500('AMC instalment with amount 0'),
 
   // Known checklist blockers still present; the screen test asserts HTTP 200.
   ...group(['TC-APP018-062', 'TC-APP018-088'], {
@@ -124,22 +118,10 @@ export const TRIAGE: Record<string, Triage> = {
     next: 'Dev: check that consultation radiology orders reach RIS for the branch; then rerun.',
     owner: 'Dev',
   }),
-  'TC-APP005-023': {
-    cause: 'site',
-    finding: 'Searching Issue Lines for an item or remark ("generik") gives "No issue lines yet." (same on 2026-10-18).',
-    next: 'Dev: the Issue Lines search should match item and remarks.',
-    owner: 'Dev',
-  },
   'TC-APP005-042': {
     cause: 'site',
     finding: 'Issue Lines search "Paracetamol" lists one of the two sales of the test (same on 2026-10-18); the second sale was not confirmed (dispense confirm HTTP 500).',
     next: 'Dev: fix dispense confirm (see TC-APP005-028); then rerun.',
-    owner: 'Dev',
-  },
-  'TC-APP007-003': {
-    cause: 'site',
-    finding: 'Status filter "Inactive" on the item list shows no inactive item (same on 2026-10-18).',
-    next: 'Dev: the status filter of the item list.',
     owner: 'Dev',
   },
   'TC-APP009-007': {
@@ -152,24 +134,6 @@ export const TRIAGE: Record<string, Triage> = {
     cause: 'site',
     finding: 'Blocker 30: the approval chain has one step, so PO-DONE cannot show four "Done" steps.',
     next: 'Dev/Product: blocker 30 (four-step approval chain).',
-    owner: 'Dev',
-  },
-  'TC-APP018-031': {
-    cause: 'site',
-    finding: 'Branch map search finds no line for the new user (list "Showing 51–100 of 107"): the search filters the page on screen only.',
-    next: 'Dev: Branch map search on the server. QA automation: page through the list as a workaround.',
-    owner: 'Dev',
-  },
-  'TC-APP018-042': {
-    cause: 'site',
-    finding: 'As TC-APP018-041: the test user\'s line in Branch map is past the first page and the search covers one page only.',
-    next: 'Dev: Branch map search on the server; then rerun.',
-    owner: 'Dev',
-  },
-  'TC-APP018-041': {
-    cause: 'site',
-    finding: 'The branch input of the test user\'s line in Branch map is not reachable: the user is past the first page and the search covers one page only.',
-    next: 'Dev: Branch map search on the server; then rerun.',
     owner: 'Dev',
   },
   'TC-APP018-008': {
@@ -232,4 +196,42 @@ export const TRIAGE: Record<string, Triage> = {
     next: 'QA automation: run E2E-033 before TC-APP014-011 (both close the day), after 07:00 WIB.',
     owner: 'QA automation',
   },
+
+  // Rescan of 2026-10-21 (request bodies, page snapshots and test code).
+  ...group(['TC-APP024-010', 'TC-APP024-011', 'TC-APP024-012', 'TC-APP024-013', 'TC-APP026-005', 'TC-APP026-008', 'TC-APP026-009'], {
+    cause: 'automation',
+    finding: 'The contract or work order made by the test is not found in the desk list (22 rows, blocker 40), so its id is "" and the next action (price line, send, approve, instalment) is posted with "source":"" (an empty Document). The server answers HTTP 500 to the empty Document instead of "document is missing".',
+    next: 'QA automation: stop the test when the new id is not found (Desk.create) instead of posting an empty Document. Dev: blocker 40, and refuse an empty Document with a message.',
+    owner: 'QA automation',
+  }),
+  'TC-APP022-013': {
+    cause: 'site',
+    finding: 'Step 2: a service order with "Document" left empty (as the workbook asks) is saved ("Saved."); the workbook expects a refusal ("document is missing"). The HTTP 500 of this test is step 1 (order for a request that is not approved), a refusal answered with 500.',
+    next: 'Dev: refuse an order without a document, and answer step 1 with a message instead of HTTP 500.',
+    owner: 'Dev',
+  },
+  'TC-APP024-002': {
+    cause: 'site',
+    finding: 'Step 5: a shift for a location code that does not exist (QA-X-TIDAK-ADA-…) is saved ("Saved."); the workbook expects a refusal ("location is missing"). Steps 1-4 are refused, but with HTTP 500.',
+    next: 'Dev: check that the location exists; answer the refusals with messages.',
+    owner: 'Dev',
+  },
+  'TC-APP005-023': {
+    cause: 'automation',
+    finding: 'Step 6 searches Issue Lines for "generik", but no step makes a line with that remark, and step 5 leaves the list on its last page while the search covers the page on screen only.',
+    next: 'QA automation: make a sale with the remark "generik" first and search from page 1.',
+    owner: 'QA automation',
+  },
+  'TC-APP007-003': {
+    cause: 'automation',
+    finding: 'After "Inactive" is chosen the table shows its empty row (no inactive item on the page on screen: the filter narrows only the 50 rows of the page, blocker 40); the test reads that row as an item with status "".',
+    next: 'QA automation: treat the empty row as "no rows"; the missing inactive item stays a note on blocker 40.',
+    owner: 'QA automation',
+  },
+  ...group(['TC-APP018-031', 'TC-APP018-041', 'TC-APP018-042'], {
+    cause: 'automation',
+    finding: 'The test reads only the first page of User Site Mapping (mapLines); with 107 users the new user\'s line is on a later page.',
+    next: 'QA automation: page through User Site Mapping (pages/paging.ts) to find the line.',
+    owner: 'QA automation',
+  }),
 };

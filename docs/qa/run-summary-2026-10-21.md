@@ -25,6 +25,20 @@ The detail is in these files:
 
 Of the 850 test cases that ran to a result (Passed + Deviation + Failed), **576 (68%) passed in full**.
 
+The 74 failures, after a rescan of every request body, page snapshot and test (section 3.5): **49 are site defects, 24 come from the tests, 1 from the order of the run**.
+
+### Why 478 test cases are Not run
+
+The users U3–U7 made on 2026-10-20 did unlock test cases, but those test cases still need their tests written.
+
+| Reason | Test cases | What is needed |
+|---|---|---|
+| **No test written yet**: the plan became "automate" when U3–U7 were made, but no spec declares them | 191 | QA automation writes the tests (they are listed in sheet Test cases, "No test") |
+| Automation Candidate = **Needs Evaluation** in the workbook | 159 | Product/QA decide whether to automate them |
+| Needs user **U10** (second tenant, tenant without a licence, platform superadmin) | 121 | A decision and a second tenant (deferred in 00-prerequisites.xlsx) |
+| Automation Candidate = **No** | 4 | None (manual) |
+| A precondition the shared site cannot give in one run (today's quota of DR-1 used up, arrivals at 06:50/07:05 WIB, an arrival made yesterday) | 3 | A run at a set time or over two days |
+
 ### E2E chains (50 cross-application chains)
 
 | Status | 2026-10-21 | 2026-10-18 |
@@ -44,11 +58,11 @@ The rise in failed chains has two main sources:
 1. **The largest new defect is blocker 40: pickers and lists reach only their first records.**
    - Type-ahead pickers (Department, Bed, Employee, Account) search only the first 50 records the page loaded.
    - The desk lists (Housekeeping, Maintenance, Fixed assets, Services) show 22 rows with no paging.
-   - The search of Users, Departments and Branch map filters only the page on screen.
+   - The search of Users and Departments, and the status filter of the Item list, narrow only the page on screen.
    - Once the data grows past these limits, a new record is "not found".
 
-   About 80 test cases and 16 chains failed on it. For 01/02, the departments "QA Poli Uji …" were renamed (with your approval); the 01/02 rerun went from 50 failed to 8.
-2. **HTTP 500 on valid input** remains on dispense confirm, lab revert, diet calculate, paying with deposits, housekeeping contracts, AMC and a few more (section 3.2).
+   About 70 test cases and 16 chains failed on it (the records exist: e.g. the employees are among the 297 on Employees, the bed is on Beds). For 01/02, the departments "QA Poli Uji …" were renamed (with your approval); the 01/02 rerun went from 50 failed to 8.
+2. **HTTP 500 on valid input** remains on dispense confirm, lab revert, diet calculate and paying with deposits (section 3.2).
 3. **Wrong input is refused with HTTP 500 instead of a validation message** in 106 negative/boundary tests. Examples: a duplicate patient or MRN, a duplicate appointment type, a service order without a document. The wrong data is not saved, but the user gets no proper message.
 4. **Old blockers** stop the most test cases:
 
@@ -122,7 +136,7 @@ Registered in `lib/qa-data/found-blockers.ts` and `docs/qa/blockers-found.md`, w
 | Employee (Leave, Payroll) | the new employees `QA-EMP-…` and `X QA Pegawai` are not offered | 10 (12 TC), 17 (11 TC), E2E-010 |
 | Account (Budget posting rules) | the run's QA-XSS account is not in the select | 19-033 |
 | Housekeeping/Maintenance/Fixed assets/Services desk lists | the first 22 rows, no paging or search | 22-001/003, 24-004, 26-004/007, 27-003, E2E-012/013/014/032/044 |
-| Users/Departments/Branch map search | filters only the page on screen | 18-031/041/042 |
+| Users/Departments search, Item list status filter | narrow only the page on screen | 01/02 lookups (fixed in the tests), 07-003 |
 | RIS "Schedule and report", Inventory items | a new order or item cannot be chosen or found; probably the same defect, to confirm | 03-048/051, E2E-003/008/027/035 |
 
 The workbook already expects this: steps 2–3 of TC-APP001-053 test the pickers with more than 50 users and more than 50 departments.
@@ -139,8 +153,6 @@ The workbook already expects this: steps 2–3 of TC-APP001-053 test the pickers
 | Revert latest stamp (lab) | 11-041 | `POST /en/laboratory/work` |
 | Diet "Calculate" (assessment) | 13-040, E2E-045 | `POST /en/diet/orders` |
 | Pay a bill already covered by deposits | 14-004, 14-010 | `POST /en/billing/cashier` |
-| Save a housekeeping contract | 24-010…013 | `POST /en/housekeeping/contracts` |
-| Save an AMC document | 26-009 | `POST /en/maintenance/amc` |
 | Others (once per test) | see sheet HTTP 5xx, group "Positive test" | |
 
 **Next action Dev:** look up the digest in the server log, fix the action, then rerun its tests.
@@ -164,9 +176,34 @@ The workbook already expects this: steps 2–3 of TC-APP001-053 test the pickers
 
 | Case | Test |
 |---|---|
+| A service order without a document is saved | 22-013 |
+| A shift for a location code that does not exist is saved | 24-002 |
 | A pain policy without a number is saved | 08-038 |
 | An imprest row without an amount is saved | 19-036 |
 | A repeated leave type name is accepted | site: 4× QA-Annual, 4× QA-Lama |
+
+### 3.5 Rescan: was the form filled wrongly?
+
+Every failed test was checked again against the request it sent (sheet HTTP 5xx), the page snapshot at the failure and its code.
+
+**Filled correctly; the site fails (49).**
+- The HTTP 500 on dispense confirm, lab revert, diet Calculate and Pay carry complete, well-formed values (3.2).
+- For the picker failures, the record the test typed exists (checked on 2026-10-21): the 3 employees are among the 297 on Employees, and bed QA-199-… is on Beds. The picker does not offer them.
+- 22-013 and 24-002 fill the form as the workbook asks (Document empty, an unknown location); the site saves it.
+
+**The test is wrong (24).**
+
+| Tests | What the test does wrong | Fix |
+|---|---|---|
+| 24-010…013, 26-005, 26-008, 26-009 | The new contract or work order is not found in the 22-row list (blocker 40), so its id is "" and the next action is posted with an **empty Document**; the server answers 500 | Stop the test when the new id is not found (Desk.create) instead of posting an empty Document |
+| 18-031, 18-041, 18-042 | Reads only the first page of User Site Mapping; with 107 users the new user's line is on a later page | Page through the list |
+| 05-023 | Searches Issue Lines for "generik", but no step makes such a line, and the search runs on the last page | Make the sale with that remark first; search from page 1 |
+| 07-003 | Reads the table's empty row as an item with status "" | Treat the empty row as "no rows" |
+| 01-024, 035, 043, 061, 062, 063 | No test written yet | Write the tests |
+| 01-053, 02-017 | Waits for an option or a "no match" text; the site shows an empty list | Accept the empty list |
+| 15-024/025, 19-026, 18-008 | Fixed values collide with an earlier run; precondition changed by the prerequisite run; timing (fixed) | See section 5 |
+
+**Order of the run (1):** 14-036.
 
 ## 4. E2E chains
 
@@ -293,8 +330,8 @@ The figures include the 01/02 rerun. **Blockers** are the blockers that stopped 
 
 **Failures (4):**
 
-- 023 — [site] Searching Issue Lines for an item or remark ("generik") gives "No issue lines yet." (same on 2026-10-18).
-  - Next: Dev: the Issue Lines search should match item and remarks. (Dev)
+- 023 — [automation] Step 6 searches Issue Lines for "generik", but no step makes a line with that remark, and step 5 leaves the list on its last page while the search covers the page on screen only.
+  - Next: QA automation: make a sale with the remark "generik" first and search from page 1. (QA automation)
 - 028, 033 — [site] Dispense confirm (walk-in sale of QA-PARA, quantity 1) answers HTTP 500 (server action error, digest in sheet HTTP 5xx). The request carries well-formed values from the workbook (see the request body in sheet HTTP 5xx).
   - Next: Dev: look up the digest in the server log and fix the action; then rerun the test. (Dev)
 - 042 — [site] Issue Lines search "Paracetamol" lists one of the two sales of the test (same on 2026-10-18); the second sale was not confirmed (dispense confirm HTTP 500).
@@ -320,8 +357,8 @@ The figures include the 01/02 rerun. **Blockers** are the blockers that stopped 
 
 **Failures (1):**
 
-- 003 — [site] Status filter "Inactive" on the item list shows no inactive item (same on 2026-10-18).
-  - Next: Dev: the status filter of the item list. (Dev)
+- 003 — [automation] After "Inactive" is chosen the table shows its empty row (no inactive item on the page on screen: the filter narrows only the 50 rows of the page, blocker 40); the test reads that row as an item with status "".
+  - Next: QA automation: treat the empty row as "no rows"; the missing inactive item stays a note on blocker 40. (QA automation)
 
 ### 08 Operation Theater
 
@@ -465,12 +502,8 @@ The figures include the 01/02 rerun. **Blockers** are the blockers that stopped 
 
 - 008 — [automation] After the edit, the row was looked up before the search had filtered the list (timing). The tax code is saved with the new rate.
   - Next: Fixed 2026-10-21 (Mdm.row waits for the search); rerun. (QA automation)
-- 031 — [site] Branch map search finds no line for the new user (list "Showing 51–100 of 107"): the search filters the page on screen only.
-  - Next: Dev: Branch map search on the server. QA automation: page through the list as a workaround. (Dev)
-- 041 — [site] The branch input of the test user's line in Branch map is not reachable: the user is past the first page and the search covers one page only.
-  - Next: Dev: Branch map search on the server; then rerun. (Dev)
-- 042 — [site] As TC-APP018-041: the test user's line in Branch map is past the first page and the search covers one page only.
-  - Next: Dev: Branch map search on the server; then rerun. (Dev)
+- 031, 041, 042 — [automation] The test reads only the first page of User Site Mapping (mapLines); with 107 users the new user's line is on a later page.
+  - Next: QA automation: page through User Site Mapping (pages/paging.ts) to find the line. (QA automation)
 - 062, 088 — [site] Blocker 4 still present: /entitlements and /tenants answer HTTP 500 for the hospital administrator.
   - Next: Dev: blocker 4 (hide the links or allow the screens); QA: the screen test stays failed until then. (Dev)
 
@@ -526,8 +559,8 @@ The figures include the 01/02 rerun. **Blockers** are the blockers that stopped 
 
 - 001, 003 — [site] The desk list shows its first 22 rows only, with no paging and no search; the record saved now is past them, so its status or id cannot be read (checked 2026-10-21 on /housekeeping/contracts, /maintenance/work, /maintenance/amc, /fixed-assets/register, /services/categories).
   - Next: Dev: add paging or a search (newest first) to the desk lists; then rerun. Found blocker 40. (Dev)
-- 013 — [site] Service order without a document: the input is wrong on purpose (negative test). The site refuses it, but with HTTP 500 instead of a message; nothing is saved.
-  - Next: Dev: validate the input and answer a message (the workbook names the text); then rerun. (Dev)
+- 013 — [site] Step 2: a service order with "Document" left empty (as the workbook asks) is saved ("Saved."); the workbook expects a refusal ("document is missing"). The HTTP 500 of this test is step 1 (order for a request that is not approved), a refusal answered with 500.
+  - Next: Dev: refuse an order without a document, and answer step 1 with a message instead of HTTP 500. (Dev)
 
 ### 23 Sourcing
 
@@ -549,12 +582,12 @@ The figures include the 01/02 rerun. **Blockers** are the blockers that stopped 
 
 **Failures (6):**
 
-- 002 — [site] Shift for a location code that does not exist: the input is wrong on purpose (negative test). The site refuses it, but with HTTP 500 instead of a message; nothing is saved.
-  - Next: Dev: validate the input and answer a message (the workbook names the text); then rerun. (Dev)
+- 002 — [site] Step 5: a shift for a location code that does not exist (QA-X-TIDAK-ADA-…) is saved ("Saved."); the workbook expects a refusal ("location is missing"). Steps 1-4 are refused, but with HTTP 500.
+  - Next: Dev: check that the location exists; answer the refusals with messages. (Dev)
 - 004 — [site] The desk list shows its first 22 rows only, with no paging and no search; the record saved now is past them, so its status or id cannot be read (checked 2026-10-21 on /housekeeping/contracts, /maintenance/work, /maintenance/amc, /fixed-assets/register, /services/categories).
   - Next: Dev: add paging or a search (newest first) to the desk lists; then rerun. Found blocker 40. (Dev)
-- 010, 011, 012, 013 — [site] Saving a housekeeping contract answers HTTP 500 (server action error, digest in sheet HTTP 5xx). The request carries well-formed values from the workbook (see the request body in sheet HTTP 5xx).
-  - Next: Dev: look up the digest in the server log and fix the action; then rerun the test. (Dev)
+- 010, 011, 012, 013 — [automation] The contract or work order made by the test is not found in the desk list (22 rows, blocker 40), so its id is "" and the next action (price line, send, approve, instalment) is posted with "source":"" (an empty Document). The server answers HTTP 500 to the empty Document instead of "document is missing".
+  - Next: QA automation: stop the test when the new id is not found (Desk.create) instead of posting an empty Document. Dev: blocker 40, and refuse an empty Document with a message. (QA automation)
 
 ### 25 Linen
 
@@ -578,12 +611,8 @@ The figures include the 01/02 rerun. **Blockers** are the blockers that stopped 
 
 - 004, 007 — [site] The desk list shows its first 22 rows only, with no paging and no search; the record saved now is past them, so its status or id cannot be read (checked 2026-10-21 on /housekeeping/contracts, /maintenance/work, /maintenance/amc, /fixed-assets/register, /services/categories).
   - Next: Dev: add paging or a search (newest first) to the desk lists; then rerun. Found blocker 40. (Dev)
-- 005 — [site] Work order above the budget balance: the input is wrong on purpose (negative test). The site refuses it, but with HTTP 500 instead of a message; nothing is saved.
-  - Next: Dev: validate the input and answer a message (the workbook names the text); then rerun. (Dev)
-- 008 — [site] AMC instalment with amount 0: the input is wrong on purpose (negative test). The site refuses it, but with HTTP 500 instead of a message; nothing is saved.
-  - Next: Dev: validate the input and answer a message (the workbook names the text); then rerun. (Dev)
-- 009 — [site] Saving an AMC document answers HTTP 500 (server action error, digest in sheet HTTP 5xx). The request carries well-formed values from the workbook (see the request body in sheet HTTP 5xx).
-  - Next: Dev: look up the digest in the server log and fix the action; then rerun the test. (Dev)
+- 005, 008, 009 — [automation] The contract or work order made by the test is not found in the desk list (22 rows, blocker 40), so its id is "" and the next action (price line, send, approve, instalment) is posted with "source":"" (an empty Document). The server answers HTTP 500 to the empty Document instead of "document is missing".
+  - Next: QA automation: stop the test when the new id is not found (Desk.create) instead of posting an empty Document. Dev: blocker 40, and refuse an empty Document with a message. (QA automation)
 
 ### 27 Fixed assets
 
@@ -602,10 +631,10 @@ The figures include the 01/02 rerun. **Blockers** are the blockers that stopped 
 
 ### Dev
 
-1. **Blocker 40**: search pickers and lists on the server, and give the desk lists paging or a search (3.1). The largest impact: about 80 test cases and 16 chains.
-2. **HTTP 500 on valid input** (3.2): dispense confirm, lab revert, diet calculate, pay with deposits, housekeeping contracts, AMC.
+1. **Blocker 40**: search pickers and lists on the server, and give the desk lists paging or a search (3.1). The largest impact: about 70 test cases and 16 chains.
+2. **HTTP 500 on valid input** (3.2): dispense confirm, lab revert, diet calculate, pay with deposits; and refuse an empty Document with a message instead of a 500.
 3. **Refusals answered with 500** (3.3): answer with a validation message instead.
-4. **Missing validation** (3.4): pain policy, imprest, repeated leave type names.
+4. **Missing validation** (3.4): pain policy, imprest, repeated leave type names, service order without a document, shift for an unknown location.
 5. **Old blockers with the largest impact**: 2/25 (Transfusion Medicine), 13 (branch set-up), 5 (All branches), 14 (records across applications), 10, 39 (tender), 23 (ward care), and 38 (saving the rights of a role, which also holds 4 U8 accounts).
 6. Blockers 3 and 4 (screens `/cssd/issues/new`, `/entitlements`, `/tenants`) still answer HTTP 500.
 
@@ -614,10 +643,11 @@ The figures include the 01/02 rerun. **Blockers** are the blockers that stopped 
 1. **Write the tests of the 191 test cases that are now "automate"** (since U3–U7 are ready), including 6 in 01: 024, 035, 043, 061, 062, 063.
 2. Chains E2E-009/011/040/042/050: run the steps that are now "automate" instead of stopping.
 3. TC-APP001-053 and 002-017: accept the empty list in step 1, then automate steps 2–3.
-4. TC-APP019-026: clear the accounts of the operating rule first (its precondition changed with prerequisite S09). TC-APP015-024/025: a triage category description that is unique per run, and retire the category at the end of the test.
-5. Run order: E2E-033 before TC-APP014-011, and TC-APP014-036 after TC-APP014-011. All of them after 07:00 WIB.
-6. **Rerun chains E2E-001/018/025/048 tomorrow after 07:00 WIB.** The departments are renamed, but the U1 cashier day is closed until 07:00.
-7. The Settings tests (TC-APP018) make new "QA Poli Uji …" departments on every run. Consider names that sort after "QA Poli Umum" (for example "QA Zz …"), so DEP-1 is not pushed out of the first 50 again while blocker 40 is open.
+4. The test fixes of 3.5: stop on an empty new id (Desk.create), page through User Site Mapping, 05-023 precondition, 07-003 empty row.
+5. TC-APP019-026: clear the accounts of the operating rule first (its precondition changed with prerequisite S09). TC-APP015-024/025: a triage category description that is unique per run, and retire the category at the end of the test.
+6. Run order: E2E-033 before TC-APP014-011, and TC-APP014-036 after TC-APP014-011. All of them after 07:00 WIB.
+7. **Rerun chains E2E-001/018/025/048 tomorrow after 07:00 WIB.** The departments are renamed, but the U1 cashier day is closed until 07:00.
+8. The Settings tests (TC-APP018) make new "QA Poli Uji …" departments on every run. Consider names that sort after "QA Poli Umum" (for example "QA Zz …"), so DEP-1 is not pushed out of the first 50 again while blocker 40 is open.
 
 ### Product / Site admin
 
