@@ -452,6 +452,66 @@ export const FOUND_BLOCKERS: FoundBlocker[] = [
       { id: 'TC-APP023-020', steps: [2, 3, 4, 5, 6] },
     ],
   },
+  {
+    no: 40,
+    blocker: 'Pickers and lists reach only their first records: a record past them cannot be chosen or found',
+    category: 'Function',
+    scope:
+      'Type-ahead pickers: Department (01/02 Book, Arrival, queues), Bed (04 Admissions), Employee (10 Leave, 17 Payroll), ' +
+      'Account (19 Budget posting rules)\nDesk lists: /housekeeping/*, /maintenance/*, /fixed-assets/*, /services/*\n' +
+      'Search of Users, Departments and Branch map (18 Settings)',
+    cause:
+      'A type-ahead picker filters the records the page loaded once (the first 50 by name) and never asks the server: typing the ' +
+      'full name of a record past them gives "No matching department" (QA Poli Umum, number 51+ of 75 departments) or no hit ' +
+      '(new employees QA-EMP-…, X QA Pegawai; new bed QA-199-…; account QA-XSS-…). The desk lists show their first 22 rows with no ' +
+      'paging and no search, so a document saved now is never listed (its status and id cannot be read). The search of Users, ' +
+      'Departments and Branch map filters only the page on screen. Seen 2026-10-21 once the shared site held more than 50 records ' +
+      '(Users 107, Departments 75); the same tests passed on 2026-10-18. Workaround used on 2026-10-21 for 01/02: the 39 test ' +
+      'departments "QA Poli Uji …" renamed "QA Zz Poli Uji …" so that QA Poli Umum is among the first 50 again.',
+    fix:
+      '1. Search pickers and lists on the server (or load all records); give the desk lists paging or a search, newest first.\n' +
+      '2. Run the listed test cases and the chains E2E-001, 003, 008, 010, 012, 013, 014, 018, 025, 026, 027, 029, 032, 035, 044 and 048 again.',
+    who: 'Development',
+    howFound: 'Seen on the site (full run of 2026-10-21, docs/qa/run-summary-2026-10-21.md)',
+    testCases: [
+      { id: 'TC-APP001-053', steps: [2, 3] },
+      { id: 'TC-APP002-017', steps: [2, 3] },
+      { id: 'TC-APP004-034', steps: [2, 3] },
+      { id: 'TC-APP010-008', steps: [2, 3, 4] },
+      { id: 'TC-APP010-009', steps: [1, 2] },
+      { id: 'TC-APP010-010', steps: [1, 2] },
+      { id: 'TC-APP010-011', steps: [1, 2] },
+      { id: 'TC-APP010-012', steps: [1, 2, 3] },
+      { id: 'TC-APP010-016', steps: [1, 2, 3] },
+      { id: 'TC-APP010-017', steps: [1, 2, 3] },
+      { id: 'TC-APP010-018', steps: [1, 2, 3] },
+      { id: 'TC-APP010-019', steps: [2, 3, 4, 5] },
+      { id: 'TC-APP010-022', steps: [2, 3, 4, 5] },
+      { id: 'TC-APP010-023', steps: [2, 3] },
+      { id: 'TC-APP010-032', steps: [1, 2, 3, 4, 5] },
+      { id: 'TC-APP017-001', steps: [2, 3, 4, 5] },
+      { id: 'TC-APP017-003', steps: [1, 2, 3, 4] },
+      { id: 'TC-APP017-008', steps: [1, 2, 3] },
+      { id: 'TC-APP017-010', steps: [1, 2, 3] },
+      { id: 'TC-APP017-012', steps: [1, 2, 3, 4] },
+      { id: 'TC-APP017-013', steps: [1, 2] },
+      { id: 'TC-APP017-014', steps: [2, 3, 4, 5] },
+      { id: 'TC-APP017-015', steps: [1, 2, 3, 4] },
+      { id: 'TC-APP017-016', steps: [1, 2, 3] },
+      { id: 'TC-APP017-026', steps: [1, 2, 3] },
+      { id: 'TC-APP017-051', steps: [1, 2, 3, 4] },
+      { id: 'TC-APP018-031', steps: [4, 5, 6] },
+      { id: 'TC-APP018-041', steps: [2, 3, 4, 5] },
+      { id: 'TC-APP018-042', steps: [1, 2, 3] },
+      { id: 'TC-APP019-033', steps: [3] },
+      { id: 'TC-APP022-001', steps: [3, 4, 5, 6] },
+      { id: 'TC-APP022-003', steps: [4] },
+      { id: 'TC-APP024-004', steps: [3, 4, 5] },
+      { id: 'TC-APP026-004', steps: [3, 4, 5, 6, 7, 8] },
+      { id: 'TC-APP026-007', steps: [5, 6, 7, 8] },
+      { id: 'TC-APP027-003', steps: [3, 4, 5, 6] },
+    ],
+  },
 ];
 
 export function foundBlocker(no: number): FoundBlocker {

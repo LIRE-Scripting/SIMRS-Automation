@@ -52,13 +52,13 @@ The 27 module workbooks share the sheets Summary, Journeys (25 columns) and Step
 |---|---|---|---|---|---|---|
 | U1 | Administrator with roles at one branch | Podomoro only | All rights (role admin) | 958 | Exists: rs.admin2 | Done |
 | U2 | Administrator with roles at all branches | All branches | All rights (role admin) | 46 | Exists: rs.admin | Done |
-| U3 | User without write rights ("Staff") | Podomoro only | Read only; no *_WRITE or *_APPROVE right | 80 | To create | Open |
-| U4 | Second user of the same role | Podomoro only | Same rights as the first user (a second administrator is enough to run the flow) | 53 | To create | Open |
-| U5 | Approvers and heads | Podomoro only | FINANCE_APPROVE, BUDGET_APPROVE, CSSD_APPROVE; approvers of the procurement chain (Approver 2, Approver 3, Director); head roles | 85 | To create | Open |
-| U6 | User at a second branch only | Kemayoran only (or Daan Mogot) | Same rights as U1 or the working role | 34 | To create | Open |
-| U7 | User linked to an employee | Podomoro only | HR or Payroll right; linked with "Link me" on My profile | 9 | To prepare: link an account | Open |
-| U8 | One account per working role | Podomoro only | The write right of each application (sheet Role accounts) | 1022 | To create or adjust: rs.<role> accounts exist, check their Branch (default is all branches) | Open |
-| U9 | Account with the licensing right | Any | LICENSING_WRITE | 1 | To create, if these screens are in scope | Open |
+| U3 | User without write rights ("Staff") | Podomoro only | Read only; no *_WRITE or *_APPROVE right | 80 | Exists: qa.staff (role qa_staff, no privilege) | Done |
+| U4 | Second user of the same role | Podomoro only | Same rights as the first user (a second administrator is enough to run the flow) | 53 | Exists: qa.admin3 (admin) | Done |
+| U5 | Approvers and heads | Podomoro only | FINANCE_APPROVE, BUDGET_APPROVE, CSSD_APPROVE; approvers of the procurement chain (Approver 2, Approver 3, Director); head roles | 85 | Exists: qa.approver (finance, budget, cssd, procurement); FINANCE_APPROVE does not exist on the tenant; approval chains name steps only, no approver | Done |
+| U6 | User at a second branch only | Kemayoran only (or Daan Mogot) | Same rights as U1 or the working role | 34 | Exists: qa.kemayoran (admin at Kemayoran) | Done |
+| U7 | User linked to an employee | Podomoro only | HR or Payroll right; linked with "Link me" on My profile | 9 | Exists: qa.pegawai (hrd, payroll), linked to employee X-EMP-QA-PEGAWAI | Done |
+| U8 | One account per working role | Podomoro only | The write right of each application (sheet Role accounts) | 1022 | Partly: 22 qa.<role> accounts at Podomoro (sheet Role accounts); 04, 18, 22 and 23 wait for blocker 38 (rights of a new role cannot be saved) | Partly |
+| U9 | Account with the licensing right | Any | LICENSING_WRITE | 1 | Not possible: the tenant has no privilege LICENSING_WRITE | Open |
 | U10 | Second tenant, tenant without a licence, platform superadmin | Other tenant | Platform rights | 68 | Deferred: needs a decision and a second tenant | Open |
 
 Password: shared by all accounts, read from `QA_PASSWORD` in `.env` (Q2). Sessions: `tests/e2e/auth.setup.ts` → `.auth/U1.json`, `.auth/U2.json`.
@@ -67,48 +67,48 @@ Password: shared by all accounts, read from `QA_PASSWORD` in `.env` (Q2). Sessio
 
 | Application | Working role | Write right | Journeys (stated) | Account | Prepared |
 |---|---|---|---|---|---|
-| 01 Ambulatory Care | Clerk | REGISTRATION_WRITE | 76 | — | Open |
-| 02 Appointment | Clerk | REGISTRATION_WRITE | 24 | — | Open |
-| 03 Patient Care | Doctor | CLINICAL_WRITE | 49 | — | Open |
-| 04 Inpatient | Nurse | ADT_WRITE | 68 | — | Open |
-| 05 Pharmacy | Pharmacist | PHARMACY_WRITE | 58 | — | Open |
-| 06 Transfusion Medicine | Tech | BLOODBANK_WRITE | 75 | — | Open |
-| 07 Inventory | Warehouse | INVENTORY_WRITE | 49 | — | Open |
-| 08 Operation Theater | Theatre nurse | OT_WRITE | 35 | — | Open |
-| 09 Procurement | Officer | PROC_WRITE | 47 | — | Open |
-| 10 HR | HR admin | HR_WRITE | 49 | — | Open |
-| 11 Laboratory | Analyst | LABORATORY_WRITE | 40 | — | Open |
-| 12 RIS | Radiographer | RADIOLOGY_WRITE | 29 | — | Open |
-| 13 Dietary | Dietitian | DIET_WRITE | 42 | — | Open |
-| 14 Hospital Accounts | Cashier | BILLING_WRITE | 64 | — | Open |
-| 15 Emergency | Nurse | EMERGENCY_WRITE | 41 | — | Open |
-| 16 MRD | Records officer | MRD_WRITE | 36 | — | Open |
-| 17 Payroll | Payroll officer | PAYROLL_WRITE | 40 | — | Open |
-| 18 Settings | Hospital administrator | MDM_WRITE, IDENTITY_*_WRITE, WORKFLOW_WRITE | 47 | — | Open |
-| 19 Finance | Accountant | FINANCE_WRITE, FINANCE_APPROVE | 59 | — | Open |
-| 20 Budget | Budget officer | BUDGET_WRITE, BUDGET_APPROVE | 22 | — | Open |
-| 21 CSSD | CSSD officer | CSSD_WRITE, CSSD_APPROVE | 16 | — | Open |
-| 22 Services | Services officer | SERVICES_WRITE | 13 | — | Open |
-| 23 Sourcing | Sourcing officer | SOURCING_WRITE | 12 | — | Open |
-| 24 Housekeeping | Housekeeping supervisor | HOUSEKEEPING_WRITE | 8 | — | Open |
-| 25 Linen | Linen supervisor | LINEN_WRITE | 7 | — | Open |
-| 26 Maintenance | Maintenance officer | MAINTENANCE_WRITE | 8 | — | Open |
-| 27 Fixed assets | Asset administrator | FIXED_ASSET_WRITE | 8 | — | Open |
+| 01 Ambulatory Care | Clerk | REGISTRATION_WRITE | 76 | qa.pendaftaran (role pendaftaran) | Done |
+| 02 Appointment | Clerk | REGISTRATION_WRITE | 24 | qa.pendaftaran (role pendaftaran) | Done |
+| 03 Patient Care | Doctor | CLINICAL_WRITE | 49 | qa.dokter (role dokter) | Done |
+| 04 Inpatient | Nurse | ADT_WRITE | 68 | not made: role qa_rawat_inap has no rights (blocker 38) | Blocked |
+| 05 Pharmacy | Pharmacist | PHARMACY_WRITE | 58 | qa.apoteker (role apoteker) | Done |
+| 06 Transfusion Medicine | Tech | BLOODBANK_WRITE | 75 | qa.bankdarah (role bankdarah) | Done |
+| 07 Inventory | Warehouse | INVENTORY_WRITE | 49 | qa.gudang (role gudang) | Done |
+| 08 Operation Theater | Theatre nurse | OT_WRITE | 35 | qa.ok (role ok) | Done |
+| 09 Procurement | Officer | PROC_WRITE | 47 | qa.procurement (role procurement) | Done |
+| 10 HR | HR admin | HR_WRITE | 49 | qa.hrd (role hrd) | Done |
+| 11 Laboratory | Analyst | LABORATORY_WRITE | 40 | qa.analis (role analis) | Done |
+| 12 RIS | Radiographer | RADIOLOGY_WRITE | 29 | qa.radiografer (role radiografer) | Done |
+| 13 Dietary | Dietitian | DIET_WRITE | 42 | qa.gizi (role gizi) | Done |
+| 14 Hospital Accounts | Cashier | BILLING_WRITE | 64 | qa.kasir (role kasir) | Done |
+| 15 Emergency | Nurse | EMERGENCY_WRITE | 41 | qa.igd (role igd) | Done |
+| 16 MRD | Records officer | MRD_WRITE | 36 | qa.rekammedis (role rekammedis) | Done |
+| 17 Payroll | Payroll officer | PAYROLL_WRITE | 40 | qa.payroll (role payroll) | Done |
+| 18 Settings | Hospital administrator | MDM_WRITE, IDENTITY_*_WRITE, WORKFLOW_WRITE | 47 | not made: role qa_settings has no rights (blocker 38) | Blocked |
+| 19 Finance | Accountant | FINANCE_WRITE, FINANCE_APPROVE | 59 | qa.finance (role finance) | Done |
+| 20 Budget | Budget officer | BUDGET_WRITE, BUDGET_APPROVE | 22 | qa.budget (role budget) | Done |
+| 21 CSSD | CSSD officer | CSSD_WRITE, CSSD_APPROVE | 16 | qa.cssd (role cssd) | Done |
+| 22 Services | Services officer | SERVICES_WRITE | 13 | not made: role qa_services has no rights (blocker 38) | Blocked |
+| 23 Sourcing | Sourcing officer | SOURCING_WRITE | 12 | not made: role qa_sourcing has no rights (blocker 38) | Blocked |
+| 24 Housekeeping | Housekeeping supervisor | HOUSEKEEPING_WRITE | 8 | qa.housekeeping (role housekeeping) | Done |
+| 25 Linen | Linen supervisor | LINEN_WRITE | 7 | qa.linen (role linen) | Done |
+| 26 Maintenance | Maintenance officer | MAINTENANCE_WRITE | 8 | qa.ipsrs (role ipsrs) | Done |
+| 27 Fixed assets | Asset administrator | FIXED_ASSET_WRITE | 8 | qa.aset (role aset) | Done |
 
 ### Set-up and data
 
 | No | Prerequisite | Applications | Journeys | What to prepare | Who | Status |
 |---|---|---|---|---|---|---|
-| 1 | Go-ahead to create data on the site | All |  | A written go-ahead: which applications, branch Podomoro, test data with the prefix "X ", and whether Finance vouchers, stock movements, budget holds and pay data may be created. | Requester | Open |
+| 1 | Go-ahead to create data on the site | All |  | A written go-ahead: which applications, branch Podomoro, test data with the prefix "X ", and whether Finance vouchers, stock movements, budget holds and pay data may be created. — Go-ahead of 2026-10-20 for one run (used). | Requester | Done |
 | 2 | Patients for testing | 01 to 05, 11 to 16 |  | Confirm that the patient data is made-up, or create test patients with the prefix "X " (needs the go-ahead). | Requester | Open |
 | 3 | Branch for testing | All |  | Podomoro, with users whose roles are given at Podomoro only (tested with rs.admin2 on 2026-10-13). | Requester | Done |
-| 4 | Diagnosis code version | 03 Patient Care | JRN-APP003-042, JRN-APP003-047 | Import and activate a diagnosis code version (API or seed; no screen does it). | Site administrator | Open |
-| 5 | Item below its minimum stock | 09 Procurement | JRN-APP009-043 | One item of a Podomoro store below its minimum stock. | Tester (go-ahead) | Open |
-| 6 | User linked to an employee | 10 HR, 17 Payroll | JRN-APP010-044 | "Link me" on My profile for the test user (U7). | Tester (go-ahead) | Open |
-| 7 | Emergency registration configuration | 15 Emergency | JRN-APP015-025, JRN-APP015-026 | A registration configuration for type 7 (emergency) at Podomoro. | Site administrator | Open |
-| 8 | Finance configuration of the branch | 19 Finance, and every application that books a voucher | JRN-APP019-045, JRN-APP019-055 | The finance configuration of Podomoro: control accounts (the screen offers "Open configuration"); a test financial year. | Site administrator | Open |
-| 9 | Budget posting rule and approvers | 20 Budget | JRN-APP020-010 to 012 | A Budget posting rule for Podomoro; an approver (U5) in each approval chain of Settings, Process definitions. | Site administrator | Open |
-| 10 | CSSD start-of-day and kit set-up | 21 CSSD | JRN-APP021-003, JRN-APP021-006 | A passed Bowie Dick test for the autoclave; KIT and KITS in Inventory. | Tester (go-ahead) | Open |
+| 4 | Diagnosis code version | 03 Patient Care | JRN-APP003-042, JRN-APP003-047 | Import and activate a diagnosis code version (API or seed; no screen does it). — No screen (2026-10-20). | Site administrator | Open |
+| 5 | Item below its minimum stock | 09 Procurement | JRN-APP009-043 | One item of a Podomoro store below its minimum stock. — Reorder of Podomoro lists items below their minimum (2026-10-20). | Tester (go-ahead) | Done |
+| 6 | User linked to an employee | 10 HR, 17 Payroll | JRN-APP010-044 | "Link me" on My profile for the test user (U7). — qa.pegawai (U7) linked to X-EMP-QA-PEGAWAI. | Tester (go-ahead) | Done |
+| 7 | Emergency registration configuration | 15 Emergency | JRN-APP015-025, JRN-APP015-026 | A registration configuration for type 7 (emergency) at Podomoro. — No screen makes a registration configuration (2026-10-20). | Site administrator | Open |
+| 8 | Finance configuration of the branch | 19 Finance, and every application that books a voucher | JRN-APP019-045, JRN-APP019-055 | The finance configuration of Podomoro: control accounts (the screen offers "Open configuration"); a test financial year. — HO Podomoro: year 2026, control accounts set (2026-10-20). | Site administrator | Done |
+| 9 | Budget posting rule and approvers | 20 Budget | JRN-APP020-010 to 012 | A Budget posting rule for Podomoro; an approver (U5) in each approval chain of Settings, Process definitions. — Allocation capital and operating rules of HO Podomoro Ready; approval chains have no approver field: U5 holds BUDGET_APPROVE. | Site administrator | Done |
+| 10 | CSSD start-of-day and kit set-up | 21 CSSD | JRN-APP021-003, JRN-APP021-006 | A passed Bowie Dick test for the autoclave; KIT and KITS in Inventory. — Bowie Dick passed 2026-10-20 (daily); category KITS made; drug form KIT has no screen. | Tester (go-ahead) | Partly |
 | 11 | Records made in another application | 12, 14 to 21, 23, 25 to 27 | 34 journeys (sheet Journeys, column Needs a record from) | Run the feeding journeys first, in Podomoro, and note the ids: Settings, then HR, Inventory, Procurement and Finance, then the others. | Tester (go-ahead) | Open |
 | 12 | Defects that stop journeys | 06, 18, 21 and others |  | See 00-blockers-checklist-linked.xlsx. | Development | Open |
 
@@ -435,31 +435,31 @@ Journey IDs are shortened: `001-003` = `JRN-APP001-003`.
 
 | Module | TCs | read-only | saves | chain | fixme | skip | with TBD step |
 |---|---|---|---|---|---|---|---|
-| [01 Ambulatory Care](traceability/01-ambulatory-care.md) | 89 | 3 | 59 | 0 | 26 | 1 | 8 |
+| [01 Ambulatory Care](traceability/01-ambulatory-care.md) | 89 | 3 | 65 | 0 | 20 | 1 | 8 |
 | [02 Appointment](traceability/02-appointment.md) | 33 | 2 | 27 | 0 | 4 | 0 | 1 |
-| [03 Patient Care](traceability/03-patient-care.md) | 63 | 1 | 33 | 0 | 29 | 0 | 6 |
-| [04 Inpatient](traceability/04-inpatient.md) | 90 | 2 | 59 | 0 | 28 | 1 | 3 |
-| [05 Pharmacy](traceability/05-pharmacy.md) | 78 | 0 | 45 | 0 | 33 | 0 | 11 |
-| [06 Transfusion Medicine](traceability/06-transfusion-medicine.md) | 81 | 1 | 32 | 0 | 47 | 1 | 5 |
-| [07 Inventory](traceability/07-inventory.md) | 67 | 2 | 45 | 0 | 20 | 0 | 16 |
-| [08 Operation Theater](traceability/08-operation-theater.md) | 53 | 1 | 39 | 0 | 13 | 0 | 11 |
-| [09 Procurement](traceability/09-procurement.md) | 65 | 1 | 29 | 0 | 35 | 0 | 19 |
-| [10 HR](traceability/10-hr.md) | 68 | 2 | 31 | 0 | 35 | 0 | 17 |
-| [11 Laboratory](traceability/11-laboratory.md) | 54 | 1 | 36 | 0 | 16 | 1 | 11 |
-| [12 RIS](traceability/12-ris.md) | 35 | 1 | 19 | 1 | 14 | 0 | 6 |
-| [13 Dietary](traceability/13-dietary.md) | 62 | 3 | 35 | 0 | 24 | 0 | 18 |
-| [14 Hospital Accounts](traceability/14-hospital-accounts.md) | 85 | 0 | 50 | 0 | 35 | 0 | 25 |
-| [15 Emergency](traceability/15-emergency.md) | 69 | 1 | 43 | 2 | 23 | 0 | 28 |
-| [16 MRD](traceability/16-mrd.md) | 49 | 2 | 22 | 1 | 24 | 0 | 11 |
-| [17 Payroll](traceability/17-payroll.md) | 69 | 1 | 25 | 1 | 42 | 0 | 32 |
-| [18 Settings](traceability/18-settings.md) | 92 | 2 | 71 | 0 | 19 | 0 | 29 |
-| [19 Finance](traceability/19-finance.md) | 128 | 4 | 66 | 5 | 53 | 0 | 31 |
-| [20 Budget](traceability/20-budget.md) | 64 | 0 | 22 | 7 | 35 | 0 | 13 |
-| [21 CSSD](traceability/21-cssd.md) | 57 | 0 | 29 | 0 | 28 | 0 | 14 |
-| [22 Services](traceability/22-services.md) | 36 | 0 | 22 | 0 | 14 | 0 | 22 |
-| [23 Sourcing](traceability/23-sourcing.md) | 34 | 0 | 12 | 6 | 16 | 0 | 26 |
-| [24 Housekeeping](traceability/24-housekeeping.md) | 22 | 0 | 18 | 0 | 4 | 0 | 14 |
-| [25 Linen](traceability/25-linen.md) | 21 | 0 | 14 | 3 | 4 | 0 | 14 |
-| [26 Maintenance](traceability/26-maintenance.md) | 20 | 0 | 12 | 4 | 4 | 0 | 14 |
-| [27 Fixed assets](traceability/27-fixed-assets.md) | 20 | 0 | 10 | 6 | 4 | 0 | 13 |
-| **Total** | **1604** | **30** | **905** | **36** | **629** | **4** | **418** |
+| [03 Patient Care](traceability/03-patient-care.md) | 63 | 1 | 37 | 0 | 25 | 0 | 6 |
+| [04 Inpatient](traceability/04-inpatient.md) | 90 | 2 | 63 | 0 | 24 | 1 | 3 |
+| [05 Pharmacy](traceability/05-pharmacy.md) | 78 | 0 | 56 | 0 | 22 | 0 | 11 |
+| [06 Transfusion Medicine](traceability/06-transfusion-medicine.md) | 81 | 1 | 33 | 0 | 46 | 1 | 5 |
+| [07 Inventory](traceability/07-inventory.md) | 67 | 2 | 49 | 0 | 16 | 0 | 16 |
+| [08 Operation Theater](traceability/08-operation-theater.md) | 53 | 1 | 43 | 0 | 9 | 0 | 11 |
+| [09 Procurement](traceability/09-procurement.md) | 65 | 1 | 42 | 0 | 22 | 0 | 19 |
+| [10 HR](traceability/10-hr.md) | 68 | 2 | 45 | 0 | 21 | 0 | 17 |
+| [11 Laboratory](traceability/11-laboratory.md) | 54 | 1 | 40 | 0 | 12 | 1 | 11 |
+| [12 RIS](traceability/12-ris.md) | 35 | 1 | 23 | 1 | 10 | 0 | 6 |
+| [13 Dietary](traceability/13-dietary.md) | 62 | 3 | 41 | 0 | 18 | 0 | 18 |
+| [14 Hospital Accounts](traceability/14-hospital-accounts.md) | 85 | 0 | 57 | 2 | 26 | 0 | 25 |
+| [15 Emergency](traceability/15-emergency.md) | 69 | 1 | 49 | 2 | 17 | 0 | 28 |
+| [16 MRD](traceability/16-mrd.md) | 49 | 2 | 31 | 1 | 15 | 0 | 11 |
+| [17 Payroll](traceability/17-payroll.md) | 69 | 1 | 30 | 5 | 33 | 0 | 32 |
+| [18 Settings](traceability/18-settings.md) | 92 | 2 | 77 | 2 | 11 | 0 | 29 |
+| [19 Finance](traceability/19-finance.md) | 128 | 4 | 98 | 7 | 19 | 0 | 31 |
+| [20 Budget](traceability/20-budget.md) | 64 | 0 | 42 | 11 | 11 | 0 | 13 |
+| [21 CSSD](traceability/21-cssd.md) | 57 | 0 | 42 | 4 | 11 | 0 | 14 |
+| [22 Services](traceability/22-services.md) | 36 | 0 | 23 | 0 | 13 | 0 | 22 |
+| [23 Sourcing](traceability/23-sourcing.md) | 34 | 0 | 13 | 6 | 15 | 0 | 26 |
+| [24 Housekeeping](traceability/24-housekeeping.md) | 22 | 0 | 19 | 0 | 3 | 0 | 14 |
+| [25 Linen](traceability/25-linen.md) | 21 | 0 | 15 | 3 | 3 | 0 | 14 |
+| [26 Maintenance](traceability/26-maintenance.md) | 20 | 0 | 13 | 4 | 3 | 0 | 14 |
+| [27 Fixed assets](traceability/27-fixed-assets.md) | 20 | 0 | 11 | 6 | 3 | 0 | 13 |
+| **Total** | **1604** | **30** | **1084** | **54** | **432** | **4** | **418** |

@@ -18,7 +18,7 @@ const range = (prefix: string, nos: number[]) => nos.map((n) => `${prefix}-${Str
 const PICKER = (what: string, detail: string): Triage => ({
   cause: 'site',
   finding: `The ${what} picker searches only the records the page loaded first (${detail}); a record past them is "not found" although it exists. Shows since the data grew past the limit.`,
-  next: `Dev: search the ${what} list on the server (or load all); then rerun. Proposed found blocker 40 (pickers and lists capped).`,
+  next: `Dev: search the ${what} list on the server (or load all); then rerun. Found blocker 40 (pickers and lists capped).`,
   owner: 'Dev',
 });
 
@@ -26,7 +26,7 @@ const PICKER = (what: string, detail: string): Triage => ({
 const DESK_LIST: Triage = {
   cause: 'site',
   finding: 'The desk list shows its first 22 rows only, with no paging and no search; the record saved now is past them, so its status or id cannot be read (checked 2026-10-21 on /housekeeping/contracts, /maintenance/work, /maintenance/amc, /fixed-assets/register, /services/categories).',
-  next: 'Dev: add paging or a search (newest first) to the desk lists; then rerun. Proposed found blocker 40.',
+  next: 'Dev: add paging or a search (newest first) to the desk lists; then rerun. Found blocker 40.',
   owner: 'Dev',
 };
 
@@ -54,7 +54,7 @@ export const TRIAGE: Record<string, Triage> = {
   ...group(['TC-APP001-053', 'TC-APP002-017'], {
     cause: 'automation',
     finding: 'Rerun after the rename: typing the cashier\'s name in "Consultant or unit" shows an empty list with no "no match" text; the test waits for an option or that text. An empty list means "not offered", as the workbook expects. Steps 2-3 of this test case (pickers with more than 50 users or departments) are now runnable: Users 107, Departments 75; the site fails them (pickers capped at 50).',
-    next: 'QA automation: accept the empty list in step 1 and automate steps 2-3 (they will fail on proposed blocker 40 until Dev fixes the pickers).',
+    next: 'QA automation: accept the empty list in step 1 and automate steps 2-3 (they will fail on found blocker 40 until Dev fixes the pickers).',
     owner: 'QA automation',
   }),
   ...group(range('TC-APP001', [24, 35, 43, 61, 62, 63]), {
@@ -194,7 +194,7 @@ export const TRIAGE: Record<string, Triage> = {
   // E2E chains.
   ...group(['E2E-001', 'E2E-018', 'E2E-025', 'E2E-048'], {
     cause: 'site',
-    finding: 'The chain books or queues the patient in QA Poli Umum; the Department picker searches only the first 50 departments (proposed blocker 40).',
+    finding: 'The chain books or queues the patient in QA Poli Umum; the Department picker searches only the first 50 departments (found blocker 40).',
     next: 'Departments renamed 2026-10-21; rerun these chains after 07:00 WIB (E2E-033 closes the U1 cashier day until then). Dev: picker search on the server.',
     owner: 'QA automation',
   }),
@@ -212,7 +212,7 @@ export const TRIAGE: Record<string, Triage> = {
   }),
   ...group(['E2E-008', 'E2E-035'], {
     cause: 'site',
-    finding: 'The inventory item saved in the chain (QA-INV-PARA-…) is not found in the item list afterwards: the list does not reach the new item (capped list, as proposed blocker 40).',
+    finding: 'The inventory item saved in the chain (QA-INV-PARA-…) is not found in the item list afterwards: the list does not reach the new item (capped list, probably found blocker 40, to confirm).',
     next: 'Dev: item list search/paging that reaches new items; QA: confirm by hand once.',
     owner: 'Dev',
   }),
