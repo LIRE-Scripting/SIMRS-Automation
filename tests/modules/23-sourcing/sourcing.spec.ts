@@ -2,6 +2,7 @@ import type { Locator, Page } from '@playwright/test';
 import { expect, qaTest, test, type Qa } from '../../../fixtures/e2e';
 import { installToastRecorder, toastMark } from '../../../lib/assertions';
 import { addDays, todayWib } from '../../../lib/dates';
+import { auditEntries, menuScreens, userPage } from '../shared/access';
 import { screenOpens } from '../shared/screen-opens';
 import { toastsAfter } from '../18-settings/helpers';
 import { TC_APP023_020 } from './cases';
@@ -294,6 +295,26 @@ qaTest('TC-APP023-019', async ({ qa }) => {
 });
 
 qaTest('TC-APP023-020', TC_APP023_020);
+
+qaTest('TC-APP023-021', async ({ page, qa, browser }) => {
+  const staff = await userPage(browser, 'U3');
+  try {
+    await qa.step(1, async () => {
+      qa.note(1, `U3 opens ${(await menuScreens(staff, '/sourcing', ['Tenders', 'Bids', 'Deposits'])).join('; ')} (TBD in the workbook)`);
+    });
+    await qa.step(2, async () => {
+      const category = await master(page, qa, 'Category', 'X-ALKES', 'X Alkes uji');
+      refused(qa, 2, await desk(staff, 'tenders').save({ Number: qa.code('X-TND-001'), Code: category, Name: 'open', Document: await approvedRequest(page), Close: WEEK() }), 'missing required privilege');
+      qa.note(2, 'a tender cannot be created by U1 either (found blocker 39): the refusal does not show which check stopped it');
+    });
+    // No tender, so no bid to open or accept (found blocker 39).
+    for (const st of [3, 4, 5]) qa.blocked(st, 39);
+    const entries = await auditEntries(page, 'sourcing');
+    qa.note(5, `Audit Log, module "sourcing": ${entries.length} entries (TBD in the workbook: no entry is written)`);
+  } finally {
+    await staff.context().close();
+  }
+});
 
 const ROUTES: [string, string, string][] = [
   ['TC-APP023-022', '/sourcing', 'Sourcing'],

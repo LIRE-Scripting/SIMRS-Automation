@@ -3,8 +3,9 @@ import { expect, qaTest, test, type Qa } from '../../../fixtures/e2e';
 import { installToastRecorder } from '../../../lib/assertions';
 import { addDays, todayWib } from '../../../lib/dates';
 import { Desk, SAVED, refused } from '../shared/desk';
+import { auditEntries, menuScreens, saveIfOffered, userPage } from '../shared/access';
 import { screenOpens } from '../shared/screen-opens';
-import { AI, approvedOrder, assetAccount, buy, CH, masters, NO_STOCK, register, SLR, TC_APP027_001, TC_APP027_003 } from './cases';
+import { AI, approvedOrder, assetAccount, buy, CH, masters, NO_STOCK, register, registerRows, SLR, TC_APP027_001, TC_APP027_003 } from './cases';
 
 /**
  * 27-fixed-assets.xlsx: classification, register and movement. Codes and
@@ -156,6 +157,37 @@ qaTest('TC-APP027-012', async ({ qa }) => {
   qa.notRun(4, 'needs a commissioned asset and a completed work order (26)');
   qa.notRun(6, 'see step 2');
   qa.note(2, NO_STOCK);
+});
+
+qaTest('TC-APP027-013', async ({ page, qa, browser }) => {
+  // Precondition (made by U1): an asset bought on Register.
+  const b = await buy(page, qa);
+  expect(b.toasts).toContain(SAVED);
+  const before = (await registerRows(page, b.no)).find((x) => x[0] === b.no);
+  const staff = await userPage(browser, 'U3');
+  try {
+    await qa.step(1, async () => {
+      qa.note(1, `U3 opens ${(await menuScreens(staff, '/fixed-assets', ['Classification', 'Register', 'Movement'])).join('; ')} (TBD in the workbook)`);
+    });
+    await qa.step(2, async () => {
+      refused(qa, 2, await moves(staff).save({ Code: b.no, [CH]: qa.prefix('X dr. Uji'), Date: todayWib() }, 'Issue'), 'missing required privilege');
+    });
+    await qa.step(3, async () => {
+      const toasts = await saveIfOffered(register(staff), { Code: b.no, Date: todayWib() }, 'Write off');
+      if (toasts === null) qa.note(3, 'Register offers no "Write off" action');
+      else refused(qa, 3, toasts, 'missing required privilege');
+      expect((await registerRows(page, b.no)).find((x) => x[0] === b.no)?.[1]).toBe(before?.[1]);
+    });
+    await qa.step(4, async () => {
+      refused(qa, 4, await register(staff).save({ Code: b.no, Date: addDays(todayWib(), -15), Amount: '2500000' }, 'Depreciate'), 'missing required privilege');
+    });
+    await qa.step(5, async () => {
+      const entries = await auditEntries(page, 'fixed');
+      qa.note(5, `Audit Log, module "fixed": ${entries.length} entries${entries[0] ? `, newest "${entries[0].slice(0, 120)}"` : ''} (TBD in the workbook: no entry is written)`);
+    });
+  } finally {
+    await staff.context().close();
+  }
 });
 
 const ROUTES: [string, string, string][] = [

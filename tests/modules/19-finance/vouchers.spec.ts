@@ -5,7 +5,7 @@ import { todayWib } from '../../../lib/dates';
 import { backToEnglish, switchLanguage } from '../shared/language';
 import { screenOpens } from '../shared/screen-opens';
 import { invalidFields } from '../18-settings/helpers';
-import { Accounts, PostingRules, account, clickFor, createAccount, retireAccount } from './helpers';
+import { Accounts, PostingRules, account, clickFor, createAccount, plain, retireAccount, Vouchers } from './helpers';
 
 /**
  * 19-finance.xlsx: Vouchers, ERP staging, the hub and the screen checks.
@@ -23,57 +23,6 @@ test.beforeEach(async ({ page }) => {
 test.afterEach(async ({ page }) => {
   await backToEnglish(page);
 });
-
-const plain = (t: string) => t.replace(/[  ]/g, ' ').replace(/\s+/g, ' ').trim();
-
-class Vouchers {
-  constructor(readonly page: Page) {}
-  async open(): Promise<void> {
-    await this.page.goto('/en/finance/vouchers');
-    await expect(this.page.getByRole('heading', { level: 1, name: 'Vouchers' })).toBeVisible();
-    await this.page.waitForLoadState('networkidle').catch(() => {});
-  }
-  rows(): Locator {
-    return this.page.getByRole('table').getByRole('rowgroup').nth(1).getByRole('row');
-  }
-  /** The panel holding a heading (the "Create voucher" form or the voucher detail). */
-  panel(heading: string | RegExp): Locator {
-    return this.page
-      .locator('div')
-      .filter({ has: this.page.getByText(heading, { exact: typeof heading === 'string' }) })
-      .filter({ has: this.page.getByRole('button', { name: /^(Save|Close)$/ }) })
-      .last();
-  }
-  get form(): Locator {
-    return this.page.locator('form').filter({ has: this.page.getByRole('heading', { name: 'Create voucher' }) });
-  }
-  async openForm(): Promise<void> {
-    await this.open();
-    await this.page.getByRole('button', { name: 'New voucher' }).click();
-    await expect(this.form.getByText('Create a voucher and post it to the ledger.')).toBeVisible();
-  }
-  /** A field of the form: its label wraps a span with the name and the input. */
-  field(label: string): Locator {
-    return this.form.locator('label').filter({ has: this.page.locator(`span:text-is("${label}")`) }).locator('input, select, textarea');
-  }
-  async create(v: { value?: string; party?: string; narration?: string; currency?: string; type?: string }): Promise<string[]> {
-    await this.openForm();
-    if (v.type) await this.field('Doc type').selectOption({ label: v.type });
-    if (v.currency !== undefined) await this.field('Currency').fill(v.currency);
-    if (v.value !== undefined) await this.field('Voucher value').fill(v.value);
-    if (v.party !== undefined) await this.field('Party').fill(v.party);
-    if (v.narration !== undefined) await this.field('Narration').fill(v.narration);
-    return clickFor(this.page, this.form.getByRole('button', { name: /^(Save|Saving…)$/ }));
-  }
-  /** The detail panel shown after a save or after "Open". */
-  get detail(): Locator {
-    return this.page
-      .locator('div')
-      .filter({ has: this.page.getByRole('heading', { level: 2, name: /^(VCH|SV|DC|DIET)-/ }) })
-      .filter({ has: this.page.getByRole('term') })
-      .last();
-  }
-}
 
 const VCH = { value: '1500000', party: 'QA PT Uji', narration: 'QA Jurnal uji' };
 

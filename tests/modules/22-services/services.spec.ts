@@ -1,5 +1,6 @@
 import { expect, qaTest, test, type Qa } from '../../../fixtures/e2e';
 import { installToastRecorder } from '../../../lib/assertions';
+import { auditEntries, menuScreens, toastsOf, userPage } from '../shared/access';
 import { screenOpens } from '../shared/screen-opens';
 import { act, approvedPr, category, desk, item, ORDER, purchaseRequest, request, SAVED, TC_APP022_001, TC_APP022_003, TC_APP022_005, TC_APP022_009, TC_APP022_012 } from './cases';
 
@@ -169,6 +170,46 @@ qaTest('TC-APP022-013', async ({ page, qa }) => {
 qaTest('TC-APP022-014', async ({ qa }) => {
   qa.notRun(1, 'U1 works on one branch; "All branches" in the header needs U2');
   qa.notRun(2, 'see step 1');
+});
+
+qaTest('TC-APP022-022', async ({ page, qa, browser }) => {
+  // Precondition (made by U1): a purchase order sent for approval.
+  const it = await item(page, qa, await category(page, qa));
+  const v = ORDER(qa, it, await approvedPr(page, it));
+  expect(await desk(page, 'orders').save(v)).toContain(SAVED);
+  expect(await act(page, 'orders', v.Number, 'Send order')).toContain(SAVED);
+  const staff = await userPage(browser, 'U3');
+  try {
+    await qa.step(1, async () => {
+      qa.note(1, `U3 opens ${(await menuScreens(staff, '/services', ['Service request', 'Service purchase order', 'Service category'])).join('; ')} (TBD in the workbook)`);
+    });
+    await qa.step(2, async () => {
+      const cat = await category(page, qa);
+      refused(qa, 2, await desk(staff, 'requests').save({ Number: qa.code('X-SR-001'), Parent: cat, Item: it, Department: qa.prefix('X Bangsal uji'), Description: qa.prefix('X cuci linen') }), 'missing required privilege');
+    });
+    await qa.step(3, async () => {
+      refused(qa, 3, await desk(staff, 'orders').save({ Document: await desk(page, 'orders').id(v.Number) }, 'Approve order'), 'missing required privilege');
+      expect(await desk(page, 'orders').status(v.Number)).toBe('sent');
+    });
+    await qa.step(4, async () => {
+      await staff.goto('/en/services/bills');
+      await expect(staff.getByRole('main').getByRole('heading', { level: 1, name: 'Vendor bill' })).toBeVisible();
+      const open = staff.getByRole('main').getByRole('button').filter({ hasNotText: /^(Search|Next page|Previous page)$/ }).first();
+      await open.click();
+      const d = staff.getByRole('dialog');
+      for (const box of await d.getByRole('textbox').all()) if (!(await box.inputValue())) await box.fill(qa.prefix('X-UJI'));
+      const next = d.getByRole('button', { name: 'Next' });
+      if (await next.isVisible()) await next.click();
+      const toasts = await toastsOf(staff, () => d.getByRole('button', { name: 'Save' }).click());
+      refused(qa, 4, toasts, 'missing required privilege');
+    });
+    await qa.step(5, async () => {
+      const entries = await auditEntries(page, 'services');
+      qa.note(5, `Audit Log, module "services": ${entries.length} entries${entries[0] ? `, newest "${entries[0].slice(0, 120)}"` : ''} (TBD in the workbook: no entry is written)`);
+    });
+  } finally {
+    await staff.context().close();
+  }
 });
 
 const ROUTES: [string, string, string][] = [

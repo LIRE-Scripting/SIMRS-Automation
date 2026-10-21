@@ -3,6 +3,7 @@ import { expect, qaTest, test, type Qa } from '../../../fixtures/e2e';
 import { installToastRecorder } from '../../../lib/assertions';
 import { addDays, todayWib } from '../../../lib/dates';
 import { Desk, SAVED, refused } from '../shared/desk';
+import { auditEntries, menuScreens, userPage } from '../shared/access';
 import { screenOpens } from '../shared/screen-opens';
 
 /**
@@ -381,6 +382,45 @@ qaTest('TC-APP024-013', async ({ page, qa }) => {
     const fields = await c.dialog.getByRole('textbox').evaluateAll((es) => es.map((e) => e.getAttribute('aria-label') ?? (e as HTMLInputElement).labels?.[0]?.textContent ?? ''));
     expect(fields.some((f) => /location/i.test(f))).toBe(false);
   });
+});
+
+qaTest('TC-APP024-014', async ({ page, qa, browser }) => {
+  // Preconditions (made by U1): a contract sent for approval and an approved one.
+  const sent = await contract(page, qa, 'sent');
+  const approved = await contract(page, qa);
+  const staff = await userPage(browser, 'U3');
+  try {
+    await qa.step(1, async () => {
+      qa.note(1, `U3 opens ${(await menuScreens(staff, '/housekeeping', ['Locations', 'Contracts', 'Bills'])).join('; ')} (TBD in the workbook)`);
+    });
+    await qa.step(2, async () => {
+      refused(qa, 2, await locations(staff).save({ [LOC]: qa.code('X-LT1'), Name: qa.name('X Lantai tanpa hak'), [CEF]: CENTER, [PQ]: '3' }), 'missing required privilege');
+    });
+    await qa.step(3, async () => {
+      refused(qa, 3, await contracts(staff).save({ Document: sent }, 'Approve contract'), 'missing required privilege');
+      // The list holds only its first 40 contracts (blocker 40): the status is read when the contract is there.
+      const status = await contracts(page).status(sent);
+      if (status) expect(status).toBe('sent');
+      else qa.note(3, 'the status of the contract cannot be read: the list shows its first 40 contracts (found blocker 40)');
+    });
+    await qa.step(4, async () => {
+      refused(qa, 4, await bills(staff).save({ Document: approved, Amount: '300000' }), 'missing required privilege');
+    });
+    await qa.step(5, async () => {
+      const b = bills(staff);
+      await b.open();
+      const before = await b.main.innerText();
+      await b.main.getByRole('button', { name: 'CSV', exact: true }).click();
+      const changed = await expect.poll(async () => (await b.main.innerText()) !== before, { timeout: 5_000 }).toBe(true).then(() => true, () => false);
+      qa.note(5, `"CSV" for U3: ${changed ? 'the export is shown' : 'nothing changes'} (TBD in the workbook)`);
+    });
+    await qa.step(6, async () => {
+      const entries = await auditEntries(page, 'housekeeping');
+      qa.note(6, `Audit Log, module "housekeeping": ${entries.length} entries${entries[0] ? `, newest "${entries[0].slice(0, 120)}"` : ''} (TBD in the workbook: no entry is written)`);
+    });
+  } finally {
+    await staff.context().close();
+  }
 });
 
 const ROUTES: [string, string, string][] = [

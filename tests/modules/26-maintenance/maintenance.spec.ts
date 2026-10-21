@@ -3,6 +3,7 @@ import { expect, qaTest, test, type Qa } from '../../../fixtures/e2e';
 import { installToastRecorder } from '../../../lib/assertions';
 import { addDays, todayWib } from '../../../lib/dates';
 import { Desk, SAVED, refused } from '../shared/desk';
+import { auditEntries, menuScreens, userPage } from '../shared/access';
 import { screenOpens } from '../shared/screen-opens';
 import { breakdown, BREAKDOWN, CA, JB, NE, NV, ORDER, plans, SPARE, TC_APP026_001, TC_APP026_004, work } from './cases';
 
@@ -263,6 +264,42 @@ qaTest('TC-APP026-012', async ({ page, qa }) => {
     qa.note(2, `a code Fixed assets does not have: "${r.toasts.join(' / ')}"`);
   });
   for (const s of [3, 4, 5, 6]) qa.notRun(s, 'needs a completed and invoiced work order (budget hold needs U5; the spare is not in Inventory)');
+});
+
+qaTest('TC-APP026-013', async ({ page, qa, browser }) => {
+  // Preconditions (made by U1): a breakdown and a work order sent for approval.
+  const w = work(page);
+  const bd = await breakdown(page, qa);
+  const sent = await w.create(ORDER(qa, bd), 'Work order');
+  expect(sent.toasts).toContain(SAVED);
+  expect(await w.save({ Document: sent.id }, 'Send order')).toContain(SAVED);
+  const staff = await userPage(browser, 'U3');
+  try {
+    await qa.step(1, async () => {
+      qa.note(1, `U3 opens ${(await menuScreens(staff, '/maintenance', ['Plans', 'Work', 'AMC'])).join('; ')} (TBD in the workbook)`);
+    });
+    await qa.step(2, async () => {
+      const toasts = await work(staff).save(BREAKDOWN(qa, qa.code('X-AST-AC1')), 'Breakdown');
+      qa.note(2, `a breakdown reported by U3: "${toasts.join(' / ') || 'no toast'}" (TBD in the workbook: whether a ward nurse may report one)`);
+    });
+    await qa.step(3, async () => {
+      refused(qa, 3, await work(staff).save({ Document: sent.id }, 'Approve order'), 'missing required privilege');
+      const status = await w.status(sent.id);
+      if (status) expect(status).toBe('sent');
+      else qa.note(3, 'the status of the order cannot be read: the list shows its first 40 rows (found blocker 40)');
+    });
+    await qa.step(4, async () => {
+      // No order can be approved and completed (no budget head has a balance): "Invoice" is tried on the sent order.
+      refused(qa, 4, await work(staff).save({ Amount: '450000', Document: sent.id }, 'Invoice'), 'missing required privilege');
+      qa.note(4, 'the order is sent, not completed: no order can be approved while no budget head has a balance (allocations need U5)');
+    });
+    await qa.step(5, async () => {
+      const entries = await auditEntries(page, 'maintenance');
+      qa.note(5, `Audit Log, module "maintenance": ${entries.length} entries${entries[0] ? `, newest "${entries[0].slice(0, 120)}"` : ''} (TBD in the workbook: no entry is written)`);
+    });
+  } finally {
+    await staff.context().close();
+  }
 });
 
 const ROUTES: [string, string, string][] = [

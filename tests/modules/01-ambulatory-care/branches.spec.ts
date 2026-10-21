@@ -7,6 +7,7 @@ import { todayWib } from '../../../lib/dates';
 import { AppointmentsPage } from '../../../pages/ambulatory/AppointmentsPage';
 import { ArrivalPage } from '../../../pages/ambulatory/ArrivalPage';
 import { RegisteredPatientsPage } from '../../../pages/ambulatory/RegisteredPatientsPage';
+import { seedPatientOf } from '../shared/access';
 
 /**
  * 01-ambulatory-care.xlsx, the journeys on two branches: BR-A = Podomoro
@@ -49,17 +50,6 @@ async function toastsAfter(page: Page, mark: number): Promise<string[]> {
     // no toast
   }
   return toastsSince(page, mark);
-}
-
-/** PT-B: a seed patient of Kemayoran (the first row of its list), as no patient can be registered there (blocker 41). */
-async function seedPatientOf(page: Page): Promise<{ mrn: string; fullName: string }> {
-  const reg = new RegisteredPatientsPage(page);
-  await reg.open();
-  const row = reg.rows().first();
-  return {
-    mrn: (await (await reg.cell(row, 'MRN')).innerText()).trim(),
-    fullName: (await (await reg.cell(row, 'Full name')).innerText()).trim(),
-  };
 }
 
 /**

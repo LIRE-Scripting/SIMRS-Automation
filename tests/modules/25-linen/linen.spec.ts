@@ -2,6 +2,7 @@ import type { Page } from '@playwright/test';
 import { expect, qaTest, test, type Qa } from '../../../fixtures/e2e';
 import { installToastRecorder } from '../../../lib/assertions';
 import { Desk, SAVED, refused } from '../shared/desk';
+import { auditEntries, menuScreens, userPage } from '../shared/access';
 import { screenOpens } from '../shared/screen-opens';
 import { ITEMS, stores, STORES, TC_APP025_001 } from './cases';
 
@@ -143,6 +144,28 @@ for (const id of ['TC-APP025-010', 'TC-APP025-012', 'TC-APP025-013']) {
 
 qaTest('TC-APP025-011', async ({ qa }) => {
   qa.notRun(1, 'U1 works on one branch; "All branches" in the header needs U2');
+});
+
+qaTest('TC-APP025-014', async ({ page, qa, browser }) => {
+  const staff = await userPage(browser, 'U3');
+  try {
+    await qa.step(1, async () => {
+      qa.note(1, `U3 opens ${(await menuScreens(staff, '/linen', ['Stores and recipe', 'Work orders', 'Circulation'])).join('; ')} (TBD in the workbook)`);
+    });
+    await qa.step(2, async () => {
+      refused(qa, 2, await moves(staff).save(MOVE(qa)), 'missing required privilege');
+      qa.note(2, `the item has no stock either: ${ITEMS}`);
+    });
+    // No work order can be saved, so none is sent or received (the finished item and its recipe are records of Inventory, checklist blocker 14).
+    for (const s of [3, 4]) qa.blocked(s, 14);
+    qa.note(3, ITEMS);
+    await qa.step(5, async () => {
+      const entries = await auditEntries(page, 'linen');
+      qa.note(5, `Audit Log, module "linen": ${entries.length} entries${entries[0] ? `, newest "${entries[0].slice(0, 120)}"` : ''}; no order of a user with the right can be approved or charged (blocker 14) (TBD in the workbook)`);
+    });
+  } finally {
+    await staff.context().close();
+  }
 });
 
 const ROUTES: [string, string, string][] = [
