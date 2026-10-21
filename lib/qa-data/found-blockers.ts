@@ -459,13 +459,15 @@ export const FOUND_BLOCKERS: FoundBlocker[] = [
     scope:
       'Type-ahead pickers: Department (01/02 Book, Arrival, queues), Bed (04 Admissions), Employee (10 Leave, 17 Payroll), ' +
       'Account (19 Budget posting rules)\nDesk lists: /housekeeping/*, /maintenance/*, /fixed-assets/*, /services/*\n' +
-      'Search of Users and Departments (18 Settings), filter of the Item list (07)',
+      'Search of Users and Departments and the User Site Mapping list (18 Settings), filter of the Item list (07)',
     cause:
       'A type-ahead picker filters the records the page loaded once (the first 50 by name) and never asks the server: typing the ' +
       'full name of a record past them gives "No matching department" (QA Poli Umum, number 51+ of 75 departments) or no hit ' +
       '(new employees QA-EMP-…, X QA Pegawai, all present among the 297 employees; new bed QA-199-…, present on Beds; account QA-XSS-…). The desk lists show their first 22 rows with no ' +
-      'paging and no search, so a document saved now is never listed (its status and id cannot be read). The search of Users and ' +
-      'Departments and the status filter of the Item list narrow only the page on screen. Seen 2026-10-21 once the shared site held more than 50 records ' +
+      'paging and no search, and the server sends them only its first 40 records, so a document saved now is never listed (its status cannot be read; its id ' +
+      'is taken from the answer of the save). The search of Users and ' +
+      'Departments and the status filter of the Item list narrow only the page on screen. User Site Mapping draws only 24 rows of each page of 50 ("Showing 51–100 of 127" lists 24 ' +
+      'logins), so the line of a new user is often never shown. Seen 2026-10-21 once the shared site held more than 50 records ' +
       '(Users 107, Departments 75); the same tests passed on 2026-10-18. Workaround used on 2026-10-21 for 01/02: the 39 test ' +
       'departments "QA Poli Uji …" renamed "QA Zz Poli Uji …" so that QA Poli Umum is among the first 50 again.',
     fix:
@@ -500,10 +502,14 @@ export const FOUND_BLOCKERS: FoundBlocker[] = [
       { id: 'TC-APP017-016', steps: [1, 2, 3] },
       { id: 'TC-APP017-026', steps: [1, 2, 3] },
       { id: 'TC-APP017-051', steps: [1, 2, 3, 4] },
+      { id: 'TC-APP018-031', steps: [4] },
+      { id: 'TC-APP018-041', steps: [1, 2, 3] },
+      { id: 'TC-APP018-042', steps: [1, 2] },
       { id: 'TC-APP019-033', steps: [3] },
       { id: 'TC-APP022-001', steps: [3, 4, 5, 6] },
       { id: 'TC-APP022-003', steps: [4] },
       { id: 'TC-APP024-004', steps: [3, 4, 5] },
+      { id: 'TC-APP024-013', steps: [2, 5] },
       { id: 'TC-APP026-004', steps: [3, 4, 5, 6, 7, 8] },
       { id: 'TC-APP026-007', steps: [5, 6, 7, 8] },
       { id: 'TC-APP027-003', steps: [3, 4, 5, 6] },

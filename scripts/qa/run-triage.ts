@@ -198,12 +198,14 @@ export const TRIAGE: Record<string, Triage> = {
   },
 
   // Rescan of 2026-10-21 (request bodies, page snapshots and test code).
-  ...group(['TC-APP024-010', 'TC-APP024-011', 'TC-APP024-012', 'TC-APP024-013', 'TC-APP026-005', 'TC-APP026-008', 'TC-APP026-009'], {
-    cause: 'automation',
-    finding: 'The contract or work order made by the test is not found in the desk list (22 rows, blocker 40), so its id is "" and the next action (price line, send, approve, instalment) is posted with "source":"" (an empty Document). The server answers HTTP 500 to the empty Document instead of "document is missing".',
-    next: 'QA automation: stop the test when the new id is not found (Desk.create) instead of posting an empty Document. Dev: blocker 40, and refuse an empty Document with a message.',
-    owner: 'QA automation',
-  }),
+  // 24-010…013, 26-008, 26-009 posted an empty Document on 2026-10-21 (the new id was not found in the list); Desk.create
+  // now takes the id from the answer of the save, and they passed on the rerun of 2026-10-21.
+  'TC-APP026-005': {
+    cause: 'site',
+    finding: 'The save of a breakdown answers "Saved." with the id 00000000-0000-0000-0000-000000000000, and the new breakdown is not in the desk list (the server sends its first 40 records, blocker 40), so no work order can be made for it. Before the test fix the nil id was posted as Document and the server answered HTTP 500.',
+    next: 'Dev: answer the save of a breakdown with its id, and blocker 40. QA automation: the test now stops there instead of posting the nil id.',
+    owner: 'Dev',
+  },
   'TC-APP022-013': {
     cause: 'site',
     finding: 'Step 2: a service order with "Document" left empty (as the workbook asks) is saved ("Saved."); the workbook expects a refusal ("document is missing"). The HTTP 500 of this test is step 1 (order for a request that is not approved), a refusal answered with 500.',
@@ -229,9 +231,9 @@ export const TRIAGE: Record<string, Triage> = {
     owner: 'QA automation',
   },
   ...group(['TC-APP018-031', 'TC-APP018-041', 'TC-APP018-042'], {
-    cause: 'automation',
-    finding: 'The test reads only the first page of User Site Mapping (mapLines); with 107 users the new user\'s line is on a later page.',
-    next: 'QA automation: page through User Site Mapping (pages/paging.ts) to find the line.',
-    owner: 'QA automation',
+    cause: 'site',
+    finding: 'User Site Mapping draws only 24 rows of each page of 50 ("Showing 51–100 of 127" lists 24 logins): rows 25–50 of every page are never shown, and the new user\'s line falls among them (blocker 40). The test now pages through the list (rerun 2026-10-21); before that it read page 1 only.',
+    next: 'Dev: draw every row of the page (blocker 40); then run again.',
+    owner: 'Dev',
   }),
 };

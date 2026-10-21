@@ -353,7 +353,10 @@ qaTest('TC-APP024-013', async ({ page, qa }) => {
   let id = '';
   await qa.step(2, async () => {
     id = await contract(page, qa);
-    expect(await contracts(page).status(id)).toBe('approved');
+    // The list holds only its first 40 contracts (blocker 40): a new one is often not there to be read.
+    const status = await contracts(page).status(id);
+    if (status) expect(status).toBe('approved');
+    else qa.blocked(2, 40);
   });
   await qa.step(3, async () => {
     const g = logs(page);
@@ -370,7 +373,7 @@ qaTest('TC-APP024-013', async ({ page, qa }) => {
   await qa.step(5, async () => {
     qa.note(5, 'no screen shows the logs of a contract, their total or a proposed bill amount (as the workbook says)');
     const c = contracts(page);
-    expect((await c.list(id)).length).toBeGreaterThan(0);
+    if (!(await c.list(id)).length) qa.blocked(5, 40);
   });
   await qa.step(6, async () => {
     const c = contracts(page);

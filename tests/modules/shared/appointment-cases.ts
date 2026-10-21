@@ -957,14 +957,19 @@ export const CASES = {
       await field.fill(cashierName);
       const list = page.locator(`#${await field.getAttribute('aria-controls')}`);
       const offered = list.getByRole('option').filter({ hasText: cashierName });
-      await expect(offered.or(list.getByText(/no match|nothing/i)).first()).toBeVisible();
+      // A name that is not offered leaves the list empty, with no text: wait for the list to settle instead.
+      await page.waitForLoadState('networkidle').catch(() => {});
+      await expect(offered.or(list.getByText(/no match|nothing/i)).first()).toBeVisible({ timeout: 5_000 }).catch(() => {});
       if (await offered.count()) {
         qa.deviation(1, 'Not offered: only doctors are consultants', `"${(await offered.first().innerText()).trim()}" (role kasir) is offered`);
       }
     });
 
+    // Past 50 records the picker filters only the first 50 it loads (found blocker 40).
     if (userCount <= 50) qa.notRun(2, `needs more than 50 users in the tenant; the Users list has ${userCount}`);
+    else qa.blocked(2, 40);
     if (depCount <= 50) qa.notRun(3, `needs more than 50 departments in BR-A; the Departments list has ${depCount}`);
+    else qa.blocked(3, 40);
   },
 
   dateRange: async ({ page, qa }, route) => {

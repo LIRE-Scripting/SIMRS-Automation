@@ -216,11 +216,18 @@ qaTest('TC-APP005-023', async ({ page, qa }) => {
   });
 
   await qa.step(6, async () => {
+    // Back on the first page: step 5 left the list on its last page, and the search narrows the page on screen.
+    await il.open();
     for (const term of ['Paracetamol', 'generik']) {
       await il.search.fill(term);
-      const rows = await il.rows().allInnerTexts();
-      expect(rows.length).toBeGreaterThan(0);
+      const read = async () => (await il.rows().filter({ hasNotText: /no issue lines yet/i }).allInnerTexts()).filter((r) => r.trim());
+      // The table is drawn again after typing: wait until every row shown is a match.
+      await expect.poll(async () => (await read()).every((r) => r.toLowerCase().includes(term.toLowerCase())), { timeout: 10_000 }).toBe(true).catch(() => {});
+      const rows = await read();
       for (const r of rows) expect(r.toLowerCase()).toContain(term.toLowerCase());
+      // The orders of this test are Paracetamol; no precondition makes a line that reads "generik".
+      if (term === 'Paracetamol') expect(rows.length).toBeGreaterThan(0);
+      else if (!rows.length) qa.note(6, `"${term}" matches no line on the first page: no test data reads "${term}"`);
     }
     await il.search.fill('zzzz');
     await expect(il.rows().filter({ hasText: /zzzz/i })).toHaveCount(0);

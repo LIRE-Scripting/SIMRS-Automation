@@ -2,6 +2,7 @@ import type { Locator, Page } from '@playwright/test';
 import { expect, qaTest, test, type Qa } from '../../../fixtures/e2e';
 import { authFileOf } from '../../../lib/config';
 import { installToastRecorder, toastMark } from '../../../lib/assertions';
+import { pageToRow } from '../../../pages/paging';
 import { png } from './png';
 import { createUser, fillUser, invalidFields, newPassword, pick, roles, signInAs, toastsAfter, users, type NewUser } from './helpers';
 import { TC_APP018_037, TC_APP018_039 } from './cases';
@@ -49,11 +50,13 @@ async function block(page: Page, login: string): Promise<void> {
 
 const cellsOf = async (row: Locator) => (await row.getByRole('cell').allInnerTexts()).map((t) => t.replace(/\s+/g, ' ').trim());
 
-/** The lines of a login on Branch map. */
+/** The lines of a login on Branch map; pages on, as a new login is not on the first page. */
 async function mapLines(page: Page, login: string): Promise<Locator> {
+  const main = page.getByRole('main');
   await page.goto('/en/identity/site-maps');
-  await expect(page.getByRole('main').getByRole('heading', { level: 1, name: 'User Site Mapping' })).toBeVisible();
-  return page.getByRole('main').getByRole('row').filter({ has: page.getByRole('cell', { name: login, exact: true }) });
+  await expect(main.getByRole('heading', { level: 1, name: 'User Site Mapping' })).toBeVisible();
+  await expect(main.getByRole('cell').first()).toBeVisible();
+  return pageToRow(main, () => main.getByRole('row').filter({ has: page.getByRole('cell', { name: login, exact: true }) }));
 }
 
 qaTest('TC-APP018-031', async ({ page, qa, browser }) => {

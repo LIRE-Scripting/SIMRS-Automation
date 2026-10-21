@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import type { Locator, Page } from '@playwright/test';
 import { expect, qaTest, test, type Qa } from '../../../fixtures/e2e';
 import { installToastRecorder, toastMark, toastsSince } from '../../../lib/assertions';
@@ -25,12 +26,13 @@ async function toastsAfter(page: Page, mark: number, timeout = 8_000): Promise<s
   return toastsSince(page, mark);
 }
 
-/** A colour of this test: "#" and six hex digits taken from the token. */
+/**
+ * A colour of this test: "#" and six hex digits of a hash of a new token.
+ * (The last hex digit of each token character repeated colours of earlier
+ * runs that are still active.)
+ */
 function colourOf(qa: Qa): string {
-  const t = qa.token().toLowerCase();
-  let hex = '';
-  for (const ch of t) hex += ch.charCodeAt(0).toString(16).slice(-1);
-  return `#${(hex + '000000').slice(-6)}`;
+  return `#${createHash('sha1').update(qa.token()).digest('hex').slice(0, 6)}`;
 }
 
 class Categories {

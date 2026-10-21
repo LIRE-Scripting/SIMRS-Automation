@@ -279,6 +279,8 @@ qaTest('TC-APP019-026', async ({ page, qa }) => {
   try {
     await qa.step(1, async () => {
       await r.open();
+      // No account chosen: prerequisite S09 left an account on the rule, so both boxes are put on "Choose an account".
+      for (const box of [r.debit(OPERATING), r.credit(OPERATING)]) await box.selectOption('');
       expect(await r.save(OPERATING)).toContain('Choose the debit and credit accounts.');
     });
     await qa.step(2, async () => {

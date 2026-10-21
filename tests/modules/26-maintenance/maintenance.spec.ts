@@ -79,9 +79,11 @@ qaTest('TC-APP026-005', async ({ page, qa }) => {
   });
   await qa.step(4, async () => refused(qa, 4, await w.save(ORDER(qa, bd, { [NV]: '' }), 'Work order'), 'vendor is required'));
   const draft = await w.create(ORDER(qa, bd), 'Work order');
+  expect(draft.toasts, 'the draft order of steps 5–11').toContain(SAVED);
   await qa.step(5, async () => refused(qa, 5, await w.save({ Document: draft.id }, 'Approve order'), 'send the order first'));
   await qa.step(6, async () => {
     const big = await w.create(ORDER(qa, bd, { Amount: '999999999999' }), 'Work order');
+    expect(big.toasts).toContain(SAVED);
     expect(await w.save({ Document: big.id }, 'Send order')).toContain(SAVED);
     const toasts = await w.save({ Document: big.id }, 'Approve order');
     const status = await w.status(big.id);

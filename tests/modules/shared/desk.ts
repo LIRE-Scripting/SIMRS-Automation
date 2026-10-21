@@ -1,4 +1,4 @@
-import { expect, type Locator, type Page } from '@playwright/test';
+import { expect, type Locator, type Page, type Response } from '@playwright/test';
 import type { Qa } from '../../../fixtures/e2e';
 import { toastMark } from '../../../lib/assertions';
 import { toastsAfter } from '../18-settings/helpers';
@@ -73,12 +73,31 @@ export class Desk {
       rs.filter((r) => r.querySelectorAll('td').length >= 3).map((r) => Array.from(r.querySelectorAll('td')).slice(0, 3).map((c) => c.textContent?.trim() ?? '')),
     );
   }
-  /** Saves and returns the id of the row that is new afterwards. */
+  /**
+   * Saves and returns the id of the new row: the id the save action answers
+   * with (1:{"id":…}), else the row that is new in the list. The list shows its
+   * first rows only (blocker 40), so a saved row with no id found stops the test
+   * instead of sending its actions with an empty Document.
+   */
   async create(v: Record<string, string>, action?: string): Promise<{ toasts: string[]; id: string }> {
     const before = new Set((await this.list()).map((r) => r[2]));
-    const toasts = await this.save(v, action);
-    const after = await this.list();
-    return { toasts, id: after.find((r) => r[2] && !before.has(r[2]))?.[2] ?? '' };
+    const answers: Promise<string>[] = [];
+    const listen = (res: Response) => {
+      if (res.request().method() !== 'POST' || !res.request().headers()['next-action']) return;
+      // A breakdown is answered with the nil id 00000000-…: not an id, so the list is read instead.
+      answers.push(res.text().then((t) => /^1:\{"id":"([\w-]+)"\}/m.exec(t)?.[1]?.replace(/^[0-]+$/, '') ?? '', () => ''));
+    };
+    this.page.on('response', listen);
+    const toasts = await this.save(v, action).finally(() => this.page.off('response', listen));
+    const answered = (await Promise.all(answers)).find(Boolean);
+    if (answered) return { toasts, id: answered };
+    const id = await this.newRow(before);
+    if (!id && toasts.includes(SAVED)) throw new Error(`${this.route}: saved, but its id is neither in the answer nor in the list (blocker 40)`);
+    return { toasts, id };
+  }
+  /** The id of a row that is in the list now and not in before. */
+  private async newRow(before: Set<string>): Promise<string> {
+    return (await this.list()).find((r) => r[2] && !before.has(r[2]))?.[2] ?? '';
   }
   async status(id: string): Promise<string> {
     return (await this.list()).find((r) => r[2] === id)?.[0] ?? '';

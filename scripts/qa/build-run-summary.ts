@@ -19,6 +19,8 @@
  *
  * Usage: npm run qa:run-summary
  */
+import { execFileSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 import ExcelJS from 'exceljs';
@@ -29,6 +31,7 @@ import { planFor } from '../../lib/qa-data/plan';
 import { TRIAGE, type Triage } from './run-triage';
 
 const OUT_DIR = 'reports/summary';
+const THUMBS = '.qa-state/summary-thumbs';
 const SERVER_ERRORS = process.env.QA_SERVER_ERRORS ?? '.qa-state/run-2026-10-21/http-5xx.jsonl';
 const PREVIOUS = process.env.PREVIOUS_RESULTS ?? '.qa-state/old-results/2026-10-18';
 
@@ -43,6 +46,7 @@ interface PwResult {
   steps?: PwStep[];
   errors?: { message?: string }[];
   annotations?: { type: string; description?: string }[];
+  attachments?: { name: string; contentType?: string; path?: string }[];
 }
 interface PwTest { annotations?: { type: string; description?: string }[]; results: PwResult[] }
 interface PwSpec { title: string; tests: PwTest[] }
@@ -80,6 +84,8 @@ export interface TestOutcome {
   triage?: Triage;
   /** The workbook test case has no test in the suite. */
   noTest?: boolean;
+  /** The screenshot of the moment it failed, else the one at its end. */
+  screenshot?: string;
 }
 
 /** A hint from the error text of a failed test; the reviewed cause is in scripts/qa/run-triage.ts. */
@@ -150,6 +156,7 @@ function outcome(kind: TestOutcome['kind'], id: string, spec: PwSpec, errors: Se
     notRun: of('not-run'),
     http5xx: errors.filter((e) => e.test.startsWith(`${id} `) && e.at >= (result?.startTime ?? '')).map((e) => `${e.status} ${e.method} ${new URL(e.url).pathname}${e.digest ? ` (digest ${e.digest})` : ''}`),
     seconds: Math.round((result?.duration ?? 0) / 1000),
+    screenshot: ['screenshot', 'final screenshot'].map((n) => result?.attachments?.find((a) => a.name === n && a.path && fs.existsSync(a.path))?.path).find(Boolean),
     failedStep: '',
     error: '',
     cause: '',
@@ -312,6 +319,41 @@ function sheet(wb: ExcelJS.Workbook, name: string, columns: { header: string; ke
   return ws;
 }
 
+/** A JPEG of a screenshot at most 640 x 540 (ImageMagick), so a few hundred fit in the workbook; made once per screenshot. */
+function thumbnail(png: string): { file: string; width: number; height: number } {
+  const file = path.join(THUMBS, `${createHash('sha1').update(png).digest('hex').slice(0, 16)}.jpg`);
+  if (!fs.existsSync(file)) {
+    fs.mkdirSync(THUMBS, { recursive: true });
+    execFileSync('magick', [png, '-resize', '640x540>', '-quality', '70', file]);
+  }
+  const [width, height] = execFileSync('magick', ['identify', '-format', '%w %h', file]).toString().split(' ').map(Number);
+  return { file, width, height };
+}
+
+/** Sheet Screenshots: one row per failed test, test with a deviation and chain not passed (row i + 2), with its screenshot. */
+function screenshots(wb: ExcelJS.Workbook, rows: TestOutcome[]): void {
+  const ws = sheet(wb, 'Screenshots', [
+    { header: 'Id', key: 'id', width: 15 },
+    { header: 'Status', key: 'status', width: 11 },
+    { header: 'Test case / chain', key: 'title', width: 36 },
+    { header: 'Cause / why', key: 'cause', width: 50 },
+    { header: 'Screenshot (at the failure, else at the end of the test)', key: 'shot', width: 92 },
+  ], rows.map((o) => ({
+    id: o.id,
+    status: o.status,
+    title: o.title,
+    cause: [o.triage ? `${o.triage.cause}: ${o.triage.finding}` : o.error || o.reason.slice(0, 600), o.triage?.next ? `Next: ${o.triage.next}` : ''].filter(Boolean).join('\n\n'),
+    shot: o.screenshot ? '' : 'no screenshot',
+  })), 'status');
+  rows.forEach((o, i) => {
+    const row = i + 2;
+    if (!o.screenshot) return;
+    const t = thumbnail(o.screenshot);
+    ws.getRow(row).height = Math.max(60, t.height * 0.75 + 6);
+    ws.addImage(wb.addImage({ filename: t.file, extension: 'jpeg' }), { tl: { col: 4, row: row - 1 }, ext: { width: t.width, height: t.height }, editAs: 'oneCell' });
+  });
+}
+
 async function writeWorkbook(s: Summary): Promise<void> {
   const wb = new ExcelJS.Workbook();
   const ov = wb.addWorksheet('Overview');
@@ -333,7 +375,7 @@ async function writeWorkbook(s: Summary): Promise<void> {
   add('Status meanings').font = { bold: true };
   add('Passed', 'every step met the Expected Result of the workbook');
   add('Deviation', 'ran to the end, a step differs from the Expected Result (site behaviour noted)');
-  add('Failed', 'stopped on an error: see sheet Failures for the cause and next action');
+  add('Failed', 'stopped on an error: see sheet Failures for the cause and next action, and sheet Screenshots for what the screen showed');
   add('Blocked', 'a known blocker stopped steps: see sheet Blockers');
   add('Not run', 'not run for another reason (Automation Candidate = No, needs a user/role that is not ready, ...)');
   ov.getColumn(2).alignment = { wrapText: false };
@@ -375,8 +417,11 @@ async function writeWorkbook(s: Summary): Promise<void> {
     { header: 'Status 2026-10-18', key: 'previous', width: 11 },
     { header: 'Blockers', key: 'blockers', width: 10 },
   ];
-  sheet(wb, 'E2E chains', [...cols, { header: 'Why (stop / deviation)', key: 'reason', width: 70 }, { header: 'Failed step', key: 'failedStep', width: 40 }, { header: 'Error', key: 'error', width: 50 }, { header: 'Cause', key: 'cause', width: 50 }, { header: 'Next action', key: 'next', width: 50 }, { header: 'HTTP 5xx', key: 'http5xx', width: 40 }], s.outcomes.filter((o) => o.kind === 'chain').map(outcomeRow), 'status');
-  sheet(wb, 'Failures', [...cols, { header: 'Failed step', key: 'failedStep', width: 50 }, { header: 'Error', key: 'error', width: 60 }, { header: 'Cause', key: 'cause', width: 60 }, { header: 'Next action', key: 'next', width: 60 }, { header: 'Owner', key: 'owner', width: 16 }, { header: 'HTTP 5xx', key: 'http5xx', width: 40 }], s.outcomes.filter((o) => o.status === 'Failed' || o.status === 'Deviation').map((o) => ({ ...outcomeRow(o), error: o.error || o.reason })), 'status');
+  const shotRows = s.outcomes.filter((o) => (o.kind === 'chain' && o.status !== 'Passed') || (o.kind === 'module' && (o.status === 'Failed' || o.status === 'Deviation')));
+  const shotAt = new Map(shotRows.map((o, i) => [o.id, i + 2]));
+  const link = (o: TestOutcome) => (shotAt.has(o.id) ? { text: o.screenshot ? 'screenshot' : 'none', hyperlink: `#'Screenshots'!E${shotAt.get(o.id)}` } : '');
+  sheet(wb, 'E2E chains', [...cols, { header: 'Screenshot', key: 'shot', width: 12 }, { header: 'Why (stop / deviation)', key: 'reason', width: 70 }, { header: 'Failed step', key: 'failedStep', width: 40 }, { header: 'Error', key: 'error', width: 50 }, { header: 'Cause', key: 'cause', width: 50 }, { header: 'Next action', key: 'next', width: 50 }, { header: 'HTTP 5xx', key: 'http5xx', width: 40 }], s.outcomes.filter((o) => o.kind === 'chain').map((o) => ({ ...outcomeRow(o), shot: link(o) })), 'status');
+  sheet(wb, 'Failures', [...cols, { header: 'Screenshot', key: 'shot', width: 12 }, { header: 'Failed step', key: 'failedStep', width: 50 }, { header: 'Error', key: 'error', width: 60 }, { header: 'Cause', key: 'cause', width: 60 }, { header: 'Next action', key: 'next', width: 60 }, { header: 'Owner', key: 'owner', width: 16 }, { header: 'HTTP 5xx', key: 'http5xx', width: 40 }], s.outcomes.filter((o) => o.status === 'Failed' || o.status === 'Deviation').map((o) => ({ ...outcomeRow(o), shot: link(o), error: o.error || o.reason })), 'status');
   sheet(wb, 'Blockers', [
     { header: 'No', key: 'no', width: 6 },
     { header: 'Blocker', key: 'title', width: 60 },
@@ -404,6 +449,7 @@ async function writeWorkbook(s: Summary): Promise<void> {
     { header: 'Response', key: 'response', width: 50 },
   ], s.errors.map((e) => ({ ...e, test: e.test.replace(/ \[[^\]]+\].*$/, ''), path: new URL(e.url).pathname })));
   sheet(wb, 'Test cases', [...cols, { header: 'Why', key: 'reason', width: 70 }, { header: 'Error', key: 'error', width: 50 }, { header: 'Seconds', key: 'seconds', width: 9 }], s.outcomes.filter((o) => o.kind === 'module').map(outcomeRow), 'status');
+  screenshots(wb, shotRows);
   await wb.xlsx.writeFile(path.join(OUT_DIR, 'simrs-run-summary.xlsx'));
 }
 

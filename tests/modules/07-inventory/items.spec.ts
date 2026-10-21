@@ -84,7 +84,7 @@ qaTest('TC-APP007-003', async ({ page, qa }) => {
   await qa.step(1, async () => {
     await items.open();
     await expect(items.table.getByRole('columnheader')).toHaveText(['Code', 'Name', 'Batch', 'Serialized', 'Status', 'Actions']);
-    const names = await items.rows().evaluateAll((rs) => rs.map((r) => r.querySelectorAll('td')[1]?.textContent?.trim() ?? ''));
+    const names = await items.rows().evaluateAll((rs) => rs.filter((r) => r.querySelectorAll('td').length > 1).map((r) => r.querySelectorAll('td')[1]?.textContent?.trim() ?? ''));
     const sorted = [...names].sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }));
     const byCode = [...names].sort();
     if (sorted.join() !== names.join() && byCode.join() !== names.join()) qa.deviation(1, 'The items in name order', `the order starts ${names.slice(0, 3).join(' | ')}`);
@@ -94,14 +94,14 @@ qaTest('TC-APP007-003', async ({ page, qa }) => {
 
   await qa.step(2, async () => {
     await items.search.fill('para');
-    const texts = await items.rows().evaluateAll((rs) => rs.map((r) => `${r.querySelectorAll('td')[0]?.textContent} ${r.querySelectorAll('td')[1]?.textContent}`.toLowerCase()));
+    const texts = await items.rows().evaluateAll((rs) => rs.filter((r) => r.querySelectorAll('td').length > 1).map((r) => `${r.querySelectorAll('td')[0]?.textContent} ${r.querySelectorAll('td')[1]?.textContent}`.toLowerCase()));
     expect(texts.length).toBeGreaterThan(0);
     for (const x of texts) expect(x).toContain('para');
   });
 
   await qa.step(3, async () => {
     await items.status.selectOption({ label: 'Inactive' });
-    const statuses = await items.rows().evaluateAll((rs) => rs.map((r) => r.querySelectorAll('td')[4]?.textContent?.trim() ?? ''));
+    const statuses = await items.rows().evaluateAll((rs) => rs.filter((r) => r.querySelectorAll('td').length > 1).map((r) => r.querySelectorAll('td')[4]?.textContent?.trim() ?? ''));
     for (const x of statuses) expect(x).toBe('Inactive');
     if (!(await items.row(inactive.code).count())) qa.note(3, 'the new inactive item is not among the rows: the filters narrow only the 50 rows of the page on screen (TC-APP007-019)');
   });
