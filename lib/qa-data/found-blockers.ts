@@ -515,6 +515,24 @@ export const FOUND_BLOCKERS: FoundBlocker[] = [
       { id: 'TC-APP027-003', steps: [3, 4, 5, 6] },
     ],
   },
+  {
+    no: 41,
+    blocker: 'No patient can be registered in Kemayoran (BR-B): "Register" answers HTTP 500',
+    category: 'Function',
+    scope: '01 Ambulatory Care\nRegistered Patients, /registration/patients, "New Registration" on branch Kemayoran',
+    cause:
+      'A complete registration (visit type Outpatient, names, with or without a date of birth) on Kemayoran posts and gets HTTP 500 ' +
+      '(digest 2980747901), toast "Registration failed": for U6 qa.kemayoran (admin of Kemayoran) and for U2 choosing Branch ' +
+      '"Kemayoran". The same form on Podomoro saves ("Patient registered"). Kemayoran holds only its 40 seed patients ' +
+      '(seen 2026-10-21). PT-B ("QA-AMB Pasien Cabang", BR-B) cannot be made; the tests use a seed patient of Kemayoran instead where they can.',
+    fix: '1. Fix the registration of a patient on Kemayoran (probably a set-up of the branch the action needs, e.g. its MRN numbering).\n2. Run TC-APP001-024 and TC-APP001-043 again.',
+    who: 'Development',
+    howFound: 'Seen on the site (TC-APP001-024 and 063, written 2026-10-21)',
+    testCases: [
+      { id: 'TC-APP001-024', steps: [3, 6] },
+      { id: 'TC-APP001-043', steps: [3] },
+    ],
+  },
 ];
 
 export function foundBlocker(no: number): FoundBlocker {

@@ -57,12 +57,7 @@ export const TRIAGE: Record<string, Triage> = {
     next: 'QA automation: accept the empty list in step 1 and automate steps 2-3 (they will fail on found blocker 40 until Dev fixes the pickers).',
     owner: 'QA automation',
   }),
-  ...group(range('TC-APP001', [24, 35, 43, 61, 62, 63]), {
-    cause: 'automation',
-    finding: 'The test case became runnable when users U3-U7 were made (2026-10-20); its test is not written yet ("write its test").',
-    next: 'QA automation: write the test from the workbook steps.',
-    owner: 'QA automation',
-  }),
+  // TC-APP001-024, 035, 043, 061, 062, 063 had no test on 2026-10-21; written the same day (branches.spec.ts, rights.spec.ts).
   'TC-APP004-034': PICKER('Bed', 'the bed list of the ward; the new bed QA-199-… is not offered'),
   ...group(range('TC-APP010', [8, 9, 10, 11, 12, 16, 17, 18, 19, 22, 23, 32]), PICKER('Employee (leave)', 'employees made by earlier runs fill it; the new QA-EMP-… and X QA Pegawai are not offered')),
   ...group([...range('TC-APP017', [1, 3, 8, 10, 12, 13, 14, 15, 51])], PICKER('Employee (payroll)', 'the new QA-EMP-… of the run is not offered')),

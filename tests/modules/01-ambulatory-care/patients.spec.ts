@@ -840,6 +840,53 @@ qaTest('TC-APP001-034', async ({ page, qa }) => {
   });
 });
 
+qaTest('TC-APP001-035', async ({ page, qa }) => {
+  const reg = new RegisteredPatientsPage(page);
+  const token = qa.token();
+  // PT-MOM (Data catalogue): "QA-AMB Ibu Satu", date of birth 1995-08-09. Test Data: baby "QA-AMB Bayi Tanpa Ibu".
+  const mom = await reg.register({ firstName: 'QA-AMB Ibu', lastName: `Satu ${token}`, dateOfBirth: '1995-08-09' });
+  const today = todayWib();
+  const baby = { visitType: 'Newborn' as const, firstName: 'QA-AMB Bayi Tanpa', lastName: `Ibu ${token}`, dateOfBirth: today, born: today };
+  const babyName = `QA-AMB Bayi Tanpa Ibu ${token}`;
+  const notSaved = async () => {
+    const check = new RegisteredPatientsPage(page);
+    if (await reg.registerDialog().isVisible()) return;
+    await check.search(babyName);
+    await expect(check.row(babyName)).toHaveCount(0);
+  };
+  await reg.open();
+  await reg.openRegister();
+  await reg.fillRegister(baby);
+
+  await qa.step(1, async () => {
+    expectRefused(qa, 1, await attemptRegister(reg), 'Newborn requires a mother');
+    await notSaved();
+  });
+
+  await qa.step(2, async () => {
+    await reg.registerDialog().getByRole('textbox', { name: 'Mother' }).fill(`Ibu Satu ${token}`);
+    expectRefused(qa, 2, await attemptRegister(reg), 'Newborn requires a mother');
+    await notSaved();
+  });
+
+  await qa.step(3, async () => {
+    const d = reg.registerDialog();
+    await reg.pickFrom(d.getByRole('textbox', { name: 'Mother' }), `Ibu Satu ${token}`, mom.mrn, d);
+    const r = await attemptRegister(reg);
+    expect(r.toast).toBe('Patient registered');
+    await reg.search(babyName);
+    await expect(reg.row(babyName)).toHaveCount(1);
+  });
+
+  await qa.step(4, async () => {
+    const d = await reg.openRegister();
+    await reg.visitTypeSelect(d).selectOption('Newborn');
+    const mother = await d.getByRole('textbox', { name: 'Mother' }).inputValue();
+    if (mother) qa.deviation(4, 'The Mother field is empty', `the Mother field still shows "${mother}" (the previous mother)`);
+    await page.keyboard.press('Escape');
+  });
+});
+
 qaTest('TC-APP001-036', async ({ page, qa }) => {
   const reg = new RegisteredPatientsPage(page);
   const token = qa.token();

@@ -9,7 +9,7 @@ The detail is in these files:
 | `reports/summary/simrs-run-summary.xlsx` | Overview, Modules, E2E chains, Failures (cause, next action, owner), Blockers, HTTP 5xx (every request with its body and digest), Test cases, **Screenshots** (the screen of every failed test, test with a deviation and chain not passed; linked from Failures and E2E chains) |
 | `reports/e2e/<NN-module>.xlsx` | Module workbooks: every step with Execution Status, Actual Result, Defect Reference, Automation notes and a screenshot link |
 | `reports/e2e-chains/e2e-journeys.xlsx` | The 50 E2E chains, step by step |
-| `docs/qa/blockers-found.md` | Every blocker found by the automation, including the new blocker 40 |
+| `docs/qa/blockers-found.md` | Every blocker found by the automation, including the new blockers 40 and 41 |
 
 ## 1. Summary
 
@@ -17,15 +17,15 @@ The detail is in these files:
 
 | Status | 2026-10-21 | 2026-10-18 | Meaning |
 |---|---|---|---|
-| Passed | **587** | 545 | every step met its Expected Result |
-| Deviation | **200** | 170 | the test ran to the end; a step differs from its Expected Result (the site's behaviour is recorded) |
-| Failed | **60** | 82 | the test stopped on an error |
-| Blocked | **279** | 256 | a known blocker stopped steps |
+| Passed | **589** | 545 | every step met its Expected Result |
+| Deviation | **202** | 170 | the test ran to the end; a step differs from its Expected Result (the site's behaviour is recorded) |
+| Failed | **54** | 82 | the test stopped on an error |
+| Blocked | **281** | 256 | a known blocker stopped steps |
 | Not run | **478** | 551 | Automation Candidate = No, waits for a user or role, or **has no test yet (191)** |
 
-Of the 847 test cases that ran to a result (Passed + Deviation + Failed), **587 (69%) passed in full**. The figures include the rerun of the fixed tests (section 3.5).
+Of the 845 test cases that ran to a result (Passed + Deviation + Failed), **589 (70%) passed in full**. The figures include the rerun of the fixed tests and the 6 tests written on 2026-10-21 (section 3.5).
 
-The rescan of every request body, page snapshot and test found 74 failures: 49 site defects, 24 from the tests, 1 from the order of the run. The tests that filled a form wrongly were fixed and run again (section 3.5). **Now 60 failures: 53 site defects, 6 tests not written yet, 1 from the order of the run.**
+The rescan of every request body, page snapshot and test found 74 failures: 49 site defects, 24 from the tests, 1 from the order of the run. The tests that filled a form wrongly were fixed and run again (section 3.5). **Now 54 failures: 53 site defects and 1 from the order of the run; none comes from a test.**
 
 ### Why 478 test cases are Not run
 
@@ -107,10 +107,10 @@ The fixture (`fixtures/e2e.ts`, `serverErrors`) records every 5xx answer of the 
 
 | Group | Requests | Tests | Meaning |
 |---|---|---|---|
-| Known blocker | 72 | 47 | a 500 already recorded as a blocker (2, 25, 26, 31, 39, 38, …) |
-| Negative/boundary test | 233 | 105 | input wrong on purpose or at a limit; the site refuses it, but with a 500, not a message |
+| Known blocker | 73 | 48 | a 500 already recorded as a blocker (2, 25, 26, 31, 39, 38, …) |
+| Negative/boundary test | 235 | 106 | input wrong on purpose or at a limit; the site refuses it, but with a 500, not a message |
 | Positive test | 38 | 32 | input meant to be valid; a server error not yet recorded as a blocker |
-| From an earlier run of the test, superseded by a rerun (01/02, the fixed tests) | 51 | 20 | not counted |
+| From an earlier run of the test, superseded by a rerun (01/02, the fixed tests) | 57 | 22 | not counted |
 
 The groups come from the test type, so the request bodies still need a look in the sheet. Cases checked by hand:
 
@@ -205,9 +205,9 @@ Every failed test was checked again against the request it sent (sheet HTTP 5xx)
 | 15-024/025 | The colour made from the token repeated an active colour of an earlier run | A colour from a hash of a new token | **Pass** |
 | 19-026 | Prerequisite S09 left an account on the operating rule, so "save without accounts" was not without accounts | Put both boxes on "Choose an account" first | **Pass** |
 | 18-008 | Read the list before the search result was drawn | Wait for the search result | **Pass** |
-| 01-024, 035, 043, 061, 062, 063 | No test written yet | Write the tests | Still failing (6) |
+| 01-024, 035, 043, 061, 062, 063 | No test written yet | Written (`01-ambulatory-care/branches.spec.ts`, `rights.spec.ts`, `patients.spec.ts`) | 061 and 063 **pass**; 035 and 062 pass with **deviations** (a newborn without a mother is answered with HTTP 500 "Registration failed"; the Mother field keeps the previous mother; a user with no rights reads the patient list, appointments and arrivals); 024 and 043 run with steps **blocked by the new blocker 41** |
 
-New site finding from the rerun: **26-005** – the save of a breakdown answers "Saved." with the id `00000000-0000-0000-0000-000000000000`, and the breakdown is not in the list, so no work order can be made for it.
+New site findings: **blocker 41** – no patient can be registered in Kemayoran (BR-B): "Register" answers HTTP 500 (digest 2980747901) for U6 and for U2 choosing Kemayoran; Podomoro saves. **26-005** – the save of a breakdown answers "Saved." with the id `00000000-0000-0000-0000-000000000000`, and the breakdown is not in the list, so no work order can be made for it.
 
 **Order of the run (1):** 14-036.
 
@@ -270,20 +270,17 @@ A chain stops at its first blocker; the steps after it are Blocked. The step det
 
 ## 5. Per module
 
-The figures include the 01/02 rerun and the rerun of the fixed tests. **Blockers** are the blockers that stopped test cases of the module (number of test cases). **Failures** are the failures with their cause and next action: [site] a site defect, [automation] a test problem, [environment] the order of the run. Deviations (differences from the Expected Result) are recorded per step in `reports/e2e/<NN>.xlsx`, column Actual Result.
+The figures include the 01/02 rerun, the rerun of the fixed tests and the tests written on 2026-10-21. **Blockers** are the blockers that stopped test cases of the module (number of test cases). **Failures** are the failures with their cause and next action: [site] a site defect, [automation] a test problem, [environment] the order of the run. Deviations (differences from the Expected Result) are recorded per step in `reports/e2e/<NN>.xlsx`, column Actual Result.
 
 ### 01 Ambulatory Care
 
 | Test cases | Passed | Deviation | Failed | Blocked | Not run (no test yet) | HTTP 5xx |
 |---|---|---|---|---|---|---|
-| 89 | 27 | 23 | 6 | 10 | 23 (0) | 18 |
+| 89 | 29 | 25 | 0 | 12 | 23 (0) | 21 |
 
-**Blockers:** 17 (5 TC) – Book settings: a quota or open-hours row cannot be switched to "Unit"; 18 (2 TC) – More than 3 bookings on one day cannot be made with the shared Book settings; 19 (1 TC) – A patient cannot be marked deceased; 20 (1 TC) – A registered patient cannot be edited; 40 (1 TC) – Pickers and lists reach only their first records: a record past them cannot be chosen or found.
+**Blockers:** 17 (5 TC) – Book settings: a quota or open-hours row cannot be switched to "Unit"; 18 (2 TC) – More than 3 bookings on one day cannot be made with the shared Book settings; 19 (1 TC) – A patient cannot be marked deceased; 20 (1 TC) – A registered patient cannot be edited; 40 (1 TC) – Pickers and lists reach only their first records: a record past them cannot be chosen or found; 41 (2 TC) – No patient can be registered in Kemayoran (BR-B): "Register" answers HTTP 500.
 
-**Failures (6):**
-
-- 024, 035, 043, 061, 062, 063 — [automation] The test case became runnable when users U3-U7 were made (2026-10-20); its test is not written yet ("write its test").
-  - Next: QA automation: write the test from the workbook steps. (QA automation)
+**Failures:** none.
 
 ### 02 Appointment
 
@@ -621,6 +618,7 @@ The figures include the 01/02 rerun and the rerun of the fixed tests. **Blockers
 1. **Blocker 40**: search pickers and lists on the server, and give the desk lists paging or a search (3.1). The largest impact: about 70 test cases and 16 chains.
 2. **HTTP 500 on valid input** (3.2): dispense confirm, lab revert, diet calculate, pay with deposits; and refuse an empty Document with a message instead of a 500.
    Also: the save of a breakdown answers with the nil id `00000000-…` (26-005).
+   **Blocker 41**: registration of a patient in Kemayoran answers HTTP 500 (TC-APP001-024, 043).
 3. **Refusals answered with 500** (3.3): answer with a validation message instead.
 4. **Missing validation** (3.4): pain policy, imprest, repeated leave type names, service order without a document, shift for an unknown location.
 5. **Old blockers with the largest impact**: 2/25 (Transfusion Medicine), 13 (branch set-up), 5 (All branches), 14 (records across applications), 10, 39 (tender), 23 (ward care), and 38 (saving the rights of a role, which also holds 4 U8 accounts).
@@ -628,7 +626,7 @@ The figures include the 01/02 rerun and the rerun of the fixed tests. **Blockers
 
 ### QA automation
 
-1. **Write the tests of the 191 test cases that are now "automate"** (since U3–U7 are ready), including 6 in 01: 024, 035, 043, 061, 062, 063.
+1. **Write the tests of the 191 test cases that are now "automate"** (since U3–U7 are ready). The 6 of 01 (024, 035, 043, 061, 062, 063) were written on 2026-10-21.
 2. Chains E2E-009/011/040/042/050: run the steps that are now "automate" instead of stopping.
 3. Done on 2026-10-21: the test fixes of 3.5 (Desk.create id from the save, User Site Mapping paging, 05-023, 07-003, 01-053/02-017, 15-024/025, 19-026, 18-008); 14 of the 18 fixed tests ran to the end (24-013, 01-053 and 02-017 with steps blocked by blocker 40); 18-031/041/042 and 26-005 now fail on site defects only.
 4. Run order: E2E-033 before TC-APP014-011, and TC-APP014-036 after TC-APP014-011. All of them after 07:00 WIB.
