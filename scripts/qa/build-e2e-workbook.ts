@@ -25,6 +25,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import ExcelJS from 'exceljs';
 import { modules } from '../../lib/qa-data';
+import { addNotesColumn, evidenceCell, probableCause } from './run-notes';
 
 const OUT = 'reports/e2e';
 const REPORTS = process.argv.length > 2
@@ -62,6 +63,8 @@ interface StepOutcome {
   status: Status;
   actual: string;
   defect?: string;
+  /** Automation notes: the blocker, the error and its probable cause, the deviation or the reason not run. */
+  note?: string;
 }
 
 type Report = { suites: PwSuite[]; stats?: { startTime?: string } };
@@ -102,8 +105,8 @@ function outcomes(spec: PwSpec, stepNumbers: number[]): Map<number, StepOutcome>
     const blocker = reasons.find((r) => /^Blocker \d+/.test(r));
     for (const n of stepNumbers) {
       out.set(n, blocker
-        ? { status: 'Blocked', actual: `${runDate} E2E: not run. ${blocker}`, defect: blocker.match(/^Blocker \d+/)![0] }
-        : { status: 'Not Run', actual: `${runDate} E2E: not run. ${reasons.join('; ') || 'skipped'}` });
+        ? { status: 'Blocked', actual: `${runDate} E2E: not run. ${blocker}`, defect: blocker.match(/^Blocker \d+/)![0], note: `The test is skipped: ${reasons.join('; ')}` }
+        : { status: 'Not Run', actual: `${runDate} E2E: not run. ${reasons.join('; ') || 'skipped'}`, note: reasons.join('; ') || 'skipped' });
     }
     return out;
   }
@@ -129,21 +132,24 @@ function outcomes(spec: PwSpec, stepNumbers: number[]): Map<number, StepOutcome>
   for (const n of stepNumbers) {
     const note = testNotes.get(n)?.join('; ');
     const extra = note ? ` Note: ${note}.` : '';
+    const ownNote = note ? `Note: ${note}` : undefined;
     if (blocked.has(n)) {
       const text = blocked.get(n)!.join('; ');
-      out.set(n, { status: 'Blocked', actual: `${runDate} E2E: ${text}.${extra}`, defect: text.match(/blocker (\d+)/)?.[0].replace('blocker', 'Blocker') });
+      out.set(n, { status: 'Blocked', actual: `${runDate} E2E: ${text}.${extra}`, defect: text.match(/blocker (\d+)/)?.[0].replace('blocker', 'Blocker'), note: [`Stopped by ${text}`, ownNote].filter(Boolean).join('. ') });
     } else if (failedAt === n) {
-      out.set(n, { status: 'Failed', actual: `${runDate} E2E failed: ${firstLine(ran.get(n)?.error?.message) || testError}.${extra}` });
+      const error = firstLine(ran.get(n)?.error?.message) || testError;
+      out.set(n, { status: 'Failed', actual: `${runDate} E2E failed: ${error}.${extra}`, note: [`Error: ${error}`, `Probable cause: ${probableCause(error)}`, ownNote].filter(Boolean).join('. ') });
     } else if (deviations.has(n) && (failedAt === undefined || n < failedAt)) {
       // A deviation was seen on the screen, even on a step partly "not run".
-      out.set(n, { status: 'Failed', actual: `${runDate} E2E: Expected Result not met. ${deviations.get(n)!.join('; ')}.${extra}` });
+      const dev = deviations.get(n)!.join('; ');
+      out.set(n, { status: 'Failed', actual: `${runDate} E2E: Expected Result not met. ${dev}.${extra}`, note: [`Deviation from the workbook: ${dev}`, ownNote].filter(Boolean).join('. ') });
     } else if (notRun.has(n)) {
-      out.set(n, { status: 'Not Run', actual: `${runDate} E2E: not run. ${notRun.get(n)!.join('; ')}.${extra}` });
+      out.set(n, { status: 'Not Run', actual: `${runDate} E2E: not run. ${notRun.get(n)!.join('; ')}.${extra}`, note: notRun.get(n)!.join('; ') });
     } else if (!ran.has(n) || (failedAt !== undefined && n > failedAt)) {
       const why = result.status === 'passed' ? 'step not reached by the test' : `the test stopped earlier (${testError})`;
-      out.set(n, { status: 'Not Run', actual: `${runDate} E2E: not run; ${why}.${extra}` });
+      out.set(n, { status: 'Not Run', actual: `${runDate} E2E: not run; ${why}.${extra}`, note: [`Not reached: ${why}`, ownNote].filter(Boolean).join('. ') });
     } else {
-      out.set(n, { status: 'Passed', actual: `${runDate} E2E: as expected.${extra}` });
+      out.set(n, { status: 'Passed', actual: `${runDate} E2E: as expected.${extra}`, note: ownNote });
     }
   }
   return out;
@@ -211,6 +217,9 @@ async function main(): Promise<void> {
       if (!i) throw new Error(`${m.source} | Steps has no column "${name}"`);
       return i;
     };
+    const notesCol = addNotesColumn(ws);
+    const evidenceCol = col('Evidence Reference');
+    const workbookDir = path.posix.dirname(`${OUT}/${m.source}`);
     const count: Record<Status, number> = { Passed: 0, Failed: 0, Blocked: 0, 'Not Run': 0 };
     const cache = new Map<string, Map<number, StepOutcome>>();
 
@@ -233,6 +242,9 @@ async function main(): Promise<void> {
       row.getCell(col('Execution Status')).value = o.status;
       row.getCell(col('Actual Result')).value = o.actual;
       if (o.defect) row.getCell(col('Defect Reference')).value = o.defect;
+      row.getCell(notesCol).value = o.note ?? null;
+      row.getCell(notesCol).alignment = { wrapText: true, vertical: 'top' };
+      if (spec) row.getCell(evidenceCol).value = evidenceCell(id, workbookDir, String(row.getCell(evidenceCol).value ?? ''));
       count[o.status] += 1;
     }
 
