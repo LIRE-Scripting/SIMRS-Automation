@@ -1,6 +1,7 @@
 import { expect, qaTest, test } from '../../../fixtures/e2e';
 import { installToastRecorder } from '../../../lib/assertions';
 import { addDays, todayWib } from '../../../lib/dates';
+import { allBranchesSave, asAllBranches } from '../shared/access';
 import { backToEnglish, switchLanguage } from '../shared/language';
 import { screenOpens } from '../shared/screen-opens';
 import { catalogue, click } from './helpers';
@@ -225,8 +226,20 @@ qaTest('TC-APP013-041', async ({ page, qa }) => {
   });
 });
 
-qaTest('TC-APP013-042', async ({ qa }) => {
-  qa.notRun(1, 'U1 works on one branch, so the form shows no branch list; the case needs "All branches" in the header (U2 on this screen)');
+qaTest('TC-APP013-042', async ({ qa, browser }) => {
+  await asAllBranches(browser, async (u2) => {
+    const o = orders(u2);
+    await qa.step(1, async () => {
+      await o.open();
+      const branch = o.main.getByRole('combobox', { name: 'Branch' });
+      const offered = (await branch.count()) > 0;
+      await o.name.fill(qa.name('X Pasien Diet'));
+      const toasts = await click(u2, o.save);
+      const stopped = offered ? await branch.evaluate((e: HTMLSelectElement) => e.validationMessage) : '';
+      qa.note(1, offered ? `the form has a branch list${stopped ? `; the browser stops the click: "${stopped}"` : ''}` : 'the form has no branch list');
+      allBranchesSave(qa, 1, toasts, 'Saved');
+    });
+  });
 });
 
 qaTest('TC-APP013-043', async ({ page, qa }) => {

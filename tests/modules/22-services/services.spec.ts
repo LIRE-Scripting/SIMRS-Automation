@@ -1,6 +1,6 @@
 import { expect, qaTest, test, type Qa } from '../../../fixtures/e2e';
 import { installToastRecorder } from '../../../lib/assertions';
-import { auditEntries, menuScreens, toastsOf, userPage } from '../shared/access';
+import { allBranchesList, allBranchesSave, asAllBranches, auditEntries, menuScreens, toastsOf, userPage } from '../shared/access';
 import { screenOpens } from '../shared/screen-opens';
 import { act, approvedPr, category, desk, item, ORDER, purchaseRequest, request, SAVED, TC_APP022_001, TC_APP022_003, TC_APP022_005, TC_APP022_009, TC_APP022_012 } from './cases';
 
@@ -112,9 +112,21 @@ qaTest('TC-APP022-007', async ({ page, qa }) => {
   });
 });
 
-qaTest('TC-APP022-008', async ({ qa }) => {
-  qa.notRun(1, 'U1 works on one branch; "All branches" in the header needs U2');
-  qa.notRun(2, 'see step 1');
+qaTest('TC-APP022-008', async ({ page, qa, browser }) => {
+  // The category and the item (made by U1); U2 works on "All branches".
+  const cat = await category(page, qa);
+  const it = await item(page, qa, cat);
+  await asAllBranches(browser, async (u2) => {
+    const d = desk(u2, 'requests');
+    await qa.step(1, async () => {
+      await d.open();
+      await allBranchesList(u2, qa, 1);
+    });
+    await qa.step(2, async () => {
+      const v = { Number: qa.code('X-SR-001'), Parent: cat, Item: it, Department: qa.prefix('X Bangsal uji'), Description: qa.prefix('X cuci linen') };
+      allBranchesSave(qa, 2, await d.save(v));
+    });
+  });
 });
 
 qaTest('TC-APP022-009', TC_APP022_009);
@@ -134,9 +146,16 @@ qaTest('TC-APP022-010', async ({ page, qa }) => {
   });
 });
 
-qaTest('TC-APP022-011', async ({ qa }) => {
-  qa.notRun(1, 'U1 works on one branch; "All branches" in the header needs U2');
-  qa.notRun(2, 'see step 1');
+qaTest('TC-APP022-011', async ({ page, qa, browser }) => {
+  const it = await item(page, qa, await category(page, qa));
+  await asAllBranches(browser, async (u2) => {
+    const d = desk(u2, 'purchase-requests');
+    await qa.step(1, async () => {
+      await d.open();
+      await allBranchesList(u2, qa, 1);
+    });
+    await qa.step(2, async () => allBranchesSave(qa, 2, await d.save({ Item: it, Store: 'CSSD', Quantity: '2' })));
+  });
 });
 
 qaTest('TC-APP022-012', TC_APP022_012);
@@ -167,9 +186,18 @@ qaTest('TC-APP022-013', async ({ page, qa }) => {
   });
 });
 
-qaTest('TC-APP022-014', async ({ qa }) => {
-  qa.notRun(1, 'U1 works on one branch; "All branches" in the header needs U2');
-  qa.notRun(2, 'see step 1');
+qaTest('TC-APP022-014', async ({ page, qa, browser }) => {
+  // An approved service purchase request (made by U1).
+  const it = await item(page, qa, await category(page, qa));
+  const pr = await approvedPr(page, it);
+  await asAllBranches(browser, async (u2) => {
+    const d = desk(u2, 'orders');
+    await qa.step(1, async () => {
+      await d.open();
+      await allBranchesList(u2, qa, 1);
+    });
+    await qa.step(2, async () => allBranchesSave(qa, 2, await d.save(ORDER(qa, it, pr))));
+  });
 });
 
 qaTest('TC-APP022-022', async ({ page, qa, browser }) => {

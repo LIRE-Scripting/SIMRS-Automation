@@ -2,6 +2,7 @@ import type { Browser, Locator, Page } from '@playwright/test';
 import { expect, type Qa } from '../../../fixtures/e2e';
 import { installToastRecorder, toastMark, toastsSince } from '../../../lib/assertions';
 import { authFileOf } from '../../../lib/config';
+import { AppHeader } from '../../../pages/AppHeader';
 import { RegisteredPatientsPage } from '../../../pages/ambulatory/RegisteredPatientsPage';
 
 /**
@@ -33,6 +34,31 @@ export async function asUser<T>(browser: Browser, user: 'U1' | 'U2' | 'U3' | 'U6
   } finally {
     await page.context().close();
   }
+}
+
+/** Runs body with a page of U2 with "All branches" chosen in the header (U2 may have been left on one branch). */
+export async function asAllBranches<T>(browser: Browser, body: (page: Page) => Promise<T>): Promise<T> {
+  return asUser(browser, 'U2', async (page) => {
+    await page.goto('/en/apps');
+    await new AppHeader(page).selectBranch('All branches');
+    return body(page);
+  });
+}
+
+/** Step "opens the screen with All branches" (expected TBD): notes whether the screen asks for one branch, or what its list shows. */
+export async function allBranchesList(page: Page, qa: Qa, step: number): Promise<void> {
+  await page.waitForLoadState('networkidle').catch(() => {});
+  const main = page.getByRole('main');
+  const text = (await main.innerText()).replace(/\s+/g, ' ');
+  const asks = /(choose|select|pick|pilih)[^.]{0,40}(branch|cabang)/i.test(text);
+  const rows = await main.getByRole('table').first().getByRole('row').count().catch(() => 0);
+  qa.note(step, asks ? 'the screen asks to choose one branch' : `no request to choose one branch; the table has ${Math.max(rows - 1, 0)} rows`);
+}
+
+/** A save with "All branches" in the header: a refusal is noted with its text, a save is a deviation. */
+export function allBranchesSave(qa: Qa, step: number, toasts: string[], saved = 'Saved.', serverText = 'branch is required'): void {
+  if (toasts.some((t) => t.includes(saved))) qa.deviation(step, 'Refused: one branch must be chosen', `saved with "All branches" in the header ("${toasts.join(' / ')}")`);
+  else qa.note(step, `text shown: "${toasts.join(' / ') || 'none'}" (the workbook: the server refuses with a text ending in "${serverText}")`);
 }
 
 /** Clicks and returns the toasts that follow (waits up to 8 s for the first one). */

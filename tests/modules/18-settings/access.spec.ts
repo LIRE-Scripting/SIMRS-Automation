@@ -239,7 +239,7 @@ qaTest('TC-APP018-014', async ({ page, qa, browser }) => {
 
     await qa.step(4, async () => {
       const t = taxCodes(staff);
-      const code = qa.code('qa-tanpa-hak').toLowerCase();
+      const code = qa.code('QA-TANPA-HAK');
       await t.openAdd();
       await t.fill({ Code: code, Name: qa.name('QA Pajak Tanpa Hak'), 'Rate (%)': '11' });
       const toasts = await t.save();

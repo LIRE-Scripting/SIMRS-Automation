@@ -2,7 +2,7 @@ import { expect, qaTest, test } from '../../../fixtures/e2e';
 import { installToastRecorder, toastMark } from '../../../lib/assertions';
 import { todayWib } from '../../../lib/dates';
 import { bedWithId } from '../shared/internal-ids';
-import { patient, toastsAfter, VisitsPage } from './helpers';
+import { patient, Patients, toastsAfter, VisitsPage } from './helpers';
 
 /**
  * 15-emergency.xlsx, the old Visits screen (/emergency/visits): create a visit
@@ -284,5 +284,20 @@ qaTest('TC-APP015-058', async ({ page, qa }) => {
     await page.goto('/en/emergency/layout');
     const onLayout = await page.getByRole('main').getByText(pt.fullName).count();
     qa.note(3, `Emergency Patients ${onPatients ? 'lists' : 'does not list'} the patient; Emergency Layout ${onLayout ? 'shows' : 'does not show'} it`);
+  });
+  await qa.step(4, async () => {
+    // A second registered patient, received on Emergency Patients ("Registration", found by MRN).
+    const pt2 = await patient(page, qa, 'QA-EMG Pasien Dua');
+    const p = new Patients(page);
+    await p.open();
+    await p.main.getByRole('button', { name: 'Registration', exact: true }).click();
+    await p.dialog.getByRole('textbox', { name: 'Name or MRN' }).fill(pt2.mrn);
+    await p.dialog.getByRole('button', { name: 'Search' }).click();
+    await p.dialog.getByRole('listbox').getByRole('button').or(p.dialog.getByRole('list').getByRole('button')).first().click();
+    await p.dialog.locator('select').first().selectOption({ label: 'IGD' }).catch(() => {});
+    const toasts = await p.click(p.dialog.getByRole('button', { name: 'Receive' }));
+    expect(toasts.join(' ')).toMatch(/received/i);
+    const row = await v.row(pt2.id);
+    qa.note(4, (await row.count()) ? `Visits has a row for the patient received on Emergency Patients: ${(await v.cells(row.first())).join(' | ')}` : 'Visits has no row for the patient received on Emergency Patients');
   });
 });

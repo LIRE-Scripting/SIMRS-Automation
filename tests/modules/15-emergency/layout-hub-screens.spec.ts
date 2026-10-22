@@ -1,6 +1,7 @@
 import type { Locator, Page } from '@playwright/test';
 import { expect, qaTest, test } from '../../../fixtures/e2e';
 import { installToastRecorder, toastMark, toastsSince } from '../../../lib/assertions';
+import { asAllBranches } from '../shared/access';
 import { backToEnglish, switchLanguage } from '../shared/language';
 import { screenOpens } from '../shared/screen-opens';
 
@@ -133,8 +134,22 @@ qaTest('TC-APP015-054', async ({ page, qa }) => {
   qa.notRun(5, 'needs the MRN of a patient with an open emergency encounter; walk-in MRNs are not read here');
 });
 
-qaTest('TC-APP015-055', async ({ qa }) => {
-  qa.notRun(1, 'U1 works on one branch; "All branches" in the header needs U2 on this screen');
+qaTest('TC-APP015-055', async ({ qa, browser }) => {
+  await asAllBranches(browser, async (u2) => {
+    const b = new Board(u2);
+    await qa.step(1, async () => {
+      await b.open();
+      const centre = b.main.getByRole('combobox', { name: 'Service centre' });
+      const chosen = await centre.evaluate((e: HTMLSelectElement) => e.selectedOptions[0]?.textContent?.trim() ?? '').catch(() => '');
+      const button = b.main.getByRole('button', { name: 'New Registration' });
+      await expect(button).toBeVisible();
+      const disabled = await button.isDisabled();
+      const text = (await b.main.innerText()).replace(/\s+/g, ' ');
+      const says = /(choose|select|pilih)[^.]{0,40}(service cent|centre|center)/i.test(text.replace('Choose a department and service centre. Tiles', ''));
+      qa.note(1, `service centre on the screen: "${chosen || 'none'}"; "New Registration" is ${disabled ? 'greyed out' : 'enabled'}${says ? '; a text asks to choose a service centre' : '; nothing says that a service centre must be chosen first'}`);
+      if (!disabled) qa.deviation(1, '"New Registration" is greyed out', '"New Registration" can be clicked with no service centre chosen');
+    });
+  });
 });
 
 qaTest('TC-APP015-056', async ({ page, qa }) => {

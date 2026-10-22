@@ -1,4 +1,4 @@
-import { expect, qaTest, test } from '../../../fixtures/e2e';
+import { expect, qaTest, test, type Qa } from '../../../fixtures/e2e';
 import { installToastRecorder } from '../../../lib/assertions';
 import { addDays, todayWib } from '../../../lib/dates';
 import { ProcurementDeskPage } from '../../../pages/procurement/ProcurementPages';
@@ -11,8 +11,8 @@ import { newItem } from '../07-inventory/cases';
  * requests (/procurement/requests, titled "Purchase orders": order,
  * send_order, approve_order, amend, followup). Every action is a button
  * under the inputs; a saved line reads "<status> <number or item> <id>".
- * X-ITM1 is an item of each test made in Inventory; the supplier is the
- * seed supplier "PT Enseval" (a supplier saved here is free text).
+ * X-ITM1 is an item of each test made in Inventory; the supplier is free
+ * text, so the workbook's "X PT Pemasok Uji" is typed (with a token).
  */
 
 test.beforeEach(async ({ page }) => {
@@ -21,7 +21,6 @@ test.beforeEach(async ({ page }) => {
 });
 
 const SAVED = 'Saved.';
-const SUPPLIER = 'PT Enseval';
 
 async function press(desk: ProcurementDeskPage, name: string): Promise<string[]> {
   return toastsOf(desk.page, () => desk.button(name).click());
@@ -112,16 +111,16 @@ qaTest('TC-APP009-042', async ({ page, qa }) => {
 });
 
 /** Fills the order form of /procurement/requests. */
-async function fillOrder(desk: ProcurementDeskPage, no: string, item: string, extra: Record<string, string> = {}): Promise<void> {
+async function fillOrder(desk: ProcurementDeskPage, qa: Qa, no: string, item: string, extra: Record<string, string> = {}): Promise<void> {
   await desk.open('requests', 'Purchase orders');
-  const v: Record<string, string> = { Supplier: SUPPLIER, Number: no, Item: item, Quantity: '50', Rate: '1000', Tax: 'PPN', Terms: '30 hari', ...extra };
+  const v: Record<string, string> = { Supplier: qa.name('X PT Pemasok Uji'), Number: no, Item: item, Quantity: '50', Rate: '1000', Tax: 'PPN', Terms: '30 hari', ...extra };
   for (const [k, val] of Object.entries(v)) await desk.input(k).or(desk.main.getByRole('spinbutton', { name: k, exact: true })).fill(val);
 }
 
 qaTest('TC-APP009-043', async ({ page, qa }) => {
   const desk = new ProcurementDeskPage(page);
-  // The form's item must be a code of Inventory (TC-APP009-046 note): QA-PARA, as for the approved order of 046.
-  const item = 'QA-PARA';
+  // The form's item must be a code of Inventory (TC-APP009-046 note): X-ITM1 of this test.
+  const item = await newItem(page, qa);
   const no = qa.code('X-PO-0001');
   let id = '';
 
@@ -134,7 +133,7 @@ qaTest('TC-APP009-043', async ({ page, qa }) => {
   });
 
   await qa.step(2, async () => {
-    await fillOrder(desk, no, item);
+    await fillOrder(desk, qa, no, item);
     expect(await press(desk, 'order')).toContain(SAVED);
     await desk.open('requests', 'Purchase orders');
     id = await desk.idOf(no);
@@ -168,7 +167,7 @@ qaTest('TC-APP009-043', async ({ page, qa }) => {
 qaTest('TC-APP009-044', async ({ page, qa }) => {
   const desk = new ProcurementDeskPage(page);
   await qa.step(1, async () => {
-    await fillOrder(desk, qa.code('X-PO-0001'), 'QA-PARA', { Terms: '' });
+    await fillOrder(desk, qa, qa.code('X-PO-0001'), await newItem(page, qa), { Terms: '' });
     const toasts = await press(desk, 'order');
     expect(toasts).not.toContain(SAVED);
     qa.note(1, `"Terms" empty: "${toasts.join(' / ') || 'no toast'}" (the workbook: the server text "supplier, tax, terms, item, quantity and rate are required")`);
@@ -178,7 +177,7 @@ qaTest('TC-APP009-044', async ({ page, qa }) => {
 qaTest('TC-APP009-045', async ({ page, qa }) => {
   const desk = new ProcurementDeskPage(page);
   const no = qa.code('X-PO-0001');
-  await fillOrder(desk, no, 'QA-PARA');
+  await fillOrder(desk, qa, no, await newItem(page, qa));
   expect(await press(desk, 'order')).toContain(SAVED);
   await desk.open('requests', 'Purchase orders');
   const id = await desk.idOf(no);

@@ -1,5 +1,6 @@
 import { expect, qaTest, test } from '../../../fixtures/e2e';
 import { installToastRecorder } from '../../../lib/assertions';
+import { allBranchesList, allBranchesSave, asAllBranches } from '../shared/access';
 import { screenOpens } from '../shared/screen-opens';
 import { ledger, patientWithId, plans, pricedGroup, tariffs, TC_APP014_053, TC_APP014_057, TC_APP014_061 } from './cases';
 
@@ -60,9 +61,15 @@ qaTest('TC-APP014-055', async ({ page, qa }) => {
   }
 });
 
-qaTest('TC-APP014-056', async ({ qa }) => {
-  qa.notRun(1, 'U1 works on one branch; "All branches" in the header needs U2 on this screen (blocker 5 for its lists)');
-  qa.notRun(2, 'see step 1');
+qaTest('TC-APP014-056', async ({ qa, browser }) => {
+  await asAllBranches(browser, async (u2) => {
+    const t = tariffs(u2);
+    await qa.step(1, async () => {
+      await t.open();
+      await allBranchesList(u2, qa, 1);
+    });
+    await qa.step(2, async () => allBranchesSave(qa, 2, await t.save({ 'Group / plan code': qa.code('X-UMUM'), 'Name / destination': qa.name('X Umum') }, 'Tariff group')));
+  });
 });
 
 qaTest('TC-APP014-057', TC_APP014_057);
@@ -114,9 +121,17 @@ qaTest('TC-APP014-059', async ({ page, qa }) => {
   });
 });
 
-qaTest('TC-APP014-060', async ({ qa }) => {
-  qa.notRun(1, 'U1 works on one branch; "All branches" in the header needs U2 on this screen (blocker 5 for its lists)');
-  qa.notRun(2, 'see step 1');
+qaTest('TC-APP014-060', async ({ page, qa, browser }) => {
+  // A registered test patient (made by U1).
+  const pt = await patientWithId(page, qa);
+  await asAllBranches(browser, async (u2) => {
+    const pl = plans(u2);
+    await qa.step(1, async () => {
+      await pl.open();
+      await allBranchesList(u2, qa, 1);
+    });
+    await qa.step(2, async () => allBranchesSave(qa, 2, await pl.save({ 'Group / plan code': qa.code('X-BPJS-K1'), 'Name / destination': qa.code('X-BPJS'), 'Patient / source': pt.id }, 'Plan')));
+  });
 });
 
 qaTest('TC-APP014-061', TC_APP014_061);
@@ -169,9 +184,21 @@ qaTest('TC-APP014-063', async ({ page, qa }) => {
   });
 });
 
-qaTest('TC-APP014-064', async ({ qa }) => {
-  qa.notRun(1, 'U1 works on one branch; "All branches" in the header needs U2 on this screen (blocker 5 for its lists)');
-  qa.notRun(2, 'see step 1');
+qaTest('TC-APP014-064', async ({ page, qa, browser }) => {
+  // A tariff group with a price for the service, and a registered test patient (made by U1).
+  const { group, service } = await pricedGroup(page, qa);
+  const pt = await patientWithId(page, qa);
+  await asAllBranches(browser, async (u2) => {
+    const l = ledger(u2);
+    await qa.step(1, async () => {
+      await l.open();
+      await allBranchesList(u2, qa, 1);
+    });
+    await qa.step(2, async () => {
+      const v = { 'Invoice number': qa.code('X-RI-0001'), 'Group / plan code': group, Service: service, 'Patient / source': pt.id, Quantity: '2' };
+      allBranchesSave(qa, 2, await l.save(v, 'Bill inpatient', true));
+    });
+  });
 });
 
 qaTest('TC-APP014-065', async () => {

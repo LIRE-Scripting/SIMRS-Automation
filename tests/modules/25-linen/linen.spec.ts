@@ -2,7 +2,7 @@ import type { Page } from '@playwright/test';
 import { expect, qaTest, test, type Qa } from '../../../fixtures/e2e';
 import { installToastRecorder } from '../../../lib/assertions';
 import { Desk, SAVED, refused } from '../shared/desk';
-import { auditEntries, menuScreens, userPage } from '../shared/access';
+import { allBranchesSave, asAllBranches, auditEntries, menuScreens, userPage } from '../shared/access';
 import { screenOpens } from '../shared/screen-opens';
 import { ITEMS, stores, STORES, TC_APP025_001 } from './cases';
 
@@ -53,8 +53,11 @@ qaTest('TC-APP025-002', async ({ page, qa }) => {
   }
 });
 
-qaTest('TC-APP025-003', async ({ qa }) => {
-  qa.notRun(1, 'U1 works on one branch; "All branches" in the header needs U2');
+qaTest('TC-APP025-003', async ({ qa, browser }) => {
+  // The store names of BR-A (the shared ones): a save that is not refused changes nothing of BR-A.
+  await asAllBranches(browser, async (u2) => {
+    await qa.step(1, async () => allBranchesSave(qa, 1, await stores(u2).save(STORES), SAVED, 'the save needs one branch'));
+  });
 });
 
 const ORDER = (qa: Qa, extra: Record<string, string> = {}) => ({
@@ -98,8 +101,11 @@ qaTest('TC-APP025-006', async ({ qa }) => {
   test.skip(true, 'Blocker 14: a record made in another application (00-blockers-checklist-linked.xlsx | Checklist | row 18)');
 });
 
-qaTest('TC-APP025-007', async ({ qa }) => {
-  qa.notRun(1, 'U1 works on one branch; "All branches" in the header needs U2');
+qaTest('TC-APP025-007', async ({ qa, browser }) => {
+  await asAllBranches(browser, async (u2) => {
+    await qa.step(1, async () => allBranchesSave(qa, 1, await orders(u2).save(ORDER(qa)), SAVED, 'the save needs one branch'));
+  });
+  qa.note(1, ITEMS);
 });
 
 const MOVE = (qa: Qa, extra: Record<string, string> = {}) => ({ 'Finished item': qa.code('X-SPREI'), Batch: qa.code('X-B-001'), Quantity: '4', ...extra });
@@ -142,8 +148,11 @@ for (const id of ['TC-APP025-010', 'TC-APP025-012', 'TC-APP025-013']) {
   });
 }
 
-qaTest('TC-APP025-011', async ({ qa }) => {
-  qa.notRun(1, 'U1 works on one branch; "All branches" in the header needs U2');
+qaTest('TC-APP025-011', async ({ qa, browser }) => {
+  await asAllBranches(browser, async (u2) => {
+    await qa.step(1, async () => allBranchesSave(qa, 1, await moves(u2).save(MOVE(qa, { 'Sterile / ward store': STORES['Sterile / ward store'] })), SAVED, 'the save needs one branch'));
+  });
+  qa.note(1, ITEMS);
 });
 
 qaTest('TC-APP025-014', async ({ page, qa, browser }) => {

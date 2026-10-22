@@ -2,7 +2,7 @@ import type { Locator, Page } from '@playwright/test';
 import { expect, qaTest, test, type Qa } from '../../../fixtures/e2e';
 import { installToastRecorder, toastMark } from '../../../lib/assertions';
 import { addDays, todayWib } from '../../../lib/dates';
-import { auditEntries, menuScreens, userPage } from '../shared/access';
+import { allBranchesList, allBranchesSave, asAllBranches, auditEntries, menuScreens, userPage } from '../shared/access';
 import { screenOpens } from '../shared/screen-opens';
 import { toastsAfter } from '../18-settings/helpers';
 import { TC_APP023_020 } from './cases';
@@ -264,20 +264,37 @@ qaTest('TC-APP023-006', async ({ page, qa }) => {
   });
 });
 
-qaTest('TC-APP023-007', async ({ qa }) => {
-  qa.notRun(1, 'U1 works on one branch; "All branches" in the header needs U2');
-  qa.notRun(2, 'see step 1');
+qaTest('TC-APP023-007', async ({ page, qa, browser }) => {
+  // The tender category and an approved request of Procurement (made by U1); U2 works on "All branches".
+  const category = await master(page, qa, 'Category', 'X-ALKES', 'X Alkes uji');
+  const pr = await approvedRequest(page);
+  await asAllBranches(browser, async (u2) => {
+    const t = desk(u2, 'tenders');
+    await qa.step(1, async () => {
+      await t.open();
+      await allBranchesList(u2, qa, 1);
+    });
+    await qa.step(2, async () => {
+      allBranchesSave(qa, 2, await t.save({ Number: qa.code('X-TND-001'), Code: category, Name: 'open', Document: pr, Close: WEEK() }));
+      qa.note(2, 'a tender of one branch cannot be created either (found blocker 39), so a refusal does not tell which check refused it');
+    });
+  });
 });
 
-qaTest('TC-APP023-011', async ({ qa }) => {
-  qa.notRun(1, 'U1 works on one branch; "All branches" in the header needs U2');
-  qa.notRun(2, 'see step 1');
-});
+/** The screens of a tender (bids, agreements, deposits) on "All branches": the list, and the save that needs a tender (blocker 39). */
+async function allBranchesOfTender(browser: Parameters<typeof asAllBranches>[0], qa: Qa, route: Route): Promise<void> {
+  await asAllBranches(browser, async (u2) => {
+    await qa.step(1, async () => {
+      await desk(u2, route).open();
+      await allBranchesList(u2, qa, 1);
+    });
+  });
+  qa.blocked(2, 39);
+}
 
-qaTest('TC-APP023-015', async ({ qa }) => {
-  qa.notRun(1, 'U1 works on one branch; "All branches" in the header needs U2');
-  qa.notRun(2, 'see step 1');
-});
+qaTest('TC-APP023-011', async ({ qa, browser }) => allBranchesOfTender(browser, qa, 'bids'));
+
+qaTest('TC-APP023-015', async ({ qa, browser }) => allBranchesOfTender(browser, qa, 'agreements'));
 
 qaTest('TC-APP023-018', async ({ page, qa }) => {
   const m = desk(page, 'money');
@@ -289,10 +306,7 @@ qaTest('TC-APP023-018', async ({ page, qa }) => {
   });
 });
 
-qaTest('TC-APP023-019', async ({ qa }) => {
-  qa.notRun(1, 'U1 works on one branch; "All branches" in the header needs U2');
-  qa.notRun(2, 'see step 1');
-});
+qaTest('TC-APP023-019', async ({ qa, browser }) => allBranchesOfTender(browser, qa, 'money'));
 
 qaTest('TC-APP023-020', TC_APP023_020);
 
