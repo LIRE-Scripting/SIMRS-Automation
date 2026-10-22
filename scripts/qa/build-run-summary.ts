@@ -17,6 +17,11 @@
  *   Blocked    a blocker stopped steps (blocker annotation, or a fixme with a blocker reason)
  *   Not run    skipped for another reason (Automation Candidate No, needs a user, ...)
  *
+ * Before writing, each test case's status is checked against the steps of its
+ * result workbook (reports/e2e/<NN-module>.xlsx, npm run qa:e2e-workbook): a
+ * workbook older than the newest results file, or a test case whose steps say
+ * otherwise, stops the build. QA_SKIP_WORKBOOK_CHECK=1 writes anyway.
+ *
  * Usage: npm run qa:run-summary
  */
 import { execFileSync } from 'node:child_process';
@@ -37,6 +42,19 @@ const PREVIOUS = process.env.PREVIOUS_RESULTS ?? '.qa-state/old-results/2026-10-
 
 type Status = 'Passed' | 'Deviation' | 'Failed' | 'Blocked' | 'Not run';
 const STATUSES: Status[] = ['Passed', 'Deviation', 'Failed', 'Blocked', 'Not run'];
+
+/** The columns of sheet Modules (Passed, Deviation and Failed side by side: the formulas sum them as a range). */
+const MODULE_COLUMNS = [
+  { header: 'Module', key: 'module', width: 30 },
+  { header: 'Test cases', key: 'total', width: 11 },
+  ...STATUSES.map((x) => ({ header: x, key: x, width: 10 })),
+  { header: 'Of Not run: no test yet', key: 'noTest', width: 10 },
+  { header: 'Of Not run: written, not run yet', key: 'notRunYet', width: 10 },
+  { header: 'Pass rate (Passed / test cases)', key: 'rate', width: 13 },
+  { header: 'Coverage (run / test cases)', key: 'coverage', width: 13 },
+  { header: 'Blockers', key: 'blockers', width: 30 },
+  { header: 'HTTP 5xx', key: 'http5xx', width: 9 },
+];
 
 interface PwStep { title: string; error?: { message?: string }; steps?: PwStep[] }
 interface PwResult {
@@ -84,6 +102,8 @@ export interface TestOutcome {
   triage?: Triage;
   /** The workbook test case has no test in the suite. */
   noTest?: boolean;
+  /** A spec declares it, but no results file has it yet (written after the last run). */
+  notRunYet?: boolean;
   /** The screenshot of the moment it failed, else the one at its end. */
   screenshot?: string;
 }
@@ -190,6 +210,16 @@ const blockerTitle = (no: number): { title: string; source: string; fix: string;
   return { title: '(unknown)', source: '', fix: '', who: '', category: '' };
 };
 
+/** The test case ids a spec under tests/modules declares with qaTest(). */
+function declaredTests(dir = 'tests/modules'): Set<string> {
+  const ids = new Set<string>();
+  for (const f of fs.readdirSync(dir, { recursive: true }) as string[]) {
+    if (!f.endsWith('.spec.ts')) continue;
+    for (const m of fs.readFileSync(path.join(dir, f), 'utf8').matchAll(/qaTest\(\s*['"`](TC-APP\d{3}-\d{3})/g)) ids.add(m[1]);
+  }
+  return ids;
+}
+
 function count(rows: TestOutcome[]): Record<Status, number> {
   const c = Object.fromEntries(STATUSES.map((s) => [s, 0])) as Record<Status, number>;
   for (const r of rows) c[r.status] += 1;
@@ -203,23 +233,31 @@ function main(): void {
   const before = byId(readReports(PREVIOUS));
   const runStart = [...now.values()].map((v) => v.start).sort()[0] ?? '';
   const outcomes: TestOutcome[] = [];
+  const declared = declaredTests();
 
   for (const m of modules()) {
     for (const tc of m.testCases) {
       const r = now.get(tc.id);
       const prev = before.get(tc.id);
       if (!r) {
-        // No test declared: the plan made it runnable (e.g. a user of 00-prerequisites.xlsx became ready) but no spec runs it yet.
+        // No result: either no spec declares it yet, or a spec declares it but was written after the last run.
+        const written = declared.has(tc.id);
         outcomes.push({
           kind: 'module', id: tc.id, group: `${m.slug.slice(0, 2)} ${m.appName}`, title: tc.scenario, status: 'Not run', blockers: [],
-          reason: `No test: the plan makes it "automate" (${planFor(testCaseRef(tc.id)).user ?? 'signed out'}) but no spec in tests/modules declares it yet`,
-          failedStep: '', error: '', cause: '', deviations: [], notRun: [], http5xx: [], seconds: 0, noTest: true,
+          reason: written
+            ? 'Test written, not run yet: a spec in tests/modules declares it, but no results file of this run has it'
+            : `No test: the plan makes it "automate" (${planFor(testCaseRef(tc.id)).user ?? 'signed out'}) but no spec in tests/modules declares it yet`,
+          failedStep: '', error: '', cause: '', deviations: [], notRun: [], http5xx: [], seconds: 0, noTest: !written, notRunYet: written,
           previous: prev ? outcome('module', tc.id, prev.spec, []).status : undefined, triage: TRIAGE[tc.id],
         });
         continue;
       }
+      const o = outcome('module', tc.id, r.spec, errors);
+      // Passed with every step of the workbook "not run": nothing of it was checked (the result workbook shows all Not Run).
+      const notRunSteps = new Set(o.notRun.map((d) => Number(d.match(/^Step (\d+):/)?.[1])));
+      if (o.status === 'Passed' && tc.steps.every((st) => notRunSteps.has(st.step))) Object.assign(o, { status: 'Not run', reason: `Every step not run: ${o.notRun.join('; ')}` });
       outcomes.push({
-        ...outcome('module', tc.id, r.spec, errors),
+        ...o,
         group: `${m.slug.slice(0, 2)} ${m.appName}`,
         previous: prev ? outcome('module', tc.id, prev.spec, []).status : undefined,
         triage: TRIAGE[tc.id],
@@ -245,7 +283,7 @@ function main(): void {
     const rows = mods.filter((o) => o.group === g);
     const c = count(rows);
     const blockerNos = [...new Set(rows.flatMap((o) => (o.status === 'Blocked' ? o.blockers : [])))].sort((a, b) => a - b);
-    return { module: g, total: rows.length, ...c, noTest: rows.filter((o) => o.noTest).length, ran: rows.length - c['Not run'] - rows.filter((o) => o.status === 'Blocked' && !o.seconds).length, blockers: blockerNos, http5xx: rows.reduce((a, o) => a + o.http5xx.length, 0) };
+    return { module: g, total: rows.length, ...c, noTest: rows.filter((o) => o.noTest).length, notRunYet: rows.filter((o) => o.notRunYet).length, ran: rows.length - c['Not run'] - rows.filter((o) => o.status === 'Blocked' && !o.seconds).length, blockers: blockerNos, http5xx: rows.reduce((a, o) => a + o.http5xx.length, 0) };
   });
 
   const blockerNos = [...new Set(outcomes.flatMap((o) => o.blockers))].sort((a, b) => a - b);
@@ -279,15 +317,74 @@ function main(): void {
 
   const summary = {
     run: { start: runStart, built: new Date().toISOString(), site: 'https://rs.showcase.atklik.xyz', branch: 'Podomoro', serverErrors: SERVER_ERRORS, previous: PREVIOUS },
-    totals: { modules: count(mods), chains: count(chains), testCases: mods.length, noTest: mods.filter((o) => o.noTest).length, chainCount: chains.length, http5xx: errors.length },
+    totals: { modules: count(mods), chains: count(chains), testCases: mods.length, noTest: mods.filter((o) => o.noTest).length, notRunYet: mods.filter((o) => o.notRunYet).length, chainCount: chains.length, http5xx: errors.length },
     perModule,
     perBlocker,
     outcomes,
     errors: classified,
   };
-  fs.mkdirSync(OUT_DIR, { recursive: true });
-  fs.writeFileSync(path.join(OUT_DIR, 'run-summary.json'), JSON.stringify(summary, null, 2));
-  void writeWorkbook(summary).then(() => console.log(`${OUT_DIR}/simrs-run-summary.xlsx: ${mods.length} test cases, ${chains.length} chains, ${errors.length} HTTP 5xx`));
+  void checkResultWorkbooks(mods, dirs).then(async (problems) => {
+    if (problems.length) {
+      console.error(`The summary and the result workbooks disagree (${problems.length}):\n  ${problems.slice(0, 40).join('\n  ')}`);
+      if (process.env.QA_SKIP_WORKBOOK_CHECK !== '1') {
+        console.error('Nothing written. Run npm run qa:e2e-workbook first, or set QA_SKIP_WORKBOOK_CHECK=1 to write anyway.');
+        process.exitCode = 1;
+        return;
+      }
+    }
+    fs.mkdirSync(OUT_DIR, { recursive: true });
+    fs.writeFileSync(path.join(OUT_DIR, 'run-summary.json'), JSON.stringify(summary, null, 2));
+    await writeWorkbook(summary);
+    console.log(`${OUT_DIR}/simrs-run-summary.xlsx: ${mods.length} test cases, ${chains.length} chains, ${errors.length} HTTP 5xx`);
+  });
+}
+
+/**
+ * Checks the module outcomes against the result workbooks of reports/e2e:
+ * each workbook is newer than the newest results file, and the step statuses
+ * of each test case agree with its status here (a Deviation is a step "Failed"
+ * with "Expected Result not met"; a Failed test has a step "E2E failed").
+ */
+async function checkResultWorkbooks(mods: TestOutcome[], dirs: string[]): Promise<string[]> {
+  const dir = 'reports/e2e';
+  if (!dirs.includes(dir)) return [];
+  const newest = Math.max(...fs.readdirSync(dir).filter((f) => /^results.*\.json$/.test(f)).map((f) => fs.statSync(path.join(dir, f)).mtimeMs));
+  const byId = new Map(mods.map((o) => [o.id, o]));
+  const problems: string[] = [];
+  for (const m of modules()) {
+    const file = path.join(dir, m.source);
+    if (!fs.existsSync(file)) {
+      problems.push(`${file}: missing`);
+      continue;
+    }
+    if (fs.statSync(file).mtimeMs < newest) {
+      problems.push(`${file}: older than the newest results file`);
+      continue;
+    }
+    const wb = new ExcelJS.Workbook();
+    await wb.xlsx.readFile(file);
+    const ws = wb.getWorksheet('Steps')!;
+    const header = (ws.getRow(1).values as unknown[]).map(String);
+    const [idCol, statusCol, actualCol] = ['Test Case ID', 'Execution Status', 'Actual Result'].map((h) => header.indexOf(h));
+    const steps = new Map<string, { status: string; actual: string }[]>();
+    ws.eachRow((row, i) => {
+      const id = row.getCell(idCol).text;
+      if (i > 1 && id) steps.set(id, [...(steps.get(id) ?? []), { status: row.getCell(statusCol).text, actual: row.getCell(actualCol).text }]);
+    });
+    for (const [id, st] of steps) {
+      const has = (x: string) => st.some((s) => s.status === x);
+      const status = byId.get(id)?.status;
+      const agrees = {
+        Passed: has('Passed') && !has('Failed') && !has('Blocked'),
+        Deviation: has('Failed') && !st.some((s) => /E2E failed/.test(s.actual)),
+        Failed: st.some((s) => /E2E failed/.test(s.actual)),
+        Blocked: has('Blocked'),
+        'Not run': st.every((s) => s.status === 'Not Run' || !s.status),
+      }[status ?? 'Not run'];
+      if (!agrees) problems.push(`${id}: ${status ?? 'not in the summary'} here, steps ${[...new Set(st.map((s) => s.status || '(empty)'))].join('/')} in ${m.source}`);
+    }
+  }
+  return problems;
 }
 
 type Summary = {
@@ -369,8 +466,16 @@ async function writeWorkbook(s: Summary): Promise<void> {
   add('', ...STATUSES, 'Total').font = { bold: true };
   add('Module test cases', ...STATUSES.map((x) => s.totals.modules[x]), s.totals.testCases);
   add('  of Not run: no test written yet', '', '', '', '', (s.totals as unknown as { noTest: number }).noTest);
+  add('  of Not run: test written, not run yet', '', '', '', '', (s.totals as unknown as { notRunYet: number }).notRunYet);
   add('E2E chains', ...STATUSES.map((x) => s.totals.chains[x]), s.totals.chainCount);
   add('HTTP 5xx answers of the site', s.totals.http5xx);
+  // Over every module test case, as formulas on sheet Modules (column letters of MODULE_COLUMNS).
+  const letter = (key: string) => String.fromCharCode(65 + MODULE_COLUMNS.findIndex((c) => c.key === key));
+  const sum = (key: string) => `SUM(Modules!${letter(key)}:${letter(key)})`;
+  const all = s.totals.testCases;
+  const ran = s.totals.modules.Passed + s.totals.modules.Deviation + s.totals.modules.Failed;
+  add('Pass rate (Passed / all test cases)', { formula: `${sum('Passed')}/${sum('total')}`, result: s.totals.modules.Passed / all }).getCell(2).numFmt = '0%';
+  add('Coverage (run / all test cases)', { formula: `(${sum('Passed')}+${sum('Deviation')}+${sum('Failed')})/${sum('total')}`, result: ran / all }).getCell(2).numFmt = '0%';
   add();
   add('Status meanings').font = { bold: true };
   add('Passed', 'every step met the Expected Result of the workbook');
@@ -380,18 +485,22 @@ async function writeWorkbook(s: Summary): Promise<void> {
   add('Not run', 'not run for another reason (Automation Candidate = No, needs a user/role that is not ready, ...)');
   ov.getColumn(2).alignment = { wrapText: false };
 
-  sheet(wb, 'Modules', [
-    { header: 'Module', key: 'module', width: 30 },
-    { header: 'Test cases', key: 'total', width: 11 },
-    ...STATUSES.map((x) => ({ header: x, key: x, width: 10 })),
-    { header: 'Of Not run: no test yet', key: 'noTest', width: 10 },
-    { header: 'Pass rate of run tests', key: 'rate', width: 12 },
-    { header: 'Blockers', key: 'blockers', width: 30 },
-    { header: 'HTTP 5xx', key: 'http5xx', width: 9 },
-  ], (s.perModule as unknown as Record<string, unknown>[]).map((m) => {
+  const modules = sheet(wb, 'Modules', MODULE_COLUMNS, (s.perModule as unknown as Record<string, unknown>[]).map((m) => {
+    const all = Number(m.total);
     const ran = Number(m.Passed) + Number(m.Deviation) + Number(m.Failed);
-    return { ...m, rate: ran ? `${Math.round((Number(m.Passed) / ran) * 100)}%` : '-', blockers: (m.blockers as number[]).join(', ') };
+    return { ...m, rate: all ? Number(m.Passed) / all : '-', coverage: all ? ran / all : '-', blockers: (m.blockers as number[]).join(', ') };
   }));
+  // As formulas over every test case of the module, written or not:
+  // Pass rate = Passed / Test cases; Coverage = (Passed + Deviation + Failed) / Test cases.
+  const col = (key: string) => modules.getColumn(key).letter;
+  const [total, passedCol, failedCol] = [col('total'), col('Passed'), col('Failed')];
+  for (const key of ['rate', 'coverage']) modules.getColumn(key).numFmt = '0%';
+  modules.eachRow((row, i) => {
+    if (i === 1) return;
+    const formula = (top: string) => ({ formula: `IF(${total}${i}=0,"-",${top}/${total}${i})` });
+    row.getCell('rate').value = { ...formula(`${passedCol}${i}`), result: row.getCell('rate').value as number | string };
+    row.getCell('coverage').value = { ...formula(`SUM(${passedCol}${i}:${failedCol}${i})`), result: row.getCell('coverage').value as number | string };
+  });
 
   const outcomeRow = (o: TestOutcome) => ({
     id: o.id,

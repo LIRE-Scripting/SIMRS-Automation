@@ -121,8 +121,10 @@ function outcomes(spec: PwSpec, stepNumbers: number[]): Map<number, StepOutcome>
   const notRun = byStep('not-run');
   const blocked = byStep('blocker');
   const testNotes = byStep('note');
-  const failedAt = [...ran].find(([, s]) => s.error)?.[0];
   const testError = firstLine(result.errors?.[0]?.message);
+  // A failure outside every step (set-up, or between two steps) is put on the first step not reached.
+  const failedAt = [...ran].find(([, s]) => s.error)?.[0]
+    ?? (result.status !== 'passed' ? stepNumbers.find((n) => !ran.has(n) && !blocked.has(n) && !notRun.has(n)) : undefined);
 
   for (const n of stepNumbers) {
     const note = testNotes.get(n)?.join('; ');
@@ -131,14 +133,15 @@ function outcomes(spec: PwSpec, stepNumbers: number[]): Map<number, StepOutcome>
       const text = blocked.get(n)!.join('; ');
       out.set(n, { status: 'Blocked', actual: `${runDate} E2E: ${text}.${extra}`, defect: text.match(/blocker (\d+)/)?.[0].replace('blocker', 'Blocker') });
     } else if (failedAt === n) {
-      out.set(n, { status: 'Failed', actual: `${runDate} E2E failed: ${firstLine(ran.get(n)!.error?.message) || testError}.${extra}` });
+      out.set(n, { status: 'Failed', actual: `${runDate} E2E failed: ${firstLine(ran.get(n)?.error?.message) || testError}.${extra}` });
+    } else if (deviations.has(n) && (failedAt === undefined || n < failedAt)) {
+      // A deviation was seen on the screen, even on a step partly "not run".
+      out.set(n, { status: 'Failed', actual: `${runDate} E2E: Expected Result not met. ${deviations.get(n)!.join('; ')}.${extra}` });
     } else if (notRun.has(n)) {
       out.set(n, { status: 'Not Run', actual: `${runDate} E2E: not run. ${notRun.get(n)!.join('; ')}.${extra}` });
     } else if (!ran.has(n) || (failedAt !== undefined && n > failedAt)) {
       const why = result.status === 'passed' ? 'step not reached by the test' : `the test stopped earlier (${testError})`;
       out.set(n, { status: 'Not Run', actual: `${runDate} E2E: not run; ${why}.${extra}` });
-    } else if (deviations.has(n)) {
-      out.set(n, { status: 'Failed', actual: `${runDate} E2E: Expected Result not met. ${deviations.get(n)!.join('; ')}.${extra}` });
     } else {
       out.set(n, { status: 'Passed', actual: `${runDate} E2E: as expected.${extra}` });
     }

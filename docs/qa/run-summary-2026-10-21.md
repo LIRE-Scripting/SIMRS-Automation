@@ -17,23 +17,40 @@ The detail is in these files:
 
 | Status | 2026-10-21 | 2026-10-18 | Meaning |
 |---|---|---|---|
-| Passed | **589** | 545 | every step met its Expected Result |
-| Deviation | **202** | 170 | the test ran to the end; a step differs from its Expected Result (the site's behaviour is recorded) |
+| Passed | **563** | 545 | every step met its Expected Result |
+| Deviation | **204** | 170 | the test ran to the end; a step differs from its Expected Result (the site's behaviour is recorded) |
 | Failed | **54** | 82 | the test stopped on an error |
-| Blocked | **281** | 256 | a known blocker stopped steps |
-| Not run | **478** | 551 | Automation Candidate = No, waits for a user or role, or **has no test yet (191)** |
+| Blocked | **282** | 256 | a known blocker stopped steps |
+| Not run | **501** | 551 | Automation Candidate = No, waits for a user or role, every step not run, **no test yet (76)** or **test written, not run yet (109)** |
 
-Of the 845 test cases that ran to a result (Passed + Deviation + Failed), **589 (70%) passed in full**. The figures include the rerun of the fixed tests and the 6 tests written on 2026-10-21 (section 3.5).
+Both rates are taken over **all 1,604 test cases**, whether they have a test or not (in the workbook they are formulas, sheets Overview and Modules):
+
+- **Pass rate** = Passed / test cases = 563 / 1,604 = **35%**
+- **Coverage** = (Passed + Deviation + Failed) / test cases = 821 / 1,604 = **51%**: the share of test cases that ran to a result
+
+The figures include the rerun of the fixed tests, the 6 tests written on 2026-10-21 (section 3.5) and the first new tests of 2026-10-22 that ran before the site was switched off (03, 04). They are counted again by the rules of 1.1.
+
+### 1.1 Correction of the counts (2026-10-22)
+
+A check of every test case against the steps of its module workbook (`reports/e2e/<NN>.xlsx`) found 40 test cases whose status differed. The causes, now fixed:
+
+1. **The module workbooks were stale**: they were built before the rerun of the fixed tests. They are built again; `npm run qa:run-summary` now stops when a module workbook is older than the newest results file, or when a test case's steps say otherwise.
+2. **29 test cases were counted as Passed although every step was "not run"** (for example 14-012 needs a second cashier, 22-008 needs U2 on "All branches"). Nothing of them was checked, so they are now **Not run**. Passed went from 592 to 563.
+3. **A test that failed outside its steps** (in its set-up, for example 10-009, 17-008, 26-005) had every step "Not Run" in its module workbook. The first step not reached is now **Failed**, with the error.
+4. **A deviation on a step that was also partly "not run"** (05-007, 05-009 step 8) showed as Not Run in the module workbook; it is now **Failed** (Expected Result not met), as in the summary.
+5. The run of the new 05 tests on 2026-10-22 found the site unreachable (every sign-in failed). Its results file holds no result and was moved to `.qa-state/run-2026-10-21/site-down/`; its 4 test cases count as "test written, not run yet".
 
 The rescan of every request body, page snapshot and test found 74 failures: 49 site defects, 24 from the tests, 1 from the order of the run. The tests that filled a form wrongly were fixed and run again (section 3.5). **Now 54 failures: 53 site defects and 1 from the order of the run; none comes from a test.**
 
-### Why 478 test cases are Not run
+### Why 501 test cases are Not run
 
-The users U3–U7 made on 2026-10-20 did unlock test cases, but those test cases still need their tests written.
+The users U3–U7 made on 2026-10-20 did unlock test cases; most of their tests are now written but not yet run (the site was switched off on 2026-10-22).
 
 | Reason | Test cases | What is needed |
 |---|---|---|
-| **No test written yet**: the plan became "automate" when U3–U7 were made, but no spec declares them | 191 | QA automation writes the tests (they are listed in sheet Test cases, "No test") |
+| **No test written yet**: the plan became "automate" when U3–U7 were made, but no spec declares them | 76 | QA automation writes the tests (19 Finance, 20 Budget, 21 CSSD, 13/14/18); sheet Test cases, "No test" |
+| **Test written, not run yet**: written on 2026-10-22 (commit c5248b7), the site was switched off before they ran | 109 | Run them when the site is on again |
+| **Every step not run**: the test ran, but each step needs what the shared site cannot give in one run (U2 on "All branches", a second cashier, a set time, a record of another application) | 29 | Listed per test case in sheet Test cases, column Why |
 | Automation Candidate = **Needs Evaluation** in the workbook | 159 | Product/QA decide whether to automate them |
 | Needs user **U10** (second tenant, tenant without a licence, platform superadmin) | 121 | A decision and a second tenant (deferred in 00-prerequisites.xlsx) |
 | Automation Candidate = **No** | 4 | None (manual) |
@@ -75,7 +92,7 @@ The rise in failed chains has two main sources:
    | 10 | Saved items are listed nowhere | 14 |
    | 39 | A tender cannot be created (HTTP 500) | 12 |
    | 23 | Ward care does not offer the stays of the branch | 12 |
-5. **Automation gap**: 191 test cases are now "automate" but have no test yet. 6 tests in 01 fail with "write its test", and 5 chains stop in a way that no longer applies.
+5. **Automation gap**: 76 test cases have no test yet and 109 tests are written but not run yet (the site was switched off on 2026-10-22). 5 chains stop in a way that no longer applies.
 
 ## 2. The run and the data guarantees
 
@@ -270,13 +287,13 @@ A chain stops at its first blocker; the steps after it are Blocked. The step det
 
 ## 5. Per module
 
-The figures include the 01/02 rerun, the rerun of the fixed tests and the tests written on 2026-10-21. **Blockers** are the blockers that stopped test cases of the module (number of test cases). **Failures** are the failures with their cause and next action: [site] a site defect, [automation] a test problem, [environment] the order of the run. Deviations (differences from the Expected Result) are recorded per step in `reports/e2e/<NN>.xlsx`, column Actual Result.
+The figures include the 01/02 rerun, the rerun of the fixed tests, the tests written on 2026-10-21 and the new tests of 2026-10-22 that ran, counted by the rules of 1.1. Pass rate and Coverage are over all test cases of the module. **Blockers** are the blockers that stopped test cases of the module (number of test cases). **Failures** are the failures with their cause and next action: [site] a site defect, [automation] a test problem, [environment] the order of the run. Deviations (differences from the Expected Result) are recorded per step in `reports/e2e/<NN>.xlsx`, column Actual Result.
 
 ### 01 Ambulatory Care
 
-| Test cases | Passed | Deviation | Failed | Blocked | Not run (no test yet) | HTTP 5xx |
-|---|---|---|---|---|---|---|
-| 89 | 29 | 25 | 0 | 12 | 23 (0) | 21 |
+| Test cases | Passed | Deviation | Failed | Blocked | Not run (no test yet / written, not run yet) | Pass rate | Coverage | HTTP 5xx |
+|---|---|---|---|---|---|---|---|---|
+| 89 | 29 | 25 | 0 | 12 | 23 (0 / 0) | 33% | 61% | 21 |
 
 **Blockers:** 17 (5 TC) – Book settings: a quota or open-hours row cannot be switched to "Unit"; 18 (2 TC) – More than 3 bookings on one day cannot be made with the shared Book settings; 19 (1 TC) – A patient cannot be marked deceased; 20 (1 TC) – A registered patient cannot be edited; 40 (1 TC) – Pickers and lists reach only their first records: a record past them cannot be chosen or found; 41 (2 TC) – No patient can be registered in Kemayoran (BR-B): "Register" answers HTTP 500.
 
@@ -284,9 +301,9 @@ The figures include the 01/02 rerun, the rerun of the fixed tests and the tests 
 
 ### 02 Appointment
 
-| Test cases | Passed | Deviation | Failed | Blocked | Not run (no test yet) | HTTP 5xx |
-|---|---|---|---|---|---|---|
-| 33 | 9 | 7 | 0 | 13 | 4 (0) | 10 |
+| Test cases | Passed | Deviation | Failed | Blocked | Not run (no test yet / written, not run yet) | Pass rate | Coverage | HTTP 5xx |
+|---|---|---|---|---|---|---|---|---|
+| 33 | 9 | 7 | 0 | 13 | 4 (0 / 0) | 27% | 48% | 10 |
 
 **Blockers:** 17 (4 TC) – Book settings: a quota or open-hours row cannot be switched to "Unit"; 18 (2 TC) – More than 3 bookings on one day cannot be made with the shared Book settings; 24 (6 TC) – Referral types and Cross-consult types list only the first rows, with no paging or search; 40 (1 TC) – Pickers and lists reach only their first records: a record past them cannot be chosen or found.
 
@@ -294,9 +311,9 @@ The figures include the 01/02 rerun, the rerun of the fixed tests and the tests 
 
 ### 03 Patient Care
 
-| Test cases | Passed | Deviation | Failed | Blocked | Not run (no test yet) | HTTP 5xx |
-|---|---|---|---|---|---|---|
-| 63 | 17 | 11 | 2 | 9 | 24 (4) | 1 |
+| Test cases | Passed | Deviation | Failed | Blocked | Not run (no test yet / written, not run yet) | Pass rate | Coverage | HTTP 5xx |
+|---|---|---|---|---|---|---|---|---|
+| 63 | 18 | 12 | 2 | 9 | 22 (0 / 2) | 29% | 51% | 1 |
 
 **Blockers:** 12 (5 TC) – Terminology search finds no code; 21 (1 TC) – A placed drug order cannot be cancelled or corrected; 22 (3 TC) – The drug interaction pairs of the shared data are not on the site.
 
@@ -307,11 +324,11 @@ The figures include the 01/02 rerun, the rerun of the fixed tests and the tests 
 
 ### 04 Inpatient
 
-| Test cases | Passed | Deviation | Failed | Blocked | Not run (no test yet) | HTTP 5xx |
-|---|---|---|---|---|---|---|
-| 90 | 31 | 17 | 1 | 12 | 29 (4) | 6 |
+| Test cases | Passed | Deviation | Failed | Blocked | Not run (no test yet / written, not run yet) | Pass rate | Coverage | HTTP 5xx |
+|---|---|---|---|---|---|---|---|---|
+| 90 | 31 | 18 | 1 | 13 | 27 (0 / 0) | 34% | 56% | 6 |
 
-**Blockers:** 23 (12 TC) – Ward care does not offer the stays of the branch.
+**Blockers:** 23 (12 TC) – Ward care does not offer the stays of the branch; 40 (1 TC) – Pickers and lists reach only their first records: a record past them cannot be chosen or found.
 
 **Failures (1):**
 
@@ -320,9 +337,9 @@ The figures include the 01/02 rerun, the rerun of the fixed tests and the tests 
 
 ### 05 Pharmacy
 
-| Test cases | Passed | Deviation | Failed | Blocked | Not run (no test yet) | HTTP 5xx |
-|---|---|---|---|---|---|---|
-| 78 | 25 | 11 | 3 | 7 | 32 (11) | 22 |
+| Test cases | Passed | Deviation | Failed | Blocked | Not run (no test yet / written, not run yet) | Pass rate | Coverage | HTTP 5xx |
+|---|---|---|---|---|---|---|---|---|
+| 78 | 25 | 11 | 3 | 7 | 32 (0 / 11) | 32% | 50% | 22 |
 
 **Blockers:** 22 (2 TC) – The drug interaction pairs of the shared data are not on the site; 26 (1 TC) – No store can be made, and "Branch and stores" cannot save; 27 (1 TC) – Saving a kit answers HTTP 500; 29 (3 TC) – A dispense opened from an order cannot change Issued, Requested or Generic.
 
@@ -335,9 +352,9 @@ The figures include the 01/02 rerun, the rerun of the fixed tests and the tests 
 
 ### 06 Transfusion Medicine
 
-| Test cases | Passed | Deviation | Failed | Blocked | Not run (no test yet) | HTTP 5xx |
-|---|---|---|---|---|---|---|
-| 81 | 7 | 3 | 0 | 51 | 20 (1) | 13 |
+| Test cases | Passed | Deviation | Failed | Blocked | Not run (no test yet / written, not run yet) | Pass rate | Coverage | HTTP 5xx |
+|---|---|---|---|---|---|---|---|---|
+| 81 | 6 | 3 | 0 | 51 | 21 (0 / 1) | 7% | 11% | 13 |
 
 **Blockers:** 2 (46 TC) – Donor screen answers HTTP 500; 5 (1 TC) – 28 lists do not load with "All branches"; 25 (7 TC) – Saving an external bag or a quality-control record, and approving a blood request, answer HTTP 500.
 
@@ -345,9 +362,9 @@ The figures include the 01/02 rerun, the rerun of the fixed tests and the tests 
 
 ### 07 Inventory
 
-| Test cases | Passed | Deviation | Failed | Blocked | Not run (no test yet) | HTTP 5xx |
-|---|---|---|---|---|---|---|
-| 67 | 24 | 13 | 0 | 13 | 17 (4) | 24 |
+| Test cases | Passed | Deviation | Failed | Blocked | Not run (no test yet / written, not run yet) | Pass rate | Coverage | HTTP 5xx |
+|---|---|---|---|---|---|---|---|---|
+| 67 | 24 | 13 | 0 | 13 | 17 (0 / 4) | 36% | 55% | 24 |
 
 **Blockers:** 5 (3 TC) – 28 lists do not load with "All branches"; 26 (9 TC) – No store can be made, and "Branch and stores" cannot save; 27 (1 TC) – Saving a kit answers HTTP 500.
 
@@ -355,9 +372,9 @@ The figures include the 01/02 rerun, the rerun of the fixed tests and the tests 
 
 ### 08 Operation Theater
 
-| Test cases | Passed | Deviation | Failed | Blocked | Not run (no test yet) | HTTP 5xx |
-|---|---|---|---|---|---|---|
-| 53 | 27 | 11 | 1 | 1 | 13 (4) | 20 |
+| Test cases | Passed | Deviation | Failed | Blocked | Not run (no test yet / written, not run yet) | Pass rate | Coverage | HTTP 5xx |
+|---|---|---|---|---|---|---|---|---|
+| 53 | 27 | 11 | 1 | 1 | 13 (0 / 4) | 51% | 74% | 20 |
 
 **Blockers:** 32 (1 TC) – Shifting an operating theatre slot by one hour answers HTTP 500.
 
@@ -368,9 +385,9 @@ The figures include the 01/02 rerun, the rerun of the fixed tests and the tests 
 
 ### 09 Procurement
 
-| Test cases | Passed | Deviation | Failed | Blocked | Not run (no test yet) | HTTP 5xx |
-|---|---|---|---|---|---|---|
-| 65 | 16 | 8 | 2 | 10 | 29 (13) | 14 |
+| Test cases | Passed | Deviation | Failed | Blocked | Not run (no test yet / written, not run yet) | Pass rate | Coverage | HTTP 5xx |
+|---|---|---|---|---|---|---|---|---|
+| 65 | 15 | 8 | 2 | 10 | 30 (0 / 13) | 23% | 38% | 14 |
 
 **Blockers:** 5 (3 TC) – 28 lists do not load with "All branches"; 13 (1 TC) – Set-up missing on the branch; 30 (3 TC) – The purchase order approval chain has one step, not the four of the shared data; 31 (3 TC) – Goods receipt, supplier invoice and returns answer HTTP 500.
 
@@ -383,9 +400,9 @@ The figures include the 01/02 rerun, the rerun of the fixed tests and the tests 
 
 ### 10 HR
 
-| Test cases | Passed | Deviation | Failed | Blocked | Not run (no test yet) | HTTP 5xx |
-|---|---|---|---|---|---|---|
-| 68 | 15 | 6 | 12 | 10 | 25 (14) | 2 |
+| Test cases | Passed | Deviation | Failed | Blocked | Not run (no test yet / written, not run yet) | Pass rate | Coverage | HTTP 5xx |
+|---|---|---|---|---|---|---|---|---|
+| 68 | 13 | 6 | 12 | 10 | 27 (0 / 14) | 19% | 46% | 2 |
 
 **Blockers:** 5 (4 TC) – 28 lists do not load with "All branches"; 7 (3 TC) – "Calculate fee" cannot succeed; 13 (3 TC) – Set-up missing on the branch.
 
@@ -396,9 +413,9 @@ The figures include the 01/02 rerun, the rerun of the fixed tests and the tests 
 
 ### 11 Laboratory
 
-| Test cases | Passed | Deviation | Failed | Blocked | Not run (no test yet) | HTTP 5xx |
-|---|---|---|---|---|---|---|
-| 54 | 26 | 10 | 1 | 0 | 17 (4) | 14 |
+| Test cases | Passed | Deviation | Failed | Blocked | Not run (no test yet / written, not run yet) | Pass rate | Coverage | HTTP 5xx |
+|---|---|---|---|---|---|---|---|---|
+| 54 | 26 | 10 | 1 | 0 | 17 (0 / 4) | 48% | 69% | 14 |
 
 **Blockers:** none.
 
@@ -409,9 +426,9 @@ The figures include the 01/02 rerun, the rerun of the fixed tests and the tests 
 
 ### 12 RIS
 
-| Test cases | Passed | Deviation | Failed | Blocked | Not run (no test yet) | HTTP 5xx |
-|---|---|---|---|---|---|---|
-| 35 | 12 | 9 | 0 | 0 | 14 (4) | 7 |
+| Test cases | Passed | Deviation | Failed | Blocked | Not run (no test yet / written, not run yet) | Pass rate | Coverage | HTTP 5xx |
+|---|---|---|---|---|---|---|---|---|
+| 35 | 11 | 9 | 0 | 0 | 15 (0 / 4) | 31% | 57% | 7 |
 
 **Blockers:** none.
 
@@ -419,9 +436,9 @@ The figures include the 01/02 rerun, the rerun of the fixed tests and the tests 
 
 ### 13 Dietary
 
-| Test cases | Passed | Deviation | Failed | Blocked | Not run (no test yet) | HTTP 5xx |
-|---|---|---|---|---|---|---|
-| 62 | 24 | 13 | 1 | 8 | 16 (6) | 23 |
+| Test cases | Passed | Deviation | Failed | Blocked | Not run (no test yet / written, not run yet) | Pass rate | Coverage | HTTP 5xx |
+|---|---|---|---|---|---|---|---|---|
+| 62 | 23 | 13 | 1 | 8 | 17 (1 / 5) | 37% | 60% | 23 |
 
 **Blockers:** 8 (8 TC) – A diet order never reaches Kitchen or Service and bill.
 
@@ -432,9 +449,9 @@ The figures include the 01/02 rerun, the rerun of the fixed tests and the tests 
 
 ### 14 Hospital Accounts
 
-| Test cases | Passed | Deviation | Failed | Blocked | Not run (no test yet) | HTTP 5xx |
-|---|---|---|---|---|---|---|
-| 85 | 28 | 11 | 3 | 19 | 24 (9) | 32 |
+| Test cases | Passed | Deviation | Failed | Blocked | Not run (no test yet / written, not run yet) | Pass rate | Coverage | HTTP 5xx |
+|---|---|---|---|---|---|---|---|---|
+| 85 | 21 | 11 | 3 | 19 | 31 (2 / 7) | 25% | 41% | 32 |
 
 **Blockers:** 5 (5 TC) – 28 lists do not load with "All branches"; 33 (5 TC) – The insured patient PT-BPJS is not on the site and no screen can prepare one; 34 (1 TC) – A discount above the cashier cap answers HTTP 500 instead of waiting for approval; 35 (2 TC) – The item price of a branch (margin and tax) cannot be saved; 36 (6 TC) – Patient ledger cannot show a chosen invoice: "Find patient" shows no rows, the list holds 22 invoices.
 
@@ -447,9 +464,9 @@ The figures include the 01/02 rerun, the rerun of the fixed tests and the tests 
 
 ### 15 Emergency
 
-| Test cases | Passed | Deviation | Failed | Blocked | Not run (no test yet) | HTTP 5xx |
-|---|---|---|---|---|---|---|
-| 69 | 26 | 9 | 0 | 18 | 16 (6) | 3 |
+| Test cases | Passed | Deviation | Failed | Blocked | Not run (no test yet / written, not run yet) | Pass rate | Coverage | HTTP 5xx |
+|---|---|---|---|---|---|---|---|---|
+| 69 | 24 | 9 | 0 | 18 | 18 (0 / 6) | 35% | 48% | 3 |
 
 **Blockers:** 9 (4 TC) – A closed emergency encounter cannot be received again; "Mark as alive" cannot be reached; 13 (15 TC) – Set-up missing on the branch.
 
@@ -457,9 +474,9 @@ The figures include the 01/02 rerun, the rerun of the fixed tests and the tests 
 
 ### 16 MRD
 
-| Test cases | Passed | Deviation | Failed | Blocked | Not run (no test yet) | HTTP 5xx |
-|---|---|---|---|---|---|---|
-| 49 | 16 | 9 | 0 | 4 | 20 (9) | 4 |
+| Test cases | Passed | Deviation | Failed | Blocked | Not run (no test yet / written, not run yet) | Pass rate | Coverage | HTTP 5xx |
+|---|---|---|---|---|---|---|---|---|
+| 49 | 16 | 9 | 0 | 4 | 20 (0 / 9) | 33% | 51% | 4 |
 
 **Blockers:** 6 (4 TC) – "Record code" cannot be saved with "All branches".
 
@@ -467,9 +484,9 @@ The figures include the 01/02 rerun, the rerun of the fixed tests and the tests 
 
 ### 17 Payroll
 
-| Test cases | Passed | Deviation | Failed | Blocked | Not run (no test yet) | HTTP 5xx |
-|---|---|---|---|---|---|---|
-| 69 | 13 | 3 | 11 | 22 | 20 (9) | 3 |
+| Test cases | Passed | Deviation | Failed | Blocked | Not run (no test yet / written, not run yet) | Pass rate | Coverage | HTTP 5xx |
+|---|---|---|---|---|---|---|---|---|
+| 69 | 13 | 3 | 11 | 22 | 20 (0 / 9) | 19% | 39% | 3 |
 
 **Blockers:** 5 (6 TC) – 28 lists do not load with "All branches"; 10 (14 TC) – Saved items are listed nowhere; 37 (2 TC) – The 12 salary components of the workbook are not on the site, and no screen makes them.
 
@@ -482,9 +499,9 @@ The figures include the 01/02 rerun, the rerun of the fixed tests and the tests 
 
 ### 18 Settings
 
-| Test cases | Passed | Deviation | Failed | Blocked | Not run (no test yet) | HTTP 5xx |
-|---|---|---|---|---|---|---|
-| 92 | 53 | 14 | 5 | 2 | 18 (8) | 10 |
+| Test cases | Passed | Deviation | Failed | Blocked | Not run (no test yet / written, not run yet) | Pass rate | Coverage | HTTP 5xx |
+|---|---|---|---|---|---|---|---|---|
+| 92 | 53 | 14 | 5 | 2 | 18 (3 / 5) | 58% | 78% | 10 |
 
 **Blockers:** 4 (1 TC) – Tenants and Entitlements answer HTTP 500 for the hospital administrator; 38 (1 TC) – Saving the rights of a role answers HTTP 500 ("Failed to save rights.").
 
@@ -497,9 +514,9 @@ The figures include the 01/02 rerun, the rerun of the fixed tests and the tests 
 
 ### 19 Finance
 
-| Test cases | Passed | Deviation | Failed | Blocked | Not run (no test yet) | HTTP 5xx |
-|---|---|---|---|---|---|---|
-| 128 | 63 | 10 | 2 | 7 | 46 (34) | 2 |
+| Test cases | Passed | Deviation | Failed | Blocked | Not run (no test yet / written, not run yet) | Pass rate | Coverage | HTTP 5xx |
+|---|---|---|---|---|---|---|---|---|
+| 128 | 62 | 10 | 2 | 7 | 47 (29 / 5) | 48% | 58% | 2 |
 
 **Blockers:** 13 (7 TC) – Set-up missing on the branch.
 
@@ -512,9 +529,9 @@ The figures include the 01/02 rerun, the rerun of the fixed tests and the tests 
 
 ### 20 Budget
 
-| Test cases | Passed | Deviation | Failed | Blocked | Not run (no test yet) | HTTP 5xx |
-|---|---|---|---|---|---|---|
-| 64 | 29 | 0 | 0 | 8 | 27 (24) | 0 |
+| Test cases | Passed | Deviation | Failed | Blocked | Not run (no test yet / written, not run yet) | Pass rate | Coverage | HTTP 5xx |
+|---|---|---|---|---|---|---|---|---|
+| 64 | 28 | 0 | 0 | 8 | 28 (24 / 0) | 44% | 44% | 0 |
 
 **Blockers:** 13 (8 TC) – Set-up missing on the branch.
 
@@ -522,9 +539,9 @@ The figures include the 01/02 rerun, the rerun of the fixed tests and the tests 
 
 ### 21 CSSD
 
-| Test cases | Passed | Deviation | Failed | Blocked | Not run (no test yet) | HTTP 5xx |
-|---|---|---|---|---|---|---|
-| 57 | 27 | 1 | 1 | 8 | 20 (17) | 1 |
+| Test cases | Passed | Deviation | Failed | Blocked | Not run (no test yet / written, not run yet) | Pass rate | Coverage | HTTP 5xx |
+|---|---|---|---|---|---|---|---|---|
+| 57 | 27 | 1 | 1 | 8 | 20 (17 / 0) | 47% | 51% | 1 |
 
 **Blockers:** 3 (3 TC) – New sterile issue page answers HTTP 500; 13 (5 TC) – Set-up missing on the branch.
 
@@ -535,9 +552,9 @@ The figures include the 01/02 rerun, the rerun of the fixed tests and the tests 
 
 ### 22 Services
 
-| Test cases | Passed | Deviation | Failed | Blocked | Not run (no test yet) | HTTP 5xx |
-|---|---|---|---|---|---|---|
-| 36 | 19 | 0 | 3 | 10 | 4 (1) | 20 |
+| Test cases | Passed | Deviation | Failed | Blocked | Not run (no test yet / written, not run yet) | Pass rate | Coverage | HTTP 5xx |
+|---|---|---|---|---|---|---|---|---|
+| 36 | 16 | 0 | 3 | 10 | 7 (0 / 1) | 44% | 53% | 20 |
 
 **Blockers:** 5 (3 TC) – 28 lists do not load with "All branches"; 11 (7 TC) – Service receipt and Vendor bill are never listed.
 
@@ -550,9 +567,9 @@ The figures include the 01/02 rerun, the rerun of the fixed tests and the tests 
 
 ### 23 Sourcing
 
-| Test cases | Passed | Deviation | Failed | Blocked | Not run (no test yet) | HTTP 5xx |
-|---|---|---|---|---|---|---|
-| 34 | 14 | 0 | 0 | 16 | 4 (1) | 14 |
+| Test cases | Passed | Deviation | Failed | Blocked | Not run (no test yet / written, not run yet) | Pass rate | Coverage | HTTP 5xx |
+|---|---|---|---|---|---|---|---|---|
+| 34 | 10 | 0 | 0 | 16 | 8 (0 / 1) | 29% | 29% | 14 |
 
 **Blockers:** 5 (4 TC) – 28 lists do not load with "All branches"; 39 (12 TC) – A tender cannot be created: "Create tender" answers HTTP 500 for every approved purchase request.
 
@@ -560,9 +577,9 @@ The figures include the 01/02 rerun, the rerun of the fixed tests and the tests 
 
 ### 24 Housekeeping
 
-| Test cases | Passed | Deviation | Failed | Blocked | Not run (no test yet) | HTTP 5xx |
-|---|---|---|---|---|---|---|
-| 22 | 14 | 1 | 2 | 1 | 4 (1) | 23 |
+| Test cases | Passed | Deviation | Failed | Blocked | Not run (no test yet / written, not run yet) | Pass rate | Coverage | HTTP 5xx |
+|---|---|---|---|---|---|---|---|---|
+| 22 | 14 | 1 | 2 | 1 | 4 (0 / 1) | 64% | 77% | 23 |
 
 **Blockers:** 40 (1 TC) – Pickers and lists reach only their first records: a record past them cannot be chosen or found.
 
@@ -575,9 +592,9 @@ The figures include the 01/02 rerun, the rerun of the fixed tests and the tests 
 
 ### 25 Linen
 
-| Test cases | Passed | Deviation | Failed | Blocked | Not run (no test yet) | HTTP 5xx |
-|---|---|---|---|---|---|---|
-| 21 | 7 | 0 | 0 | 10 | 4 (1) | 7 |
+| Test cases | Passed | Deviation | Failed | Blocked | Not run (no test yet / written, not run yet) | Pass rate | Coverage | HTTP 5xx |
+|---|---|---|---|---|---|---|---|---|
+| 21 | 4 | 0 | 0 | 10 | 7 (0 / 1) | 19% | 19% | 7 |
 
 **Blockers:** 14 (10 TC) – 34 journeys need a record made in another application.
 
@@ -585,9 +602,9 @@ The figures include the 01/02 rerun, the rerun of the fixed tests and the tests 
 
 ### 26 Maintenance
 
-| Test cases | Passed | Deviation | Failed | Blocked | Not run (no test yet) | HTTP 5xx |
-|---|---|---|---|---|---|---|
-| 20 | 13 | 0 | 3 | 0 | 4 (1) | 25 |
+| Test cases | Passed | Deviation | Failed | Blocked | Not run (no test yet / written, not run yet) | Pass rate | Coverage | HTTP 5xx |
+|---|---|---|---|---|---|---|---|---|
+| 20 | 13 | 0 | 3 | 0 | 4 (0 / 1) | 65% | 80% | 25 |
 
 **Blockers:** none.
 
@@ -600,9 +617,9 @@ The figures include the 01/02 rerun, the rerun of the fixed tests and the tests 
 
 ### 27 Fixed assets
 
-| Test cases | Passed | Deviation | Failed | Blocked | Not run (no test yet) | HTTP 5xx |
-|---|---|---|---|---|---|---|
-| 20 | 5 | 0 | 1 | 10 | 4 (1) | 17 |
+| Test cases | Passed | Deviation | Failed | Blocked | Not run (no test yet / written, not run yet) | Pass rate | Coverage | HTTP 5xx |
+|---|---|---|---|---|---|---|---|---|
+| 20 | 5 | 0 | 1 | 10 | 4 (0 / 1) | 25% | 30% | 17 |
 
 **Blockers:** 14 (10 TC) – 34 journeys need a record made in another application.
 
@@ -626,12 +643,13 @@ The figures include the 01/02 rerun, the rerun of the fixed tests and the tests 
 
 ### QA automation
 
-1. **Write the tests of the 191 test cases that are now "automate"** (since U3–U7 are ready). The 6 of 01 (024, 035, 043, 061, 062, 063) were written on 2026-10-21.
-2. Chains E2E-009/011/040/042/050: run the steps that are now "automate" instead of stopping.
-3. Done on 2026-10-21: the test fixes of 3.5 (Desk.create id from the save, User Site Mapping paging, 05-023, 07-003, 01-053/02-017, 15-024/025, 19-026, 18-008); 14 of the 18 fixed tests ran to the end (24-013, 01-053 and 02-017 with steps blocked by blocker 40); 18-031/041/042 and 26-005 now fail on site defects only.
-4. Run order: E2E-033 before TC-APP014-011, and TC-APP014-036 after TC-APP014-011. All of them after 07:00 WIB.
-5. **Rerun chains E2E-001/018/025/048 tomorrow after 07:00 WIB.** The departments are renamed, but the U1 cashier day is closed until 07:00.
-6. The Settings tests (TC-APP018) make new "QA Poli Uji …" departments on every run. Consider names that sort after "QA Poli Umum" (for example "QA Zz …"), so DEP-1 is not pushed out of the first 50 again while blocker 40 is open.
+1. **Run the 109 tests written on 2026-10-22** (commit c5248b7) when the site is on again, and fix what fails.
+2. **Write the tests of the 76 test cases that still have none**: 19-044…084, 20-013…045, 21-008…034, 14-070/071, 13-052, 18-054/055/060. The 6 of 01 (024, 035, 043, 061, 062, 063) were written on 2026-10-21.
+3. Chains E2E-009/011/040/042/050: run the steps that are now "automate" instead of stopping.
+4. Done on 2026-10-21: the test fixes of 3.5 (Desk.create id from the save, User Site Mapping paging, 05-023, 07-003, 01-053/02-017, 15-024/025, 19-026, 18-008); 14 of the 18 fixed tests ran to the end (24-013, 01-053 and 02-017 with steps blocked by blocker 40); 18-031/041/042 and 26-005 now fail on site defects only.
+5. Run order: E2E-033 before TC-APP014-011, and TC-APP014-036 after TC-APP014-011. All of them after 07:00 WIB.
+6. **Rerun chains E2E-001/018/025/048 tomorrow after 07:00 WIB.** The departments are renamed, but the U1 cashier day is closed until 07:00.
+7. The Settings tests (TC-APP018) make new "QA Poli Uji …" departments on every run. Consider names that sort after "QA Poli Umum" (for example "QA Zz …"), so DEP-1 is not pushed out of the first 50 again while blocker 40 is open.
 
 ### Product / Site admin
 
@@ -648,5 +666,7 @@ QA_ALLOW_WRITES=1 QA_SERVER_ERRORS=.qa-state/run-<date>/http-5xx.jsonl \
 # … chains: --project=e2e tests/e2e/chains (PLAYWRIGHT_JSON_OUTPUT_NAME=reports/e2e-chains/results-1-chains.json)
 npm run qa:e2e-workbook && npm run qa:e2e-chains && npm run qa:run-summary
 ```
+
+`qa:run-summary` checks every test case against the steps of its module workbook first, and writes nothing when a module workbook is stale or disagrees (`QA_SKIP_WORKBOOK_CHECK=1` writes anyway).
 
 The raw Playwright results of the run of 2026-10-18 are in `.qa-state/old-results/2026-10-18/` (used for the "2026-10-18" columns). The 5xx recording of this run is `.qa-state/run-2026-10-21/http-5xx.jsonl`.
