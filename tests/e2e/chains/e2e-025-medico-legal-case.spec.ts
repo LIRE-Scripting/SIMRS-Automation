@@ -84,7 +84,7 @@ chainTest('E2E-025', async ({ page, chain }) => {
     const no = docNo(qa, 'QA-REQ-001');
     const purpose = 'QA Kontrol poli penyakit dalam';
     await qa.step(1, async () => {
-      await page.goto('/en/apps');
+      await page.goto('/id/apps');
       await page.getByRole('link', { name: /^MRD\b/ }).first().click();
       await page.getByRole('main').getByRole('link', { name: 'File Requests' }).first().click();
       await expect(s.main.getByRole('heading', { level: 1, name: 'Patient File Requests' })).toBeVisible();

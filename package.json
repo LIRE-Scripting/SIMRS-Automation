@@ -16,7 +16,8 @@
     "qa:e2e-chains": "tsx scripts/qa/build-e2e-chains.ts",
     "test:prereq": "playwright test --project=prereq",
     "qa:prereq-evidence": "tsx scripts/qa/build-prereq-evidence.ts",
-    "qa:run-summary": "tsx scripts/qa/build-run-summary.ts"
+    "qa:run-summary": "tsx scripts/qa/build-run-summary.ts",
+    "qa:messages": "tsx scripts/qa/fetch-messages.ts"
   },
   "keywords": [],
   "author": "",

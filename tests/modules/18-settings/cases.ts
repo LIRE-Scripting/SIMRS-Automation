@@ -16,7 +16,7 @@ export const TC_APP018_004 = async ({ page, qa }: CaseArgs): Promise<void> => {
   const code = qa.code('QA-DEP-01');
   const name = qa.name('QA Poli Uji');
   await qa.step(1, async () => {
-    await page.goto('/en/settings');
+    await page.goto('/id/settings');
     await page.getByRole('main').getByRole('link', { name: /^Departments\b/ }).click();
     await expect(d.main.getByRole('heading', { level: 1, name: 'Departments' })).toBeVisible();
     await expect(d.main.getByText('Department on one branch.', { exact: true })).toBeVisible();
@@ -52,7 +52,7 @@ export const TC_APP018_006 = async ({ page, qa }: CaseArgs): Promise<void> => {
   const code = qa.code('QA-SC-01');
   const name = qa.name('QA Loket Uji');
   await qa.step(1, async () => {
-    await page.goto('/en/settings');
+    await page.goto('/id/settings');
     await page.getByRole('main').getByRole('link', { name: /^Service centers\b/ }).click();
     await expect(sc.main.getByRole('heading', { level: 1, name: 'Service Centers' })).toBeVisible();
     await expect(sc.main.getByText('Service center on a branch, optionally under a department.', { exact: true })).toBeVisible();
@@ -93,7 +93,7 @@ export const TC_APP018_052 = async ({ page, qa }: CaseArgs): Promise<void> => {
   const date = sundayAhead();
   try {
     await qa.step(1, async () => {
-      await page.goto('/en/settings');
+      await page.goto('/id/settings');
       await page.getByRole('main').getByRole('link', { name: /^Holidays\b/ }).click();
       await expect(h.main.getByRole('heading', { level: 1, name: 'Holidays' })).toBeVisible();
       await expect(h.main.getByText('A day the clinic is closed. Blank site means every site.', { exact: true })).toBeVisible();
@@ -134,7 +134,7 @@ export const TC_APP018_037 = async ({ page, qa }: CaseArgs): Promise<void> => {
   const name = roleName(qa);
   const description = qa.name('X Peran uji');
   await qa.step(1, async () => {
-    await page.goto('/en/settings');
+    await page.goto('/id/settings');
     await page.getByRole('main').getByRole('link', { name: /^Roles\b/ }).click();
     await expect(r.main.getByRole('heading', { level: 1, name: 'Roles' })).toBeVisible();
     await expect(r.main.getByText('Roles used to grant access.', { exact: true })).toBeVisible();
@@ -155,7 +155,7 @@ export const TC_APP018_037 = async ({ page, qa }: CaseArgs): Promise<void> => {
     expect((await r.cells(await r.row(name))).slice(0, 3)).toEqual([name, description, 'Active']);
   });
   await qa.step(4, async () => {
-    await page.goto('/en/identity/rights');
+    await page.goto('/id/identity/rights');
     await pickRole(page, name);
     await expect(page.getByRole('main').getByText(/^0 \/ \d+$/)).toBeVisible();
     expect(await page.getByRole('main').getByRole('checkbox', { checked: true }).count()).toBe(0);
@@ -180,7 +180,7 @@ export const TC_APP018_039 = async ({ page, qa }: CaseArgs): Promise<void> => {
   expect(await r.add({ 'Role name': name, Description: qa.name('X Peran uji') })).toContain('Role added.');
   try {
     await qa.step(1, async () => {
-      await page.goto('/en/settings');
+      await page.goto('/id/settings');
       await main.getByRole('link', { name: /^Rights\b/ }).click();
       await expect(main.getByRole('heading', { level: 1, name: 'User Rights' })).toBeVisible();
       await expect(main.getByText('Privileges granted to each role.', { exact: true })).toBeVisible();

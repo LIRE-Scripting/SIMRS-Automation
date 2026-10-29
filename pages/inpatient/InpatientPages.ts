@@ -1,9 +1,11 @@
 import { expect, type Locator, type Page } from '@playwright/test';
 import { toastLocator } from '../../lib/assertions';
+import { asOnSite, onSite } from '../../lib/i18n';
+import { NotOffered } from '../../lib/not-offered';
 import { escapeRe } from '../ambulatory/RegisteredPatientsPage';
 
 /**
- * Inpatient (/en/adt): Bed management, Admissions, Discharges, Admission
+ * Inpatient (/id/adt): Bed management, Admissions, Discharges, Admission
  * requests and Ward care. Read from the live screens on 2026-10-15.
  */
 
@@ -11,7 +13,9 @@ import { escapeRe } from '../ambulatory/RegisteredPatientsPage';
 async function pick(page: Page, field: Locator, typed: string, choose: string = typed): Promise<void> {
   await field.fill(typed);
   const list = page.locator(`#${await field.getAttribute('aria-controls')}`);
-  await list.getByRole('option').filter({ hasText: new RegExp(escapeRe(choose)) }).first().getByRole('button').click();
+  const hit = list.getByRole('option').filter({ hasText: new RegExp(escapeRe(choose)) }).first();
+  if (!(await hit.waitFor({ timeout: 10_000 }).then(() => true, () => false))) throw new NotOffered(`the bed "${choose}" is not offered by the picker (found blocker 40)`);
+  await hit.getByRole('button').click();
 }
 
 abstract class ListScreen {
@@ -32,7 +36,13 @@ abstract class ListScreen {
 
   async cell(row: Locator, column: string): Promise<Locator> {
     const headers = (await this.table.getByRole('columnheader').allInnerTexts()).map((h) => h.trim());
-    const i = headers.indexOf(column);
+    let i = headers.indexOf(column);
+    if (i < 0) {
+      // A header whose Indonesian text has several English meanings ("Masuk": Admit, Admitted) is found by its text on the site.
+      const shown = await asOnSite(() => this.table.getByRole('columnheader').allInnerTexts());
+      const wanted = onSite(column, true);
+      i = shown.findIndex((h) => (typeof wanted === 'string' ? h.trim() === wanted : wanted.test(h.trim())));
+    }
     if (i < 0) throw new Error(`Column "${column}" not in ${headers.join(', ')}`);
     return row.getByRole('cell').nth(i);
   }
@@ -61,7 +71,7 @@ export class BedsPage extends ListScreen {
   readonly heading = this.page.getByRole('main').getByRole('heading', { level: 1, name: 'Bed management' });
 
   async open(): Promise<void> {
-    await this.page.goto('/en/adt/beds');
+    await this.page.goto('/id/adt/beds');
     await expect(this.heading).toBeVisible();
   }
 
@@ -117,7 +127,7 @@ export class AdmissionsPage extends ListScreen {
   readonly wizard = this.page.getByRole('dialog', { name: 'Admit patient' });
 
   async open(): Promise<void> {
-    await this.page.goto('/en/adt/admissions');
+    await this.page.goto('/id/adt/admissions');
     await expect(this.heading).toBeVisible();
   }
 
@@ -201,7 +211,7 @@ export class DischargesPage extends ListScreen {
   readonly heading = this.page.getByRole('main').getByRole('heading', { level: 1, name: 'Discharges' });
 
   async open(): Promise<void> {
-    await this.page.goto('/en/adt/discharges');
+    await this.page.goto('/id/adt/discharges');
     await expect(this.heading).toBeVisible();
   }
 }

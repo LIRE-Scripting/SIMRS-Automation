@@ -1,4 +1,4 @@
-import type { Browser, Page } from '@playwright/test';
+import type { Browser, Locator, Page } from '@playwright/test';
 import { expect, qaTest, test } from '../../../fixtures/e2e';
 import { registerPatient } from '../../../lib/ambulatory-data';
 import { installToastRecorder, toastLocator, toastMark, toastsSince } from '../../../lib/assertions';
@@ -32,12 +32,37 @@ async function freshSession(browser: Browser): Promise<Page> {
   return page;
 }
 
+/**
+ * The row of an order on Radiology, Orders: the list is filtered by the study
+ * and paged (it opens on the orders with the latest study date, so a new order
+ * without one is on a later page).
+ */
+async function radiologyRow(page: Page, study: string): Promise<Locator> {
+  await page.goto('/id/radiology/orders');
+  await page.waitForLoadState('networkidle').catch(() => {});
+  const main = page.getByRole('main');
+  const row = main.getByRole('row').filter({ hasText: study }).first();
+  const filter = main.getByRole('textbox', { name: 'Study description' });
+  if (await filter.count()) {
+    await filter.fill(study);
+    await filter.press('Enter');
+  }
+  for (let i = 0; i < 40; i++) {
+    if (await row.waitFor({ timeout: 3_000 }).then(() => true, () => false)) return row;
+    const next = main.getByRole('button', { name: 'Next page' });
+    if (!(await next.isVisible()) || (await next.isDisabled())) break;
+    await next.click();
+    await page.waitForLoadState('networkidle').catch(() => {});
+  }
+  return row;
+}
+
 qaTest('TC-APP003-001', async ({ page, qa }) => {
   const c = new ConsultationPage(page);
   const pt1 = await newPt1(page, qa);
 
   await qa.step(1, async () => {
-    await page.goto('/en/apps');
+    await page.goto('/id/apps');
     await page.getByRole('link', { name: /^Patient Care\b/ }).first().click();
     await page.getByRole('main').getByRole('link', { name: 'Open Consultation' }).click();
     await expect(c.heading).toBeVisible();
@@ -601,9 +626,9 @@ qaTest('TC-APP003-048', async ({ page, qa }) => {
   });
 
   await qa.step(3, async () => {
-    await page.goto('/en/radiology/orders');
-    await expect(page.getByRole('main').getByText(study).first()).toBeVisible();
-    qa.note(3, `the order row reads: ${(await page.getByRole('main').getByRole('row').filter({ hasText: study }).first().innerText().catch(() => '')).replace(/\s+/g, ' ')}`);
+    const row = await radiologyRow(page, study);
+    await expect(row).toBeVisible();
+    qa.note(3, `the order row reads: ${(await row.innerText().catch(() => '')).replace(/\s+/g, ' ')}`);
   });
 });
 
@@ -658,8 +683,7 @@ qaTest('TC-APP003-051', async ({ page, qa }) => {
   await expect(toastLocator(page, /^Radiology order created\. It is worked on the radiology screen\.$/)).toBeVisible();
 
   await qa.step(1, async () => {
-    await page.goto('/en/radiology/orders');
-    const row = page.getByRole('main').getByRole('row').filter({ hasText: study }).first();
+    const row = await radiologyRow(page, study);
     await expect(row).toBeVisible();
     const text = await row.innerText();
     if (!text.includes(pt1.fullName) || !text.includes(pt1.mrn)) {

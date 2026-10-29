@@ -83,7 +83,7 @@ chainTest('E2E-006', async ({ page, chain }) => {
       expect(toasts.some((t) => SERVER_ERROR.test(t))).toBe(false);
     });
     await qa.step(2, async () => {
-      await page.goto('/en/pharmacy/orders');
+      await page.goto('/id/pharmacy/orders');
       const rows = page.getByRole('main').getByRole('table').getByRole('row').filter({ hasText: r.patient });
       qa.note(2, `Pharmacy Orders rows for the patient of the request: ${(await rows.allInnerTexts()).map((t) => t.replace(/\s+/g, ' ')).join(' // ') || 'none'}`);
     });
@@ -114,7 +114,7 @@ chainTest('E2E-006', async ({ page, chain }) => {
     const d = desk.dialog();
     const incision = qa.name('X sama');
     await qa.step(1, async () => {
-      await page.goto('/en/ot');
+      await page.goto('/id/ot');
       await page.getByRole('complementary').getByRole('link', { name: 'Billing' }).first().click();
       await expect(desk.main.getByRole('heading', { level: 1, name: 'Billing policy' })).toBeVisible();
     });

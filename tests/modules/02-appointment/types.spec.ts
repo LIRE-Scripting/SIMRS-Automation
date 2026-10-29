@@ -12,7 +12,7 @@ import { BOOKING_LIST, TypeListPage, type TypeKind } from '../../../pages/appoin
  */
 
 type Args = { page: import('@playwright/test').Page; qa: Qa };
-const SCHEDULE = '/en/appointment/schedule';
+const SCHEDULE = '/id/appointment/schedule';
 
 test.beforeEach(async ({ page }) => {
   await installToastRecorder(page);
@@ -64,7 +64,7 @@ const adding = (kind: TypeKind) => async ({ page, qa }: Args) => {
   const name = qa.name('X Tipe uji 01');
 
   await qa.step(1, async () => {
-    await page.goto('/en/apps');
+    await page.goto('/id/apps');
     await page.getByRole('link', { name: /^Appointment\b/ }).first().click();
     await page.getByRole('complementary').filter({ hasText: 'Appointment' }).getByRole('link', { name: kind, exact: true }).click();
     await expect(list.heading).toBeVisible();

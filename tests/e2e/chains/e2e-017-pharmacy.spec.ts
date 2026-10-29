@@ -151,13 +151,13 @@ chainTest('E2E-017', async ({ page, chain }) => {
       await w.pickPatient(pt1);
       await w.addItem(para.code);
       await w.addItem(PHARMACY.ibu.code);
-      await expect(w.selectedCount()).toHaveText(/^Selected \(2\)$/i);
+      await expect(w.selectedCount()).toHaveText(/^(Selected|Dipilih) \(2\)$/i);
     });
     await qa.step(2, async () => {
       await w.selected().filter({ hasText: PHARMACY.ibu.code }).getByRole('button', { name: 'Remove' }).click();
-      await expect(w.selectedCount()).toHaveText(/^Selected \(1\)$/i);
+      await expect(w.selectedCount()).toHaveText(/^(Selected|Dipilih) \(1\)$/i);
       await w.addItem(PHARMACY.ibu.code);
-      await expect(w.selectedCount()).toHaveText(/^Selected \(2\)$/i);
+      await expect(w.selectedCount()).toHaveText(/^(Selected|Dipilih) \(2\)$/i);
     });
     await qa.step(3, async () => {
       await w.goNext('Set quantities');

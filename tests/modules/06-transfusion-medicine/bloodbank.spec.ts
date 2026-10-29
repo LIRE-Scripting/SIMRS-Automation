@@ -466,7 +466,7 @@ qaTest('TC-APP006-029', async ({ page, qa }) => {
   const qc = new QcPage(page);
 
   await qa.step(1, async () => {
-    await page.goto('/en/bloodbank');
+    await page.goto('/id/bloodbank');
     await page.getByRole('main').getByRole('link', { name: 'Quality control', exact: true }).click();
     await expect(qc.heading).toBeVisible();
     await expect(qc.main.getByText('One list for red cells, plasma, platelets, cryoprecipitate, equipment, and CuSO4.')).toBeVisible();

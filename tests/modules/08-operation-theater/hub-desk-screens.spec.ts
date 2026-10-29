@@ -1,8 +1,9 @@
+import { asOnSite } from '../../../lib/i18n';
 import { expect, qaTest, test } from '../../../fixtures/e2e';
 import { installToastRecorder, toastMark } from '../../../lib/assertions';
 import { todayWib } from '../../../lib/dates';
 import { OtDeskPage, OtRequestsPage } from '../../../pages/ot/OtPages';
-import { backToEnglish, switchLanguage } from '../shared/language';
+import { backToIndonesian, switchLanguage } from '../shared/language';
 import { screenOpens } from '../shared/screen-opens';
 import { act, procedure, request, toastsAfter } from './helpers';
 
@@ -18,7 +19,7 @@ test.beforeEach(async ({ page }) => {
 });
 
 test.afterEach(async ({ page }) => {
-  await backToEnglish(page);
+  await backToIndonesian(page);
 });
 
 qaTest('TC-APP008-008', async ({ page, qa }) => {
@@ -26,7 +27,7 @@ qaTest('TC-APP008-008', async ({ page, qa }) => {
   const ot = new OtRequestsPage(page);
 
   await qa.step(1, async () => {
-    await page.goto('/en/apps');
+    await page.goto('/id/apps');
     await page.getByRole('link', { name: /^Operation Theater\b/ }).first().click();
     await expect(main.getByRole('navigation', { name: 'Breadcrumb' })).toHaveText(/^Home\s*\/\s*Apps\s*\/\s*Operation Theater$/);
     await expect(main.getByRole('heading', { level: 1, name: 'Operation Theater' })).toBeVisible();
@@ -41,12 +42,12 @@ qaTest('TC-APP008-008', async ({ page, qa }) => {
   await qa.step(2, async () => {
     await main.getByRole('link', { name: 'Requests', exact: true }).last().click();
     await expect(ot.heading).toBeVisible();
-    await page.goto('/en/ot');
+    await page.goto('/id/ot');
     await page.getByRole('complementary').getByRole('link', { name: 'Requests', exact: true }).first().click();
     await expect(ot.heading).toBeVisible();
   });
 
-  await qa.step(3, async () => {
+  await qa.step(3, () => asOnSite(async () => {
     await switchLanguage(page, 'ID');
     await page.goto('/id/ot/requests');
     const h1 = (await main.getByRole('heading', { level: 1 }).innerText()).trim();
@@ -55,7 +56,7 @@ qaTest('TC-APP008-008', async ({ page, qa }) => {
     qa.note(3, `heading "${h1}"; columns ${cols.join(', ')}; buttons ${[...new Set(buttons)].slice(0, 8).join(', ')}`);
     const english = [h1 === 'OT requests' && 'heading', cols.includes('Blocked') && '"Blocked"', buttons.includes('Schedule') && '"Schedule"'].filter(Boolean);
     if (english.length) qa.deviation(3, 'Headings, column names, buttons and toasts are Indonesian ("Permintaan OT", "Jadwalkan", …)', `English: ${english.join(', ')}`);
-  });
+  }));
 });
 
 qaTest('TC-APP008-035', async ({ page, qa }) => {
@@ -65,7 +66,7 @@ qaTest('TC-APP008-035', async ({ page, qa }) => {
   const d = desk.dialog();
 
   await qa.step(1, async () => {
-    await page.goto('/en/ot');
+    await page.goto('/id/ot');
     await page.getByRole('complementary').getByRole('link', { name: 'Dossiers' }).first().click();
     await expect(desk.main.getByRole('heading', { level: 1, name: 'Dossiers' })).toBeVisible();
     await expect(desk.main.getByRole('button', { name: 'Save', exact: true })).toBeVisible();
@@ -120,7 +121,7 @@ qaTest('TC-APP008-037', async ({ page, qa }) => {
   const incision = qa.name('X sama');
 
   await qa.step(1, async () => {
-    await page.goto('/en/ot');
+    await page.goto('/id/ot');
     await page.getByRole('complementary').getByRole('link', { name: 'Billing' }).first().click();
     await expect(desk.main.getByRole('heading', { level: 1, name: 'Billing policy' })).toBeVisible();
     await expect(desk.main.getByRole('button', { name: 'Save', exact: true })).toBeVisible();
@@ -157,10 +158,14 @@ qaTest('TC-APP008-038', async ({ page, qa }) => {
     const mark = await toastMark(page);
     await d.getByRole('button', { name: 'Save' }).click();
     const toasts = await toastsAfter(page, mark);
-    expect(toasts).not.toContain('Saved');
-    await page.goto('/en/ot/policies');
-    await expect(desk.main.getByText(incision)).toHaveCount(0);
     qa.note(1, `text shown: "${toasts.join(' / ') || 'none'}"`);
+    if (toasts.includes('Saved')) {
+      // Saved with no percentage: the server should refuse it.
+      qa.deviation(1, 'Refused: "incision, department type, and percentage are required"', `"Saved." with the percentage empty (policy "${incision}")`);
+      return;
+    }
+    await page.goto('/id/ot/policies');
+    await expect(desk.main.getByText(incision)).toHaveCount(0);
   });
 });
 
@@ -174,7 +179,7 @@ qaTest('TC-APP008-039', async ({ page, qa }) => {
   const slot = desk.main.getByRole('button').filter({ hasText: room });
 
   await qa.step(1, async () => {
-    await page.goto('/en/ot');
+    await page.goto('/id/ot');
     await page.getByRole('complementary').getByRole('link', { name: 'Calendar' }).first().click();
     await expect(desk.main.getByRole('heading', { level: 1, name: 'Calendar' })).toBeVisible();
     await expect(desk.main.locator('input[type="date"]')).toHaveValue(todayWib());
@@ -208,7 +213,7 @@ qaTest('TC-APP008-040', async ({ page, qa }) => {
   let chronicRefused = '';
 
   await qa.step(1, async () => {
-    await page.goto('/en/ot');
+    await page.goto('/id/ot');
     await page.getByRole('complementary').getByRole('link', { name: 'Pain' }).first().click();
     await expect(desk.main.getByRole('heading', { level: 1, name: 'Pain' })).toBeVisible();
     await expect(chronic.getByRole('button', { name: 'Save' })).toBeVisible();
@@ -254,7 +259,7 @@ qaTest('TC-APP008-041', async ({ page, qa }) => {
     await chronic.getByRole('button', { name: 'Save' }).click();
     const toasts = await toastsAfter(page, mark);
     expect(toasts).not.toContain('Saved');
-    await page.goto('/en/ot/pain');
+    await page.goto('/id/ot/pain');
     await expect(desk.main.getByText(note)).toHaveCount(0);
     qa.note(1, `text shown: "${toasts.join(' / ') || 'none'}"`);
   });
@@ -277,7 +282,7 @@ qaTest('TC-APP008-042', async ({ page, qa }) => {
 qaTest('TC-APP008-043', async ({ page, qa }) => {
   const desk = new OtDeskPage(page);
   await qa.step(1, async () => {
-    await page.goto('/en/ot');
+    await page.goto('/id/ot');
     await desk.main.getByRole('link', { name: 'Case', exact: true }).click();
     await expect(desk.main.getByRole('heading', { level: 1, name: 'Surgical case' })).toBeVisible();
     await expect(

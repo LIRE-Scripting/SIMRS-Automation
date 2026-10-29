@@ -40,7 +40,7 @@ qaTest('TC-APP013-004', async ({ page, qa }) => {
   const t = new TpnPage(page);
 
   await qa.step(1, async () => {
-    await page.goto('/en/diet');
+    await page.goto('/id/diet');
     await page.getByRole('main').getByRole('link', { name: 'TPN', exact: true }).click();
     await expect(t.heading).toBeVisible();
     await expect(t.main.getByText('Calculate one composition, save it on the patient, and list it for compounding.', { exact: true })).toBeVisible();

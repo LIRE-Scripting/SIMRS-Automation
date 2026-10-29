@@ -1,9 +1,10 @@
+import { asOnSite, sourceOnSite } from '../../../lib/i18n';
 import type { Page } from '@playwright/test';
 import { expect, qaTest, test } from '../../../fixtures/e2e';
 import { installToastRecorder } from '../../../lib/assertions';
 import { addDays } from '../../../lib/dates';
 import { EmployeesPage } from '../../../pages/hr/HrPages';
-import { backToEnglish, switchLanguage } from '../shared/language';
+import { backToIndonesian, switchLanguage } from '../shared/language';
 import {
   SITE_NEW,
   cities,
@@ -36,12 +37,12 @@ test.beforeEach(async ({ page }) => {
 });
 
 test.afterEach(async ({ page }) => {
-  await backToEnglish(page);
+  await backToIndonesian(page);
 });
 const GROUPS = ['Organization', 'Reference', 'Access', 'Appearance', 'Workflow', 'Trail'];
 
 async function directory(page: Page): Promise<void> {
-  await page.goto('/en/settings');
+  await page.goto('/id/settings');
   await expect(page.getByRole('main').getByRole('heading', { level: 1, name: 'Settings' })).toBeVisible();
 }
 
@@ -61,7 +62,7 @@ async function groupsOf(page: Page): Promise<Record<string, string[]>> {
 qaTest('TC-APP018-001', async ({ page, qa }) => {
   const main = page.getByRole('main');
   await qa.step(1, async () => {
-    await page.goto('/en/apps');
+    await page.goto('/id/apps');
     await page.getByRole('main').getByRole('link', { name: /^Settings\b/ }).first().click();
     await expect(main.getByRole('navigation', { name: 'Breadcrumb' })).toHaveText(/^Home\s*\/\s*Apps\s*\/\s*Settings$/);
     await expect(main.getByRole('heading', { level: 1, name: 'Settings' })).toBeVisible();
@@ -82,11 +83,13 @@ qaTest('TC-APP018-001', async ({ page, qa }) => {
     await expect(main.getByRole('heading', { level: 2, name: 'Appearance' })).toBeInViewport();
   });
   await qa.step(4, async () => {
-    await main.getByRole('textbox', { name: 'Find a setting…' }).fill('branch');
-    const left = Object.values(await groupsOf(page)).flat();
+    // The settings are named in the language of the site: "cabang" on /id.
+    await main.getByRole('textbox', { name: 'Find a setting…' }).fill(page.url().includes('/id/') ? 'cabang' : 'branch');
+    // The names as the site writes them ("Cabang" reads back as "Branch", not "Branches").
+    const left = Object.values(await asOnSite(() => groupsOf(page))).flat();
     qa.note(4, `left: ${left.join(', ')}`);
     const expected = ['Branches', 'Departments', 'Branch map', 'Branch features'];
-    for (const e of expected) expect(left).toContain(e);
+    for (const e of expected) expect(left.some((l) => new RegExp(`^${sourceOnSite(e)}$`).test(l)), e).toBe(true);
     if (left.length !== expected.length) qa.deviation(4, `Only ${expected.join(', ')}`, left.join(', '));
   });
   await qa.step(5, async () => {
@@ -109,7 +112,13 @@ qaTest('TC-APP018-001', async ({ page, qa }) => {
       const h1 = await page.getByRole('heading', { level: 1 }).count();
       if (error || !h1) broken.push(`${name} (${page.url()})`);
     }
-    expect(broken).toEqual([]);
+    // Tenants and Entitlements answer HTTP 500 for the hospital administrator (checklist blocker 4).
+    const known = broken.filter((b) => /\/(tenants|entitlements)\)$/.test(b));
+    if (known.length) {
+      qa.note(6, `${known.join('; ')}: HTTP 500 (blocker 4)`);
+      qa.blocked(6, 4);
+    }
+    expect(broken.filter((b) => !known.includes(b))).toEqual([]);
   });
 });
 
@@ -118,7 +127,7 @@ qaTest('TC-APP018-002', async ({ page, qa }) => {
   const code = qa.code('QA-SITE-01');
   const name = qa.name('QA Klinik Uji');
   await qa.step(1, async () => {
-    await page.goto('/en/settings');
+    await page.goto('/id/settings');
     await page.getByRole('main').getByRole('link', { name: /^Branches\b/ }).click();
     await expect(s.main.getByRole('heading', { level: 1, name: 'Sites' })).toBeVisible();
     await expect(s.main.getByText('Hospital, clinic, or standalone location.', { exact: true })).toBeVisible();
@@ -212,7 +221,7 @@ qaTest('TC-APP018-007', async ({ page, qa }) => {
   const code = `QA-${qa.token()}`;
   const name = qa.name('QA Negara Uji');
   await qa.step(1, async () => {
-    await page.goto('/en/settings');
+    await page.goto('/id/settings');
     await page.getByRole('main').getByRole('link', { name: /^Countries\b/ }).click();
     await c.main.getByRole('button', { name: 'Add Country' }).click();
     await expect(c.dialog).toHaveAccessibleName('Add Country');
@@ -261,7 +270,7 @@ qaTest('TC-APP018-008', async ({ page, qa }) => {
   const code = qa.code('QA-PPN11');
   const name = qa.name('QA PPN 11 persen');
   await qa.step(1, async () => {
-    await page.goto('/en/mdm/sites');
+    await page.goto('/id/mdm/sites');
     await page.getByRole('main').getByRole('navigation', { name: 'Breadcrumb' }).getByRole('link', { name: 'Settings' }).click();
     await page.getByRole('main').getByRole('link', { name: 'Tax Codes' }).click();
     await expect(t.main.getByRole('heading', { level: 1, name: 'Tax Codes' })).toBeVisible();
@@ -299,7 +308,8 @@ qaTest('TC-APP018-009', async ({ page, qa }) => {
   const d = departments(page);
   // The site orders by the plain character codes (capitals first: "IPSRS" before "Intensive Care").
   const isSorted = (xs: string[]) => xs.every((x, i) => i === 0 || xs[i - 1] <= x);
-  const namesOf = (m: Mdm) => m.rows().evaluateAll((rs) => rs.filter((r) => r.querySelectorAll('td').length > 1).map((r) => r.querySelectorAll('td')[1]?.textContent?.trim() ?? ''));
+  // The names as the site writes them (read back in English, some would sort differently).
+  const namesOf = (m: Mdm) => asOnSite(() => m.rows().evaluateAll((rs) => rs.filter((r) => r.querySelectorAll('td').length > 1).map((r) => r.querySelectorAll('td')[1]?.textContent?.trim() ?? '')));
   await qa.step(1, async () => {
     await d.open();
     await expect(d.main.getByRole('columnheader')).toHaveText(['Code', 'Name', 'Site', 'Status', 'Actions']);
@@ -336,7 +346,7 @@ qaTest('TC-APP018-009', async ({ page, qa }) => {
 qaTest('TC-APP018-012', async ({ page, qa }) => {
   const main = page.getByRole('main');
   await qa.step(1, async () => {
-    await page.goto('/en/settings');
+    await page.goto('/id/settings');
     await main.getByRole('link', { name: /^Branches\b/ }).click();
     await expect(main.getByRole('navigation', { name: 'Breadcrumb' })).toHaveText(/^Home\s*\/\s*Settings\s*\/\s*Sites$/);
   });
@@ -346,15 +356,15 @@ qaTest('TC-APP018-012', async ({ page, qa }) => {
     const sub = (await main.getByRole('paragraph').first().innerText()).trim();
     if (sub !== 'Organization, access, appearance, and the trail — each once.') qa.deviation(2, 'The Settings directory of step 1', `a second page "Settings" with "${sub}" and the tiles ${(await main.getByRole('link').allInnerTexts()).map((t) => t.trim()).filter((t) => !['Home', 'Apps'].includes(t)).join(', ')}`);
   });
-  await qa.step(3, async () => {
+  await qa.step(3, () => asOnSite(async () => {
     await switchLanguage(page, 'ID');
     await page.goto('/id/settings');
     const h1 = (await main.getByRole('heading', { level: 1 }).innerText()).trim();
     const groups = (await main.getByRole('heading', { level: 2 }).allInnerTexts()).map((t) => t.trim());
     qa.note(3, `heading "${h1}", groups ${groups.join(', ')}`);
     if (h1 !== 'Pengaturan' || groups.includes('Organization')) qa.deviation(3, '"Pengaturan", the groups "Organisasi", "Referensi", "Akses", "Tampilan", "Alur", "Jejak"', `"${h1}", ${groups.join(', ')}`);
-  });
-  await qa.step(4, async () => {
+  }));
+  await qa.step(4, () => asOnSite(async () => {
     await page.goto('/id/mdm/departments');
     const add = main.getByRole('button', { name: /Departemen|Department/ }).first();
     const addText = (await add.innerText()).trim();
@@ -368,7 +378,7 @@ qaTest('TC-APP018-012', async ({ page, qa }) => {
     if (addText !== 'Tambah Departemen' || !toasts.includes('Departemen ditambahkan.')) {
       qa.deviation(4, '"Tambah Departemen", "Kode departemen", "Departemen ditambahkan."', `"${addText}", ${labels.slice(0, 2).join(', ')}, toast "${toasts.join(' / ')}"`);
     }
-  });
+  }));
 });
 
 qaTest('TC-APP018-015', async ({ page, qa }) => {
@@ -586,7 +596,7 @@ qaTest('TC-APP018-029', async ({ page, qa }) => {
     });
     await qa.step(3, async () => {
       const img = '<img src=x onerror=alert(1)>';
-      await page.goto('/en/settings');
+      await page.goto('/id/settings');
       await page.getByRole('main').getByRole('textbox', { name: 'Find a setting…' }).fill(img);
       await expect(page.getByRole('main').getByText('Nothing matches.')).toBeVisible();
       await d.open();
@@ -640,7 +650,7 @@ qaTest('TC-APP018-053', async ({ page, qa }) => {
 qaTest('TC-APP018-058', async ({ page, qa }) => {
   const main = page.getByRole('main');
   await qa.step(1, async () => {
-    await page.goto('/en/settings');
+    await page.goto('/id/settings');
     await main.getByRole('link', { name: /^Audit retention\b/ }).click();
     await expect(main.getByRole('heading', { level: 1, name: 'Audit retention' })).toBeVisible();
     await expect(main.getByText('Yearly audit-log retention. This screen only lists them.', { exact: true })).toBeVisible();
@@ -654,14 +664,14 @@ qaTest('TC-APP018-058', async ({ page, qa }) => {
     qa.note(2, 'neither the time kept nor a way to change it is shown (as the workbook says)');
   });
   await qa.step(3, async () => {
-    await page.goto('/en/mdm');
+    await page.goto('/id/mdm');
     await main.getByRole('link', { name: 'Facility time' }).click();
     await expect(main.getByRole('heading', { level: 1, name: 'Facility time' })).toBeVisible();
     expect(await main.locator('input, select, textarea').count()).toBe(0);
     expect(await main.getByRole('paragraph').count()).toBe(1);
   });
   await qa.step(4, async () => {
-    await page.goto('/en/settings');
+    await page.goto('/id/settings');
     await main.getByRole('link', { name: /^Branch features\b/ }).click();
     await expect(main.getByRole('heading', { level: 1, name: 'Feature Branch Mapping' })).toBeVisible();
     await expect(main.getByText('Show or hide features for this hospital.', { exact: true })).toBeVisible();

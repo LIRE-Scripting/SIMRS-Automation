@@ -36,7 +36,7 @@ class TwoForms {
   }
 
   async open(): Promise<void> {
-    await this.page.goto(`/en${this.route}`);
+    await this.page.goto(`/id${this.route}`);
     await expect(this.main.getByRole('heading', { level: 1, name: this.title })).toBeVisible();
     await this.page.waitForLoadState('networkidle').catch(() => {});
   }
@@ -57,7 +57,7 @@ class TwoForms {
 
 /** Opens the screen from the Pharmacy hub; a deviation when the hub has no link to it. */
 async function fromHub(page: Page, qa: Qa, s: TwoForms, link: string): Promise<void> {
-  await page.goto('/en/apps');
+  await page.goto('/id/apps');
   await page.getByRole('main').getByRole('link', { name: /^Pharmacy\b/ }).first().click();
   const tile = page.getByRole('main').getByRole('link', { name: link, exact: true });
   if (await tile.count()) {

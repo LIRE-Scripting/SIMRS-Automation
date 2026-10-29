@@ -13,7 +13,7 @@ import { ConsultationPage } from '../../../../pages/clinical/ConsultationPage';
  * 03 Patient Care), written as in the module specs but on the chain's patient.
  */
 export type Patient = { mrn: string; fullName: string };
-export const SCHEDULE = '/en/appointment/schedule';
+export const SCHEDULE = '/id/appointment/schedule';
 const pad = (n: number) => String(n).padStart(3, '0');
 
 /** TC-APP001-001: registers "QA-AMB Pasien Satu <token>" with an automatic MRN. */
@@ -22,7 +22,7 @@ export async function registerSteps(page: Page, qa: Qa): Promise<Patient> {
   const last = `Satu ${qa.token()}`;
   let before = 0;
   await qa.step(1, async () => {
-    await page.goto('/en/apps');
+    await page.goto('/id/apps');
     await page.getByRole('link', { name: /Ambulatory Care/ }).first().click();
     await page.getByRole('main').getByRole('link', { name: 'New Registration' }).click();
     await expect(reg.heading).toBeVisible();
@@ -119,7 +119,7 @@ export async function arriveSteps(page: Page, qa: Qa, pt: Patient): Promise<void
   const last = await arrival.lastNumber(SHARED.dep1.name);
   if (last) qa.note(2, `precondition "no arrival in ${SHARED.dep1.name} today" not met on the shared site (last No. ${pad(last)}); expected the next number`);
   await qa.step(1, async () => {
-    await page.goto('/en/registration');
+    await page.goto('/id/registration');
     await page.getByRole('main').getByRole('link', { name: 'Arrival', exact: true }).click();
     await expect(arrival.heading).toBeVisible();
   });
@@ -143,7 +143,7 @@ export async function arriveSteps(page: Page, qa: Qa, pt: Patient): Promise<void
 export async function consultSteps(page: Page, qa: Qa, pt: Patient): Promise<void> {
   const c = new ConsultationPage(page);
   await qa.step(1, async () => {
-    await page.goto('/en/apps');
+    await page.goto('/id/apps');
     await page.getByRole('link', { name: /^Patient Care\b/ }).first().click();
     await page.getByRole('main').getByRole('link', { name: 'Open Consultation' }).click();
     await expect(c.heading).toBeVisible();

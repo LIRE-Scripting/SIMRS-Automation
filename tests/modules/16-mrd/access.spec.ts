@@ -377,7 +377,7 @@ qaTest('TC-APP016-041', async ({ page, qa, browser }) => {
     await qa.step(4, async () => {
       const shown: string[] = [];
       for (const [route, heading] of [['/mrd/outpatient', 'Outpatient visits without a document'], ['/mrd/coding', 'Discharged stays missing a diagnosis code']] as const) {
-        await staff.goto(`/en${route}`);
+        await staff.goto(`/id${route}`);
         await staff.waitForLoadState('networkidle').catch(() => {});
         if (await staff.getByRole('main').getByRole('heading', { level: 1, name: heading }).isVisible()) shown.push(`${heading} (${Math.max((await staff.getByRole('main').getByRole('row').count()) - 1, 0)} rows)`);
       }

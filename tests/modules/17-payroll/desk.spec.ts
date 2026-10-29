@@ -47,7 +47,7 @@ qaTest('TC-APP017-043', async ({ page, qa }) => {
     expect(await d.main.getByRole('table').innerText()).toBe(before);
   });
   await qa.step(3, async () => {
-    await page.goto('/en/finance');
+    await page.goto('/id/finance');
     await page.getByRole('complementary').getByRole('link', { name: 'Vouchers', exact: true }).first().click();
     await page.waitForLoadState('networkidle').catch(() => {});
     const hits = page.getByRole('row').filter({ hasText: e.no });
@@ -107,7 +107,7 @@ qaTest('TC-APP017-046', async ({ page, qa }) => {
   const d = new Desk(page);
   const e = await payslip(d, page, qa);
   await qa.step(1, async () => {
-    await page.goto('/en/payroll');
+    await page.goto('/id/payroll');
     await page.getByRole('complementary').getByRole('link', { name: 'Payslip' }).first().click();
     await expect(d.main.getByRole('heading', { level: 1, name: 'Payroll desk' })).toBeVisible();
     await expect(d.main.getByText('The payslip stays on this screen. Nothing is emailed.', { exact: true }).first()).toBeVisible();

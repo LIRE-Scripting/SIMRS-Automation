@@ -39,7 +39,7 @@ export async function asUser<T>(browser: Browser, user: 'U1' | 'U2' | 'U3' | 'U6
 /** Runs body with a page of U2 with "All branches" chosen in the header (U2 may have been left on one branch). */
 export async function asAllBranches<T>(browser: Browser, body: (page: Page) => Promise<T>): Promise<T> {
   return asUser(browser, 'U2', async (page) => {
-    await page.goto('/en/apps');
+    await page.goto('/id/apps');
     await new AppHeader(page).selectBranch('All branches');
     return body(page);
   });
@@ -94,7 +94,7 @@ export async function screenRefuses(page: Page): Promise<boolean> {
 
 /** "Opens Apps -> No <card> card, or the card opens a "no access" page". */
 export async function appsCardRefused(page: Page, qa: Qa, step: number, card: RegExp): Promise<void> {
-  await page.goto('/en/apps');
+  await page.goto('/id/apps');
   const link = page.getByRole('main').getByRole('link', { name: card });
   if (!(await link.count())) return;
   await link.first().click();
@@ -121,7 +121,7 @@ export async function rowCount(page: Page): Promise<number> {
 export async function routesRefused(page: Page, qa: Qa, step: number, routes: string[], then?: (route: string) => Promise<string | void>): Promise<void> {
   const shown: string[] = [];
   for (const route of routes) {
-    await page.goto(`/en${route}`);
+    await page.goto(`/id${route}`);
     await page.waitForLoadState('networkidle').catch(() => {});
     const extra = then ? await then(route) : undefined;
     if (await screenRefuses(page)) continue;
@@ -160,10 +160,10 @@ export async function columnTexts(page: Page, column = 0, scope?: Locator): Prom
  * rows found in U1's list too.
  */
 export async function otherBranchRowsShown(u1: Page, u6: Page, route: string, column = 0): Promise<{ b: string[]; shownToA: string[] }> {
-  await u6.goto(`/en${route}`);
+  await u6.goto(`/id${route}`);
   await u6.waitForLoadState('networkidle').catch(() => {});
   const b = await columnTexts(u6, column);
-  await u1.goto(`/en${route}`);
+  await u1.goto(`/id${route}`);
   await u1.waitForLoadState('networkidle').catch(() => {});
   const a = new Set(await columnTexts(u1, column));
   return { b, shownToA: b.filter((k) => a.has(k)) };
@@ -192,7 +192,7 @@ export async function seedPatientOf(page: Page): Promise<{ mrn: string; fullName
 export async function menuScreens(page: Page, hub: string, links: string[]): Promise<string[]> {
   const out: string[] = [];
   for (const name of links) {
-    await page.goto(`/en${hub}`);
+    await page.goto(`/id${hub}`);
     await page.waitForLoadState('networkidle').catch(() => {});
     const link = page.getByRole('complementary').getByRole('link', { name, exact: true }).or(page.getByRole('main').getByRole('link', { name, exact: true })).first();
     if (!(await link.count())) {
@@ -209,7 +209,7 @@ export async function menuScreens(page: Page, hub: string, links: string[]): Pro
 
 /** The newest Audit Log entries of a module (filter "Module"), as row texts. */
 export async function auditEntries(page: Page, module: string): Promise<string[]> {
-  await page.goto('/en/audit');
+  await page.goto('/id/audit');
   await page.getByRole('textbox', { name: 'Module' }).fill(module);
   await page.getByRole('button', { name: 'Search' }).click();
   await page.waitForLoadState('networkidle').catch(() => {});

@@ -1,7 +1,8 @@
 import { expect, qaTest, test } from '../../../fixtures/e2e';
 import { installToastRecorder, toastMark } from '../../../lib/assertions';
 import { todayWib } from '../../../lib/dates';
-import { bedWithId } from '../shared/internal-ids';
+import { RegisteredPatientsPage } from '../../../pages/ambulatory/RegisteredPatientsPage';
+import { bedWithId, patientIdOf } from '../shared/internal-ids';
 import { patient, Patients, toastsAfter, VisitsPage } from './helpers';
 
 /**
@@ -263,7 +264,7 @@ qaTest('TC-APP015-058', async ({ page, qa }) => {
   const v = new VisitsPage(page);
   const pt = await patient(page, qa);
   await qa.step(1, async () => {
-    await page.goto('/en/emergency');
+    await page.goto('/id/emergency');
     const links = (await page.getByRole('main').getByRole('link').allInnerTexts()).concat(await page.getByRole('complementary').getByRole('link').allInnerTexts());
     qa.note(1, `hub and menu: ${links.map((l) => l.trim()).filter(Boolean).join(', ')}`);
     expect(links.some((l) => /^Visits$/.test(l.trim()))).toBe(false);
@@ -278,25 +279,34 @@ qaTest('TC-APP015-058', async ({ page, qa }) => {
     qa.note(2, `listed with Priority ${c[0]}`);
   });
   await qa.step(3, async () => {
-    await page.goto('/en/emergency/patients');
+    await page.goto('/id/emergency/patients');
     await page.getByRole('main').getByRole('searchbox', { name: 'Search' }).fill(pt.fullName);
     const onPatients = await page.getByRole('main').getByRole('row').filter({ hasText: pt.fullName }).count();
-    await page.goto('/en/emergency/layout');
+    await page.goto('/id/emergency/layout');
     const onLayout = await page.getByRole('main').getByText(pt.fullName).count();
     qa.note(3, `Emergency Patients ${onPatients ? 'lists' : 'does not list'} the patient; Emergency Layout ${onLayout ? 'shows' : 'does not show'} it`);
   });
   await qa.step(4, async () => {
-    // A second registered patient, received on Emergency Patients ("Registration", found by MRN).
-    const pt2 = await patient(page, qa, 'QA-EMG Pasien Dua');
+    // A second patient registered for the emergency desk, received on Emergency Patients ("Registration", found by MRN):
+    // the dialog offers registrations of the visit type "Emergency desk" only.
+    const reg = new RegisteredPatientsPage(page);
+    await reg.open();
+    const registered = await reg.register({ visitType: 'Emergency desk', firstName: 'QA-EMG Pasien', lastName: `Dua ${qa.token()}` });
+    const pt2 = { ...registered, id: await patientIdOf(page, registered.mrn) };
     const p = new Patients(page);
     await p.open();
     await p.main.getByRole('button', { name: 'Registration', exact: true }).click();
     await p.dialog.getByRole('textbox', { name: 'Name or MRN' }).fill(pt2.mrn);
     await p.dialog.getByRole('button', { name: 'Search' }).click();
-    await p.dialog.getByRole('listbox').getByRole('button').or(p.dialog.getByRole('list').getByRole('button')).first().click();
+    // The hit is a button "<name> · <MRN>" in the dialog.
+    await p.dialog.getByRole('button', { name: new RegExp(pt2.mrn) }).first().click();
     await p.dialog.locator('select').first().selectOption({ label: 'IGD' }).catch(() => {});
     const toasts = await p.click(p.dialog.getByRole('button', { name: 'Receive' }));
-    expect(toasts.join(' ')).toMatch(/received/i);
+    // Received when the patient is on Emergency Patients afterwards (the receipt may show no toast).
+    await p.open();
+    const listed = (await p.main.getByText(pt2.fullName).count()) > 0;
+    qa.note(4, `Receive: "${toasts.join(' / ') || 'no toast'}"; Emergency Patients ${listed ? 'lists' : 'does not list'} ${pt2.fullName}`);
+    if (!listed && !toasts.join(' ').match(/received/i)) qa.deviation(4, 'The second patient is received on Emergency Patients', `"${toasts.join(' / ') || 'no toast'}" and the patient is not listed`);
     const row = await v.row(pt2.id);
     qa.note(4, (await row.count()) ? `Visits has a row for the patient received on Emergency Patients: ${(await v.cells(row.first())).join(' | ')}` : 'Visits has no row for the patient received on Emergency Patients');
   });

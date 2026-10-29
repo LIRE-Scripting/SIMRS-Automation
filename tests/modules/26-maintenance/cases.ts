@@ -15,7 +15,7 @@ export const TC_APP026_001 = async ({ page, qa }: CaseArgs): Promise<void> => {
   const card = qa.code('X-JC-AC');
   const asset = qa.code('X-AST-AC1');
   await qa.step(1, async () => {
-    await page.goto('/en/maintenance');
+    await page.goto('/id/maintenance');
     await page.getByRole('main').getByRole('link', { name: 'Plans' }).click();
     await expect(p.main.getByRole('heading', { level: 1, name: 'Plans' })).toBeVisible();
     await expect(p.main.getByRole('button', { name: 'Job card' })).toBeVisible();
@@ -54,7 +54,7 @@ export const TC_APP026_004 = async ({ page, qa }: CaseArgs): Promise<void> => {
   let wo = '';
   let approved = false;
   await qa.step(1, async () => {
-    await page.goto('/en/maintenance');
+    await page.goto('/id/maintenance');
     await page.getByRole('main').getByRole('link', { name: 'Work' }).click();
     await expect(w.main.getByRole('heading', { level: 1, name: 'Work' })).toBeVisible();
     await expect(w.main.getByRole('button', { name: 'Breakdown' })).toBeVisible();
@@ -65,10 +65,22 @@ export const TC_APP026_004 = async ({ page, qa }: CaseArgs): Promise<void> => {
     await expect(w.dialog.getByRole('list', { name: 'Wizard steps' }).getByRole('listitem')).toHaveText([/^1\s*Details$/, /^2\s*Review$/]);
     for (const f of ['Number', CA, NE, NV, JB]) await expect(w.dialog.getByRole('textbox', { name: f })).toBeVisible();
   });
+  let listed = true;
   await qa.step(3, async () => {
-    bd = await breakdown(page, qa);
+    try {
+      bd = await breakdown(page, qa);
+    } catch (e) {
+      if (!/blocker 40/.test((e as Error).message)) throw e;
+      listed = false;
+      return qa.note(3, 'the breakdown is saved, but its id is neither in the answer of the save nor in the list, which holds its first 40 rows');
+    }
     expect(bd).not.toBe('');
   });
+  if (!listed) {
+    // No id of the breakdown of the test: no work order can be made for it (found blocker 40).
+    for (const st of [3, 4, 5, 6, 7, 8]) qa.blocked(st, 40);
+    return;
+  }
   await qa.step(4, async () => {
     const r = await w.create(ORDER(qa, bd), 'Work order');
     expect(r.toasts).toContain(SAVED);

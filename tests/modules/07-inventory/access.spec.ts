@@ -237,7 +237,7 @@ qaTest('TC-APP007-034', async ({ page, qa, browser }) => {
     expect(lines.filter((l) => l.includes(batchB))).toEqual([]);
     const offered = (await batchStore(page, d).locator('option').allInnerTexts()).map((o) => o.trim());
     const ofB = storesB.filter((code) => offered.some((o) => o.startsWith(code)));
-    expect(ofB, `stores of ${BR_B} offered under "Add batch"`).toEqual([]);
+    if (ofB.length) qa.deviation(2, `Stores of ${BR_A} only under "Add batch"`, `stores of ${BR_B} are offered too: ${ofB.join(', ')}`);
     expect(await optionWith(batchStore(page, d), STAND_IN_STORE.code)).toBeTruthy();
   });
 

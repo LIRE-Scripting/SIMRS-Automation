@@ -31,7 +31,7 @@ export class RequestsPage {
     this.dialog = page.getByRole('dialog', { name: 'New diet request' });
   }
   async open(): Promise<void> {
-    await this.page.goto('/en/diet/requests');
+    await this.page.goto('/id/diet/requests');
     await expect(this.heading).toBeVisible();
   }
   rows(): Locator {
@@ -102,7 +102,7 @@ export class TpnPage {
     this.workbench = this.main.getByRole('table');
   }
   async open(): Promise<void> {
-    await this.page.goto('/en/diet/tpn');
+    await this.page.goto('/id/diet/tpn');
     await expect(this.heading).toBeVisible();
   }
   field(name: string): Locator {
@@ -184,7 +184,7 @@ export function catalogue(page: Page) {
       return (await main.innerText()).split('\n')[1] ?? '';
     },
     async open(): Promise<void> {
-      await page.goto('/en/diet/catalogue');
+      await page.goto('/id/diet/catalogue');
       await expect(main.getByRole('heading', { level: 1, name: 'Catalogue' })).toBeVisible();
     },
   };

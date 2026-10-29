@@ -1,16 +1,16 @@
 import { expect, type Locator, type Page } from '@playwright/test';
 
 /**
- * Appointment > Referral types (/en/appointment/referral-types) and
- * Cross-consult types (/en/appointment/cross-consult-types): one layout, a
+ * Appointment > Referral types (/id/appointment/referral-types) and
+ * Cross-consult types (/id/appointment/cross-consult-types): one layout, a
  * list (Code, Name, Active) and a dialog "Add" (Code, Name, Active).
  * Read from the live screens on 2026-10-15.
  */
 export type TypeKind = 'Referral types' | 'Cross-consult types';
 
 export const TYPE_ROUTES: Record<TypeKind, string> = {
-  'Referral types': '/en/appointment/referral-types',
-  'Cross-consult types': '/en/appointment/cross-consult-types',
+  'Referral types': '/id/appointment/referral-types',
+  'Cross-consult types': '/id/appointment/cross-consult-types',
 };
 
 /** The list in the booking dialog that offers this kind of type. */

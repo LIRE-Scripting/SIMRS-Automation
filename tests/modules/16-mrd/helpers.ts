@@ -22,7 +22,7 @@ export class Screen {
     this.dialog = page.getByRole('dialog');
   }
   async open(): Promise<void> {
-    await this.page.goto(`/en/mrd/${this.route}`);
+    await this.page.goto(`/id/mrd/${this.route}`);
     await expect(this.main.getByRole('heading', { level: 1, name: this.heading })).toBeVisible();
     await this.page.waitForLoadState('networkidle').catch(() => {});
   }
@@ -35,7 +35,8 @@ export class Screen {
     const match = () => this.rows().filter({ has: this.page.getByRole('cell', { name: docNo, exact: true }) });
     const next = this.main.getByRole('button', { name: 'Next page' });
     for (let i = 0; i < 50; i++) {
-      if (await match().count()) return match();
+      // A page renders twice after paging: its rows are given a moment.
+      if (await match().first().waitFor({ timeout: 2_500 }).then(() => true, () => false)) return match();
       if (!(await next.isVisible()) || (await next.isDisabled())) break;
       const first = await this.rows().first().innerText();
       await next.press('Enter');

@@ -1,4 +1,5 @@
 import { expect, type Locator, type Page } from '@playwright/test';
+import { toastInEnglish } from './i18n';
 
 /**
  * Locator for a toast message. The app renders toasts either as an alert
@@ -30,6 +31,8 @@ export async function installToastRecorder(page: Page): Promise<void> {
     new MutationObserver(() => {
       document.querySelectorAll('[role="status"],[role="alert"]').forEach((el) => {
         const text = el.textContent?.trim() ?? '';
+        // The banner of a tenant without branding is a status region on every page, not a toast.
+        if (/^Tenant branding is not configured/.test(text)) return;
         if (text && seen.get(el) !== text) {
           seen.set(el, text);
           w.__qaToasts.push(text);
@@ -44,7 +47,9 @@ export async function toastMark(page: Page): Promise<number> {
   return page.evaluate(() => (window as unknown as { __qaToasts?: string[] }).__qaToasts?.length ?? 0);
 }
 
-/** Toast texts recorded after `mark`. */
+/** Toast texts recorded after `mark`, in English (the site runs in Indonesian, lib/i18n). */
 export async function toastsSince(page: Page, mark: number): Promise<string[]> {
-  return page.evaluate((m) => ((window as unknown as { __qaToasts?: string[] }).__qaToasts ?? []).slice(m), mark);
+  const texts = await page.evaluate((m) => ((window as unknown as { __qaToasts?: string[] }).__qaToasts ?? []).slice(m), mark);
+  const url = page.url();
+  return texts.map((t) => toastInEnglish(t, url));
 }

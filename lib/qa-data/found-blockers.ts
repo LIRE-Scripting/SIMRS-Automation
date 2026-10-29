@@ -415,43 +415,36 @@ export const FOUND_BLOCKERS: FoundBlocker[] = [
     no: 38,
     blocker: 'Saving the rights of a role answers HTTP 500 ("Failed to save rights.")',
     category: 'Function',
-    scope: '18 Settings\nUser Rights, /identity/rights, "Save rights"',
+    scope: '18 Settings\nUser Rights, /identity/rights, "Save rights"; 00-prerequisites.xlsx | Role accounts (U8 of 04 Inpatient, 18 Settings, 22 Services, 23 Sourcing)',
     cause:
       'With a new test role picked ("0 / 40") and DIET_WRITE ticked, "Save rights" posts to /identity/rights and gets HTTP 500; ' +
-      'the toast is "Failed to save rights." (seen 2026-10-15). No privilege can be granted to a role, so a role made on Roles ' +
-      'cannot be given any right. The shared role admin was not tried.',
-    fix: '1. Fix the save of role privileges.\n2. Run TC-APP018-039 again (and steps 4 and 5 with the 13 Dietary flow).',
+      'the toast is "Failed to save rights." (seen 2026-10-15, TC-APP018-039). The prerequisites run of 2026-10-20 met it again for the ' +
+      'four roles qa_rawat_inap (ADT_WRITE), qa_settings (7 Settings rights), qa_services (SERVICES_WRITE) and qa_sourcing (SOURCING_WRITE), ' +
+      'twice each, digest 2696407390: the role ids and privilege ids were valid (the same request loaded the role with HTTP 200), so the server ' +
+      'fails on storing the role-privilege link. No role but admin holds those rights, so the four U8 accounts qa.perawat.ri, qa.settings, ' +
+      'qa.services and qa.sourcing were not made (their roles exist with 0 rights); 22 of the 26 U8 accounts and U3–U7 were made and sign in ' +
+      '(docs/qa/prereq-users-and-blockers.md). The journeys of those four applications run as U1 (admin): the flows are proven, the limits ' +
+      'of a role are not. Steps that need a user with only some rights of an application (a writer-only or an approver-only user, a ' +
+      'pharmacist without the cashier role) are not run for the same reason.',
+    fix: '1. Fix the save of role privileges (server log, digest 2696407390, 2026-10-15 and 2026-10-20).\n2. PREREQ_RETRY=blocked npm run test:prereq, then npm run qa:prereq-evidence: the four roles get their rights and the four accounts are made.\n3. Run TC-APP018-039 again (and steps 4 and 5 with the 13 Dietary flow), and the journeys of 04, 18, 22 and 23 with their role accounts.',
     who: 'Development',
-    howFound: 'Seen on the site (automation of 18 Settings)',
+    howFound: 'Seen on the site (automation of 18 Settings, 2026-10-15; prerequisites run, 2026-10-20)',
     testCases: [{ id: 'TC-APP018-039', steps: [3] }],
   },
   {
     no: 39,
-    blocker: 'A tender cannot be created: "Create tender" answers HTTP 500 for every approved purchase request',
+    blocker: 'A tender cannot be created: "Create tender" answers HTTP 500 for every approved purchase request (holds on 2026-10-29 only for a request that already has a tender)',
     category: 'Function',
     scope: '23 Sourcing\nTenders, /sourcing/tenders, "Create tender" (Document = id of an approved purchase request)',
     cause:
       'With a category, the type "open", a close date and the internal id of an approved purchase request of Procurement ' +
       '(/procurement/requests: the requests of 09 and the seed requests PO-001 and PO-USG), "Save" posts and gets HTTP 500, toast ' +
-      '"Minified React error #441" (seen 2026-10-15). Without a tender no bid, agreement or deposit can be recorded.',
+      '"Minified React error #441" (seen 2026-10-15). Without a tender no bid, agreement or deposit can be recorded. On 2026-10-29 the save answers "Saved." for a request that has no tender yet (a request raised and approved just before), and the tender is listed as draft; a second tender for the same request still answers HTTP 500 (digest 3536862028) instead of a refusal. The tests start each tender from its own new request.',
     fix: '1. Fix the creation of a tender from an approved purchase request.\n2. Run TC-APP023-005, 006, 008 … 010, 012 … 014, 016 … 018 and 020 again.',
     who: 'Development',
     howFound: 'Seen on the site (automation of 23 Sourcing)',
-    testCases: [
-      { id: 'TC-APP023-005', steps: [3, 4, 5, 6] },
-      { id: 'TC-APP023-006', steps: [6, 7] },
-      { id: 'TC-APP023-008' },
-      { id: 'TC-APP023-009' },
-      { id: 'TC-APP023-010' },
-      { id: 'TC-APP023-012' },
-      { id: 'TC-APP023-013' },
-      { id: 'TC-APP023-014' },
-      { id: 'TC-APP023-016' },
-      { id: 'TC-APP023-017' },
-      { id: 'TC-APP023-018', steps: [1, 2, 3] },
-      { id: 'TC-APP023-020', steps: [2, 3, 4, 5, 6] },
-      { id: 'TC-APP023-021', steps: [3, 4, 5] },
-    ],
+    // Since 2026-10-29 a tender saves for a request with no tender yet (TC-APP023-005 "Saved.", draft); the sourcing tests run again.
+    testCases: [],
   },
   {
     no: 40,
@@ -459,7 +452,7 @@ export const FOUND_BLOCKERS: FoundBlocker[] = [
     category: 'Function',
     scope:
       'Type-ahead pickers: Department (01/02 Book, Arrival, queues), Bed (04 Admissions), Employee (10 Leave, 17 Payroll), ' +
-      'Account (19 Budget posting rules)\nDesk lists: /housekeeping/*, /maintenance/*, /fixed-assets/*, /services/*\n' +
+      'Account (19 Budget posting rules, the account lists of Journals, documents and Finance desks), Order (12 "Schedule and report", its first 20)\nDesk lists: /billing/plans (14 Patient plan), /housekeeping/*, /maintenance/*, /fixed-assets/*, /services/*\n' +
       'Search of Users and Departments and the User Site Mapping list (18 Settings), filter of the Item list (07)',
     cause:
       'A type-ahead picker filters the records the page loaded once (the first 50 by name) and never asks the server: typing the ' +
@@ -495,6 +488,23 @@ export const FOUND_BLOCKERS: FoundBlocker[] = [
       { id: 'TC-APP010-013', steps: [6, 7, 8] },
       { id: 'TC-APP010-020', steps: [1, 2] },
       { id: 'TC-APP010-032', steps: [1, 2, 3, 4, 5] },
+      { id: 'TC-APP026-013', steps: [3, 4] },
+      { id: 'TC-APP012-029', steps: [2] },
+      { id: 'TC-APP012-025', steps: [2] },
+      { id: 'TC-APP014-057', steps: [3] },
+      { id: 'TC-APP004-010', steps: [2, 3] },
+      { id: 'TC-APP004-006', steps: [4] },
+      { id: 'TC-APP004-074', steps: [1, 2] },
+      { id: 'TC-APP026-005', steps: [2, 3, 4, 5, 6, 7, 8, 9, 10, 11] },
+      { id: 'TC-APP005-042', steps: [1, 2] },
+      { id: 'TC-APP019-042', steps: [2, 3, 4, 5] },
+      { id: 'TC-APP019-043', steps: [1, 2] },
+      { id: 'TC-APP022-007', steps: [1, 2, 3, 4] },
+      { id: 'TC-APP019-002', steps: [1, 2] },
+      { id: 'TC-APP019-003', steps: [1, 2] },
+      { id: 'TC-APP019-021', steps: [1, 2, 3, 4] },
+      { id: 'TC-APP026-006', steps: [4, 5] },
+      { id: 'TC-APP026-012', steps: [2, 3, 4, 5, 6] },
       { id: 'TC-APP010-033', steps: [3, 4] },
       { id: 'TC-APP017-001', steps: [2, 3, 4, 5] },
       { id: 'TC-APP017-003', steps: [1, 2, 3, 4] },
@@ -538,6 +548,258 @@ export const FOUND_BLOCKERS: FoundBlocker[] = [
       { id: 'TC-APP001-024', steps: [3, 6] },
       { id: 'TC-APP001-043', steps: [3] },
     ],
+  },
+  {
+    no: 42,
+    blocker: 'No imprest advance can be requested: no imprest eligibility can be set up for the branch',
+    category: 'Data + Function',
+    scope: '19 Finance\nImprest, /finance/imprest, "Advance request" (Save); Branch configuration, /finance/configuration, imprest eligibility ("Add row")',
+    cause:
+      'Saving an advance of 2000000 for a QA employee with the QA-ATK type answers "The amount exceeds the employee\'s imprest eligibility." ' +
+      '(seen 2026-10-28). The precondition is an eligibility row for the employee or the department in the branch configuration, but ' +
+      '"Add row" there adds no row to fill (TC-APP019-035, TC-APP019-036 step 3), so no advance, payment of an advance, bill or settlement can follow.',
+    fix: '1. Make the imprest eligibility row of the branch configuration usable (or set one for the QA employees of Podomoro).\n2. Run TC-APP019-066 and E2E-042 again.',
+    who: 'Site administrator, then Development',
+    howFound: 'Seen on the site (TC-APP019-066, written 2026-10-28)',
+    testCases: [
+      { id: 'TC-APP019-066', steps: [2, 3, 4, 5] },
+      { id: 'TC-APP019-067', steps: [1] },
+    ],
+  },
+  {
+    no: 43,
+    blocker: 'A year balance cannot be saved on the HR desk: "Year balance" answers HTTP 500',
+    category: 'Function',
+    scope: '10 HR\nHR desk, /hr/desk/leave, dialog "Year balance", action "Year balance" (Save)',
+    cause:
+      'Saving a year balance 2027 (2027-01-01 to 2027-12-31, 12 days) for an employee of the test answers HTTP 500 (digest 3646853607), ' +
+      'toast "Minified React error #441", with the typed leave type and with the code of a leave type made just before (seen 2026-10-28; ' +
+      'the same answer on every run since 2026-10-18, TC-APP010-047 and 048). No balance, so no application against it, no approval and no cancellation.',
+    fix: '1. Fix the save of a year balance on the HR desk.\n2. Run TC-APP010-042, TC-APP010-043 and E2E-040 again.',
+    who: 'Development',
+    howFound: 'Seen on the site (TC-APP010-042, written 2026-10-22, run 2026-10-28)',
+    testCases: [
+      { id: 'TC-APP010-042', steps: [3, 4, 5, 6] },
+      { id: 'TC-APP010-043', steps: [4] },
+    ],
+  },
+  {
+    no: 44,
+    blocker: 'No purchase order can be made on Purchase requests (/procurement/requests): "order" answers HTTP 500',
+    category: 'Function',
+    scope: '09 Procurement\nPurchase requests (titled "Purchase orders"), /procurement/requests, button "order"',
+    cause:
+      'An order of supplier, item (X-ITM1 of Inventory), quantity 50, rate 1000, tax PPN and terms "30 hari" answers HTTP 500 (digest 1569332509), ' +
+      'toast "Minified React error #441": as in the workbook, with the id of an approved purchase request of the test in "Document", and with ' +
+      'the existing vendor "QA PT Medika Uji" (seen 2026-10-28). No order, so no send, approval, amendment or follow-up can be tried.',
+    fix: '1. Fix the save of an order on /procurement/requests (or name what it needs).\n2. Run TC-APP009-043 and TC-APP009-045 again.',
+    who: 'Development',
+    howFound: 'Seen on the site (TC-APP009-043, written 2026-10-22, run 2026-10-28)',
+    testCases: [
+      { id: 'TC-APP009-043', steps: [2, 3, 4, 5] },
+      { id: 'TC-APP009-045', steps: [1, 2] },
+    ],
+  },
+  {
+    no: 45,
+    blocker: 'The financial year 2026 of Podomoro has no periods: no journal, voucher or payment dated today can be saved',
+    category: 'Data',
+    scope: '19 Finance\nFinancial years, /finance/financial-years (year 2026: "Periods 0"); Journals, the documents and Payments (Save)',
+    cause:
+      'The open year 2026 (2026-01-01 to 2026-12-31, monthly) lists 0 periods. A manual journal dated today answers "No financial period covers ' +
+      'this date." and a payment "no period for the voucher date" (seen 2026-10-28). The site checks the period first, so the other refusals of ' +
+      'the dialog (balance, lines, narration, dates) are not reached either. The periods are made by "Periods" on the year, a set-up of the ' +
+      'books for every user, left to the finance administrator.',
+    fix: '1. Generate the periods of the financial year 2026 (Financial years, "Periods").\n2. Run TC-APP019-044 to 055 again.',
+    who: 'Finance administrator',
+    howFound: 'Seen on the site (TC-APP019-044, written 2026-10-28)',
+    testCases: [
+      { id: 'TC-APP019-044', steps: [3, 4, 5, 6, 7] },
+      { id: 'TC-APP019-045', steps: [1, 2, 3, 4] },
+      { id: 'TC-APP019-046', steps: [1, 5] },
+      { id: 'TC-APP019-048', steps: [1, 2, 3, 4, 5] },
+      { id: 'TC-APP019-049', steps: [1, 2, 3] },
+      { id: 'TC-APP019-050', steps: [3, 4, 5, 6] },
+      { id: 'TC-APP019-051', steps: [1, 2, 3, 4, 5] },
+      { id: 'TC-APP019-052', steps: [2, 3, 4] },
+      { id: 'TC-APP019-054', steps: [3, 4] },
+      { id: 'TC-APP019-055', steps: [2] },
+    ],
+  },
+  {
+    no: 46,
+    blocker: 'No user can approve a finance document: "Approve" answers "missing required privilege" (the tenant has no FINANCE_APPROVE)',
+    category: 'Data + Function',
+    scope: '19 Finance\nLegal agreements, Loans, Security receipts, Bank guarantees, Letters of credit, Payment requests, Rough sheets ("Approve" on a row)',
+    cause:
+      '"Send" moves a document of the test to "Pending"; "Approve" then answers "missing required privilege" for U1 rs.admin2 and for U5 ' +
+      'qa.approver (roles finance, budget, cssd, procurement), seen 2026-10-28. 00-prerequisites.xlsx records that the right FINANCE_APPROVE ' +
+      'does not exist on the tenant, so no role can be given it. Nothing that follows an approval (posting, disposal, encashment, renewal, ' +
+      'payment of a request) can be tried; "Source document" of a payment request from an agreement offers no approved agreement.',
+    fix: '1. Add the finance approval right to the tenant and to the approver role (U5 qa.approver).\n2. Run TC-APP019-068 to 078 again.',
+    who: 'Development, then Site administrator',
+    howFound: 'Seen on the site (TC-APP019-070, written 2026-10-28)',
+    testCases: [
+      { id: 'TC-APP019-068', steps: [2, 3] },
+      { id: 'TC-APP019-069', steps: [3] },
+      { id: 'TC-APP019-070', steps: [2, 3, 4] },
+      { id: 'TC-APP019-071', steps: [2] },
+      { id: 'TC-APP019-072', steps: [2, 3, 4] },
+      { id: 'TC-APP019-073', steps: [1] },
+      { id: 'TC-APP019-074', steps: [2, 3, 4] },
+      { id: 'TC-APP019-075', steps: [1] },
+      { id: 'TC-APP019-076', steps: [2, 3, 5] },
+      { id: 'TC-APP019-078', steps: [2, 3, 4] },
+    ],
+  },
+  {
+    no: 47,
+    blocker: 'A dispense with a line discount above the maximum answers HTTP 500: no discount waits for the cashier',
+    category: 'Function',
+    scope: '05 Pharmacy\nDispense, /pharmacy/dispense, "Confirm dispense" with a line discount above "Maximum line discount (%)"; 14 Hospital Accounts, Fast Cashier, "Dispense discounts"',
+    cause:
+      'With "Maximum line discount (%)" 10 (05 catalogue), a counter sale of QA-PARA x 2 with a line discount of 20 answers HTTP 500 ' +
+      '(digest 2492312887), toast "Minified React error #441" (seen 2026-10-28). The panel "Dispense discounts" of Fast Cashier stays empty, ' +
+      'so no discount can be approved or rejected.',
+    fix: '1. Fix the dispense of a line above the maximum discount (it should wait for approval).\n2. Run TC-APP014-070 and TC-APP014-071 again.',
+    who: 'Development',
+    howFound: 'Seen on the site (TC-APP014-070, written 2026-10-28)',
+    testCases: [
+      { id: 'TC-APP014-070', steps: [1, 2, 3] },
+      { id: 'TC-APP014-071', steps: [2, 3] },
+    ],
+  },
+  {
+    no: 48,
+    blocker: 'A saved unsterile receipt does not open: its page never loads and nginx answers "504 Gateway Time-out"',
+    category: 'Function',
+    scope: '21 CSSD\nUnsterile Receipt, /cssd/receipts/<id> ("Open" on a row of the list)',
+    cause:
+      'A receipt of the test is saved (toast "Receipt saved.") and listed ("Pending", "With the writer"), but "Open" on its row never ' +
+      'shows the document: GET /id/cssd/receipts/<id> answers 504 after a minute, and while it hangs other pages of the site ' +
+      '(/api/notifications, /id/cssd) answer 504 too. Seen in every run of 2026-10-28 and 2026-10-29, and in a read-only check on an idle ' +
+      'site on 2026-10-29 (UR-0014 did not open within 120 s, while the list opened in 0.7 s). A saved receipt cannot be sent, approved or ' +
+      'cancelled, so no set reaches the CSSD store unsterile and no cycle can load it.',
+    fix: '1. Fix the page of a saved unsterile receipt (it should open with "Send for Approval").\n2. Run TC-APP021-012, 014, 017, 019 and 029 again.',
+    who: 'Development',
+    howFound: 'Seen on the site (TC-APP021-012, 2026-10-29)',
+    testCases: [
+      { id: 'TC-APP021-012', steps: [4, 5, 6] },
+      { id: 'TC-APP021-014', steps: [1] },
+      { id: 'TC-APP021-017', steps: [3, 4, 5, 6, 7] },
+      { id: 'TC-APP021-019', steps: [1] },
+      { id: 'TC-APP021-029', steps: [3] },
+    ],
+  },
+  {
+    no: 49,
+    blocker: '"Calculate" on Diet orders answers HTTP 500: no prescription is assessed',
+    category: 'Function',
+    scope: '13 Dietary\nDiet orders, /diet/orders, button "Calculate"',
+    cause:
+      '"Calculate" posts the assessment of the first prescription of the list (female, 60 kg, 160 cm, as the workbook says) and gets HTTP 500 ' +
+      '(digest 3479685728), toast "Minified React error #441"; seen on every run since 2026-10-21 (E2E-045 and TC-APP013-040, on /en and on /id). ' +
+      'The first line stays "pending", so no BMI is shown and the order of step 4 is not tied to an assessed prescription.',
+    fix: '1. Fix the assessment of "Calculate" on Diet orders.\n2. Run TC-APP013-040 and E2E-045 again.',
+    who: 'Development',
+    howFound: 'Seen on the site (E2E-045, 2026-10-21; TC-APP013-040, 2026-10-29)',
+    testCases: [{ id: 'TC-APP013-040', steps: [3] }],
+  },
+  {
+    no: 50,
+    blocker: 'A sourcing agreement cannot be saved: "Save" answers HTTP 500 for a tender with an accepted bidder',
+    category: 'Function',
+    scope: '23 Sourcing\nAgreements, /sourcing/agreements, dialog "Agreements", action "Agreement" (Document = id of the tender)',
+    cause:
+      'For a published tender (closed the day before) whose bid of the test is submitted, opened, evaluated (grade A), rated "accepted" on the ' +
+      'sheet and accepted, the agreement with number, vendor, item, price 1450000 and the tender id answers HTTP 500 (digest 3681885900), toast ' +
+      '"Minified React error #441"; the same with a budget head of the test and an amount on the second step (seen 2026-10-29, TC-APP023-012, ' +
+      '013, 014, 020 and E2E-009). With no agreement there is no approval, sanction (budget reservation) or amendment.',
+    fix: '1. Fix the save of an agreement from a tender (or name what it still needs).\n2. Run TC-APP023-012, 013, 014, 020 and E2E-009 again.',
+    who: 'Development',
+    howFound: 'Seen on the site (TC-APP023-012, written 2026-10-29)',
+    testCases: [
+      { id: 'TC-APP023-012', steps: [3, 4, 5, 6, 7] },
+      { id: 'TC-APP023-013', steps: [3, 4, 5, 6, 7] },
+      { id: 'TC-APP023-014', steps: [2] },
+      { id: 'TC-APP023-020', steps: [5] },
+    ],
+  },
+  {
+    no: 51,
+    blocker: 'Item Master: a new item shows "Item added." but is not listed for a long time',
+    category: 'Function',
+    scope: '07 Inventory\nItem Master, /inventory/items, dialog "Add Item" (Minimum stock 20, Maximum stock 500), the list paged to the end',
+    cause:
+      'Saving item IT-1 of the catalogue (code QA-INV-PARA-…, minimum 20, maximum 500) posts and gets HTTP 200 and the toast "Item added.", ' +
+      'but the code is on none of the pages of the list right after, nor an hour later (seen 2026-10-29 06:20–08:00 in TC-APP007-001, ' +
+      'E2E-008 and E2E-035, 324 items paged to the end). At 12:40 the same items are listed (page 5), and an item saved at 12:30 was listed ' +
+      'at once. The item is stored; the list leaves new items out for a while, so the step that reads, edits or stocks it cannot go on.',
+    fix: '1. Find why the list leaves out new items for a while (a cache of the item list?) and fix it.\n2. Run TC-APP007-001, E2E-008 and E2E-035 again.',
+    who: 'Development',
+    howFound: 'Seen on the site (E2E-008, 2026-10-29)',
+    testCases: [{ id: 'TC-APP007-001', steps: [4] }],
+  },
+  {
+    no: 52,
+    blocker: '"Confirm dispense" answers HTTP 500 instead of the sale, with Freeze days set or for a patient whose namesake is admitted',
+    category: 'Function',
+    scope: '05 Pharmacy\nDispense, /pharmacy/dispense, step "Confirm" (counter sale)',
+    cause:
+      'Two cases, each on every run since 2026-10-15 (2026-10-21 on /en, 2026-10-29 on /id): (1) with "Freeze days" 30 for Podomoro, a sale ' +
+      'of QA-FRZ × 5 from a batch that expires in 400 days answers HTTP 500 (digest 1783668951), toast "Minified React error #441", and so ' +
+      'does the sale after Freeze days is set to 29; (2) a sale to PT-2 while PT-3 of the same name is admitted answers HTTP 500 too. ' +
+      'The workbook expects the sale to be confirmed; a refusal would be a message, not a server error.',
+    fix: '1. Fix "Confirm" of a counter sale with Freeze days set, and for a patient whose namesake is admitted.\n2. Run TC-APP005-028 and TC-APP005-033 again.',
+    who: 'Development',
+    howFound: 'Seen on the site (TC-APP005-033 and 028, since 2026-10-15)',
+    testCases: [
+      { id: 'TC-APP005-028', steps: [3] },
+      { id: 'TC-APP005-033', steps: [2, 3, 6] },
+    ],
+  },
+  {
+    no: 53,
+    blocker: '"Revert latest stamp" on the laboratory Work desk answers HTTP 500',
+    category: 'Function',
+    scope: '11 Laboratory\nWork, /laboratory/work, action "Revert latest stamp" on an order',
+    cause:
+      'For an order of the test whose last step ("Review") was made a moment before, "Revert latest stamp" posts the order id to ' +
+      '/id/laboratory/work and gets HTTP 500 (digest 3196244996), toast "Minified React error #441"; the same on 2026-10-21 (/en) and ' +
+      '2026-10-29 (/id). The latest step of an order cannot be undone.',
+    fix: '1. Fix "Revert latest stamp" on the laboratory Work desk.\n2. Run TC-APP011-041 again.',
+    who: 'Development',
+    howFound: 'Seen on the site (TC-APP011-041, 2026-10-21 and 2026-10-29)',
+    testCases: [{ id: 'TC-APP011-041', steps: [1] }],
+  },
+  {
+    no: 54,
+    blocker: 'The Triage dialog of Emergency Patients offers no triage category',
+    category: 'Function',
+    scope: '15 Emergency\nEmergency Patients, /emergency/patients, "Triage" on a row, list "Triage category"',
+    cause:
+      'For a received patient of the test, the dialog "Triage" opens with the lists "Patient condition" and "Patient status" filled, but ' +
+      '"Triage category" holds only its placeholder, also after 15 s (seen 2026-10-29 on /id; the same test saved a triage on 2026-10-21). ' +
+      'The categories exist (Triage categories screen, TC-APP015 categories tests pass), so no triage can be saved and nothing that ' +
+      'follows it (overdue mark, second triage, flag) can be checked.',
+    fix: '1. Make the Triage dialog load the categories of the branch.\n2. Run TC-APP015-037 again.',
+    who: 'Development',
+    howFound: 'Seen on the site (TC-APP015-037, 2026-10-29)',
+    testCases: [{ id: 'TC-APP015-037', steps: [2, 3, 4, 5, 6] }],
+  },
+  {
+    no: 55,
+    blocker: '"Save branding" with an uploaded logo answers HTTP 500 ("Failed to save branding.")',
+    category: 'Function',
+    scope: '18 Settings\nTenant Branding, /identity/branding, "Upload logo" then "Save branding"',
+    cause:
+      'With the product name of the test, a PNG logo of 320 × 80 px uploaded ("This file is 320 × 80 px.") and the locale en, "Save branding" ' +
+      'posts the logo as a data URL and gets HTTP 500, toast "Failed to save branding." (seen 2026-10-29; the screen now also has a radio ' +
+      'group "Tampilan" Text/Logo). The new branding cannot be saved, so the header and sign-in page cannot show it.',
+    fix: '1. Fix the save of the branding with an uploaded logo.\n2. Run TC-APP018-043 again.',
+    who: 'Development',
+    howFound: 'Seen on the site (TC-APP018-043, 2026-10-29)',
+    testCases: [{ id: 'TC-APP018-043', steps: [2, 3, 4] }],
   },
 ];
 

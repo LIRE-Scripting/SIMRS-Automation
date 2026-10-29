@@ -5,6 +5,7 @@ import { HR } from '../../../lib/hr-data';
 import { EmployeesPage } from '../../../pages/hr/HrPages';
 import { createEmployee, employee, employeeData, toastsAfter } from './helpers';
 import { TC_APP010_001, TC_APP010_002, TC_APP010_005 } from './cases';
+import { sourceOnSite } from '../../../lib/i18n';
 
 /** 10-hr.xlsx, feature "Employees (/hr/employees)". Employees are made per test. */
 
@@ -81,7 +82,8 @@ qaTest('TC-APP010-006', async ({ page, qa }) => {
 
   await qa.step(5, async () => {
     const lines = fs.readFileSync(file, 'utf8').trim().split(/\r?\n/);
-    expect(lines[0]).toBe('Employee no.,Name');
+    // The file is written in the language of the site ("No. karyawan,Nama" on /id).
+    expect(lines[0]).toMatch(new RegExp(`^${sourceOnSite('Employee no.')},${sourceOnSite('Name')}$`));
     const total = Number((await p.pager().innerText()).match(/of (\d+)$/)![1]);
     qa.note(5, `${lines.length - 1} line(s) in the file; the search shows ${total}`);
     expect(lines.length - 1).toBe(total);

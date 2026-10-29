@@ -3,7 +3,7 @@ import { expect, qaTest, test } from '../../../fixtures/e2e';
 import { installToastRecorder } from '../../../lib/assertions';
 import { everyPage } from '../../../pages/paging';
 import { appsCardRefused, asUser, BR_B, headerOneBranch, routesRefused, toastsOf, userPage } from '../shared/access';
-import { backToEnglish } from '../shared/language';
+import { backToIndonesian } from '../shared/language';
 import { CAPITAL } from './cases';
 import { Accounts, account, BR_A, createAccount, FY_NEXT, ensureFyNext, plain, PostingRules, retireAccount, Vouchers, Years } from './helpers';
 
@@ -22,7 +22,7 @@ test.beforeEach(async ({ page }) => {
 });
 
 test.afterEach(async ({ page }) => {
-  await backToEnglish(page);
+  await backToIndonesian(page);
 });
 
 /** The voucher numbers of a user's list, all pages. */
@@ -180,7 +180,7 @@ qaTest('TC-APP019-030', async ({ page, qa, browser }) => {
 
   await qa.step(2, async () => {
     const read = async (p: Page) => {
-      await p.goto('/en/finance/erp-invoice-staging');
+      await p.goto('/id/finance/erp-invoice-staging');
       await p.waitForLoadState('networkidle').catch(() => {});
       return everyPage(p.getByRole('main'), async () => (await p.getByRole('main').getByRole('rowgroup').nth(1).getByRole('row').allInnerTexts()).map((r) => plain(r).split(' ')[0]));
     };

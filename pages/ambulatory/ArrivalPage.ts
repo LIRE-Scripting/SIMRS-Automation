@@ -3,8 +3,8 @@ import { toastLocator } from '../../lib/assertions';
 import { escapeRe } from './RegisteredPatientsPage';
 
 /**
- * Ambulatory Care > Arrival (/en/registration/department-queue) and the
- * queue board (/en/queue). Read from the live screens on 2026-10-14.
+ * Ambulatory Care > Arrival (/id/registration/department-queue) and the
+ * queue board (/id/queue). Read from the live screens on 2026-10-14.
  */
 export class ArrivalPage {
   readonly page: Page;
@@ -24,7 +24,7 @@ export class ArrivalPage {
   }
 
   async open(): Promise<void> {
-    await this.page.goto('/en/registration/department-queue');
+    await this.page.goto('/id/registration/department-queue');
     await expect(this.heading).toBeVisible();
   }
 
@@ -137,7 +137,7 @@ export class ArrivalPage {
   }
 }
 
-/** The public queue board, /en/queue. */
+/** The public queue board, /id/queue. */
 export class QueueBoardPage {
   readonly page: Page;
   readonly table: Locator;
@@ -150,7 +150,7 @@ export class QueueBoardPage {
   }
 
   async open(): Promise<void> {
-    await this.page.goto('/en/queue');
+    await this.page.goto('/id/queue');
     await expect(this.table).toBeVisible();
   }
 

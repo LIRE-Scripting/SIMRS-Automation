@@ -9,6 +9,7 @@ import { advance, cellsOf, labType, toastsAfter } from '../../modules/11-laborat
 import { RadOrdersPage, StudiesPage } from '../../modules/12-ris/helpers';
 import { catalogue, click, RequestsPage, TPN_A, TPN_A_RESULTS, TpnPage } from '../../modules/13-dietary/helpers';
 import { admitSteps, newBed } from './steps/inpatient-steps';
+import { escapeText, sourceOnSite } from '../../../lib/i18n';
 
 /**
  * E2E-027: an admitted patient gets a lab test (ordered, sampled, resulted,
@@ -35,7 +36,7 @@ chainTest('E2E-027', async ({ page, chain }) => {
     const t = labType(qa);
     const d = page.getByRole('dialog', { name: 'Create lab order' });
     await qa.step(1, async () => {
-      await page.goto('/en/apps');
+      await page.goto('/id/apps');
       await page.getByRole('link', { name: /^Laboratory\b/ }).first().click();
       await page.getByRole('main').getByRole('link', { name: 'Open worklist' }).click();
       await expect(w.heading).toBeVisible();
@@ -87,7 +88,8 @@ chainTest('E2E-027', async ({ page, chain }) => {
       const row = await w.row(type);
       const sample = (await w.cells(row))[0];
       await w.press(row, 'Capture result', w.capture);
-      await expect(w.capture.getByText(`${type} · Accepted · ${sample}`, { exact: true })).toBeVisible();
+      // One text of three parts; the site writes the status in Indonesian.
+      await expect(w.capture.getByText(new RegExp(`^${escapeText(type)} · ${sourceOnSite('Accepted')} · ${escapeText(sample)}$`))).toBeVisible();
     });
     await qa.step(2, async () => {
       await w.field('Lab result').fill(LAB.result);
@@ -163,7 +165,7 @@ chainTest('E2E-027', async ({ page, chain }) => {
     const r = new RequestsPage(page);
     const no = `${DIET.request.docNo}-${qa.token()}`;
     await qa.step(1, async () => {
-      await page.goto('/en/apps');
+      await page.goto('/id/apps');
       await page.getByRole('link', { name: /^Dietary\b/ }).first().click();
       await page.getByRole('main').getByRole('link', { name: 'Open requests' }).click();
       await expect(r.heading).toBeVisible();
@@ -186,7 +188,7 @@ chainTest('E2E-027', async ({ page, chain }) => {
   const t = new TpnPage(page);
   await chain.step(8, async (qa) => {
     await qa.step(1, async () => {
-      await page.goto('/en/diet');
+      await page.goto('/id/diet');
       await page.getByRole('main').getByRole('link', { name: 'TPN', exact: true }).click();
       await expect(t.heading).toBeVisible();
     });
@@ -228,7 +230,7 @@ chainTest('E2E-027', async ({ page, chain }) => {
   await chain.step(10, async (qa) => {
     const main = page.getByRole('main');
     await qa.step(1, async () => {
-      await page.goto('/en/pharmacy');
+      await page.goto('/id/pharmacy');
       await page.getByRole('navigation', { name: 'Pharmacy' }).getByRole('link', { name: 'Price & TPN' }).click();
       await expect(main.getByRole('heading', { level: 1, name: 'Price and TPN' })).toBeVisible();
     });
@@ -260,8 +262,14 @@ chainTest('E2E-027', async ({ page, chain }) => {
     const start = `${addDays(todayWib(), 1)}T02:00:00Z`;
     await qa.step(1, async () => {
       await s.open();
+      await expect(s.order.locator('option').first()).toBeAttached();
       qa.note(1, `"Schedule and report" lists ${await s.order.locator('option').count()} orders`);
     });
+    // The list holds only its first 20 orders: a new order past them cannot be chosen (found blocker 40).
+    if ((await s.order.locator('option').count()) >= 20 && !(await s.order.locator('option', { hasText: study }).count())) {
+      qa.note(2, `the order "${study}" of step 11 is not among the orders "Schedule and report" offers`);
+      return qa.blocked(2, 40);
+    }
     await qa.step(2, async () => {
       await expect(s.order.locator('option', { hasText: study }), `the order "${study}" of step 11 can be chosen in "Schedule and report"`).toBeAttached();
       expect(await s.act(study, 'Schedule', { Room: qa.code('X-RO1'), Start: start })).toContain('Saved');

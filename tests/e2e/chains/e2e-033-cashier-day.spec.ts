@@ -23,7 +23,7 @@ chainTest('E2E-033', async ({ page, chain }) => {
     let invoice = '';
     let cashBefore = 0;
     await qa.step(1, async () => {
-      await page.goto('/en/apps');
+      await page.goto('/id/apps');
       await page.getByRole('link', { name: /^Hospital Accounts\b/ }).first().click();
       await page.getByRole('main').getByRole('link', { name: 'Fast Cashier' }).first().click();
       await expect(c.heading).toBeVisible();

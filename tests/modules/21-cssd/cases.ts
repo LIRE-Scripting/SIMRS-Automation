@@ -16,7 +16,7 @@ export const TC_APP021_001 = async ({ page, qa }: CaseArgs): Promise<void> => {
   const cycle = qa.code('X-UAP121');
   const packing = qa.code('X-POUCH');
   await qa.step(1, async () => {
-    await page.goto('/en/cssd');
+    await page.goto('/id/cssd');
     await page.getByRole('complementary').last().getByRole('link', { name: 'Autoclave' }).click();
     await expect(a.main.getByRole('heading', { level: 1, name: 'Autoclave' })).toBeVisible();
     await expect(a.main.getByText('The sterilizer. Its number is stored in upper case and must be unique.', { exact: true })).toBeVisible();
@@ -72,7 +72,7 @@ export async function made(page: Page, kind: Kind, v: { code: string; name: stri
 
 /** The options of the lists on a new document, flattened. */
 export async function offeredOn(page: Page, route: string): Promise<string[]> {
-  await page.goto(`/en/cssd/${route}`);
+  await page.goto(`/id/cssd/${route}`);
   await page.waitForLoadState('networkidle').catch(() => {});
   return page.getByRole('main').locator('option').allInnerTexts();
 }
@@ -105,7 +105,7 @@ export class Master {
     this.m = MASTERS[kind];
   }
   async open(): Promise<void> {
-    await this.page.goto(`/en/cssd/${this.m.route}`);
+    await this.page.goto(`/id/cssd/${this.m.route}`);
     await expect(this.main.getByRole('heading', { level: 1, name: this.m.heading })).toBeVisible();
     await this.page.waitForLoadState('networkidle').catch(() => {});
   }

@@ -1,9 +1,10 @@
 import type { Page } from '@playwright/test';
-import { expect, qaTest, test, type Qa } from '../../../fixtures/e2e';
-import { installToastRecorder, toastMark, toastsSince } from '../../../lib/assertions';
+import { expect, qaTest, test } from '../../../fixtures/e2e';
+import { installToastRecorder, toastMark } from '../../../lib/assertions';
 import { addDays, todayWib } from '../../../lib/dates';
 import { PROCUREMENT } from '../../../lib/procurement-data';
-import { PurchaseOrdersPage, type PurchaseOrder } from '../../../pages/procurement/ProcurementPages';
+import { PurchaseOrdersPage } from '../../../pages/procurement/ProcurementPages';
+import { createOrder as create, docNo, idr, openOrder, poToastsAfter as toastsAfter, TC_APP009_004 } from './cases';
 
 /**
  * 09-procurement.xlsx, feature "Purchase orders (/procurement/purchase-orders)".
@@ -18,47 +19,12 @@ test.beforeEach(async ({ page }) => {
 
 const SERVER_ERROR = /React error #441/;
 
-async function toastsAfter(page: Page, mark: number, timeout = 8_000): Promise<string[]> {
-  try {
-    await expect.poll(async () => (await toastsSince(page, mark)).length, { timeout }).toBeGreaterThan(0);
-  } catch {
-    // no toast
-  }
-  return toastsSince(page, mark);
-}
-
-/** "5000000" -> "IDR 5.000.000,00"; "1500000.50" -> "IDR 1.500.000,50" (Indonesian separators, as on the site). */
-export function idr(amount: string, currency = 'IDR'): string {
-  const [whole, frac = ''] = amount.split('.');
-  return `${currency} ${whole.replace(/\B(?=(\d{3})+(?!\d))/g, '.')},${(frac + '00').slice(0, 2)}`;
-}
-
-const docNo = (qa: Qa) => `QA-PO-001-${qa.token()}`;
-
-/** Creates an order through "New PO" and returns the toasts (the opened order stays on screen). */
-async function create(page: Page, po: PurchaseOrder): Promise<string[]> {
-  const p = new PurchaseOrdersPage(page);
-  await p.open();
-  await p.openNew();
-  await p.fill(po);
-  const mark = await toastMark(page);
-  await p.save().click();
-  return toastsAfter(page, mark);
-}
-
 async function cellsOf(page: Page, doc: string): Promise<string[]> {
   const p = new PurchaseOrdersPage(page);
   await p.open();
   return p.cells(await p.find(doc));
 }
 
-async function openOrder(page: Page, doc: string): Promise<PurchaseOrdersPage> {
-  const p = new PurchaseOrdersPage(page);
-  await p.open();
-  await (await p.find(doc)).getByRole('button', { name: 'Open' }).click();
-  await expect(p.view).toBeVisible();
-  return p;
-}
 
 qaTest('TC-APP009-001', async ({ page, qa }) => {
   const p = new PurchaseOrdersPage(page);
@@ -66,7 +32,7 @@ qaTest('TC-APP009-001', async ({ page, qa }) => {
   const po = { docNumber: doc, docDate: todayWib(), vendor: PROCUREMENT.vendor, dept: PROCUREMENT.dept, advance: PROCUREMENT.advance };
 
   await qa.step(1, async () => {
-    await page.goto('/en/apps');
+    await page.goto('/id/apps');
     await page.getByRole('link', { name: /^Procurement\b/ }).first().click();
     await page.getByRole('link', { name: /^Purchase orders Open purchase orders$/ }).click();
     await expect(p.heading).toBeVisible();
@@ -96,7 +62,7 @@ qaTest('TC-APP009-001', async ({ page, qa }) => {
     await expect(p.view.getByRole('heading', { level: 2, name: doc })).toBeVisible();
     await expect(p.view.getByText(`${PROCUREMENT.vendor} · ${idr(PROCUREMENT.advance)}`, { exact: true })).toBeVisible();
     await expect(p.view.getByText(`Balance: ${idr(PROCUREMENT.advance)}`, { exact: true })).toBeVisible();
-    const chain = (await p.view.getByText(/\(\d+ steps\)$/).innerText()).trim();
+    const chain = (await p.view.getByText(/\(\d+ (?:steps|langkah)\)$/).innerText()).trim();
     const steps = await p.steps();
     expect(steps[0]).toContain('Current');
     await expect(p.advance()).toBeVisible();
@@ -152,31 +118,7 @@ qaTest('TC-APP009-003', async ({ page, qa }) => {
   }
 });
 
-qaTest('TC-APP009-004', async ({ page, qa }) => {
-  const doc = docNo(qa);
-  expect(await create(page, { docNumber: doc, vendor: PROCUREMENT.vendor, advance: PROCUREMENT.advance })).toContain('Purchase order created');
-  qa.note(1, 'PO-S1 is an order of this test');
-  let p: PurchaseOrdersPage;
-
-  await qa.step(1, async () => {
-    p = await openOrder(page, doc);
-    const steps = await p.steps();
-    expect(steps[0]).toContain('Current');
-    if (!steps[0].includes('Pengajuan Departemen')) qa.deviation(1, 'Step 1 "Pengajuan Departemen" marked "Current"', `step 1 "${steps[0].join(' ')}" (found blocker 30)`);
-  });
-
-  await qa.step(2, async () => {
-    const mark = await toastMark(page);
-    await p.advance().click();
-    expect(await toastsAfter(page, mark)).toContain('Approval advanced');
-  });
-
-  await qa.step(3, async () => {
-    qa.note(3, `steps after the advance: ${(await p.steps()).map((s) => s.join(' ')).join(' / ')}`);
-  });
-  qa.blocked(3, 30);
-  qa.blocked(4, 30);
-});
+qaTest('TC-APP009-004', TC_APP009_004);
 
 qaTest('TC-APP009-007', async ({ page, qa }) => {
   const p = new PurchaseOrdersPage(page);
@@ -206,13 +148,26 @@ qaTest('TC-APP009-007', async ({ page, qa }) => {
   });
 
   await qa.step(3, async () => {
-    const first = await p.rows().first().innerText();
-    await page.getByRole('button', { name: /^\d+$/ }).last().press('Enter');
-    await expect(p.rows().first()).not.toHaveText(first);
-    const dates = await p.rows().evaluateAll((rs) => rs.map((r) => (r.querySelectorAll('td')[1]?.textContent ?? '').trim()));
-    const all = await p.rows().evaluateAll((rs) => rs.map((r) => (r.querySelectorAll('td')[1]?.textContent ?? '').trim()));
-    qa.note(3, `last page dates: ${dates.join(', ')}; first page dates: ${all.join(', ')}`);
-    expect(dates[dates.length - 1]).toBe('—');
+    // The pager shows five page numbers only: "Next page" is pressed until the last page.
+    const next = page.getByRole('button', { name: 'Next page' });
+    for (let i = 0; i < 50 && (await next.isVisible()) && (await next.isEnabled()); i++) {
+      const first = await p.rows().first().innerText();
+      await next.press('Enter');
+      await expect(p.rows().first()).not.toHaveText(first);
+    }
+    // The page renders twice after paging: the dates are read once two reads agree.
+    const read = () => p.rows().evaluateAll((rs) => rs.map((r) => (r.querySelectorAll('td')[1]?.textContent ?? '').trim()).join(', '));
+    let dates = '';
+    await expect.poll(async () => {
+      const a = await read();
+      await page.waitForTimeout(800);
+      const b = await read();
+      dates = b;
+      return a === b;
+    }, { timeout: 20_000 }).toBe(true);
+    qa.note(3, `last page (${(await p.pager().innerText().catch(() => '')).trim()}) dates: ${dates}`);
+    const last = dates.split(', ').at(-1);
+    if (last !== '—') qa.deviation(3, 'Orders without a date at the very end, with "—" under Date', `the last page ends with the date ${last}`);
   });
 });
 
@@ -283,15 +238,14 @@ qaTest('TC-APP009-015', async ({ page, qa }) => {
     const v = await openOrder(page, done);
     const steps = await v.steps();
     qa.note(2, `steps of PO-DONE: ${steps.map((s) => s.join(' ')).join(' / ')}`);
-    expect(steps.every((s) => s.includes('Done'))).toBe(true);
+    if (!steps.every((s) => s.includes('Done'))) qa.deviation(2, 'All steps "Done"', `the approved order shows ${steps.map((s) => s.join(' ')).join(' / ')} (its one-step chain, found blocker 30)`);
     const text = (await v.view.innerText()).replace(/\s+/g, ' ');
-    if (!/admin|\d{2}:\d{2}/.test(text)) qa.deviation(2, 'All steps "Done", with the name of the approver and the time', `steps ${steps.map((s) => s.join(' ')).join(' / ')}; no approver or time`);
-    await expect(v.advance()).toBeDisabled();
+    if (!/admin|\d{2}[:.]\d{2}/.test(text)) qa.deviation(2, 'All steps "Done", with the name of the approver and the time', `steps ${steps.map((s) => s.join(' ')).join(' / ')}; no approver or time`);
   });
 
   await qa.step(3, async () => {
     const v = new PurchaseOrdersPage(page);
-    await expect(v.advance()).toBeDisabled();
+    if (await v.advance().isEnabled().catch(() => false)) qa.deviation(3, 'No approval button on an approved order', 'the order still offers its approval button');
   });
 });
 

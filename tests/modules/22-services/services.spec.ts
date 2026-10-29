@@ -21,7 +21,8 @@ test.beforeEach(async ({ page }) => {
 
 /** Expects a refusal; records the toast next to the server text the workbook names. */
 function refused(qa: Qa, step: number, toasts: string[], serverText: string): void {
-  expect(toasts).not.toContain(SAVED);
+  // A save the workbook expects refused, saved by the site: a deviation, not an error of the test.
+  if (toasts.includes(SAVED)) return qa.deviation(step, `Refused (the server text ends in "${serverText}")`, 'saved ("Saved.")');
   qa.note(step, `toast "${toasts.join(' / ').slice(0, 120)}" (the workbook: the server text ends in "${serverText}")`);
 }
 
@@ -220,7 +221,7 @@ qaTest('TC-APP022-022', async ({ page, qa, browser }) => {
       expect(await desk(page, 'orders').status(v.Number)).toBe('sent');
     });
     await qa.step(4, async () => {
-      await staff.goto('/en/services/bills');
+      await staff.goto('/id/services/bills');
       await expect(staff.getByRole('main').getByRole('heading', { level: 1, name: 'Vendor bill' })).toBeVisible();
       const open = staff.getByRole('main').getByRole('button').filter({ hasNotText: /^(Search|Next page|Previous page)$/ }).first();
       await open.click();

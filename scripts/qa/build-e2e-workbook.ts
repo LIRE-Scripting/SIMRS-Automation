@@ -1,10 +1,10 @@
 /**
  * Builds the E2E result workbooks: a copy of each reference workbook that has
  * results (reference/<NN-module>.xlsx -> reports/e2e/<NN-module>.xlsx), same
- * sheets, columns and lists, with the template's own result columns of sheet
- * Steps filled from a Playwright JSON report:
+ * sheets and columns, with the template's own result columns of sheet Steps
+ * filled from a Playwright JSON report, in Indonesian (scripts/qa/report-language.ts):
  *
- *   Execution Status  Passed / Failed / Blocked / Not Run (the sheet's list)
+ *   Execution Status  Lulus / Gagal / Terblokir / Belum dijalankan (the sheet's list, in Indonesian)
  *   Actual Result     what the run saw, per step
  *   Defect Reference  the blocker number for Blocked steps
  *
@@ -25,6 +25,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import ExcelJS from 'exceljs';
 import { modules } from '../../lib/qa-data';
+import { sentenceId, statusId } from './report-language';
 import { addNotesColumn, evidenceCell, probableCause } from './run-notes';
 
 const OUT = 'reports/e2e';
@@ -105,8 +106,8 @@ function outcomes(spec: PwSpec, stepNumbers: number[]): Map<number, StepOutcome>
     const blocker = reasons.find((r) => /^Blocker \d+/.test(r));
     for (const n of stepNumbers) {
       out.set(n, blocker
-        ? { status: 'Blocked', actual: `${runDate} E2E: not run. ${blocker}`, defect: blocker.match(/^Blocker \d+/)![0], note: `The test is skipped: ${reasons.join('; ')}` }
-        : { status: 'Not Run', actual: `${runDate} E2E: not run. ${reasons.join('; ') || 'skipped'}`, note: reasons.join('; ') || 'skipped' });
+        ? { status: 'Blocked', actual: `${runDate} E2E: tidak dijalankan. ${blocker}`, defect: blocker.match(/^Blocker \d+/)![0], note: `Test dilewati: ${reasons.join('; ')}` }
+        : { status: 'Not Run', actual: `${runDate} E2E: tidak dijalankan. ${reasons.join('; ') || 'dilewati'}`, note: reasons.join('; ') || 'dilewati' });
     }
     return out;
   }
@@ -131,28 +132,37 @@ function outcomes(spec: PwSpec, stepNumbers: number[]): Map<number, StepOutcome>
 
   for (const n of stepNumbers) {
     const note = testNotes.get(n)?.join('; ');
-    const extra = note ? ` Note: ${note}.` : '';
-    const ownNote = note ? `Note: ${note}` : undefined;
+    const extra = note ? ` Catatan: ${note}.` : '';
+    const ownNote = note ? `Catatan: ${note}` : undefined;
     if (blocked.has(n)) {
       const text = blocked.get(n)!.join('; ');
-      out.set(n, { status: 'Blocked', actual: `${runDate} E2E: ${text}.${extra}`, defect: text.match(/blocker (\d+)/)?.[0].replace('blocker', 'Blocker'), note: [`Stopped by ${text}`, ownNote].filter(Boolean).join('. ') });
+      out.set(n, { status: 'Blocked', actual: `${runDate} E2E: ${text}.${extra}`, defect: text.match(/blocker (\d+)/)?.[0].replace('blocker', 'Blocker'), note: [`Dihentikan oleh ${text}`, ownNote].filter(Boolean).join('. ') });
     } else if (failedAt === n) {
       const error = firstLine(ran.get(n)?.error?.message) || testError;
-      out.set(n, { status: 'Failed', actual: `${runDate} E2E failed: ${error}.${extra}`, note: [`Error: ${error}`, `Probable cause: ${probableCause(error)}`, ownNote].filter(Boolean).join('. ') });
+      out.set(n, { status: 'Failed', actual: `${runDate} E2E gagal: ${error}.${extra}`, note: [`Error: ${error}`, `Kemungkinan penyebab: ${sentenceId(probableCause(error))}`, ownNote].filter(Boolean).join('. ') });
     } else if (deviations.has(n) && (failedAt === undefined || n < failedAt)) {
       // A deviation was seen on the screen, even on a step partly "not run".
       const dev = deviations.get(n)!.join('; ');
-      out.set(n, { status: 'Failed', actual: `${runDate} E2E: Expected Result not met. ${dev}.${extra}`, note: [`Deviation from the workbook: ${dev}`, ownNote].filter(Boolean).join('. ') });
+      out.set(n, { status: 'Failed', actual: `${runDate} E2E: Expected Result tidak terpenuhi. ${dev}.${extra}`, note: [`Deviasi dari workbook: ${dev}`, ownNote].filter(Boolean).join('. ') });
     } else if (notRun.has(n)) {
-      out.set(n, { status: 'Not Run', actual: `${runDate} E2E: not run. ${notRun.get(n)!.join('; ')}.${extra}`, note: notRun.get(n)!.join('; ') });
+      out.set(n, { status: 'Not Run', actual: `${runDate} E2E: tidak dijalankan. ${notRun.get(n)!.join('; ')}.${extra}`, note: notRun.get(n)!.join('; ') });
     } else if (!ran.has(n) || (failedAt !== undefined && n > failedAt)) {
-      const why = result.status === 'passed' ? 'step not reached by the test' : `the test stopped earlier (${testError})`;
-      out.set(n, { status: 'Not Run', actual: `${runDate} E2E: not run; ${why}.${extra}`, note: [`Not reached: ${why}`, ownNote].filter(Boolean).join('. ') });
+      const why = result.status === 'passed' ? 'langkah tidak dicapai oleh test' : `test berhenti lebih awal (${testError})`;
+      out.set(n, { status: 'Not Run', actual: `${runDate} E2E: tidak dijalankan; ${why}.${extra}`, note: [`Tidak dicapai: ${why}`, ownNote].filter(Boolean).join('. ') });
     } else {
-      out.set(n, { status: 'Passed', actual: `${runDate} E2E: as expected.${extra}`, note: ownNote });
+      out.set(n, { status: 'Passed', actual: `${runDate} E2E: sesuai harapan.${extra}`, note: ownNote });
     }
   }
   return out;
+}
+
+const STATUS_LIST_EN = '"Not Run,Passed,Failed,Blocked"';
+const STATUS_LIST_ID = `"${['Not Run', 'Passed', 'Failed', 'Blocked'].map(statusId).join(',')}"`;
+
+/** The list of column Execution Status in Indonesian, like the statuses written. */
+function statusListInIndonesian(ws: ExcelJS.Worksheet): void {
+  const dv = (ws as unknown as { dataValidations: { model: Record<string, { formulae?: string[] }> } }).dataValidations;
+  for (const rule of Object.values(dv.model)) if (rule.formulae?.[0] === STATUS_LIST_EN) rule.formulae = [STATUS_LIST_ID];
 }
 
 /**
@@ -231,7 +241,7 @@ async function main(): Promise<void> {
       const spec = byTc.get(id);
       let o: StepOutcome;
       if (!spec) {
-        o = { status: 'Not Run', actual: `${runDate} E2E: no automated test of this test case in the run.` };
+        o = { status: 'Not Run', actual: `${runDate} E2E: belum ada test otomatis untuk kasus uji ini dalam run.` };
       } else {
         if (!cache.has(id)) {
           const tc = m.testCases.find((t) => t.id === id)!;
@@ -239,7 +249,7 @@ async function main(): Promise<void> {
         }
         o = cache.get(id)!.get(n)!;
       }
-      row.getCell(col('Execution Status')).value = o.status;
+      row.getCell(col('Execution Status')).value = statusId(o.status);
       row.getCell(col('Actual Result')).value = o.actual;
       if (o.defect) row.getCell(col('Defect Reference')).value = o.defect;
       row.getCell(notesCol).value = o.note ?? null;
@@ -252,10 +262,10 @@ async function main(): Promise<void> {
     if (summary) {
       const start = summary.rowCount + 2;
       const lines: [string, string][] = [
-        ['E2E run', `${runDate}, Playwright project "e2e-modules" (tests/modules/${m.slug}/), report ${files.join(', ')}`],
-        ['E2E steps', `Passed ${count.Passed}, Failed ${count.Failed}, Blocked ${count.Blocked}, Not Run ${count['Not Run']}`],
-        ['E2E test cases in the run', `${tcs.length} of ${m.testCases.length}`],
-        ['E2E rules', 'Failed = the Expected Result was not met (also when the test asserts the site\'s current behaviour). Blocked = docs/qa/blockers-found.md or 00-blockers-checklist-linked.xlsx.'],
+        ['Run E2E', `${runDate}, project Playwright "e2e-modules" (tests/modules/${m.slug}/), di situs berbahasa Indonesia (/id), laporan ${files.join(', ')}`],
+        ['Langkah E2E', `${statusId('Passed')} ${count.Passed}, ${statusId('Failed')} ${count.Failed}, ${statusId('Blocked')} ${count.Blocked}, ${statusId('Not Run')} ${count['Not Run']}`],
+        ['Kasus uji E2E dalam run', `${tcs.length} dari ${m.testCases.length}`],
+        ['Aturan E2E', `${statusId('Failed')} = Expected Result tidak terpenuhi (juga saat test memeriksa perilaku situs saat ini). ${statusId('Blocked')} = docs/qa/blockers-found.md atau 00-blockers-checklist-linked.xlsx.`],
       ];
       lines.forEach(([k, v], i) => {
         summary.getCell(start + i, 1).value = k;
@@ -264,6 +274,7 @@ async function main(): Promise<void> {
       });
     }
 
+    statusListInIndonesian(ws);
     for (const sheet of wb.worksheets) compactValidations(sheet);
     const file = path.join(OUT, m.source);
     await wb.xlsx.writeFile(file);

@@ -40,7 +40,7 @@ qaTest('TC-APP001-001', async ({ page, qa }) => {
   let before = 0;
 
   await qa.step(1, async () => {
-    await page.goto('/en/apps');
+    await page.goto('/id/apps');
     await page.getByRole('link', { name: /Ambulatory Care/ }).first().click();
     // On the hub "New Registration" is a link (TC-APP001-026 records this).
     await page.getByRole('main').getByRole('link', { name: 'New Registration' }).click();
@@ -71,7 +71,7 @@ qaTest('TC-APP001-001', async ({ page, qa }) => {
     const d = reg.registerDialog();
     await reg.fillRegister({ firstName: 'QA-AMB Pasien', lastName: last, dateOfBirth: dob }, d);
     const saving = page.waitForFunction(() =>
-      [...document.querySelectorAll('[role="dialog"] button')].some((b) => b.textContent?.trim() === 'Saving…'),
+      [...document.querySelectorAll('[role="dialog"] button')].some((b) => ['Saving…', 'Menyimpan…'].includes(b.textContent?.trim() ?? '')),
     );
     await reg.registerButton(d).click();
     await saving;
@@ -1027,7 +1027,7 @@ qaTest('TC-APP001-066', async ({ page, qa }) => {
     await reg.fillRegister({ firstName: 'QA-AMB Pasien', lastName: `${last} ${token}` });
     const r = await attemptRegister(reg);
     expect(r.toast).toBe('Patient registered');
-    await expect(page).toHaveURL(/\/en\/registration\/patients/);
+    await expect(page).toHaveURL(/\/id\/registration\/patients/);
     await expect(reg.heading).toBeVisible();
   };
 
@@ -1135,7 +1135,7 @@ qaTest('TC-APP001-022', async ({ page, qa }) => {
 
   await qa.step(1, async () => {
     // Precondition: a counter sale in Pharmacy, Dispense for a person who is not registered.
-    await page.goto('/en/pharmacy/dispense');
+    await page.goto('/id/pharmacy/dispense');
     await expect(main.getByRole('heading', { level: 1, name: 'Dispense' })).toBeVisible();
     await main.getByRole('searchbox', { name: 'Search medical record' }).fill(fullName);
     await main.getByRole('button', { name: 'Search medical record' }).click();

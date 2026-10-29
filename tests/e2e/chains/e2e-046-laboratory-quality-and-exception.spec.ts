@@ -19,7 +19,7 @@ chainTest('E2E-046', async ({ page, chain }) => {
     const c = catalogue(page);
     const code = qa.code('X-HB');
     await qa.step(1, async () => {
-      await page.goto('/en/laboratory');
+      await page.goto('/id/laboratory');
       await page.getByRole('complementary').getByRole('link', { name: 'Specimens' }).first().click();
       await expect(c.main.getByRole('heading', { level: 1, name: 'Specimens and tests' })).toBeVisible();
     });
@@ -65,7 +65,7 @@ chainTest('E2E-046', async ({ page, chain }) => {
     const t = labType(qa);
     const d = page.getByRole('dialog', { name: 'Create lab order' });
     await qa.step(1, async () => {
-      await page.goto('/en/apps');
+      await page.goto('/id/apps');
       await page.getByRole('link', { name: /^Laboratory\b/ }).first().click();
       await page.getByRole('main').getByRole('link', { name: 'Open worklist' }).click();
       await expect(w.heading).toBeVisible();
@@ -98,7 +98,7 @@ chainTest('E2E-046', async ({ page, chain }) => {
     const type = await resulted(page, qa);
     const label = await labelOf(page, type);
     await qa.step(1, async () => {
-      await page.goto('/en/laboratory');
+      await page.goto('/id/laboratory');
       await page.getByRole('complementary').getByRole('link', { name: 'Workflow' }).first().click();
       await expect(s.heading).toBeVisible();
     });

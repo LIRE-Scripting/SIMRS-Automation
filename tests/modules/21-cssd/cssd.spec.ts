@@ -45,7 +45,7 @@ qaTest('TC-APP021-003', async ({ page, qa }) => {
   const ind = qa.code('X-K6');
   const tst = qa.code('X-BIO');
   await qa.step(1, async () => {
-    await page.goto('/en/cssd');
+    await page.goto('/id/cssd');
     await page.getByRole('complementary').last().getByRole('link', { name: 'Indicator Type' }).click();
     await expect(i.main.getByRole('heading', { level: 1, name: 'Indicator Type' })).toBeVisible();
     await expect(i.main.getByText('The kind of quality check. Test names belong to an indicator type.', { exact: true })).toBeVisible();
@@ -72,7 +72,7 @@ qaTest('TC-APP021-003', async ({ page, qa }) => {
     }
   });
   await qa.step(6, async () => {
-    await page.goto('/en/cssd/cycles/new');
+    await page.goto('/id/cssd/cycles/new');
     await page.waitForLoadState('networkidle').catch(() => {});
     const add = page.getByRole('main').getByRole('button', { name: /check|quality/i });
     if (!(await add.count())) {
@@ -113,7 +113,7 @@ qaTest('TC-APP021-004', async ({ page, qa }) => {
 qaTest('TC-APP021-027', async ({ page, qa }) => {
   const main = page.getByRole('main');
   await qa.step(1, async () => {
-    await page.goto('/en/cssd');
+    await page.goto('/id/cssd');
     await page.getByRole('complementary').last().getByRole('link', { name: 'Pack Trace' }).click();
     await expect(main.getByRole('heading', { level: 1, name: 'Pack Trace' })).toBeVisible();
     await expect(main.getByText('A packing number shows the request, the cycle that sterilized it, and the store that holds it now.', { exact: true })).toBeVisible();
@@ -126,7 +126,7 @@ qaTest('TC-APP021-027', async ({ page, qa }) => {
 qaTest('TC-APP021-028', async ({ page, qa }) => {
   const main = page.getByRole('main');
   await qa.step(1, async () => {
-    await page.goto('/en/cssd/trace');
+    await page.goto('/id/cssd/trace');
     const mark = await toastMark(page);
     await main.getByRole('button', { name: 'Open' }).click();
     const toasts = await toastsAfter(page, mark, 3_000);
@@ -134,7 +134,7 @@ qaTest('TC-APP021-028', async ({ page, qa }) => {
     qa.note(1, invalid.length ? `the browser stops the click (${invalid.join('; ')})` : toasts.length ? `toast "${toasts.join(' / ')}"` : 'nothing is said');
   });
   await qa.step(2, async () => {
-    await page.goto('/en/cssd/trace');
+    await page.goto('/id/cssd/trace');
     await main.getByRole('textbox', { name: 'Packing number' }).fill(qa.code('X-PACK'));
     const mark = await toastMark(page);
     await main.getByRole('button', { name: 'Open' }).click();
@@ -157,7 +157,7 @@ qaTest('TC-APP021-031', async ({ page, qa }) => {
   const main = page.getByRole('main');
   await qa.step(1, async () => {
     for (const [route, heading] of LISTS) {
-      await page.goto(`/en/cssd/${route}`);
+      await page.goto(`/id/cssd/${route}`);
       await expect(main.getByRole('heading', { level: 1, name: heading })).toBeVisible();
       await expect(main.getByRole('searchbox')).toBeVisible();
       await expect(main.getByRole('link', { name: 'CSV' })).toBeVisible();
@@ -171,7 +171,7 @@ qaTest('TC-APP021-031', async ({ page, qa }) => {
   });
   await qa.step(2, async () => {
     for (const [route] of LISTS) {
-      await page.goto(`/en/cssd/${route}`);
+      await page.goto(`/id/cssd/${route}`);
       await page.waitForLoadState('networkidle').catch(() => {});
       const rows = main.getByRole('table').getByRole('rowgroup').nth(1).getByRole('row').filter({ has: page.getByRole('link', { name: 'Open' }) });
       if (!(await rows.count())) {
@@ -186,14 +186,14 @@ qaTest('TC-APP021-031', async ({ page, qa }) => {
   });
   await qa.step(3, async () => {
     for (const [route] of LISTS) {
-      await page.goto(`/en/cssd/${route}`);
+      await page.goto(`/id/cssd/${route}`);
       const f = await csv(page);
       qa.note(3, `${route}: ${f.lines} line(s)`);
       expect(f.lines).toBeGreaterThan(0);
     }
   });
   await qa.step(4, async () => {
-    await page.goto('/en/cssd/requests');
+    await page.goto('/id/cssd/requests');
     await main.getByRole('link', { name: 'Open' }).first().click();
     await page.waitForLoadState('networkidle').catch(() => {});
     const buttons = (await main.getByRole('button').allInnerTexts()).map((b) => b.trim()).filter(Boolean);
@@ -204,7 +204,7 @@ qaTest('TC-APP021-031', async ({ page, qa }) => {
   await qa.step(5, async () => {
     const pairs = new Set<string>();
     for (const [route] of LISTS.filter(([r]) => r !== 'cycles')) {
-      await page.goto(`/en/cssd/${route}`);
+      await page.goto(`/id/cssd/${route}`);
       await page.waitForLoadState('networkidle').catch(() => {});
       for (const t of await main.getByRole('table').getByRole('rowgroup').nth(1).getByRole('row').allInnerTexts()) {
         const c = t.split('\t').map((x) => x.trim());
@@ -219,14 +219,14 @@ qaTest('TC-APP021-032', async ({ page, qa }) => {
   const main = page.getByRole('main');
   await qa.step(1, async () => {
     for (const [route] of LISTS) {
-      await page.goto(`/en/cssd/${route}`);
+      await page.goto(`/id/cssd/${route}`);
       await main.getByRole('searchbox').fill(qa.code('X-TIDAK-ADA'));
       await expect(main.getByRole('table').getByRole('link', { name: 'Open' })).toHaveCount(0);
       qa.note(1, `${route}: "${(await main.getByRole('table').getByRole('rowgroup').nth(1).innerText()).trim()}"`);
     }
   });
   await qa.step(2, async () => {
-    await page.goto('/en/cssd/test-names');
+    await page.goto('/id/cssd/test-names');
     const total = Number((await main.getByText(/^Showing/).innerText()).match(/of (\d+)/)?.[1] ?? 0);
     const f = await csv(page);
     qa.note(2, `Test Name: ${total} rows in the list, the CSV has ${f.lines - 1} data line(s)`);
@@ -238,7 +238,7 @@ qaTest('TC-APP021-033', async ({ page, qa }) => {
   const main = page.getByRole('main');
   const all = ['Autoclave', 'Cycle Type', 'Packing Type', 'Indicator Type', 'Test Name', 'Result Type', 'Set', 'Sterile Request', 'Unsterile Receipt', 'Sterilization Cycle', 'Bowie Dick', 'Sterile Issue', 'Sterile Receipt', 'Pack Trace'];
   await qa.step(1, async () => {
-    await page.goto('/en/apps');
+    await page.goto('/id/apps');
     await page.getByRole('link', { name: /^CSSD\b/ }).first().click();
     await expect(main.getByRole('heading', { level: 1, name: 'CSSD' })).toBeVisible();
     await expect(main.getByText('Central sterile supply. Masters and the sterilization loop live here; linen stays with Linen.', { exact: true })).toBeVisible();
@@ -246,14 +246,14 @@ qaTest('TC-APP021-033', async ({ page, qa }) => {
   });
   await qa.step(2, async () => {
     for (const name of all) {
-      await page.goto('/en/cssd');
+      await page.goto('/id/cssd');
       await main.getByRole('link', { name, exact: true }).click();
       await expect(main.getByRole('heading', { level: 1, name })).toBeVisible();
     }
   });
   await qa.step(3, async () => {
     for (const name of all) {
-      await page.goto('/en/cssd');
+      await page.goto('/id/cssd');
       await page.getByRole('complementary').last().getByRole('link', { name, exact: true }).click();
       await expect(main.getByRole('heading', { level: 1, name })).toBeVisible();
     }

@@ -3,6 +3,7 @@ import type { Qa } from '../../../fixtures/e2e';
 import { toastMark } from '../../../lib/assertions';
 import { HR } from '../../../lib/hr-data';
 import { createEmployee, employeeData, toastsAfter } from '../10-hr/helpers';
+import { NotOffered } from '../../../lib/not-offered';
 
 /**
  * Shared steps of 17-payroll.xlsx. Employees (EMP-1, EMP-2, EMP-OFF, …) are
@@ -19,8 +20,8 @@ export const SAVED = 'Saved.';
 export const plain = (t: string) => t.replace(/[  ]/g, ' ').replace(/\s+/g, ' ').trim();
 
 /** Makes an employee in HR (number "<base>-<token>") and returns number and name. */
-export async function payrollEmployee(page: Page, qa: Qa, base: { no: string; name: string } = HR.emp1, extra: { status?: 'Inactive'; name?: string } = {}): Promise<{ no: string; name: string }> {
-  const e = { ...employeeData(qa, base), ...extra };
+export async function payrollEmployee(page: Page, qa: Qa, base: { no: string; name: string } = HR.emp1, extra: { status?: 'Inactive'; name?: string; department?: string } = {}): Promise<{ no: string; name: string }> {
+  const e = { ...employeeData(qa, base, extra.department), ...extra };
   expect(await createEmployee(page, e)).toContain('Employee saved');
   return { no: e.no, name: e.name };
 }
@@ -45,16 +46,26 @@ export class Batches {
       .last();
   }
   async open(): Promise<void> {
-    await this.page.goto('/en/payroll/batches');
+    await this.page.goto('/id/payroll/batches');
     await expect(this.page.getByRole('heading', { level: 1, name: 'Payroll batches' })).toBeVisible();
     await this.page.waitForLoadState('networkidle').catch(() => {});
   }
   hits(): Locator {
     return this.page.getByRole('listbox').getByRole('option');
   }
+  /** Types into "Employee" and clicks the hit; NotOffered when the list has none (it filters the first 50 employees, found blocker 40). */
   async pick(text: string, choose = text): Promise<void> {
     await this.employee.fill(text);
-    await this.hits().filter({ hasText: choose }).first().click();
+    const hit = this.hits().filter({ hasText: choose }).first();
+    if (!(await hit.waitFor({ timeout: 10_000 }).then(() => true, () => false))) throw new NotOffered(`the employee "${choose}" is not offered under "Employee" (found blocker 40)`);
+    await hit.click();
+  }
+  /** The hit of an employee, after typing; NotOffered when the list has none (found blocker 40). */
+  async offered(text: string): Promise<Locator> {
+    await this.employee.fill(text);
+    const hit = this.hits().filter({ hasText: text });
+    if (!(await hit.first().waitFor({ timeout: 10_000 }).then(() => true, () => false))) throw new NotOffered(`the employee "${text}" is not offered under "Employee" (found blocker 40)`);
+    return hit;
   }
   rows(): Locator {
     return this.page.getByRole('table').getByRole('rowgroup').nth(1).getByRole('row');
@@ -103,7 +114,7 @@ export class Desk {
     this.dialog = page.getByRole('dialog');
   }
   async open(route: string, heading: string): Promise<void> {
-    await this.page.goto(`/en/payroll/desk${route}`);
+    await this.page.goto(`/id/payroll/desk${route}`);
     await expect(this.main.getByRole('heading', { level: 1, name: heading })).toBeVisible();
     await this.page.waitForLoadState('networkidle').catch(() => {});
   }

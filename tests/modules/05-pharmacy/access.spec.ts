@@ -60,9 +60,11 @@ qaTest('TC-APP005-020', async ({ page, qa, browser }) => {
   await qa.step(2, async () => {
     await toConfirm(page, pt1, [{ item: para, requested: '1', issued: '1' }]);
     await expect(branch.first()).toBeVisible();
-    const toasts = await toastsOf(page, () => w.confirm.click());
+    // Without a branch "Confirm dispense" may simply be disabled: that is the refusal, read instead of clicked.
+    const disabled = await w.confirm.isDisabled();
+    const toasts = disabled ? [] : await toastsOf(page, () => w.confirm.click());
     expect(toasts).not.toContain(CONFIRMED);
-    const message = toasts.join(' / ') || (await branch.first().evaluate((e: HTMLSelectElement) => e.validationMessage));
+    const message = toasts.join(' / ') || (await branch.first().evaluate((e: HTMLSelectElement) => e.validationMessage)) || (disabled ? '"Confirm dispense" is disabled until a branch is chosen' : '');
     qa.note(2, `without a branch: "${message}"`);
     if (!message.includes('Choose a branch before confirming the dispense.')) {
       qa.deviation(2, 'Toast "Choose a branch before confirming the dispense."', message ? `"${message}"` : 'no message');
@@ -198,7 +200,7 @@ qaTest('TC-APP005-046', async ({ page, qa, browser }) => {
 
   await qa.step(4, async () => {
     expect(orderB).toMatch(/order=/);
-    await page.goto(orderB.replace(/^\/(id|en)\//, '/en/'));
+    await page.goto(orderB.replace(/^\/(id|en)\//, '/id/'));
     const w = new DispenseWizard(page);
     await expect(w.heading).toBeVisible();
     await expect(w.main).not.toContainText(ptB.fullName);
@@ -209,16 +211,17 @@ qaTest('TC-APP005-046', async ({ page, qa, browser }) => {
   await qa.step(5, async () => {
     await stock(page, qa);
     const w = await toConfirm(page, pt1, [{ item: para, requested: '1', issued: '1' }]);
-    const offered = await optionsOf(page, w.store, '');
+    // An empty field offers nothing: the first letter of the store codes ("F", shared by the stores of both branches) lists them.
+    const offered = await optionsOf(page, w.store, PHARMACY_STORE.code.slice(0, 1));
     expect(offered.some((o) => o.includes(PHARMACY_STORE.code))).toBe(true);
     // The stores of BR-B: the Stores list of U6.
     const storesB = await asUser(browser, 'U6', async (u6) => {
-      await u6.goto('/en/inventory/stores');
+      await u6.goto('/id/inventory/stores');
       await u6.waitForLoadState('networkidle').catch(() => {});
       return columnTexts(u6, 0);
     });
     const shown = storesB.filter((code) => offered.some((o) => o.split(/\s|·/)[0] === code));
-    expect(shown, 'stores of BR-B offered to U1').toEqual([]);
+    if (shown.length) qa.deviation(5, `Stores of ${BR_A} only`, `stores of ${BR_B} offered to U1: ${shown.join(', ')}`);
     qa.note(5, `the Store field offers ${offered.length} stores; none of the ${storesB.length} stores of ${BR_B} (${storesB.slice(0, 5).join(', ')})`);
   });
 });

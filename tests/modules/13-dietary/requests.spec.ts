@@ -30,7 +30,7 @@ qaTest('TC-APP013-001', async ({ page, qa }) => {
   const no = docNo(qa);
 
   await qa.step(1, async () => {
-    await page.goto('/en/apps');
+    await page.goto('/id/apps');
     await page.getByRole('link', { name: /^Dietary\b/ }).first().click();
     await page.getByRole('main').getByRole('link', { name: 'Open requests' }).click();
     await expect(r.heading).toBeVisible();

@@ -1,11 +1,13 @@
+import { asOnSite } from '../../../lib/i18n';
 import type { Page } from '@playwright/test';
 import { expect, qaTest, test, type Qa } from '../../../fixtures/e2e';
 import { installToastRecorder, toastMark, toastsSince } from '../../../lib/assertions';
 import { addDays, todayWib } from '../../../lib/dates';
 import { PHARMACY_STORE } from '../../../lib/pharmacy-data';
 import { PurchaseOrdersPage, ProcurementDeskPage } from '../../../pages/procurement/ProcurementPages';
-import { backToEnglish, switchLanguage } from '../shared/language';
+import { backToIndonesian, switchLanguage } from '../shared/language';
 import { screenOpens } from '../shared/screen-opens';
+import { sourceOnSite } from '../../../lib/i18n';
 
 /**
  * 09-procurement.xlsx: hub and language (011, 013), Suppliers and requests
@@ -20,7 +22,7 @@ test.beforeEach(async ({ page }) => {
 });
 
 test.afterEach(async ({ page }) => {
-  await backToEnglish(page);
+  await backToIndonesian(page);
 });
 
 async function toastsAfter(page: Page, mark: number, timeout = 8_000): Promise<string[]> {
@@ -42,7 +44,7 @@ qaTest('TC-APP009-011', async ({ page, qa }) => {
   const po = new PurchaseOrdersPage(page);
 
   await qa.step(1, async () => {
-    await page.goto('/en/apps');
+    await page.goto('/id/apps');
     await page.getByRole('link', { name: /^Procurement\b/ }).first().click();
     await expect(page.getByRole('heading', { level: 1, name: 'Procurement' })).toBeVisible();
     await expect(page.getByText('Procure-to-pay', { exact: true })).toBeVisible();
@@ -53,14 +55,14 @@ qaTest('TC-APP009-011', async ({ page, qa }) => {
     await page.getByRole('link', { name: /^Purchase orders Open purchase orders$/ }).click();
     await expect(po.heading).toBeVisible();
     await expect(page.getByRole('navigation').filter({ hasText: /^Procurement\s*\/\s*Purchase orders$/ })).toBeVisible();
-    await page.goto('/en/procurement');
+    await page.goto('/id/procurement');
     await page.getByRole('navigation', { name: 'Procurement' }).getByRole('link', { name: 'Purchase orders' }).click();
     await expect(po.heading).toBeVisible();
     const side = (await page.getByRole('navigation', { name: 'Procurement' }).getByRole('link').allInnerTexts()).map((t) => t.trim());
     qa.note(2, `sidebar: ${side.join(', ')}`);
   });
 
-  await qa.step(3, async () => {
+  await qa.step(3, () => asOnSite(async () => {
     await switchLanguage(page, 'ID');
     await page.goto('/id/procurement/purchase-orders');
     const h1 = (await page.getByRole('heading', { level: 1 }).innerText()).trim();
@@ -68,20 +70,22 @@ qaTest('TC-APP009-011', async ({ page, qa }) => {
     const cols = (await page.getByRole('columnheader').allInnerTexts()).map((c) => c.trim());
     qa.note(3, `heading "${h1}", button "${button}", columns ${cols.join(', ')}`);
     if (button === 'New PO' || cols.includes('Balance')) qa.deviation(3, 'Indonesian headings, column names and buttons ("PO baru", …)', `English: ${[button === 'New PO' && '"New PO"', cols.includes('Balance') && 'columns'].filter(Boolean).join(', ')}`);
-  });
+  }));
 });
 
 qaTest('TC-APP009-013', async ({ page, qa }) => {
   await qa.step(1, async () => {
-    await page.goto('/en/apps');
+    await page.goto('/id/apps');
     await expect(page.getByRole('link', { name: /^Procurement\b/ }).first()).toContainText('PR, PO, tender');
   });
 
   await qa.step(2, async () => {
-    await page.goto('/en/procurement');
-    const side = (await page.getByRole('navigation', { name: 'Procurement' }).getByRole('link').allInnerTexts()).map((t) => t.trim());
+    await page.goto('/id/procurement');
+    const nav = page.getByRole('navigation', { name: 'Procurement' }).getByRole('link');
+    const side = (await nav.allInnerTexts()).map((t) => t.trim());
     qa.note(2, `sidebar: ${side.join(', ')}. "Suppliers" has the buttons request, send_request, approve_request and reject_request`);
-    expect(side).toContain('Suppliers');
+    // "Pemasok" reads back as "Supplier": the link is looked for by its text on the site.
+    await expect(nav.filter({ hasText: new RegExp(`^${sourceOnSite('Suppliers')}$`) })).toHaveCount(1);
   });
 
   await qa.step(3, async () => {
@@ -103,7 +107,7 @@ qaTest('TC-APP009-037', async ({ page, qa }) => {
   const supplier = qa.name('X PT Pemasok Uji');
 
   await qa.step(1, async () => {
-    await page.goto('/en/procurement');
+    await page.goto('/id/procurement');
     await page.getByRole('navigation', { name: 'Procurement' }).getByRole('link', { name: 'Suppliers' }).click();
     await expect(desk.main.getByRole('heading', { level: 1, name: 'Suppliers and requests' })).toBeVisible();
     for (const f of ['Supplier', 'Item', 'Quantity', 'Document']) await expect(desk.input(f)).toBeVisible();
@@ -162,7 +166,7 @@ qaTest('TC-APP009-046', async ({ page, qa }) => {
   const id = await approvedOrder(page, qa);
 
   await qa.step(1, async () => {
-    await page.goto('/en/procurement');
+    await page.goto('/id/procurement');
     await page.getByRole('navigation', { name: 'Procurement' }).getByRole('link', { name: 'Receipts' }).click();
     await expect(desk.main.getByRole('heading', { level: 1, name: 'Receipts and returns' })).toBeVisible();
     for (const f of ['Document', 'Store', 'Batch', 'Expiry', 'Quantity', 'Amount', 'Supplier', 'Note']) await expect(desk.input(f)).toBeVisible();

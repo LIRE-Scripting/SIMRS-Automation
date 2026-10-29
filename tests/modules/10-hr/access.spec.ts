@@ -2,7 +2,7 @@ import type { Locator, Page } from '@playwright/test';
 import { expect, qaTest, test } from '../../../fixtures/e2e';
 import { installToastRecorder, toastMark } from '../../../lib/assertions';
 import { addDays, todayWib } from '../../../lib/dates';
-import { HR } from '../../../lib/hr-data';
+import { DEP_B_HIT, HR } from '../../../lib/hr-data';
 import { EmployeesPage, LeavePage, pickHit } from '../../../pages/hr/HrPages';
 import { everyPage } from '../../../pages/paging';
 import { appsCardRefused, asUser, BR_A, BR_B, headerOneBranch, routesRefused, toastsOf, tryRefused, userPage } from '../shared/access';
@@ -153,7 +153,7 @@ qaTest('TC-APP010-026', async ({ page, qa, browser }) => {
   const p = new EmployeesPage(page);
   const emp1 = await employee(page, qa);
   const emp2 = await employee(page, qa, HR.emp2);
-  const empB = await asUser(browser, 'U6', (u6) => employee(u6, qa, { no: 'QA-EMP-B01', name: HR.emp1.name }));
+  const empB = await asUser(browser, 'U6', (u6) => employee(u6, qa, { no: 'QA-EMP-B01', name: HR.emp1.name }, DEP_B_HIT));
   const taken = 'Employee no. already exists';
 
   await qa.step(1, async () => {
@@ -300,7 +300,7 @@ qaTest('TC-APP010-035', async ({ page, qa, browser }) => {
   const typeB = qa.name('QA Cuti Cabang');
   const reasonB = qa.name('QA Cuti cabang');
   const { empB, leave } = await asUser(browser, 'U6', async (u6) => {
-    const e = await employee(u6, qa, { no: 'QA-EMP-B01', name: HR.emp1.name });
+    const e = await employee(u6, qa, { no: 'QA-EMP-B01', name: HR.emp1.name }, DEP_B_HIT);
     const l = new LeavePage(u6);
     await l.open();
     const d = await l.openTypes();

@@ -6,7 +6,7 @@ import { defineAppointmentCases } from '../shared/appointment-cases';
  * (TC-APP001-011 … 054); the cases are written once in
  * tests/modules/shared/appointment-cases.ts and run here on /appointment/schedule.
  */
-defineAppointmentCases('/en/appointment/schedule', {
+defineAppointmentCases('/id/appointment/schedule', {
   bookSettings: 'TC-APP002-001',
   bookConsultant: 'TC-APP002-002',
   bookUnit: 'TC-APP002-003',

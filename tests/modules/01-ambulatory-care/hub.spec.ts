@@ -1,3 +1,4 @@
+import { asOnSite } from '../../../lib/i18n';
 import { expect, qaTest } from '../../../fixtures/e2e';
 import { AppHeader } from '../../../pages/AppHeader';
 import { screenOpens } from '../shared/screen-opens';
@@ -6,7 +7,7 @@ import { screenOpens } from '../shared/screen-opens';
  * 01-ambulatory-care.xlsx, feature "Ambulatory Care (/registration)" and the
  * screen checks of every route (TC-APP001-081 … 086, run as U2 on "All
  * branches" as their Preconditions say). The workbook opens /id/…; the suite
- * runs in English (answer Q6), so the same routes are opened under /en/.
+ * runs in English (answer Q6), so the same routes are opened under /id/.
  */
 
 qaTest('TC-APP001-026', async ({ page, qa }) => {
@@ -18,7 +19,7 @@ qaTest('TC-APP001-026', async ({ page, qa }) => {
   ];
 
   await qa.step(1, async () => {
-    await page.goto('/en/apps');
+    await page.goto('/id/apps');
     await page.getByRole('link', { name: /Ambulatory Care/ }).first().click();
     const crumbs = main.getByRole('navigation', { name: 'Breadcrumb' });
     await expect(crumbs).toHaveText(/^Home\s*\/\s*Apps\s*\/\s*Ambulatory Care$/);
@@ -31,7 +32,7 @@ qaTest('TC-APP001-026', async ({ page, qa }) => {
 
   await qa.step(2, async () => {
     for (const s of screens) {
-      await page.goto('/en/registration');
+      await page.goto('/id/registration');
       await main.getByRole('link', { name: s.link, exact: true }).click();
       await expect(main.getByRole('heading', { level: 1, name: s.heading })).toBeVisible();
     }
@@ -48,9 +49,9 @@ qaTest('TC-APP001-026', async ({ page, qa }) => {
     }
   });
 
-  await qa.step(3, async () => {
+  await qa.step(3, () => asOnSite(async () => {
     const header = new AppHeader(page);
-    await page.goto('/en/registration/patients');
+    await page.goto('/id/registration/patients');
     await header.selectLanguage('ID');
     try {
       await expect(page).toHaveURL(/\/id\/registration\/patients/);
@@ -61,9 +62,9 @@ qaTest('TC-APP001-026', async ({ page, qa }) => {
       await page.goto('/id/registration/department-queue');
       await expect(main.getByRole('heading', { level: 1, name: 'Kedatangan' })).toBeVisible();
     } finally {
-      await header.selectLanguage('EN');
+      await header.selectLanguage('ID');
     }
-  });
+  }));
 });
 
 const SCREENS: [string, string, string][] = [

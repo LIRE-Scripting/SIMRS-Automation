@@ -31,7 +31,7 @@ qaTest('TC-APP004-056', async ({ page, qa }) => {
   const referral = { code: qa.code('X-RF1'), name: qa.name('X Dokter praktik') };
 
   await qa.step(1, async () => {
-    await page.goto('/en/adt');
+    await page.goto('/id/adt');
     await page.getByRole('main').getByRole('link', { name: 'Requests', exact: true }).click();
     await expect(r.heading).toBeVisible();
     await expect(r.main.getByText("Waiting list. The stay's admit time stays on the admission.")).toBeVisible();

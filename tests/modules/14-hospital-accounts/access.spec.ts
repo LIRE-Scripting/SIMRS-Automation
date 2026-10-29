@@ -4,7 +4,7 @@ import { installToastRecorder } from '../../../lib/assertions';
 import { BILLING } from '../../../lib/billing-data';
 import { CashierPage, norm } from '../../../pages/billing/CashierPage';
 import { appsCardRefused, asUser, headerOneBranch, menuScreens, routesRefused, toastsOf, userPage } from '../shared/access';
-import { backToEnglish } from '../shared/language';
+import { backToIndonesian } from '../shared/language';
 import { patientWithId, plans, tariffs } from './cases';
 import { counterClosed, ensureSettings, sale, select } from './helpers';
 
@@ -26,7 +26,7 @@ test.beforeEach(async ({ page }) => {
 });
 
 test.afterEach(async ({ page }) => {
-  await backToEnglish(page);
+  await backToIndonesian(page);
 });
 
 const SETTING = (page: Page, label: string) => page.getByRole('textbox', { name: label === 'Rounding' ? /^Rounding/ : label, exact: label !== 'Rounding' });
@@ -227,7 +227,11 @@ qaTest('TC-APP014-049', async ({ page, qa, browser }) => {
     qa.note(2, `BR-A: ${Object.entries(mine).map(([k, v]) => `${k} ${v}`).join(', ')}; System cash ${cash}. BR-B: ${Object.entries(valuesB).map(([k, v]) => `${k} ${v}`).join(', ')}`);
   });
 
-  await qa.step(3, () => headerOneBranch(page, qa, 3));
+  await qa.step(3, async () => {
+    // Fast Cashier has no landmarks: the header is read on Apps.
+    await page.goto('/id/apps');
+    await headerOneBranch(page, qa, 3);
+  });
 });
 
 qaTest('TC-APP014-072', async ({ page, qa, browser }) => {

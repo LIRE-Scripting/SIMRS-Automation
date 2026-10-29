@@ -1,8 +1,9 @@
+import { asOnSite } from '../../../lib/i18n';
 import { expect, qaTest, test } from '../../../fixtures/e2e';
 import { installToastRecorder } from '../../../lib/assertions';
 import { addDays, todayWib } from '../../../lib/dates';
 import { allBranchesSave, asAllBranches } from '../shared/access';
-import { backToEnglish, switchLanguage } from '../shared/language';
+import { backToIndonesian, switchLanguage } from '../shared/language';
 import { screenOpens } from '../shared/screen-opens';
 import { catalogue, click } from './helpers';
 import { orders, TC_APP013_034, TC_APP013_040 } from './cases';
@@ -20,13 +21,13 @@ test.beforeEach(async ({ page }) => {
 });
 
 test.afterEach(async ({ page }) => {
-  await backToEnglish(page);
+  await backToIndonesian(page);
 });
 
 qaTest('TC-APP013-011', async ({ page, qa }) => {
   const main = page.getByRole('main');
   await qa.step(1, async () => {
-    await page.goto('/en/apps');
+    await page.goto('/id/apps');
     await page.getByRole('link', { name: /^Dietary\b/ }).first().click();
     await expect(main.getByRole('navigation', { name: 'Breadcrumb' })).toHaveText(/^Home\s*\/\s*Apps\s*\/\s*Dietary$/);
     await expect(main.getByRole('heading', { level: 1, name: 'Dietary' })).toBeVisible();
@@ -37,14 +38,14 @@ qaTest('TC-APP013-011', async ({ page, qa }) => {
   });
   await qa.step(2, async () => {
     for (const [tile, heading] of [['Requests', 'Diet requests'], ['TPN', 'Total parenteral nutrition']]) {
-      await page.goto('/en/diet');
+      await page.goto('/id/diet');
       await main.getByRole('link', { name: tile, exact: true }).click();
       await expect(main.getByRole('heading', { level: 1, name: heading })).toBeVisible();
     }
     const side = (await page.getByRole('complementary').getByRole('link').allInnerTexts()).map((s) => s.trim()).filter(Boolean);
     qa.note(2, `sidebar: ${side.join(', ')}`);
   });
-  await qa.step(3, async () => {
+  await qa.step(3, () => asOnSite(async () => {
     await switchLanguage(page, 'ID');
     const seen: string[] = [];
     for (const r of ['/id/diet', '/id/diet/requests', '/id/diet/tpn']) {
@@ -53,7 +54,7 @@ qaTest('TC-APP013-011', async ({ page, qa }) => {
     }
     qa.note(3, `headings: ${seen.join(', ')}`);
     if (seen.includes('Dietary') || seen.includes('Diet requests')) qa.deviation(3, 'Headings, field names, buttons and toasts are Indonesian ("Gizi", "Permintaan diet", …)', `English: ${seen.join(', ')}`);
-  });
+  }));
 });
 
 qaTest('TC-APP013-034', TC_APP013_034);

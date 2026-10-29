@@ -1,7 +1,7 @@
 import { expect, type Locator, type Page } from '@playwright/test';
 
 /**
- * Hospital Accounts > Fast Cashier (/en/billing/cashier). The screen has no
+ * Hospital Accounts > Fast Cashier (/id/billing/cashier). The screen has no
  * <main> landmark; its parts are found by their headings and labels. Read from
  * the live screen on 2026-10-15.
  */
@@ -21,7 +21,7 @@ export class CashierPage {
   }
 
   async open(): Promise<void> {
-    await this.page.goto('/en/billing/cashier');
+    await this.page.goto('/id/billing/cashier');
     await expect(this.heading).toBeVisible();
     await this.page.waitForLoadState('networkidle').catch(() => {});
   }
@@ -35,7 +35,8 @@ export class CashierPage {
   }
 
   tender(): Locator {
-    return this.page.getByRole('combobox', { name: 'Tender' });
+    // On /id "Tender" is "Cara bayar" or "Metode", and "Metode" also names the list of the item price: the list offering "Card".
+    return this.page.getByRole('combobox', { name: 'Tender' }).filter({ has: this.page.locator('option', { hasText: 'Card' }) });
   }
 
   /** "Available", "Amount due", "Deposits" of the bar. */

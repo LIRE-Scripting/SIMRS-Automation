@@ -17,7 +17,7 @@ chainTest('E2E-018', async ({ page, chain }) => {
   const arrival = new ArrivalPage(page);
   const main = page.getByRole('main');
   const pendingList = async () => {
-    await page.goto('/en/mrd');
+    await page.goto('/id/mrd');
     await page.getByRole('complementary').getByRole('link', { name: 'Visits without a document' }).first().click();
     await expect(main.getByRole('heading', { level: 1, name: 'Outpatient visits without a document' })).toBeVisible();
   };
@@ -28,7 +28,7 @@ chainTest('E2E-018', async ({ page, chain }) => {
     const dob = '1990-05-17';
     let before = 0;
     await qa.step(1, async () => {
-      await page.goto('/en/apps');
+      await page.goto('/id/apps');
       await page.getByRole('link', { name: /Ambulatory Care/ }).first().click();
       await page.getByRole('main').getByRole('link', { name: 'New Registration' }).click();
       await expect(reg.heading).toBeVisible();
@@ -115,7 +115,7 @@ chainTest('E2E-018', async ({ page, chain }) => {
     const no = docNo(qa, 'QA-REQ-001');
     const purpose = 'QA Kontrol poli penyakit dalam';
     await qa.step(1, async () => {
-      await page.goto('/en/apps');
+      await page.goto('/id/apps');
       await page.getByRole('link', { name: /^MRD\b/ }).first().click();
       await page.getByRole('main').getByRole('link', { name: 'File Requests' }).first().click();
       await expect(s.main.getByRole('heading', { level: 1, name: 'Patient File Requests' })).toBeVisible();
@@ -175,7 +175,7 @@ chainTest('E2E-018', async ({ page, chain }) => {
     const shelf = qa.prefix('X Rak A-12');
     const clinic = qa.prefix('X Poli Penyakit Dalam');
     await qa.step(1, async () => {
-      await page.goto('/en/mrd');
+      await page.goto('/id/mrd');
       await page.getByRole('complementary').getByRole('link', { name: 'Patient Records' }).first().click();
       await expect(s.main.getByRole('heading', { level: 1, name: 'Patient Records' })).toBeVisible();
     });

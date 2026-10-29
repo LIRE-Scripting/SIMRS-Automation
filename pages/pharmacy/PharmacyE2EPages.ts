@@ -2,7 +2,7 @@ import { expect, type Locator, type Page } from '@playwright/test';
 import { escapeRe } from '../ambulatory/RegisteredPatientsPage';
 
 /**
- * Pharmacy (/en/pharmacy): Orders, the Dispense wizard and Issue Lines. Read
+ * Pharmacy (/id/pharmacy): Orders, the Dispense wizard and Issue Lines. Read
  * from the live screens on 2026-10-15.
  */
 
@@ -32,7 +32,7 @@ export class OrdersPage {
   }
 
   async open(visitClass?: 'outpatient' | 'inpatient'): Promise<void> {
-    await this.page.goto(`/en/pharmacy/orders${visitClass ? `?visit_class=${visitClass}` : ''}`);
+    await this.page.goto(`/id/pharmacy/orders${visitClass ? `?visit_class=${visitClass}` : ''}`);
     await expect(this.heading).toBeVisible();
   }
 
@@ -75,7 +75,7 @@ export class DispenseWizard {
 
   constructor(
     readonly page: Page,
-    readonly lang: 'en' | 'id' = 'en',
+    readonly lang: 'en' | 'id' = 'id',
   ) {
     this.main = page.getByRole('main');
     this.heading = this.main.getByRole('heading', { level: 1 });
@@ -109,7 +109,8 @@ export class DispenseWizard {
   async pickPatient(p: { mrn: string; fullName: string }, typed: string = p.fullName): Promise<void> {
     await this.searchPatient(typed);
     await this.patientResults().filter({ hasText: p.mrn }).click();
-    await expect(this.main.getByText(new RegExp(`${escapeRe(p.fullName)}\\s+MRN\\s+${escapeRe(p.mrn)}`))).toBeVisible();
+    // "<name> MRN <mrn>"; the Indonesian site writes "RM" for MRN.
+    await expect(this.main.getByText(new RegExp(`${escapeRe(p.fullName)}\\s+(MRN|RM)\\s+${escapeRe(p.mrn)}`))).toBeVisible();
   }
 
   itemResults(): Locator {
@@ -125,11 +126,11 @@ export class DispenseWizard {
 
   /** Lines under "Selected (n)". */
   selected(): Locator {
-    return this.main.getByText(/^Selected \(\d+\)$/).locator('xpath=following::ul[1]').getByRole('listitem');
+    return this.main.getByText(/^(Selected|Dipilih) \(\d+\)$/).locator('xpath=following::ul[1]').getByRole('listitem');
   }
 
   selectedCount(): Locator {
-    return this.main.getByText(/^Selected \(\d+\)$/);
+    return this.main.getByText(/^(Selected|Dipilih) \(\d+\)$/);
   }
 
   /** The row of an item on "Set quantities". */
@@ -161,9 +162,12 @@ export class DispenseWizard {
 
   /** A text shown only on that step. */
   marker(step: WizardStep): Locator {
-    // An order opens on "Select items" with its own hint ("<patient> — <drug>. Issued quantity …") instead of the search hint.
+    // An order opens on "Select items" with its own hint ("<patient> — <drug>. Issued quantity …") instead of the search hint;
+    // both hints in English and in Indonesian (the site runs in Indonesian, lib/i18n).
     if (step === 'Select items') {
-      return this.main.getByText(/^(Search by name or code, then click a result to add\. Use Scan for barcode \/ exact code\.|.+ — .+\. Issued quantity cannot exceed what is still ordered\.)$/);
+      return this.main.getByText(
+        /^(Search by name or code, then click a result to add\. Use Scan for barcode \/ exact code\.|Cari nama atau kode, lalu klik hasil untuk menambah\. Gunakan Scan untuk barcode \/ kode tepat\.|.+ — .+\. (Issued quantity cannot exceed what is still ordered|Jumlah yang dikeluarkan tidak boleh melebihi sisa order)\.)$/,
+      );
     }
     const text = {
       'Select items': 'Search by name or code, then click a result to add. Use Scan for barcode / exact code.',
@@ -227,7 +231,7 @@ export class IssueLinesPage {
   }
 
   async open(): Promise<void> {
-    await this.page.goto('/en/pharmacy/issue-lines');
+    await this.page.goto('/id/pharmacy/issue-lines');
     await expect(this.heading).toBeVisible();
   }
 
@@ -242,5 +246,23 @@ export class IssueLinesPage {
 
   pager(): Locator {
     return this.main.getByText(/^Showing \d+–\d+ of \d+$/);
+  }
+
+  /**
+   * Shows the page that holds the rows `row` finds: the search narrows only the
+   * page on screen (found blocker 40), so with no hit the search is cleared and
+   * the list is paged until the rows are there.
+   */
+  async showRow(row: () => Locator, text: string): Promise<void> {
+    await this.search.fill(text);
+    if (await row().first().waitFor({ timeout: 5_000 }).then(() => true, () => false)) return;
+    await this.search.fill('');
+    const next = this.main.getByRole('button', { name: 'Next page' });
+    for (let i = 0; i < 40; i++) {
+      if (await row().first().waitFor({ timeout: 2_000 }).then(() => true, () => false)) return;
+      if (!(await next.isVisible()) || (await next.isDisabled())) return;
+      await next.click();
+      await this.page.waitForLoadState('networkidle').catch(() => {});
+    }
   }
 }

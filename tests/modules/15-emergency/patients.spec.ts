@@ -4,6 +4,7 @@ import { installToastRecorder } from '../../../lib/assertions';
 import { addDays, todayWib } from '../../../lib/dates';
 import { registerPatient } from '../../../lib/ambulatory-data';
 import { attach, encounter, Patients, pdf, WALKED_IN, walkInName } from './helpers';
+import { asOnSite } from '../../../lib/i18n';
 
 /**
  * 15-emergency.xlsx, Emergency Patients (/emergency/patients). A "received,
@@ -31,7 +32,7 @@ async function anyCategory(d: Locator): Promise<string> {
 qaTest('TC-APP015-031', async ({ page, qa }) => {
   const p = new Patients(page);
   await qa.step(1, async () => {
-    await page.goto('/en/emergency');
+    await page.goto('/id/emergency');
     await page.getByRole('main').getByRole('link', { name: 'Emergency Patients' }).click();
     await expect(p.main.getByText('Receive a registration, or register and receive a walk-in in one step.', { exact: true })).toBeVisible();
     await expect(p.main.getByRole('tab')).toHaveText(['Emergency Patients', 'Emergency OP Patients', 'Emergency IP Patients']);
@@ -175,11 +176,24 @@ qaTest('TC-APP015-037', async ({ page, qa }) => {
     await expect(d.getByRole('combobox', { name: 'Patient condition' }).locator('option')).toHaveText(['Patient condition', 'Conscious', 'Unconscious', 'Critical']);
     await expect(d.getByRole('combobox', { name: 'Patient status' }).locator('option')).toHaveText(['Patient status', 'Waiting', 'In treatment', 'Referred']);
     for (const b of ['Save', 'Flag triage required']) await expect(d.getByRole('button', { name: b })).toBeVisible();
-    category = await anyCategory(d);
+    // The categories load after the dialog opens.
+    await d.getByRole('combobox', { name: 'Triage category' }).locator('option').nth(1).waitFor({ state: 'attached', timeout: 15_000 }).catch(() => {});
+    category = (await anyCategory(d)) ?? '';
+    if (!category) qa.note(1, '"Triage category" offers no category, only its placeholder (found blocker 54)');
   });
+  if (!category) {
+    for (const st of [2, 3, 4, 5, 6]) qa.blocked(st, 54);
+    return;
+  }
   await qa.step(2, async () => {
     const d = p.dialog;
-    await d.getByRole('combobox', { name: 'Triage category' }).selectOption({ label: category });
+    // The categories load after the dialog opens: the list is given its options first.
+    await expect(d.getByRole('combobox', { name: 'Triage category' }).locator('option', { hasText: category })).toHaveCount(1, { timeout: 15_000 });
+    // By its value: the label read back in English is not always the one the site writes ("Kuning IGD").
+    const list = d.getByRole('combobox', { name: 'Triage category' });
+    const value = await list.locator('option').nth(1).getAttribute('value');
+    category = (await asOnSite(() => list.locator('option').nth(1).innerText())).trim();
+    await list.selectOption({ value: value ?? '' });
     await d.getByRole('combobox', { name: 'Patient condition' }).selectOption('Critical');
     await d.getByRole('combobox', { name: 'Patient status' }).selectOption('Waiting');
     expect(await p.click(d.getByRole('button', { name: 'Save' }))).toContain('Triage saved. This category is now current.');

@@ -5,6 +5,7 @@ import { addDays, todayWib } from '../../../lib/dates';
 import { Desk, SAVED, refused } from '../shared/desk';
 import { auditEntries, menuScreens, userPage } from '../shared/access';
 import { screenOpens } from '../shared/screen-opens';
+import { expectStatus } from '../shared/desk-status';
 
 /**
  * 24-housekeeping.xlsx: locations (shifts, activities, materials, match),
@@ -64,7 +65,7 @@ qaTest('TC-APP024-001', async ({ page, qa }) => {
   const l = locations(page);
   const code = qa.code('X-LT1');
   await qa.step(1, async () => {
-    await page.goto('/en/housekeeping');
+    await page.goto('/id/housekeeping');
     await page.getByRole('main').getByRole('link', { name: 'Locations' }).click();
     await expect(l.main.getByRole('heading', { level: 1, name: 'Locations' })).toBeVisible();
     for (const b of ['New location', 'Search']) await expect(l.main.getByRole('button', { name: b, exact: true })).toBeVisible();
@@ -132,7 +133,7 @@ qaTest('TC-APP024-004', async ({ page, qa }) => {
   const c = contracts(page);
   let id = '';
   await qa.step(1, async () => {
-    await page.goto('/en/housekeeping');
+    await page.goto('/id/housekeeping');
     await page.getByRole('main').getByRole('link', { name: 'Contracts' }).click();
     await expect(c.main.getByRole('heading', { level: 1, name: 'Contracts' })).toBeVisible();
     await expect(c.main.getByRole('button', { name: 'New', exact: true })).toBeVisible();
@@ -147,16 +148,16 @@ qaTest('TC-APP024-004', async ({ page, qa }) => {
     const r = await c.create(CONTRACT(qa));
     expect(r.toasts).toContain(SAVED);
     id = r.id;
-    expect(await c.status(id)).toBe('draft');
+    await expectStatus(qa, 3, c, id, 'draft');
   });
   await qa.step(4, async () => {
     expect(await c.save({ Document: id, [CEF]: qa.prefix('X per orang per shift'), Amount: '150000' }, 'Price line')).toContain(SAVED);
   });
   await qa.step(5, async () => {
     expect(await c.save({ Document: id }, 'Send contract')).toContain(SAVED);
-    expect(await c.status(id)).toBe('sent');
+    await expectStatus(qa, 5, c, id, 'sent');
     expect(await c.save({ Document: id }, 'Approve contract')).toContain(SAVED);
-    expect(await c.status(id)).toBe('approved');
+    await expectStatus(qa, 5, c, id, 'approved');
   });
 });
 
@@ -204,7 +205,7 @@ qaTest('TC-APP024-007', async ({ page, qa }) => {
   const loc = await location(page, qa, { shifts: [['X Pagi', '2'], ['X Sore', '1']], activity: true });
   let id = '';
   await qa.step(1, async () => {
-    await page.goto('/en/housekeeping');
+    await page.goto('/id/housekeeping');
     await page.getByRole('main').getByRole('link', { name: 'Daily logs' }).click();
     await expect(g.main.getByRole('heading', { level: 1, name: 'Daily logs' })).toBeVisible();
     await expect(g.main.getByRole('button', { name: 'New', exact: true })).toBeVisible();
@@ -220,12 +221,12 @@ qaTest('TC-APP024-007', async ({ page, qa }) => {
     expect(r.toasts).toContain(SAVED);
     id = r.id;
     const status = await g.status(id);
-    expect(status).not.toBe('');
-    if (status !== 'draft') qa.deviation(3, 'a row with the status "draft"', `the new log reads "${status}"`);
+    if (!status) qa.note(3, `${id} is not among the rows the list shows (found blocker 40): its status cannot be read`);
+    if (status && status !== 'draft') qa.deviation(3, 'a row with the status "draft"', `the new log reads "${status}"`);
   });
   await qa.step(4, async () => {
     expect(await g.save({ Document: id }, 'Approve log')).toContain(SAVED);
-    expect(await g.status(id)).toBe('approved');
+    await expectStatus(qa, 4, g, id, 'approved');
   });
 });
 
@@ -271,7 +272,7 @@ qaTest('TC-APP024-010', async ({ page, qa }) => {
   const b = bills(page);
   const id = await contract(page, qa);
   await qa.step(1, async () => {
-    await page.goto('/en/housekeeping');
+    await page.goto('/id/housekeeping');
     await page.getByRole('main').getByRole('link', { name: 'Bills' }).click();
     await expect(b.main.getByRole('heading', { level: 1, name: 'Bills' })).toBeVisible();
     for (const x of ['New', 'Search', 'CSV']) await expect(b.main.getByRole('button', { name: x, exact: true })).toBeVisible();
@@ -288,7 +289,7 @@ qaTest('TC-APP024-010', async ({ page, qa }) => {
     expect(r.id).not.toBe('');
   });
   await qa.step(4, async () => {
-    await page.goto('/en/finance/vouchers');
+    await page.goto('/id/finance/vouchers');
     await page.waitForLoadState('networkidle').catch(() => {});
     const rows = (await page.getByRole('table').getByRole('row').filter({ hasText: 'QA-PT Bersih Uji' }).allInnerTexts()).map((x) => x.replace(/\s+/g, ' '));
     qa.note(4, `vouchers of the vendor on the first page: ${rows.slice(0, 2).join(' ; ') || 'none'}`);

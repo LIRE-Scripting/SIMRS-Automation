@@ -26,8 +26,8 @@ qaTest('TC-APP007-039', async ({ page, qa }) => {
   const f = new StoreFormsPage(page);
 
   await qa.step(1, async () => {
-    await page.goto('/en/inventory');
-    await page.goto('/en/inventory/setup');
+    await page.goto('/id/inventory');
+    await page.goto('/id/inventory/setup');
     await expect(f.main.getByRole('heading', { level: 1, name: 'Branch and stores' })).toBeVisible();
     for (const n of ['Code', 'Name', 'Parent category', 'Store', 'From store', 'To store']) await expect(f.input(n)).toBeVisible();
     await expect(f.main.getByRole('button', { name: 'Save' })).toHaveCount(3);
@@ -244,7 +244,7 @@ qaTest('TC-APP007-052', async ({ page, qa }) => {
 
 qaTest('TC-APP007-053', async ({ page, qa }) => {
   await qa.step(1, async () => {
-    await page.goto('/en/inventory');
+    await page.goto('/id/inventory');
     await page.getByRole('main').getByRole('link', { name: 'Stock book', exact: true }).click();
     await expect(page.getByRole('main').getByRole('heading', { level: 1, name: 'Stock book' })).toBeVisible();
     await expect(page.getByRole('main').getByText('Receipts, transfers, returns, and counts are appended per batch. A Fornas receipt lands in the shared warehouse. Selling prices stay on the price list.')).toBeVisible();

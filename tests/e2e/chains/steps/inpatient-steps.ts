@@ -2,6 +2,7 @@ import { expect, type Page } from '@playwright/test';
 import type { Qa } from '../../../../fixtures/e2e';
 import { toastLocator } from '../../../../lib/assertions';
 import { AdmissionsPage, BedsPage, DischargesPage } from '../../../../pages/inpatient/InpatientPages';
+import { NotOffered } from '../../../../lib/not-offered';
 
 /**
  * Steps of 04-inpatient.xlsx used by several chains, written as in
@@ -27,7 +28,7 @@ export async function admitSteps(page: Page, qa: Qa, name: string, bed: string):
   await adm.open();
   const before = await adm.census();
   await qa.step(1, async () => {
-    await page.goto('/en/adt');
+    await page.goto('/id/adt');
     await page.getByRole('main').getByRole('link', { name: 'Open admissions' }).click();
     await adm.admitButton.click();
     await expect(w.getByText('Three steps: patient, bed, then review.')).toBeVisible();
@@ -97,10 +98,22 @@ export async function transferSteps(page: Page, qa: Qa, name: string, from: stri
     await expect(d).toContainText(`${name} · ${from}`);
     await expect(d.getByRole('button', { name: 'Transfer' })).toBeDisabled();
   });
+  let offered = true;
   await qa.step(2, async () => {
-    await adm.pickBed(d.getByRole('combobox', { name: 'New bed' }), to);
+    try {
+      await adm.pickBed(d.getByRole('combobox', { name: 'New bed' }), to);
+    } catch (e) {
+      if (!(e instanceof NotOffered)) throw e;
+      offered = false;
+      return qa.note(2, `the new bed ${to} is not offered under "New bed": the picker filters only the first 50 beds it loaded`);
+    }
     await expect(d.getByRole('button', { name: 'Transfer' })).toBeEnabled();
   });
+  if (!offered) {
+    qa.blocked(2, 40);
+    qa.blocked(3, 40);
+    return;
+  }
   await qa.step(3, async () => {
     await d.getByRole('button', { name: 'Transfer' }).click();
     await expect(toastLocator(page, /^Transferred$/)).toBeVisible();

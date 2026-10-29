@@ -1,3 +1,4 @@
+import { asOnSite } from '../../../lib/i18n';
 import { expect, qaTest } from '../../../fixtures/e2e';
 import { AppHeader } from '../../../pages/AppHeader';
 import { screenOpens } from '../shared/screen-opens';
@@ -8,7 +9,7 @@ qaTest('TC-APP007-015', async ({ page, qa }) => {
   const tiles: [string, string][] = [['Item Master', 'Item Master'], ['Stock Requests', 'Stock Requests'], ['Stores', 'Stores']];
 
   await qa.step(1, async () => {
-    await page.goto('/en/apps');
+    await page.goto('/id/apps');
     await page.getByRole('link', { name: /^Inventory\b/ }).first().click();
     await expect(main.getByRole('navigation', { name: 'Breadcrumb' })).toHaveText(/^Home\s*\/\s*Apps\s*\/\s*Inventory$/);
     await expect(main.getByRole('heading', { level: 1, name: 'Inventory' })).toBeVisible();
@@ -20,13 +21,13 @@ qaTest('TC-APP007-015', async ({ page, qa }) => {
 
   await qa.step(2, async () => {
     for (const [tile, heading] of tiles) {
-      await page.goto('/en/inventory');
+      await page.goto('/id/inventory');
       await main.getByRole('link', { name: tile, exact: true }).last().click();
       await expect(main.getByRole('heading', { level: 1, name: heading })).toBeVisible();
     }
   });
 
-  await qa.step(3, async () => {
+  await qa.step(3, () => asOnSite(async () => {
     const header = new AppHeader(page);
     try {
       await header.selectLanguage('ID');
@@ -38,9 +39,9 @@ qaTest('TC-APP007-015', async ({ page, qa }) => {
       expect(seen).not.toEqual(['Item Master', 'Stock Requests', 'Stores']);
       qa.note(3, `Indonesian headings: ${seen.join(', ')}`);
     } finally {
-      await header.selectLanguage('EN');
+      await header.selectLanguage('ID');
     }
-  });
+  }));
 });
 
 const SCREENS: [string, string, string][] = [

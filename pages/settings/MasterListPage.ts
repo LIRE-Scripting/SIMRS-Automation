@@ -4,8 +4,8 @@ import { pageToRow } from '../paging';
 
 /**
  * The list screens of Settings that share one layout: Departments
- * (/en/mdm/departments), Service centers (/en/mdm/service-centers) and Users
- * (/en/identity/users). A heading, an "Add …" button, a search box, a table
+ * (/id/mdm/departments), Service centers (/id/mdm/service-centers) and Users
+ * (/id/identity/users). A heading, an "Add …" button, a search box, a table
  * with an "Edit <name>" button per row, and an "Add …" dialog with Save.
  * Read from the live screens on 2026-10-14.
  */
@@ -24,15 +24,15 @@ export class MasterListPage {
   }
 
   static departments(page: Page): MasterListPage {
-    return new MasterListPage(page, '/en/mdm/departments', 'Departments', 'Add Department');
+    return new MasterListPage(page, '/id/mdm/departments', 'Departments', 'Add Department');
   }
 
   static serviceCenters(page: Page): MasterListPage {
-    return new MasterListPage(page, '/en/mdm/service-centers', 'Service Centers', 'Add Service Center');
+    return new MasterListPage(page, '/id/mdm/service-centers', 'Service Centers', 'Add Service Center');
   }
 
   static users(page: Page): MasterListPage {
-    return new MasterListPage(page, '/en/identity/users', 'Users', 'Add User');
+    return new MasterListPage(page, '/id/identity/users', 'Users', 'Add User');
   }
 
   async open(): Promise<void> {
@@ -49,7 +49,8 @@ export class MasterListPage {
     if (i < 0) throw new Error(`Column "${column}" not in ${headers.join(', ')}`);
     // The list filters as you type; wait until it shows only matches or its empty text.
     await expect(table.getByRole('row').filter({ has: this.page.getByRole('cell') }).first()).toContainText(
-      new RegExp(`${value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}|yet\\.`),
+      // The empty text: "No users yet." (on /id "Belum ada pengguna.").
+      new RegExp(`${value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}|yet\\.|^Belum ada`),
     );
     // The search filters only the page on screen (50 rows), so every page is looked at.
     return pageToRow(this.main, () =>

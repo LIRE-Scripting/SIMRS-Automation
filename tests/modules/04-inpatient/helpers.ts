@@ -18,7 +18,7 @@ export class Requests {
   }
 
   async open() {
-    await this.page.goto('/en/adt/requests');
+    await this.page.goto('/id/adt/requests');
     await expect(this.heading).toBeVisible();
   }
 
@@ -86,7 +86,7 @@ export class Ward {
   }
 
   async open() {
-    await this.page.goto('/en/adt/ward');
+    await this.page.goto('/id/adt/ward');
     await expect(this.heading).toBeVisible();
   }
 

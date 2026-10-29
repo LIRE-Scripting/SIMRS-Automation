@@ -1,8 +1,9 @@
+import { asOnSite } from '../../../lib/i18n';
 import { expect, qaTest, test } from '../../../fixtures/e2e';
 import { installToastRecorder } from '../../../lib/assertions';
 import { registerPatient } from '../../../lib/ambulatory-data';
 import { todayWib } from '../../../lib/dates';
-import { backToEnglish, switchLanguage } from '../shared/language';
+import { backToIndonesian, switchLanguage } from '../shared/language';
 import { createRequest, docNo, hits, issue, mrdPatient, pick, records, requests, toastsAfter } from './helpers';
 import { screenOpens } from '../shared/screen-opens';
 
@@ -21,7 +22,7 @@ test.beforeEach(async ({ page }) => {
 });
 
 test.afterEach(async ({ page }) => {
-  await backToEnglish(page);
+  await backToIndonesian(page);
 });
 
 qaTest('TC-APP016-001', async ({ page, qa }) => {
@@ -29,7 +30,7 @@ qaTest('TC-APP016-001', async ({ page, qa }) => {
   const no = docNo(qa, 'QA-REQ-001');
   const purpose = 'QA Kontrol poli penyakit dalam';
   await qa.step(1, async () => {
-    await page.goto('/en/apps');
+    await page.goto('/id/apps');
     await page.getByRole('link', { name: /^MRD\b/ }).first().click();
     await page.getByRole('main').getByRole('link', { name: 'File Requests' }).first().click();
     await expect(s.main.getByRole('heading', { level: 1, name: 'Patient File Requests' })).toBeVisible();
@@ -195,7 +196,7 @@ qaTest('TC-APP016-005', async ({ page, qa }) => {
 qaTest('TC-APP016-008', async ({ page, qa }) => {
   const main = page.getByRole('main');
   await qa.step(1, async () => {
-    await page.goto('/en/apps');
+    await page.goto('/id/apps');
     await page.getByRole('link', { name: /^MRD\b/ }).first().click();
     await expect(main.getByRole('navigation', { name: 'Breadcrumb' })).toHaveText(/^Home\s*\/\s*Apps\s*\/\s*MRD$/);
     await expect(main.getByRole('heading', { level: 1, name: 'MRD' })).toBeVisible();
@@ -206,20 +207,20 @@ qaTest('TC-APP016-008', async ({ page, qa }) => {
   });
   await qa.step(2, async () => {
     for (const [tile, heading] of [['File Requests', 'Patient File Requests'], ['Patient Records', 'Patient Records']]) {
-      await page.goto('/en/mrd');
+      await page.goto('/id/mrd');
       await main.getByRole('link', { name: tile, exact: true }).last().click();
       await expect(main.getByRole('heading', { level: 1, name: heading })).toBeVisible();
       await expect(main.getByRole('navigation', { name: 'Breadcrumb' })).toHaveText(new RegExp(`Home\\s*/\\s*MRD\\s*/\\s*${heading}`));
     }
   });
-  await qa.step(3, async () => {
+  await qa.step(3, () => asOnSite(async () => {
     await switchLanguage(page, 'ID');
     await page.goto('/id/mrd/records');
     const buttons = (await main.getByRole('button').allInnerTexts()).map((x) => x.trim()).filter(Boolean);
     const cols = (await main.getByRole('columnheader').allInnerTexts()).map((x) => x.trim());
     qa.note(3, `buttons ${[...new Set(buttons)].slice(0, 6).join(', ')}; columns ${cols.join(', ')}`);
     if (buttons.includes('Issue record') || cols.includes('Status')) qa.deviation(3, 'Column names, buttons, statuses and toasts are Indonesian', `English: ${buttons.includes('Issue record') ? '"Issue record"' : ''} ${cols.join(', ')}`);
-  });
+  }));
 });
 
 qaTest('TC-APP016-009', async ({ page, qa }) => {
@@ -435,7 +436,7 @@ qaTest('TC-APP016-029', async ({ page, qa }) => {
     return r.click(r.dialog.getByRole('button', { name: 'Create' }));
   };
   await qa.step(1, async () => {
-    await page.goto('/en/mrd');
+    await page.goto('/id/mrd');
     await page.getByRole('complementary').getByRole('link', { name: 'File Requests' }).first().click();
     await expect(r.main.getByRole('heading', { level: 1, name: 'Patient File Requests' })).toBeVisible();
     for (const b of ['Request types', 'New request']) await expect(r.main.getByRole('button', { name: b })).toBeVisible();
@@ -532,7 +533,7 @@ qaTest('TC-APP016-032', async ({ page, qa }) => {
   const shelf = qa.prefix('X Rak A-12');
   const clinic = qa.prefix('X Poli Penyakit Dalam');
   await qa.step(1, async () => {
-    await page.goto('/en/mrd');
+    await page.goto('/id/mrd');
     await page.getByRole('complementary').getByRole('link', { name: 'Patient Records' }).first().click();
     await expect(s.main.getByRole('heading', { level: 1, name: 'Patient Records' })).toBeVisible();
   });
@@ -601,7 +602,7 @@ qaTest('TC-APP016-033', async ({ page, qa }) => {
 qaTest('TC-APP016-040', async ({ page, qa }) => {
   const main = page.getByRole('main');
   await qa.step(1, async () => {
-    await page.goto('/en/mrd');
+    await page.goto('/id/mrd');
     await page.getByRole('complementary').getByRole('link', { name: 'Visits without a document' }).first().click();
     await expect(main.getByRole('heading', { level: 1, name: 'Outpatient visits without a document' })).toBeVisible();
     await expect(main.getByText('The document itself is recorded on the registration visit.', { exact: true })).toBeVisible();

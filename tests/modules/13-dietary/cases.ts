@@ -17,7 +17,7 @@ export const TC_APP013_034 = async ({ page, qa }: CaseArgs): Promise<void> => {
   const menu = qa.name('X Diet DM');
 
   await qa.step(1, async () => {
-    await page.goto('/en/diet');
+    await page.goto('/id/diet');
     await page.getByRole('complementary').getByRole('link', { name: 'Catalogue' }).first().click();
     await expect(c.main.getByRole('heading', { level: 1, name: 'Catalogue' })).toBeVisible();
     for (const l of [c.code, c.session, c.from, c.to, c.menu, c.item, c.gender, c.formula, c.weight, c.height, c.calculate]) await expect(l).toBeVisible();
@@ -51,7 +51,7 @@ export const TC_APP013_040 = async ({ page, qa }: CaseArgs): Promise<void> => {
   const name = qa.name('X Pasien Diet');
 
   await qa.step(1, async () => {
-    await page.goto('/en/diet');
+    await page.goto('/id/diet');
     await page.getByRole('complementary').getByRole('link', { name: 'Orders' }).first().click();
     await expect(o.main.getByRole('heading', { level: 1, name: 'Diet orders' })).toBeVisible();
     for (const l of [o.name, o.save, o.menu, o.end, o.order, o.advice, o.adviceButton]) await expect(l).toBeVisible();
@@ -63,12 +63,20 @@ export const TC_APP013_040 = async ({ page, qa }: CaseArgs): Promise<void> => {
     await o.open();
     await expect(o.line(name)).toContainText('pending');
   });
+  let calculated = true;
   await qa.step(3, async () => {
-    expect(await click(page, o.calculate)).toContain('Saved');
+    const toasts = await click(page, o.calculate);
+    if (toasts.some((t) => /React error #441/.test(t))) {
+      // "Calculate" answers HTTP 500 (found blocker 49): no prescription is assessed.
+      calculated = false;
+      return qa.note(3, `"Calculate": "${toasts.join(' / ').slice(0, 80)}"; the first line reads "${(await o.lines().first().innerText()).trim()}"`);
+    }
+    expect(toasts).toContain('Saved');
     await o.open();
     const first = (await o.lines().first().innerText()).trim();
     qa.note(3, `first line after Calculate: "${first}"; this test's line: "${(await o.line(name).innerText()).trim()}"`);
   });
+  if (!calculated) qa.blocked(3, 49);
   await qa.step(4, async () => {
     await o.menu.fill(qa.name('X Diet DM'));
     await o.end.fill(addDays(todayWib(), 3));
@@ -105,7 +113,7 @@ export function orders(page: Page) {
     line: (name: string) => main.getByRole('paragraph').filter({ hasText: name }),
     lines: () => main.getByRole('paragraph'),
     async open(): Promise<void> {
-      await page.goto('/en/diet/orders');
+      await page.goto('/id/diet/orders');
       await expect(main.getByRole('heading', { level: 1, name: 'Diet orders' })).toBeVisible();
     },
   };

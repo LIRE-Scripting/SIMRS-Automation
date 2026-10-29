@@ -6,6 +6,7 @@ import { Desk, SAVED, refused } from '../shared/desk';
 import { auditEntries, menuScreens, userPage } from '../shared/access';
 import { screenOpens } from '../shared/screen-opens';
 import { breakdown, BREAKDOWN, CA, JB, NE, NV, ORDER, plans, SPARE, TC_APP026_001, TC_APP026_004, work } from './cases';
+import { expectStatus } from '../shared/desk-status';
 
 /**
  * 26-maintenance.xlsx: plans (job card, plan, schedule, daily status, open
@@ -143,7 +144,7 @@ qaTest('TC-APP026-007', async ({ page, qa }) => {
   let ind = '';
   let con = '';
   await qa.step(1, async () => {
-    await page.goto('/en/maintenance');
+    await page.goto('/id/maintenance');
     await page.getByRole('main').getByRole('link', { name: 'AMC' }).click();
     await expect(a.main.getByRole('heading', { level: 1, name: 'AMC' })).toBeVisible();
     await expect(a.main.getByRole('button', { name: 'AMC indent' })).toBeVisible();
@@ -158,25 +159,25 @@ qaTest('TC-APP026-007', async ({ page, qa }) => {
     const r = await a.create(INDENT(qa), 'AMC indent');
     expect(r.toasts).toContain(SAVED);
     ind = r.id;
-    expect(await a.status(ind)).toBe('draft');
+    await expectStatus(qa, 3, a, ind, 'draft');
   });
   await qa.step(4, async () => {
     expect(await a.save({ Document: ind }, 'Send indent')).toContain(SAVED);
-    expect(await a.status(ind)).toBe('sent');
+    await expectStatus(qa, 4, a, ind, 'sent');
     expect(await a.save({ Document: ind }, 'Approve indent')).toContain(SAVED);
-    expect(await a.status(ind)).toBe('approved');
+    await expectStatus(qa, 4, a, ind, 'approved');
   });
   await qa.step(5, async () => {
     const r = await a.create(CONTRACT(qa, ind), 'Contract');
     expect(r.toasts).toContain(SAVED);
     con = r.id;
-    expect(await a.status(con)).toBe('draft');
+    await expectStatus(qa, 5, a, con, 'draft');
   });
   await qa.step(6, async () => {
     expect(await a.save({ Document: con }, 'Send contract')).toContain(SAVED);
-    expect(await a.status(con)).toBe('sent');
+    await expectStatus(qa, 6, a, con, 'sent');
     expect(await a.save({ Document: con }, 'Approve contract')).toContain(SAVED);
-    expect(await a.status(con)).toBe('approved');
+    await expectStatus(qa, 6, a, con, 'approved');
   });
   await qa.step(7, async () => {
     expect(await a.save({ [JB]: card, Date: '2026-12-01', Document: con }, 'AMC schedule')).toContain(SAVED);
@@ -269,10 +270,15 @@ qaTest('TC-APP026-012', async ({ page, qa }) => {
 qaTest('TC-APP026-013', async ({ page, qa, browser }) => {
   // Preconditions (made by U1): a breakdown and a work order sent for approval.
   const w = work(page);
-  const bd = await breakdown(page, qa);
-  const sent = await w.create(ORDER(qa, bd), 'Work order');
+  // A new document's id is read from the answer or the list; the list holds only its first 40 rows (found blocker 40).
+  const notListed = (e: Error) => {
+    if (!/blocker 40/.test(e.message)) throw e;
+    return '';
+  };
+  const bd = await breakdown(page, qa).catch(notListed);
+  const sent = bd ? await w.create(ORDER(qa, bd), 'Work order').catch((e: Error) => ({ toasts: [SAVED], id: notListed(e) })) : { toasts: [SAVED], id: '' };
   expect(sent.toasts).toContain(SAVED);
-  expect(await w.save({ Document: sent.id }, 'Send order')).toContain(SAVED);
+  if (sent.id) expect(await w.save({ Document: sent.id }, 'Send order')).toContain(SAVED);
   const staff = await userPage(browser, 'U3');
   try {
     await qa.step(1, async () => {
@@ -282,13 +288,17 @@ qaTest('TC-APP026-013', async ({ page, qa, browser }) => {
       const toasts = await work(staff).save(BREAKDOWN(qa, qa.code('X-AST-AC1')), 'Breakdown');
       qa.note(2, `a breakdown reported by U3: "${toasts.join(' / ') || 'no toast'}" (TBD in the workbook: whether a ward nurse may report one)`);
     });
-    await qa.step(3, async () => {
+    if (!sent.id) {
+      // No id of the order of the test (found blocker 40): its approval and invoice cannot be tried by U3.
+      qa.blocked(3, 40);
+      qa.blocked(4, 40);
+    } else await qa.step(3, async () => {
       refused(qa, 3, await work(staff).save({ Document: sent.id }, 'Approve order'), 'missing required privilege');
       const status = await w.status(sent.id);
       if (status) expect(status).toBe('sent');
       else qa.note(3, 'the status of the order cannot be read: the list shows its first 40 rows (found blocker 40)');
     });
-    await qa.step(4, async () => {
+    if (sent.id) await qa.step(4, async () => {
       // No order can be approved and completed (no budget head has a balance): "Invoice" is tried on the sent order.
       refused(qa, 4, await work(staff).save({ Amount: '450000', Document: sent.id }, 'Invoice'), 'missing required privilege');
       qa.note(4, 'the order is sent, not completed: no order can be approved while no budget head has a balance (allocations need U5)');

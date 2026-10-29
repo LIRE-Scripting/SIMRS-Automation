@@ -5,7 +5,7 @@ import { escapeRe } from './RegisteredPatientsPage';
 
 /**
  * Appointments: the same screen under Ambulatory Care
- * (/en/registration/appointments) and under Appointment (/en/appointment/schedule).
+ * (/id/registration/appointments) and under Appointment (/id/appointment/schedule).
  * Read from the live screen on 2026-10-14. The type-ahead fields
  * (Patient, Department, Consultant or unit) are comboboxes whose listbox
  * offers buttons "MRN · name" / "code · name".
@@ -59,12 +59,16 @@ function sundayOfIso(iso: string): string {
   return d.toISOString().slice(0, 10);
 }
 
-/** The week label the calendars show for the week of `iso`: "Oct 25 – Oct 31". */
-export function weekLabelOf(iso: string): string {
+/** The months as the Indonesian site writes them ("25 Okt – 31 Okt"). */
+const MONTHS_ID = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+
+/** The week label the calendars show for the week of `iso`: "Oct 25 – Oct 31", on /id "25 Okt – 31 Okt". */
+export function weekLabelOf(iso: string): RegExp {
   const sun = new Date(`${sundayOfIso(iso)}T00:00:00Z`);
   const sat = new Date(sun.getTime() + 6 * 86_400_000);
-  const f = (d: Date) => `${MONTHS[d.getUTCMonth()]} ${d.getUTCDate()}`;
-  return `${f(sun)} – ${f(sat)}`;
+  const en = (d: Date) => `${MONTHS[d.getUTCMonth()]} ${d.getUTCDate()}`;
+  const id = (d: Date) => `${d.getUTCDate()} ${MONTHS_ID[d.getUTCMonth()]}`;
+  return new RegExp(`^(?:${en(sun)} – ${en(sat)}|${id(sun)} – ${id(sat)})$`);
 }
 
 export class AppointmentsPage {
@@ -85,7 +89,7 @@ export class AppointmentsPage {
   /** Route of the screen; the list reloads with a POST to this path. */
   readonly route: string;
 
-  constructor(page: Page, route = '/en/registration/appointments') {
+  constructor(page: Page, route = '/id/registration/appointments') {
     this.page = page;
     this.route = route;
     this.main = page.getByRole('main');
@@ -237,12 +241,18 @@ export class AppointmentsPage {
 
   /** "Oct 25 – Oct 31" between the week buttons. */
   weekLabel(): Locator {
-    return this.main.getByText(/^[A-Z][a-z]{2} \d{1,2} – [A-Z][a-z]{2} \d{1,2}$/);
+    return this.main.getByText(/^(?:[A-Z][a-z]{2} \d{1,2}|\d{1,2} [A-Z][a-z]{2}) – (?:[A-Z][a-z]{2} \d{1,2}|\d{1,2} [A-Z][a-z]{2})$/);
   }
 
   /** "3 appointments" beside the week buttons. */
+  /** The badge text for `n` bookings, in either language. */
+  static badge(n: number): RegExp {
+    return new RegExp(`^${n} (?:appointments?|janji(?: temu)?)$`);
+  }
+
   weekBadge(): Locator {
-    return this.main.getByText(/^\d+ appointments?$/);
+    // On /id "17 janji".
+    return this.main.getByText(/^\d+ (?:appointments?|janji(?: temu)?)$/);
   }
 
   weekButton(name: 'Previous week' | 'Today' | 'Next week'): Locator {

@@ -32,14 +32,14 @@ export function evidenceCell(id: string, workbookDir: string, fallback: string):
   return { text: `${id}.png`, hyperlink: rel };
 }
 
-/** Appends the "Automation notes" column to a Steps sheet; returns its column number. */
+/** Appends the "Catatan otomasi" (automation notes) column to a Steps sheet; returns its column number. */
 export function addNotesColumn(ws: ExcelJS.Worksheet): number {
   const head = ws.getRow(1);
   let last = 0;
   head.eachCell({ includeEmpty: false }, (_c, i) => (last = Math.max(last, i)));
   const idx = last + 1;
   const cell = head.getCell(idx);
-  cell.value = 'Automation notes';
+  cell.value = 'Catatan otomasi';
   cell.style = JSON.parse(JSON.stringify(head.getCell(last).style));
   ws.getColumn(idx).width = 70;
   return idx;

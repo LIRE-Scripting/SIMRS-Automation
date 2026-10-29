@@ -2,7 +2,7 @@ import { expect, type Locator, type Page } from '@playwright/test';
 import { escapeRe } from '../ambulatory/RegisteredPatientsPage';
 
 /**
- * Inventory (/en/inventory): Item Master, Stores, Stock Requests, Branch and
+ * Inventory (/id/inventory): Item Master, Stores, Stock Requests, Branch and
  * stores, Store documents, Stock desk and Stock book. Read from the live
  * screens on 2026-10-15.
  */
@@ -37,7 +37,7 @@ export class ItemMasterPage {
   }
 
   async open(): Promise<void> {
-    await this.page.goto('/en/inventory/items');
+    await this.page.goto('/id/inventory/items');
     await expect(this.heading).toBeVisible();
   }
 
@@ -141,7 +141,7 @@ export class StoresPage {
   }
 
   async open(): Promise<void> {
-    await this.page.goto('/en/inventory/stores');
+    await this.page.goto('/id/inventory/stores');
     await expect(this.heading).toBeVisible();
   }
 
@@ -164,7 +164,7 @@ export class StockRequestsPage {
   }
 
   async open(): Promise<void> {
-    await this.page.goto('/en/inventory/stock-requests');
+    await this.page.goto('/id/inventory/stock-requests');
     await expect(this.heading).toBeVisible();
   }
 
@@ -199,7 +199,7 @@ export class StoreFormsPage {
   }
 
   async open(route: 'setup' | 'documents' | 'stock-desk' | 'ledger', heading: string): Promise<void> {
-    await this.page.goto(`/en/inventory/${route}`);
+    await this.page.goto(`/id/inventory/${route}`);
     await expect(this.main.getByRole('heading', { level: 1, name: heading })).toBeVisible();
   }
 

@@ -1,3 +1,4 @@
+import { asOnSite } from '../../../lib/i18n';
 import { expect, qaTest, test } from '../../../fixtures/e2e';
 import { AppHeader } from '../../../pages/AppHeader';
 import { screenOpens } from '../shared/screen-opens';
@@ -8,7 +9,7 @@ qaTest('TC-APP006-032', async ({ page, qa }) => {
   const tiles: [string, string][] = [['Blood request', 'Blood request'], ['Stock', 'Stock'], ['Quality control', 'Quality control']];
 
   await qa.step(1, async () => {
-    await page.goto('/en/apps');
+    await page.goto('/id/apps');
     await page.getByRole('link', { name: /^Transfusion Medicine\b/ }).first().click();
     await expect(main.getByRole('navigation', { name: 'Breadcrumb' })).toHaveText(/^Home\s*\/\s*Transfusion Medicine$/);
     await expect(main.getByText('Requests, donors, stock, and quality control in one flow.')).toBeVisible();
@@ -19,17 +20,17 @@ qaTest('TC-APP006-032', async ({ page, qa }) => {
 
   await qa.step(2, async () => {
     for (const [tile, heading] of tiles) {
-      await page.goto('/en/bloodbank');
+      await page.goto('/id/bloodbank');
       await main.getByRole('link', { name: tile, exact: true }).click();
       await expect(main.getByRole('heading', { level: 1, name: heading })).toBeVisible();
     }
-    await page.goto('/en/bloodbank');
+    await page.goto('/id/bloodbank');
     await main.getByRole('link', { name: 'Donors', exact: true }).click();
     await expect(main.getByRole('heading', { level: 1, name: "This page couldn't load" })).toBeVisible();
     qa.blocked(2, 2);
   });
 
-  await qa.step(3, async () => {
+  await qa.step(3, () => asOnSite(async () => {
     const header = new AppHeader(page);
     try {
       await header.selectLanguage('ID');
@@ -41,9 +42,9 @@ qaTest('TC-APP006-032', async ({ page, qa }) => {
       expect(seen).not.toEqual(['Blood request', 'Stock', 'Quality control']);
       qa.note(3, `Indonesian headings: ${seen.join(', ')}; Donors not opened (HTTP 500)`);
     } finally {
-      await header.selectLanguage('EN');
+      await header.selectLanguage('ID');
     }
-  });
+  }));
 });
 
 const SCREENS: [string, string, string][] = [
@@ -60,7 +61,7 @@ for (const [id, route, heading] of SCREENS) {
 
 qaTest('TC-APP006-074', async ({ page, qa }) => {
   // /bloodbank/donors answers HTTP 500: checklist blocker 2 (the journey of this screen check is not linked to it).
-  const response = await page.goto('/en/bloodbank/donors');
+  const response = await page.goto('/id/bloodbank/donors');
   qa.note(1, `HTTP ${response?.status()}`);
   if (response?.status() === 500) {
     qa.blocked(1, 2);

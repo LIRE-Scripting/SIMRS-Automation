@@ -24,7 +24,7 @@ export class VisitsPage {
     this.table = this.main.getByRole('table');
   }
   async open(): Promise<void> {
-    await this.page.goto('/en/emergency/visits');
+    await this.page.goto('/id/emergency/visits');
     await expect(this.heading).toBeVisible();
     await this.page.waitForLoadState('networkidle').catch(() => {});
   }
@@ -85,7 +85,7 @@ export class Patients {
     this.dialog = page.getByRole('dialog');
   }
   async open(tab?: 'Emergency Patients' | 'Emergency OP Patients' | 'Emergency IP Patients'): Promise<void> {
-    await this.page.goto('/en/emergency/patients');
+    await this.page.goto('/id/emergency/patients');
     await expect(this.main.getByRole('heading', { level: 1, name: 'Emergency Patients' })).toBeVisible();
     if (tab) await this.main.getByRole('tab', { name: tab }).click();
     await this.page.waitForLoadState('networkidle').catch(() => {});

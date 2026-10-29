@@ -2,10 +2,12 @@ import type { Locator, Page } from '@playwright/test';
 import { expect, qaTest, test } from '../../../fixtures/e2e';
 import { installToastRecorder } from '../../../lib/assertions';
 import { todayWib } from '../../../lib/dates';
-import { backToEnglish, switchLanguage } from '../shared/language';
+import { backToIndonesian, switchLanguage } from '../shared/language';
 import { screenOpens } from '../shared/screen-opens';
 import { invalidFields } from '../18-settings/helpers';
 import { Accounts, PostingRules, account, clickFor, createAccount, plain, retireAccount, Vouchers } from './helpers';
+import { NotOffered } from '../../../lib/not-offered';
+import { asOnSite, sourceOnSite } from '../../../lib/i18n';
 
 /**
  * 19-finance.xlsx: Vouchers, ERP staging, the hub and the screen checks.
@@ -21,10 +23,23 @@ test.beforeEach(async ({ page }) => {
 });
 
 test.afterEach(async ({ page }) => {
-  await backToEnglish(page);
+  await backToIndonesian(page);
 });
 
 const VCH = { value: '1500000', party: 'QA PT Uji', narration: 'QA Jurnal uji' };
+
+/** The first row `rows` finds, paging on from page 1 (a sale voucher is often not on the first page). */
+async function firstOnPages(page: Page, rows: Locator): Promise<Locator> {
+  // The pager of Vouchers sits outside <main>.
+  const next = page.getByRole('button', { name: 'Next page' });
+  for (let i = 0; i < 40; i++) {
+    if (await rows.first().waitFor({ timeout: 2_500 }).then(() => true, () => false)) break;
+    if (!(await next.isVisible()) || (await next.isDisabled())) break;
+    await next.press('Enter');
+    await page.waitForLoadState('networkidle').catch(() => {});
+  }
+  return rows.first();
+}
 
 qaTest('TC-APP019-008', async ({ page, qa }) => {
   const v = new Vouchers(page);
@@ -32,7 +47,7 @@ qaTest('TC-APP019-008', async ({ page, qa }) => {
   const narration = qa.name(VCH.narration);
   let number = '';
   await qa.step(1, async () => {
-    await page.goto('/en/finance');
+    await page.goto('/id/finance');
     await page.getByRole('main').getByRole('link', { name: 'Vouchers' }).click();
     await expect(page.getByRole('heading', { level: 1, name: 'Vouchers' })).toBeVisible();
     await expect(page.getByText('Back-office vouchers, across document types.', { exact: true })).toBeVisible();
@@ -106,7 +121,7 @@ qaTest('TC-APP019-009', async ({ page, qa }) => {
 qaTest('TC-APP019-011', async ({ page, qa }) => {
   const main = page.getByRole('main');
   await qa.step(1, async () => {
-    await page.goto('/en/finance');
+    await page.goto('/id/finance');
     await main.getByRole('link', { name: 'ERP staging' }).click();
     await expect(main.getByRole('heading', { level: 1, name: 'ERP invoice staging' })).toBeVisible();
     await expect(main.getByText('HIS invoices waiting to be posted, with patient name and medical record number.', { exact: true })).toBeVisible();
@@ -133,7 +148,7 @@ qaTest('TC-APP019-014', async ({ page, qa }) => {
   const main = page.getByRole('main');
   const five = ['Financial years', 'Chart of accounts', 'Budget posting rules', 'Vouchers', 'ERP staging'];
   await qa.step(1, async () => {
-    await page.goto('/en/apps');
+    await page.goto('/id/apps');
     await page.getByRole('link', { name: /^Finance\b/ }).first().click();
     await expect(main.getByRole('navigation', { name: 'Breadcrumb' })).toHaveText(/^Home\s*\/\s*Apps\s*\/\s*Finance$/);
     await expect(main.getByRole('heading', { level: 1, name: 'Finance' })).toBeVisible();
@@ -144,23 +159,22 @@ qaTest('TC-APP019-014', async ({ page, qa }) => {
   });
   await qa.step(2, async () => {
     for (const t of five) {
-      await page.goto('/en/finance');
+      await page.goto('/id/finance');
       await main.getByRole('link', { name: t, exact: true }).click();
       await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
     }
-    const side = (await page.getByRole('complementary').last().innerText()).replace(/\s+/g, ' ');
-    expect(side).toContain('Finance');
-    expect(side).toContain('Vouchers & GL');
-    for (const s of ['Masters', 'Ledgers']) expect(side.toLowerCase()).toContain(s.toLowerCase());
+    // The sidebar as the site writes it; each label in either language.
+    const side = (await asOnSite(() => page.getByRole('complementary').last().innerText())).replace(/\s+/g, ' ');
+    for (const s of ['Finance', 'Vouchers & GL', 'Masters', 'Ledgers']) expect(side).toMatch(new RegExp(sourceOnSite(s), 'i'));
   });
-  await qa.step(3, async () => {
+  await qa.step(3, () => asOnSite(async () => {
     await switchLanguage(page, 'ID');
     await page.goto('/id/finance');
     const h1 = (await page.getByRole('heading', { level: 1 }).innerText()).trim();
     const tiles = (await main.getByRole('link').allInnerTexts()).map((t) => t.trim()).filter(Boolean);
     qa.note(3, `heading "${h1}"; tiles ${tiles.join(', ')}`);
     if (h1 !== 'Keuangan' || tiles.includes('Financial years')) qa.deviation(3, 'Indonesian ("Keuangan", "Tahun buku", "Bagan akun", …)', `"${h1}"; ${tiles.slice(2, 6).join(', ')}`);
-  });
+  }));
 });
 
 qaTest('TC-APP019-015', async ({ page, qa }) => {
@@ -225,7 +239,7 @@ qaTest('TC-APP019-024', async ({ page, qa }) => {
       if (!opened) qa.deviation(1, 'The entries booked to the account and its balance', `the row cannot be opened; it offers ${buttons.join(', ')}`);
     });
     await qa.step(2, async () => {
-      await page.goto('/en/finance');
+      await page.goto('/id/finance');
       const tiles = (await page.getByRole('main').getByRole('link').allInnerTexts()).map((t) => t.trim()).filter((t) => !['Home', 'Apps'].includes(t));
       const side = (await page.getByRole('complementary').last().getByRole('link').allInnerTexts()).map((t) => t.trim());
       qa.note(2, `hub: ${tiles.join(', ')}; menu has "Trial balance": ${side.includes('Trial balance')}`);
@@ -272,7 +286,8 @@ qaTest('TC-APP019-033', async ({ page, qa }) => {
       const r = new PostingRules(page);
       await r.open();
       const options = await r.debit('Allocation — capital').locator('option').allInnerTexts();
-      expect(options).toContain(`${code.toUpperCase()} · ${script}`);
+      // The list offers only the first 50 accounts (found blocker 40).
+      if (!options.includes(`${code.toUpperCase()} · ${script}`)) throw new NotOffered(`the account ${code.toUpperCase()} is not offered: the list holds the first 50 accounts (found blocker 40)`);
       expect(alerted).toBe(false);
     });
   } finally {
@@ -283,7 +298,7 @@ qaTest('TC-APP019-033', async ({ page, qa }) => {
 qaTest('TC-APP019-083', async ({ page, qa }) => {
   const v = new Vouchers(page);
   await qa.step(1, async () => {
-    await page.goto('/en/finance');
+    await page.goto('/id/finance');
     await page.getByRole('complementary').getByRole('link', { name: 'Vouchers' }).first().click();
     await expect(page.getByRole('heading', { level: 1, name: 'Vouchers' })).toBeVisible();
     await expect(page.getByRole('button', { name: 'New voucher' })).toBeVisible();
@@ -312,24 +327,24 @@ qaTest('TC-APP019-083', async ({ page, qa }) => {
   });
   await qa.step(3, async () => {
     await v.open();
-    await v.rows().filter({ hasText: /^SV-/ }).first().getByRole('button', { name: 'Open' }).click();
+    await (await firstOnPages(page, v.rows().filter({ hasText: /^SV-/ }))).getByRole('button', { name: 'Open' }).click();
     const text = plain(await v.detail.innerText());
     qa.note(3, `detail of a sale: "${text.slice(0, 160)}"`);
   });
   await qa.step(4, async () => {
-    await page.goto('/en/finance/journals');
+    await page.goto('/id/finance/journals');
     await page.waitForLoadState('networkidle').catch(() => {});
     const n = await page.getByRole('row').filter({ hasText: /SV-|DC-|DIET-/ }).count();
     qa.note(4, `${n} journal row(s) carry such a number`);
   });
   await qa.step(5, async () => {
-    await page.goto('/en/finance/trial-balance');
+    await page.goto('/id/finance/trial-balance');
     await page.waitForLoadState('networkidle').catch(() => {});
     qa.note(5, `Trial balance: "${plain(await page.locator('body').innerText()).slice(0, 160)}"`);
   });
   await qa.step(6, async () => {
     await v.open();
-    await v.rows().filter({ hasText: /^SV-/ }).first().getByRole('button', { name: 'Open' }).click();
+    await (await firstOnPages(page, v.rows().filter({ hasText: /^SV-/ }))).getByRole('button', { name: 'Open' }).click();
     const buttons = (await v.detail.getByRole('button').allInnerTexts()).map((b) => b.trim());
     qa.note(6, `the detail offers ${buttons.join(', ')}`);
     expect(buttons.some((b) => /journal|approve|post/i.test(b))).toBe(false);

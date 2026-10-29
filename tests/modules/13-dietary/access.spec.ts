@@ -3,7 +3,7 @@ import { expect, qaTest, test, type Qa } from '../../../fixtures/e2e';
 import { installToastRecorder } from '../../../lib/assertions';
 import { DIET } from '../../../lib/diet-data';
 import { pageToRow } from '../../../pages/paging';
-import { appsCardRefused, asUser, BR_B, headerOneBranch, routesRefused, toastsOf, tryRefused, userPage } from '../shared/access';
+import { appsCardRefused, asUser, BR_B, headerOneBranch, menuScreens, routesRefused, toastsOf, tryRefused, userPage } from '../shared/access';
 import { click, RequestsPage, TpnPage, TPN_A } from './helpers';
 
 /**
@@ -207,4 +207,41 @@ qaTest('TC-APP013-029', async ({ page, qa, browser }) => {
   });
 
   await qa.step(4, () => headerOneBranch(page, qa, 4));
+});
+
+qaTest('TC-APP013-052', async ({ qa, browser }) => {
+  const staff = await userPage(browser, 'U3');
+  const main = staff.getByRole('main');
+  /** Clicks a button of a diet screen as U3; the toasts, or a note that the screen does not offer it. */
+  const tryAs = async (route: string, button: string, fill?: () => Promise<void>): Promise<string> => {
+    await staff.goto(`/id${route}`);
+    await staff.waitForLoadState('networkidle').catch(() => {});
+    const b = main.getByRole('button', { name: button }).first();
+    if (!(await b.isVisible().catch(() => false))) return `no "${button}" offered`;
+    if (fill) await fill();
+    const toasts = await toastsOf(staff, () => b.click());
+    return `"${toasts.join(' / ') || 'no toast'}"`;
+  };
+  try {
+    await qa.step(1, async () => {
+      qa.note(1, `U3 (no right) opens ${(await menuScreens(staff, '/diet', ['Catalogue', 'Diet orders', 'Kitchen', 'Service and bill'])).join('; ')} (TBD in the workbook)`);
+    });
+    await qa.step(2, async () => {
+      const r = await tryAs('/diet/catalogue', 'Save', async () => {
+        await main.getByRole('textbox').first().fill(qa.code('X-DIET-01'));
+      });
+      expect(r).not.toMatch(/"(Saved|.*saved)\.?"/i);
+      qa.note(2, `Save on Catalogue: ${r} (TBD in the workbook: refused)`);
+    });
+    await qa.step(3, async () => qa.note(3, `Calculate on Catalogue: ${await tryAs('/diet/catalogue', 'Calculate')} (TBD in the workbook)`));
+    await qa.step(4, async () => qa.note(4, `Approve on Kitchen: ${await tryAs('/diet/kitchen', 'Approve')} (TBD in the workbook)`));
+    await qa.step(5, async () => {
+      const r = await tryAs('/diet/service', 'Bill contractor', async () => {
+        await main.getByRole('textbox').first().fill(qa.name('X Kontraktor gizi'));
+      });
+      qa.note(5, `Bill contractor on Service and bill: ${r} (TBD in the workbook: refused)`);
+    });
+  } finally {
+    await staff.context().close();
+  }
 });

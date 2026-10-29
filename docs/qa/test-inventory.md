@@ -457,9 +457,9 @@ Journey IDs are shortened: `001-003` = `JRN-APP001-003`.
 | [20 Budget](traceability/20-budget.md) | 64 | 0 | 42 | 11 | 11 | 0 | 13 |
 | [21 CSSD](traceability/21-cssd.md) | 57 | 0 | 42 | 4 | 11 | 0 | 14 |
 | [22 Services](traceability/22-services.md) | 36 | 0 | 23 | 0 | 13 | 0 | 22 |
-| [23 Sourcing](traceability/23-sourcing.md) | 34 | 0 | 13 | 6 | 15 | 0 | 26 |
+| [23 Sourcing](traceability/23-sourcing.md) | 34 | 0 | 18 | 9 | 7 | 0 | 26 |
 | [24 Housekeeping](traceability/24-housekeeping.md) | 22 | 0 | 19 | 0 | 3 | 0 | 14 |
 | [25 Linen](traceability/25-linen.md) | 21 | 0 | 15 | 3 | 3 | 0 | 14 |
 | [26 Maintenance](traceability/26-maintenance.md) | 20 | 0 | 13 | 4 | 3 | 0 | 14 |
 | [27 Fixed assets](traceability/27-fixed-assets.md) | 20 | 0 | 11 | 6 | 3 | 0 | 13 |
-| **Total** | **1604** | **30** | **1084** | **54** | **432** | **4** | **418** |
+| **Total** | **1604** | **30** | **1089** | **57** | **424** | **4** | **418** |

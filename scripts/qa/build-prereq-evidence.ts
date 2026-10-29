@@ -7,7 +7,10 @@
  * The same pictures go into reference/00-prerequisites.xlsx: a sheet Evidence
  * (one block per item: result, notes, pictures) and a last column "Evidence"
  * on Users, Role accounts and Set-up and data that links each row to its block.
- * Running it again replaces both.
+ * Running it again replaces both. The texts the builder writes are in
+ * Indonesian (results, headers, meanings); the notes of the run are kept as
+ * they were recorded, and the sheets named after 00-prerequisites.xlsx keep
+ * its sheet names.
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -17,6 +20,16 @@ import type { PrereqItem } from '../../tests/prereq/prereq.spec';
 const DIR = 'reports/prereq';
 const IN = path.join(DIR, 'results.json');
 const OUT = path.join(DIR, '00-prerequisites-evidence.xlsx');
+
+/** The results in Indonesian. */
+const RESULT_ID: Record<PrereqItem['result'], string> = {
+  Done: 'Selesai',
+  'Already present': 'Sudah ada',
+  Failed: 'Gagal',
+  Blocked: 'Terblokir',
+  'Not possible': 'Tidak memungkinkan',
+  'Not done': 'Tidak dikerjakan',
+};
 
 const FILL: Record<PrereqItem['result'], string> = {
   Done: 'FFC6EFCE',
@@ -41,13 +54,13 @@ const head = (ws: ExcelJS.Worksheet, row: number) => {
 
 // ------------------------------------------------------------ summary
 
-const sum = wb.addWorksheet('Summary');
+const sum = wb.addWorksheet('Ringkasan');
 sum.columns = [{ width: 28 }, { width: 14 }, { width: 14 }, { width: 14 }, { width: 14 }, { width: 14 }, { width: 14 }, { width: 10 }];
-sum.addRow(['KlikMed: evidence of the prerequisite run (00-prerequisites.xlsx)']).font = { bold: true, size: 14 };
-sum.addRow([`Site ${run.site}; run ${run.runAt.replace('T', ' ').slice(0, 16)} UTC by ${run.runBy}; one run under the go-ahead of 2026-10-20. Accounts use the shared password QA_PASSWORD (.env).`]);
+sum.addRow(['KlikMed: bukti run prasyarat (00-prerequisites.xlsx)']).font = { bold: true, size: 14 };
+sum.addRow([`Situs ${run.site}; run ${run.runAt.replace('T', ' ').slice(0, 16)} UTC oleh ${run.runBy}; satu run dengan persetujuan 2026-10-20. Akun memakai password bersama QA_PASSWORD (.env).`]);
 sum.addRow([]);
 const results = Object.keys(FILL) as PrereqItem['result'][];
-sum.addRow(['Sheet', ...results, 'Total']);
+sum.addRow(['Sheet', ...results.map((r) => RESULT_ID[r]), 'Total']);
 head(sum, 4);
 for (const sheet of ['Users', 'Role accounts', 'Roles', 'Set-up and data'] as const) {
   const items = run.items.filter((i) => i.sheet === sheet);
@@ -55,17 +68,17 @@ for (const sheet of ['Users', 'Role accounts', 'Roles', 'Set-up and data'] as co
 }
 sum.addRow(['Total', ...results.map((r) => run.items.filter((i) => i.result === r).length), run.items.length]).font = { bold: true };
 sum.addRow([]);
-sum.addRow(['Result', 'Meaning']).font = { bold: true };
+sum.addRow(['Hasil', 'Arti']).font = { bold: true };
 const meaning: Record<PrereqItem['result'], string> = {
-  Done: 'Made by this run and checked (toast, then sign-in or the screen afterwards).',
-  'Already present': 'Found on the site before saving; nothing saved.',
-  Failed: 'Tried; the site refused or the check after saving failed (see Notes).',
-  Blocked: 'Stopped by a known defect (blocker number in Notes).',
-  'Not possible': 'No screen does it, or the site lacks what it needs; left to the site administrator or Development.',
-  'Not done': 'Out of this run by decision (see Notes).',
+  Done: 'Dibuat oleh run ini dan dicek (toast, lalu login atau layar sesudahnya).',
+  'Already present': 'Sudah ada di situs sebelum disimpan; tidak ada yang disimpan.',
+  Failed: 'Dicoba; situs menolak atau pengecekan setelah simpan gagal (lihat Catatan).',
+  Blocked: 'Dihentikan oleh cacat yang diketahui (nomor blocker di Catatan).',
+  'Not possible': 'Tidak ada layar untuk itu, atau situs belum punya yang dibutuhkan; diserahkan ke administrator situs atau Development.',
+  'Not done': 'Di luar run ini atas keputusan (lihat Catatan).',
 };
 for (const r of results) {
-  const row = sum.addRow([r, meaning[r]]);
+  const row = sum.addRow([RESULT_ID[r], meaning[r]]);
   row.getCell(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: FILL[r] } };
 }
 
@@ -82,21 +95,21 @@ for (const sheet of ['Users', 'Role accounts', 'Roles', 'Set-up and data'] as co
     { header: '00-prerequisites.xlsx', width: 30 },
     { header: 'Item', width: 34 },
     { header: 'Login', width: 18 },
-    { header: 'Roles / rights', width: 26 },
-    { header: 'Branch', width: 12 },
-    { header: 'Action', width: 26 },
-    { header: 'Result', width: 15 },
-    { header: 'Notes', width: 90 },
-    { header: 'Screenshots', width: 40 },
-    { header: 'Time (UTC)', width: 17 },
+    { header: 'Role / hak akses', width: 26 },
+    { header: 'Cabang', width: 12 },
+    { header: 'Aksi', width: 26 },
+    { header: 'Hasil', width: 15 },
+    { header: 'Catatan', width: 90 },
+    { header: 'Tangkapan layar', width: 40 },
+    { header: 'Waktu (UTC)', width: 17 },
   ];
   head(ws, 1);
   ws.views = [{ state: 'frozen', ySplit: 1 }];
   for (const i of run.items.filter((x) => x.sheet === sheet)) {
-    const row = ws.addRow([i.id, i.ref, i.item, i.login ?? '', i.roles ?? '', i.branch ?? '', i.action, i.result, i.notes.map((n) => `• ${n}`).join('\n'), '', i.at.replace('T', ' ').slice(0, 16)]);
+    const row = ws.addRow([i.id, i.ref, i.item, i.login ?? '', i.roles ?? '', i.branch ?? '', i.action, RESULT_ID[i.result], i.notes.map((n) => `• ${n}`).join('\n'), '', i.at.replace('T', ' ').slice(0, 16)]);
     row.alignment = { vertical: 'top', wrapText: true };
     row.getCell(8).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: FILL[i.result] } };
-    // One cell holds one link: the first screenshot is linked, every one is named (sheet Screenshots shows them all).
+    // One cell holds one link: the first screenshot is linked, every one is named (sheet Tangkapan layar shows them all).
     if (i.screenshots.length) {
       const names = i.screenshots.map((s) => `${shotIds.get(s)} ${path.basename(s)}`).join('\n');
       const rel = path.posix.relative(DIR, i.screenshots[0].split(path.sep).join('/'));
@@ -109,9 +122,9 @@ for (const sheet of ['Users', 'Role accounts', 'Roles', 'Set-up and data'] as co
 
 // ------------------------------------------------------------ screenshots
 
-const pics = wb.addWorksheet('Screenshots');
+const pics = wb.addWorksheet('Tangkapan layar');
 pics.columns = [{ width: 12 }, { width: 10 }, { width: 60 }, { width: 140 }];
-pics.addRow(['Screenshot', 'Item', 'File', 'Picture']);
+pics.addRow(['Tangkapan layar', 'Item', 'File', 'Gambar']);
 head(pics, 1);
 let at = 2;
 const WIDTH = 960;
@@ -157,14 +170,14 @@ async function intoReference(): Promise<void> {
   if (old) ref.removeWorksheet(old.id);
   const ev = ref.addWorksheet('Evidence');
   ev.columns = [{ width: 14 }, { width: 130 }];
-  ev.getCell('A1').value = `Evidence of the prerequisite run (${run.runAt.slice(0, 10)}, ${run.runBy}); the same as ${OUT}. One block per item: result, notes, screenshots.`;
+  ev.getCell('A1').value = `Bukti run prasyarat (${run.runAt.slice(0, 10)}, ${run.runBy}); sama dengan ${OUT}. Satu blok per item: hasil, catatan, tangkapan layar.`;
   ev.getCell('A1').font = { bold: true };
   const blockRow = new Map<string, number>();
   let at = 3;
   for (const i of run.items) {
     blockRow.set(i.id, at);
     const top = ev.getRow(at);
-    top.values = [i.id, `${i.item} | ${i.ref}${i.login ? ` | ${i.login}` : ''} | ${i.result}`];
+    top.values = [i.id, `${i.item} | ${i.ref}${i.login ? ` | ${i.login}` : ''} | ${RESULT_ID[i.result]}`];
     top.font = { bold: true };
     top.getCell(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: FILL[i.result] } };
     const notes = ev.getRow(at + 1);
@@ -183,11 +196,11 @@ async function intoReference(): Promise<void> {
   const link = (ids: string[]): ExcelJS.CellValue => {
     const found = ids.filter((id) => blockRow.has(id));
     if (!found.length) return null;
-    const results = found.map((id) => run.items.find((x) => x.id === id)!.result);
+    const results = found.map((id) => RESULT_ID[run.items.find((x) => x.id === id)!.result]);
     const label =
       found.length <= 2
         ? found.map((id, k) => `${id}: ${results[k]}`).join('; ')
-        : `${found.length} items: ${[...new Set(results)].map((r) => `${results.filter((x) => x === r).length} ${r}`).join(', ')}`;
+        : `${found.length} item: ${[...new Set(results)].map((r) => `${results.filter((x) => x === r).length} ${r}`).join(', ')}`;
     return { text: label, hyperlink: `#'Evidence'!A${blockRow.get(found[0])}` };
   };
   /** Writes the column "Evidence" after the last header of a sheet; rows are matched by the text of a key column. */

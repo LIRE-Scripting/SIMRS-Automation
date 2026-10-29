@@ -6,6 +6,7 @@ import { pageToRow } from '../../../pages/paging';
 import { png } from './png';
 import { createUser, fillUser, invalidFields, newPassword, pick, roles, signInAs, toastsAfter, users, type NewUser } from './helpers';
 import { TC_APP018_037, TC_APP018_039 } from './cases';
+import { NotOffered } from '../../../lib/not-offered';
 
 /**
  * 18-settings.xlsx: Users, Roles, Rights, Branch map, Sign-in log, Brand,
@@ -53,10 +54,13 @@ const cellsOf = async (row: Locator) => (await row.getByRole('cell').allInnerTex
 /** The lines of a login on Branch map; pages on, as a new login is not on the first page. */
 async function mapLines(page: Page, login: string): Promise<Locator> {
   const main = page.getByRole('main');
-  await page.goto('/en/identity/site-maps');
+  await page.goto('/id/identity/site-maps');
   await expect(main.getByRole('heading', { level: 1, name: 'User Site Mapping' })).toBeVisible();
   await expect(main.getByRole('cell').first()).toBeVisible();
-  return pageToRow(main, () => main.getByRole('row').filter({ has: page.getByRole('cell', { name: login, exact: true }) }));
+  const lines = await pageToRow(main, () => main.getByRole('row').filter({ has: page.getByRole('cell', { name: login, exact: true }) }));
+  // Each page draws only some of its logins (found blocker 40): a new login is often on no page.
+  if (!(await lines.count())) throw new NotOffered(`the login ${login} is on no page of User Site Mapping (found blocker 40)`);
+  return lines;
 }
 
 qaTest('TC-APP018-031', async ({ page, qa, browser }) => {
@@ -64,7 +68,7 @@ qaTest('TC-APP018-031', async ({ page, qa, browser }) => {
   const v = userData(qa);
   try {
     await qa.step(1, async () => {
-      await page.goto('/en/settings');
+      await page.goto('/id/settings');
       await page.getByRole('main').getByRole('link', { name: /^Users\b/ }).click();
       await expect(u.main.getByRole('heading', { level: 1, name: 'Users' })).toBeVisible();
       await expect(u.main.getByText('Users of this hospital.', { exact: true })).toBeVisible();
@@ -108,7 +112,7 @@ qaTest('TC-APP018-031', async ({ page, qa, browser }) => {
       }
     });
     await qa.step(6, async () => {
-      await page.goto('/en/audit');
+      await page.goto('/id/audit');
       await page.getByRole('textbox', { name: 'Action' }).fill('user.create');
       await page.getByRole('button', { name: 'Search' }).click();
       await page.waitForLoadState('networkidle').catch(() => {});
@@ -307,7 +311,7 @@ qaTest('TC-APP018-039', TC_APP018_039);
 qaTest('TC-APP018-040', async ({ page, qa }) => {
   const main = page.getByRole('main');
   await qa.step(1, async () => {
-    await page.goto('/en/identity/rights');
+    await page.goto('/id/identity/rights');
     const box = main.getByRole('combobox', { name: 'Role' });
     const before = await main.getByText(/^\d+ \/ \d+$/).innerText();
     await box.fill('');
@@ -335,7 +339,7 @@ qaTest('TC-APP018-041', async ({ page, qa }) => {
   };
   try {
     await qa.step(1, async () => {
-      await page.goto('/en/settings');
+      await page.goto('/id/settings');
       await main.getByRole('link', { name: /^Branch map\b/ }).click();
       await expect(main.getByRole('heading', { level: 1, name: 'User Site Mapping' })).toBeVisible();
       await expect(main.getByText('Branch where each role applies. Empty means every branch.', { exact: true })).toBeVisible();
@@ -352,7 +356,7 @@ qaTest('TC-APP018-041', async ({ page, qa }) => {
       await expect((await mapLines(page, v.login)).getByRole('combobox', { name: 'Branch' })).toHaveValue('');
     });
     await qa.step(4, async () => {
-      await page.goto('/en/settings');
+      await page.goto('/id/settings');
       await main.getByRole('link', { name: /^Sign-in log\b/ }).click();
       await expect(main.getByRole('heading', { level: 1, name: 'User Login Log' })).toBeVisible();
       await expect(main.getByText('Login events for users of this hospital.', { exact: true })).toBeVisible();
@@ -398,9 +402,9 @@ qaTest('TC-APP018-042', async ({ page, qa, browser }) => {
     });
     await qa.step(3, async () => {
       for (let i = 0; i < 3; i++) await (await signInAs(browser, v.login, `${v.password}x`)).context.close();
-      await page.goto('/en/identity/login-log');
+      await page.goto('/id/identity/login-log');
       const mine = await page.getByRole('main').getByRole('row').filter({ hasText: v.login }).count();
-      await page.goto('/en/audit');
+      await page.goto('/id/audit');
       await page.getByRole('textbox', { name: 'Action' }).fill('identity.login');
       await page.getByRole('button', { name: 'Search' }).click();
       await page.waitForLoadState('networkidle').catch(() => {});
@@ -418,7 +422,7 @@ const radioName = (r: Locator) => r.evaluate((e) => (e.getAttribute('aria-label'
 type Brand = { name: string; url: string; locale: string; colour: string; complete: boolean; logo: boolean };
 
 async function brandNow(page: Page): Promise<Brand> {
-  await page.goto('/en/identity/branding');
+  await page.goto('/id/identity/branding');
   const main = page.getByRole('main');
   await expect(main.getByRole('heading', { level: 1, name: 'Tenant Branding' })).toBeVisible();
   await page.waitForLoadState('networkidle').catch(() => {});
@@ -426,7 +430,7 @@ async function brandNow(page: Page): Promise<Brand> {
     name: await main.getByRole('textbox', { name: 'Product name' }).inputValue(),
     url: await main.getByRole('textbox', { name: 'Logo URL' }).inputValue(),
     locale: await main.getByRole('combobox', { name: 'Default locale' }).inputValue(),
-    colour: await radioName(main.getByRole('radio', { checked: true })),
+    colour: await radioName(main.getByRole('radiogroup', { name: 'Primary color' }).getByRole('radio', { checked: true })),
     complete: await main.getByRole('checkbox', { name: 'Branding complete' }).isChecked(),
     logo: (await main.getByRole('button', { name: 'Remove logo' }).count()) > 0,
   };
@@ -451,12 +455,13 @@ async function restoreBrand(page: Page, b: Brand): Promise<void> {
 }
 
 qaTest('TC-APP018-043', async ({ page, qa, browser }) => {
+  let brandingFailed = false;
   const main = page.getByRole('main');
   const before = await brandNow(page);
   const product = qa.prefix('X RS Uji');
   try {
     await qa.step(1, async () => {
-      await page.goto('/en/settings');
+      await page.goto('/id/settings');
       await main.getByRole('link', { name: /^Brand\b/ }).click();
       await expect(main.getByRole('heading', { level: 1, name: 'Tenant Branding' })).toBeVisible();
       await expect(main.getByText('Product name, logo, colors, and default language.', { exact: true })).toBeVisible();
@@ -472,22 +477,29 @@ qaTest('TC-APP018-043', async ({ page, qa, browser }) => {
       await main.getByRole('button', { name: 'Upload logo' }).setInputFiles({ name: 'qa-logo.png', mimeType: 'image/png', buffer: png(320, 80) });
       await expect(main.getByText('This file is 320 × 80 px.')).toBeVisible();
       await main.getByRole('combobox', { name: 'Default locale' }).selectOption('en');
-      expect(await saveBranding(page)).toContain('Branding updated.');
+      const saved = await saveBranding(page);
+      if (saved.includes('Failed to save branding.')) {
+        // The save with the uploaded logo answers HTTP 500 (found blocker 55).
+        brandingFailed = true;
+        return qa.note(2, `"Save branding" with the uploaded logo: "${saved.join(' / ')}" (HTTP 500)`);
+      }
+      expect(saved).toContain('Branding updated.');
     });
-    await qa.step(3, async () => {
+    if (brandingFailed) for (const st of [2, 3, 4]) qa.blocked(st, 55);
+    else await qa.step(3, async () => {
       await page.reload();
       const header = (await page.getByRole('banner').first().innerText()).replace(/\s+/g, ' ');
       const logo = await page.getByRole('banner').first().locator('img').count();
       const anon = await browser.newContext({ storageState: { cookies: [], origins: [] } });
       const p = await anon.newPage();
-      await p.goto('/en/login');
+      await p.goto('/id/login');
       const signIn = (await p.locator('body').innerText()).replace(/\s+/g, ' ').slice(0, 160);
       const signInLogo = await p.locator('img').count();
       await anon.close();
       qa.note(3, `header "${header.slice(0, 80)}" (${logo} image); sign-in page "${signIn}" (${signInLogo} image)`);
       if (!header.includes(product)) qa.deviation(3, 'The new name and logo are shown', `the header reads "${header.slice(0, 60)}"`);
     });
-    await qa.step(4, async () => {
+    if (!brandingFailed) await qa.step(4, async () => {
       const anon = await browser.newContext({ storageState: { cookies: [], origins: [] }, locale: 'de-DE' });
       const p = await anon.newPage();
       await p.goto('/');
@@ -569,8 +581,8 @@ qaTest('TC-APP018-045', async ({ page, qa, browser }) => {
       const now = await look();
       const u2 = await browser.newContext({ storageState: authFileOf('U2') });
       const p2 = await u2.newPage();
-      await p2.goto('/en/identity/branding');
-      const u2Colour = await radioName(p2.getByRole('main').getByRole('radio', { checked: true }));
+      await p2.goto('/id/identity/branding');
+      const u2Colour = await radioName(p2.getByRole('main').getByRole('radiogroup', { name: 'Primary color' }).getByRole('radio', { checked: true }));
       await u2.close();
       qa.note(1, `"${otherName}" clicked, not saved: page ${was === now ? 'unchanged' : `"${was}" -> "${now}"`}; sent ${sent.join(', ') || 'nothing'}; U2 sees "${u2Colour}"`);
     });
@@ -584,7 +596,7 @@ qaTest('TC-APP018-045', async ({ page, qa, browser }) => {
 qaTest('TC-APP018-046', async ({ page, qa, browser }) => {
   const main = page.getByRole('main');
   await qa.step(1, async () => {
-    await page.goto('/en/settings');
+    await page.goto('/id/settings');
     await main.getByRole('link', { name: /^Theme\b/ }).click();
     const h1 = (await main.getByRole('heading', { level: 1 }).innerText()).trim();
     const appearance = await main.getByRole('radio', { name: /dark|light|system/i }).count();
@@ -596,7 +608,7 @@ qaTest('TC-APP018-046', async ({ page, qa, browser }) => {
   });
   let widget = '';
   await qa.step(3, async () => {
-    await page.goto('/en/settings');
+    await page.goto('/id/settings');
     await main.getByRole('link', { name: /^Dashboard\b/ }).click();
     await expect(main.getByRole('heading', { level: 1, name: 'Configure dashboard' })).toBeVisible();
     await expect(main.getByText('Show or hide dashboard widgets.', { exact: true })).toBeVisible();
@@ -614,20 +626,20 @@ qaTest('TC-APP018-046', async ({ page, qa, browser }) => {
     await qa.step(5, async () => {
       const u2 = await browser.newContext({ storageState: authFileOf('U2') });
       const p2 = await u2.newPage();
-      await p2.goto('/en/identity/dashboard');
+      await p2.goto('/id/identity/dashboard');
       const state = (await p2.getByRole('main').getByRole('list').first().getByRole('listitem').first().getByRole('button').innerText()).trim();
       await u2.close();
       qa.note(5, `U2 sees "${widget}" as "${state}"`);
     });
   } finally {
-    await page.goto('/en/identity/dashboard');
+    await page.goto('/id/identity/dashboard');
     const first = main.getByRole('list').first().getByRole('listitem').first().getByRole('button');
     if ((await first.innerText()).trim() !== 'Visible') await first.click();
   }
 });
 
 async function addRule(page: Page, role: string | null): Promise<string[]> {
-  await page.goto('/en/identity/notifications');
+  await page.goto('/id/identity/notifications');
   await page.getByRole('main').getByRole('button', { name: 'Add rule' }).click();
   const d = page.getByRole('dialog');
   const box = d.getByRole('combobox', { name: 'Role' });
@@ -644,7 +656,7 @@ async function addRule(page: Page, role: string | null): Promise<string[]> {
 const ruleRows = (page: Page) => page.getByRole('main').getByRole('rowgroup').nth(1).getByRole('row').filter({ has: page.getByRole('button', { name: 'Remove' }) });
 
 async function ruleCount(page: Page): Promise<number> {
-  await page.goto('/en/identity/notifications');
+  await page.goto('/id/identity/notifications');
   await page.waitForLoadState('networkidle').catch(() => {});
   return ruleRows(page).count();
 }
@@ -662,7 +674,7 @@ qaTest('TC-APP018-047', async ({ page, qa }) => {
   const keep = await ruleCount(page);
   try {
     await qa.step(1, async () => {
-      await page.goto('/en/settings');
+      await page.goto('/id/settings');
       await main.getByRole('link', { name: /^Notifications\b/ }).click();
       await expect(main.getByRole('heading', { level: 1, name: 'Notification config' })).toBeVisible();
       await expect(main.getByText('Who receives an in-app notice when a BPJS claim is submitted.', { exact: true })).toBeVisible();
@@ -723,7 +735,7 @@ async function passwordScreen(page: Page, qa: Qa, browser: import('@playwright/t
   const v = await newUser(page, qa);
   const s = await signInAs(browser, v.login, v.password);
   expect(s.ok, s.message).toBe(true);
-  await s.page.goto('/en/identity/password');
+  await s.page.goto('/id/identity/password');
   return { v, s };
 }
 
@@ -759,14 +771,14 @@ qaTest('TC-APP018-049', async ({ page, qa, browser }) => {
       expect(fresh.ok, fresh.message).toBe(true);
     });
     await qa.step(4, async () => {
-      await s.page.goto('/en/identity/password');
+      await s.page.goto('/id/identity/password');
       const inputs = await s.page.getByRole('main').getByRole('textbox').count();
       const text = await s.page.getByRole('main').innerText();
       expect(inputs).toBe(2);
       qa.note(4, `${inputs} inputs; rules shown: ${/length|character|expir|reuse/i.test(text) ? 'yes' : 'none'}`);
     });
     await qa.step(5, async () => {
-      await page.goto('/en/settings');
+      await page.goto('/id/settings');
       await page.getByRole('main').getByRole('link', { name: /^Second-level security\b/ }).click();
       await expect(page.getByRole('main').getByRole('heading', { level: 1, name: 'Second-level security' })).toBeVisible();
       await expect(page.getByRole('main').getByText('Second-level security is not available yet.', { exact: true })).toBeVisible();
@@ -784,7 +796,7 @@ qaTest('TC-APP018-050', async ({ page, qa, browser }) => {
       expect(await change(s.page, `${v.password}x`, newPassword())).toContain('Could not change password.');
     });
     await qa.step(2, async () => {
-      await s.page.goto('/en/identity/password');
+      await s.page.goto('/id/identity/password');
       const toasts = await change(s.page, v.password, '');
       expect(toasts).not.toContain('Password updated.');
       const invalid = await invalidFields(s.page.getByRole('main'));
@@ -806,14 +818,14 @@ qaTest('TC-APP018-051', async ({ page, qa, browser }) => {
       if (toasts.includes('Password updated.')) current = '1';
     });
     await qa.step(2, async () => {
-      await s.page.goto('/en/identity/password');
+      await s.page.goto('/id/identity/password');
       const toasts = await change(s.page, current, current);
       qa.note(2, `the current password again: toast "${toasts.join(' / ')}"`);
     });
     await qa.step(3, async () => {
       const meant = newPassword();
       const typed = `${meant}x`;
-      await s.page.goto('/en/identity/password');
+      await s.page.goto('/id/identity/password');
       const toasts = await change(s.page, current, typed);
       const tryMeant = await signInAs(browser, v.login, meant);
       await tryMeant.context.close();
@@ -829,7 +841,7 @@ qaTest('TC-APP018-051', async ({ page, qa, browser }) => {
 const auditRows = (page: Page) => page.getByRole('table').getByRole('rowgroup').nth(1).getByRole('row').filter({ has: page.getByRole('cell').nth(1) });
 
 async function auditSearch(page: Page, v: { module?: string; action?: string; patient?: string }): Promise<void> {
-  await page.goto('/en/audit');
+  await page.goto('/id/audit');
   if (v.module !== undefined) await page.getByRole('textbox', { name: 'Module' }).fill(v.module);
   if (v.action !== undefined) await page.getByRole('textbox', { name: 'Action' }).fill(v.action);
   if (v.patient !== undefined) await page.getByRole('textbox', { name: 'Patient name' }).fill(v.patient);
@@ -840,7 +852,7 @@ async function auditSearch(page: Page, v: { module?: string; action?: string; pa
 qaTest('TC-APP018-056', async ({ page, qa }) => {
   const col = async (n: number) => auditRows(page).evaluateAll((rs, i) => rs.map((r) => r.querySelectorAll('td')[i]?.textContent?.trim() ?? ''), n);
   await qa.step(1, async () => {
-    await page.goto('/en/settings');
+    await page.goto('/id/settings');
     await page.getByRole('main').getByRole('link', { name: /^Audit trail\b/ }).click();
     await expect(page.getByRole('heading', { level: 1, name: 'Audit Log' })).toBeVisible();
     for (const f of ['Patient name', 'Module', 'Action', 'Hospital']) await expect(page.getByRole('textbox', { name: f })).toBeVisible();

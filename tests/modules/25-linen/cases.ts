@@ -12,7 +12,7 @@ export type CaseArgs = { page: Page; qa: Qa };
 export const TC_APP025_001 = async ({ page, qa }: CaseArgs): Promise<void> => {
   const s = stores(page);
   await qa.step(1, async () => {
-    await page.goto('/en/linen');
+    await page.goto('/id/linen');
     await page.getByRole('main').getByRole('link', { name: 'Stores and recipe' }).click();
     await expect(s.main.getByRole('heading', { level: 1, name: 'Stores and recipe' })).toBeVisible();
     await expect(s.main.getByRole('button', { name: 'Save stores' })).toBeVisible();

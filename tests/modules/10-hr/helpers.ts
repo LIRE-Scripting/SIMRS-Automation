@@ -20,9 +20,9 @@ export async function toastsAfter(page: Page, mark: number, timeout = 8_000): Pr
 }
 
 /** EMP-1 (or EMP-2) of the catalogue with a new token in number and name. */
-export function employeeData(qa: Qa, base: { no: string; name: string } = HR.emp1): Required<Pick<Employee, 'no' | 'name'>> & Employee {
+export function employeeData(qa: Qa, base: { no: string; name: string } = HR.emp1, department = DEP_A_HIT): Required<Pick<Employee, 'no' | 'name'>> & Employee {
   const t = qa.token();
-  return { ...HR.emp1, no: `${base.no}-${t}`, name: `${base.name} ${t}`, department: DEP_A_HIT };
+  return { ...HR.emp1, no: `${base.no}-${t}`, name: `${base.name} ${t}`, department };
 }
 
 /** Creates an employee through the six steps and returns it (toast "Employee saved"). */
@@ -37,8 +37,9 @@ export async function createEmployee(page: Page, e: Employee): Promise<string[]>
   return toastsAfter(page, mark);
 }
 
-export async function employee(page: Page, qa: Qa, base?: { no: string; name: string }): Promise<{ no: string; name: string }> {
-  const e = employeeData(qa, base);
+/** An employee of the test; an employee of BR-B (made by U6) takes DEP_B_HIT as department. */
+export async function employee(page: Page, qa: Qa, base?: { no: string; name: string }, department?: string): Promise<{ no: string; name: string }> {
+  const e = employeeData(qa, base, department);
   expect(await createEmployee(page, e)).toContain('Employee saved');
   return { no: e.no, name: e.name };
 }

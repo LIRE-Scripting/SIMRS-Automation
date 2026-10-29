@@ -40,7 +40,7 @@ chainTest('E2E-023', async ({ page, chain }) => {
   await chain.step(4, async (qa) => {
     const proc = procedure(qa);
     await qa.step(1, async () => {
-      await page.goto('/en/apps');
+      await page.goto('/id/apps');
       await page.getByRole('link', { name: /^Operation Theater\b/ }).first().click();
       await page.getByRole('main').getByRole('link', { name: 'Open requests' }).click();
       await expect(ot.heading).toBeVisible();

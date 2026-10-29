@@ -5,7 +5,7 @@ import { defineAppointmentCases } from '../shared/appointment-cases';
  * The cases are shared with 02-appointment.xlsx (same steps, same screen):
  * tests/modules/shared/appointment-cases.ts.
  */
-defineAppointmentCases('/en/registration/appointments', {
+defineAppointmentCases('/id/registration/appointments', {
   bookSettings: 'TC-APP001-011',
   bookConsultant: 'TC-APP001-012',
   bookUnit: 'TC-APP001-013',

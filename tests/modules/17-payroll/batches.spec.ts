@@ -1,7 +1,8 @@
+import { asOnSite } from '../../../lib/i18n';
 import { expect, qaTest, test } from '../../../fixtures/e2e';
 import { installToastRecorder } from '../../../lib/assertions';
 import { HR } from '../../../lib/hr-data';
-import { backToEnglish, switchLanguage } from '../shared/language';
+import { backToIndonesian, switchLanguage } from '../shared/language';
 import { screenOpens } from '../shared/screen-opens';
 import { Batches, Desk, SAVED, payrollEmployee } from './helpers';
 import { BASE, TC_APP017_001 } from './cases';
@@ -21,7 +22,7 @@ test.beforeEach(async ({ page }) => {
 });
 
 test.afterEach(async ({ page }) => {
-  await backToEnglish(page);
+  await backToIndonesian(page);
 });
 
 qaTest('TC-APP017-001', TC_APP017_001);
@@ -73,7 +74,7 @@ qaTest('TC-APP017-004', async ({ page, qa }) => {
 qaTest('TC-APP017-007', async ({ page, qa }) => {
   const main = page.getByRole('main');
   await qa.step(1, async () => {
-    await page.goto('/en/apps');
+    await page.goto('/id/apps');
     await page.getByRole('link', { name: /^Payroll\b/ }).first().click();
     await expect(main.getByRole('navigation', { name: 'Breadcrumb' })).toHaveText(/^Home\s*\/\s*Apps\s*\/\s*Payroll$/);
     await expect(main.getByRole('heading', { level: 1, name: 'Payroll' })).toBeVisible();
@@ -83,21 +84,21 @@ qaTest('TC-APP017-007', async ({ page, qa }) => {
   });
   await qa.step(2, async () => {
     for (const via of ['tile', 'sidebar']) {
-      await page.goto('/en/payroll');
+      await page.goto('/id/payroll');
       const link = via === 'tile' ? main.getByRole('link', { name: 'Batches' }) : page.getByRole('complementary').getByRole('link', { name: 'Batches' }).first();
       await link.click();
       await expect(page.getByRole('heading', { level: 1, name: 'Payroll batches' })).toBeVisible();
       await expect(page.getByText(/^Payroll\s*\/\s*Payroll batches$/)).toBeVisible();
     }
   });
-  await qa.step(3, async () => {
+  await qa.step(3, () => asOnSite(async () => {
     await switchLanguage(page, 'ID');
     await page.goto('/id/payroll/batches');
     const h1 = (await page.getByRole('heading', { level: 1 }).innerText()).trim();
     const button = (await page.getByRole('button', { name: /batch/i }).first().innerText()).trim();
     qa.note(3, `heading "${h1}", button "${button}"`);
     if (h1 === 'Payroll batches' || button === 'Run batch') qa.deviation(3, 'Headings, fields, buttons and toasts are Indonesian ("Batch payroll", "Jalankan batch", …)', `heading "${h1}", button "${button}"`);
-  });
+  }));
 });
 
 qaTest('TC-APP017-008', async ({ page, qa }) => {
@@ -254,8 +255,8 @@ qaTest('TC-APP017-016', async ({ page, qa }) => {
   const off = await payrollEmployee(page, qa, { no: 'QA-EMP-NONAKTIF', name: HR.emp1.name }, { status: 'Inactive' });
   await qa.step(1, async () => {
     await b.open();
-    await b.employee.fill(off.no);
-    const hit = b.hits().filter({ hasText: off.no });
+    // No hit is what the list does for every employee past its first 50 (found blocker 40), so it says nothing of the status.
+    const hit = await b.offered(off.no);
     await expect(hit).toHaveCount(1);
     const text = await hit.innerText();
     if (!/inactive|nonaktif/i.test(text.replace(off.no, ''))) qa.deviation(1, 'No hit, or the hit is marked as inactive', `hit "${text.trim()}" with no mark`);
@@ -277,7 +278,7 @@ qaTest('TC-APP017-016', async ({ page, qa }) => {
 qaTest('TC-APP017-020', async ({ page, qa }) => {
   let screens = '';
   await qa.step(1, async () => {
-    await page.goto('/en/payroll');
+    await page.goto('/id/payroll');
     const tiles = (await page.getByRole('main').getByRole('link').allInnerTexts()).map((t) => t.trim()).filter((t) => !['Home', 'Apps'].includes(t));
     const side = (await page.getByRole('complementary').getByRole('link').allInnerTexts()).map((t) => t.trim());
     screens = side.slice(side.indexOf('Analytics') + 1).join(', ');
@@ -304,8 +305,7 @@ qaTest('TC-APP017-026', async ({ page, qa }) => {
   const e = await payrollEmployee(page, qa, { no: 'QA-EMP-XSS', name: HR.emp1.name }, { name });
   await qa.step(1, async () => {
     await b.open();
-    await b.employee.fill(e.no);
-    await expect(b.hits().filter({ hasText: e.no })).toContainText(name);
+    await expect(await b.offered(e.no)).toContainText(name);
     await b.hits().filter({ hasText: e.no }).click();
     await expect(b.employee).toHaveValue(`${e.no} ${name}`);
     expect(alerted).toBe(false);

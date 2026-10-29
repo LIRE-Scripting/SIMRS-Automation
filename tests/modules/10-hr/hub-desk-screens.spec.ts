@@ -1,6 +1,7 @@
+import { asOnSite } from '../../../lib/i18n';
 import { expect, qaTest, test, type Qa } from '../../../fixtures/e2e';
 import { installToastRecorder, toastMark } from '../../../lib/assertions';
-import { backToEnglish, switchLanguage } from '../shared/language';
+import { backToIndonesian, switchLanguage } from '../shared/language';
 import { screenOpens } from '../shared/screen-opens';
 import { employee, toastsAfter } from './helpers';
 
@@ -12,14 +13,14 @@ test.beforeEach(async ({ page }) => {
 });
 
 test.afterEach(async ({ page }) => {
-  await backToEnglish(page);
+  await backToIndonesian(page);
 });
 
 qaTest('TC-APP010-015', async ({ page, qa }) => {
   const main = page.getByRole('main');
 
   await qa.step(1, async () => {
-    await page.goto('/en/apps');
+    await page.goto('/id/apps');
     await page.getByRole('link', { name: /^HR\b/ }).first().click();
     await expect(main.getByRole('navigation', { name: 'Breadcrumb' })).toHaveText(/^Home\s*\/\s*Apps\s*\/\s*HR$/);
     await expect(main.getByRole('heading', { level: 1, name: 'HR' })).toBeVisible();
@@ -29,23 +30,23 @@ qaTest('TC-APP010-015', async ({ page, qa }) => {
 
   await qa.step(2, async () => {
     for (const [tile, heading] of [['Employees', 'Employees'], ['Leave applications', 'Leave applications']]) {
-      await page.goto('/en/hr');
+      await page.goto('/id/hr');
       await main.getByRole('link', { name: tile, exact: true }).click();
       await expect(page.getByRole('heading', { level: 1, name: heading })).toBeVisible();
       await page.getByRole('navigation', { name: 'HR' }).getByRole('link', { name: tile, exact: true }).click();
       await expect(page.getByRole('heading', { level: 1, name: heading })).toBeVisible();
     }
-    await page.goto('/en/hr');
+    await page.goto('/id/hr');
     const roster = main.getByRole('link', { name: 'Duty roster', exact: true });
     const href = await roster.getAttribute('href');
     await roster.click();
     await page.waitForLoadState('domcontentloaded');
     const path = new URL(page.url()).pathname;
     qa.note(2, `"Duty roster" links to ${href} and shows ${path}`);
-    if (path === '/en/hr') qa.deviation(2, '"Duty roster" leads to the Duty Roster module', `the link (${href}) stays on the HR hub`);
+    if (path === '/id/hr') qa.deviation(2, '"Duty roster" leads to the Duty Roster module', `the link (${href}) stays on the HR hub`);
   });
 
-  await qa.step(3, async () => {
+  await qa.step(3, () => asOnSite(async () => {
     await switchLanguage(page, 'ID');
     const seen: string[] = [];
     for (const r of ['/id/hr', '/id/hr/employees', '/id/hr/leave-applications']) {
@@ -55,12 +56,12 @@ qaTest('TC-APP010-015', async ({ page, qa }) => {
     const buttons = (await page.getByRole('button').allInnerTexts()).map((b) => b.trim()).filter(Boolean);
     qa.note(3, `headings ${seen.join(', ')}; buttons on the leave screen: ${[...new Set(buttons)].slice(0, 10).join(', ')}`);
     if (seen.includes('HR') || seen.includes('Employees') || buttons.includes('Submit leave')) qa.deviation(3, 'Headings, buttons and toasts are Indonesian ("SDM", "Karyawan", "Ajukan cuti", …)', `English: ${seen.join(', ')}`);
-  });
+  }));
 });
 
 /** HR desk, Year balance: a correction through the dialog; returns the toasts. */
 async function yearBalance(page: import('@playwright/test').Page, v: { emp: string; type: string; kind: string; days: string; action: string; year?: string }): Promise<string[]> {
-  await page.goto('/en/hr/desk/leave');
+  await page.goto('/id/hr/desk/leave');
   await page.getByRole('main').getByRole('button', { name: 'Year balance' }).click();
   const d = page.getByRole('dialog', { name: 'Year balance' });
   await d.getByRole('textbox', { name: 'Employee no' }).fill(v.emp);

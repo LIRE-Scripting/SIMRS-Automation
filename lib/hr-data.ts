@@ -30,5 +30,7 @@ export const HR = {
 
 /** DEP-A exists on the site as "QA-DEP-1 · QA Poli Umum" (made by 01, Q14). */
 export const DEP_A_HIT = HR.depA;
+/** A department of BR-B for an employee made by U6 (Kemayoran): DEP-A is a department of Podomoro, which U6 is not offered; the seed department "101001 · Dokter Umum" of Kemayoran stands in. */
+export const DEP_B_HIT = 'Dokter Umum';
 /** SC-A and ST-A are not on the site; QA-UNIT-1 and the 07 stand-in store stand in (Q25). */
 export const SC_STAND_IN = { code: 'QA-UNIT-1', name: 'QA Ruang Tindakan' } as const;

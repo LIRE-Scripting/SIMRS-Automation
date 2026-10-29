@@ -8,7 +8,7 @@ import { ArrivalPage, QueueBoardPage } from '../../../pages/ambulatory/ArrivalPa
 
 /**
  * 01-ambulatory-care.xlsx, Arrival (/registration/department-queue) and the
- * queue board (/en/queue).
+ * queue board (/id/queue).
  *
  * DEP-1/DEP-2 are shared by every run (lib/ambulatory-data.ts), so other
  * runs may already have issued numbers today: where the workbook expects
@@ -56,7 +56,7 @@ qaTest('TC-APP001-019', async ({ page, qa }) => {
   const n = await nextNumber(arrival, qa, 2, SHARED.dep1.name);
 
   await qa.step(1, async () => {
-    await page.goto('/en/registration');
+    await page.goto('/id/registration');
     await page.getByRole('main').getByRole('link', { name: 'Arrival', exact: true }).click();
     await expect(arrival.heading).toBeVisible();
     await expect(arrival.main).toContainText("Today's arrival list. Arrive issues a number. Call publishes that row to the queue board.");

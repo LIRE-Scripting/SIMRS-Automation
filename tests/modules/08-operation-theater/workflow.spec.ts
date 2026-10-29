@@ -240,7 +240,7 @@ qaTest('TC-APP008-033', async ({ page, qa }) => {
   });
 
   await qa.step(2, async () => {
-    await page.goto('/en/pharmacy/orders');
+    await page.goto('/id/pharmacy/orders');
     const rows = page.getByRole('main').getByRole('table').getByRole('row').filter({ hasText: patient });
     qa.note(2, `Pharmacy Orders rows for "${patient}": ${(await rows.allInnerTexts()).map((t) => t.replace(/\s+/g, ' ')).join(' // ') || 'none'}`);
   });

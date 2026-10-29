@@ -71,7 +71,7 @@ const ORDER = (qa: Qa, extra: Record<string, string> = {}) => ({
 qaTest('TC-APP025-004', async ({ page, qa }) => {
   const o = orders(page);
   await qa.step(1, async () => {
-    await page.goto('/en/linen');
+    await page.goto('/id/linen');
     await page.getByRole('main').getByRole('link', { name: 'Work orders' }).click();
     await expect(o.main.getByRole('heading', { level: 1, name: 'Work orders' })).toBeVisible();
     await expect(o.main.getByRole('button', { name: 'Save order' })).toBeVisible();
@@ -113,7 +113,7 @@ const MOVE = (qa: Qa, extra: Record<string, string> = {}) => ({ 'Finished item':
 qaTest('TC-APP025-008', async ({ page, qa }) => {
   const m = moves(page);
   await qa.step(1, async () => {
-    await page.goto('/en/linen');
+    await page.goto('/id/linen');
     await page.getByRole('main').getByRole('link', { name: 'Circulation' }).click();
     await expect(m.main.getByRole('heading', { level: 1, name: 'Circulation' })).toBeVisible();
     await expect(m.main.getByRole('button', { name: 'Clean issue' })).toBeVisible();

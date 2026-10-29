@@ -1,8 +1,7 @@
-import type { Locator, Page } from '@playwright/test';
-import { expect, qaTest, test, type Qa } from '../../../fixtures/e2e';
+import { expect, qaTest, test } from '../../../fixtures/e2e';
 import { installToastRecorder } from '../../../lib/assertions';
 import { addDays, todayWib } from '../../../lib/dates';
-import { toastsOf } from '../shared/access';
+import { deskEmployee, idOf, leave, NLK, profile, SAVED, TC_APP010_042, YEAR } from './desk-cases';
 
 /**
  * 10-hr.xlsx, the HR desk: My profile (/hr/desk) and Year balance
@@ -19,88 +18,13 @@ test.beforeEach(async ({ page }) => {
   await installToastRecorder(page);
 });
 
-const SAVED = 'Saved.';
-const NLK = 'Name / location / kind';
-
-class HrDesk {
-  readonly main: Locator;
-  readonly dialog: Locator;
-  constructor(
-    readonly page: Page,
-    readonly route: string,
-    readonly heading: string,
-    readonly button: string,
-  ) {
-    this.main = page.getByRole('main');
-    this.dialog = page.getByRole('dialog');
-  }
-  async open(): Promise<void> {
-    await this.page.goto(`/en${this.route}`);
-    await expect(this.main.getByRole('heading', { level: 1, name: this.heading })).toBeVisible();
-    await this.page.waitForLoadState('networkidle').catch(() => {});
-  }
-  async openDialog(): Promise<void> {
-    await this.open();
-    await this.main.getByRole('button', { name: this.button, exact: true }).click();
-    await expect(this.dialog).toBeVisible();
-  }
-  /** Fills the fields on whichever step they are (text or date), picks the action and saves; returns the toasts. */
-  async save(v: Record<string, string>, action?: string): Promise<string[]> {
-    await this.openDialog();
-    const pending = new Map(Object.entries(v));
-    for (let step = 0; step < 4; step++) {
-      for (const [k, val] of [...pending]) {
-        const box = this.dialog.getByRole('textbox', { name: k, exact: true }).or(this.dialog.getByRole('spinbutton', { name: k, exact: true })).or(this.dialog.getByLabel(k, { exact: true }));
-        if (await box.first().isVisible()) {
-          await box.first().fill(val);
-          pending.delete(k);
-        }
-      }
-      if (action && (await this.dialog.getByRole('combobox', { name: 'Action' }).isVisible())) await this.dialog.getByRole('combobox', { name: 'Action' }).selectOption({ label: action });
-      const next = this.dialog.getByRole('button', { name: 'Next' });
-      if (!(await next.isVisible()) || (await next.isDisabled())) break;
-      await next.click();
-    }
-    if (pending.size) throw new Error(`fields not found: ${[...pending.keys()].join(', ')}`);
-    if (action) await this.dialog.getByRole('combobox', { name: 'Action' }).selectOption({ label: action });
-    return toastsOf(this.page, () => this.dialog.getByRole('button', { name: 'Save' }).click());
-  }
-  rows(): Locator {
-    return this.main.getByRole('table').getByRole('rowgroup').nth(1).getByRole('row');
-  }
-  /** The rows as [status, detail, id]; with a search text, typed first. */
-  async list(search?: string): Promise<string[][]> {
-    await this.open();
-    if (search) await this.main.getByRole('textbox', { name: 'Search' }).or(this.main.getByRole('searchbox')).first().fill(search);
-    await this.page.waitForLoadState('networkidle').catch(() => {});
-    return this.rows().evaluateAll((rs) => rs.filter((r) => r.querySelectorAll('td').length >= 3).map((r) => Array.from(r.querySelectorAll('td')).slice(0, 3).map((c) => c.textContent?.replace(/\s+/g, ' ').trim() ?? '')));
-  }
-}
-
-const profile = (page: Page) => new HrDesk(page, '/hr/desk', 'My profile', 'Employee');
-const leave = (page: Page) => new HrDesk(page, '/hr/desk/leave', 'Year balance', 'Year balance');
-
-/** An employee of the desk ("X-EMP-01" with a token). */
-async function deskEmployee(page: Page, qa: Qa): Promise<string> {
-  const no = qa.code('X-EMP-01');
-  expect(await profile(page).save({ 'Employee no': no, [NLK]: qa.name('X Karyawan Uji') }, 'Employee')).toContain(SAVED);
-  return no;
-}
-
-/** The id of the row of the desk list whose detail holds every text given, newest last. */
-async function idOf(d: HrDesk, ...texts: string[]): Promise<string> {
-  const rows = (await d.list(texts[0])).filter((r) => texts.every((t) => r.join(' ').includes(t)));
-  return rows.at(-1)?.[2] ?? '';
-}
-
-const YEAR = { 'Leave / shift': '', Year: '2027', From: '2027-01-01', To: '2027-12-31', Days: '12' };
 
 qaTest('TC-APP010-040', async ({ page, qa }) => {
   const p = profile(page);
   const no = qa.code('X-EMP-01');
 
   await qa.step(1, async () => {
-    await page.goto('/en/hr');
+    await page.goto('/id/hr');
     await page.getByRole('complementary').getByRole('link', { name: 'Profile' }).or(page.getByRole('main').getByRole('link', { name: 'Profile' })).first().click();
     await expect(p.main.getByRole('heading', { level: 1, name: 'My profile' })).toBeVisible();
     await expect(p.main.getByRole('textbox', { name: 'Search' }).or(p.main.getByRole('searchbox')).first()).toBeVisible();
@@ -145,46 +69,7 @@ qaTest('TC-APP010-041', async ({ page, qa }) => {
   });
 });
 
-qaTest('TC-APP010-042', async ({ page, qa }) => {
-  const l = leave(page);
-  const no = await deskEmployee(page, qa);
-  const type = qa.prefix('X-Tahunan');
-  let app = '';
-
-  await qa.step(1, async () => {
-    await page.goto('/en/hr');
-    await page.getByRole('complementary').getByRole('link', { name: 'Leave year' }).or(page.getByRole('main').getByRole('link', { name: 'Leave year' })).first().click();
-    await expect(l.main.getByRole('heading', { level: 1, name: 'Year balance' })).toBeVisible();
-    await expect(l.main.getByRole('button', { name: 'Year balance', exact: true })).toBeVisible();
-  });
-
-  await qa.step(2, async () => {
-    await l.main.getByRole('button', { name: 'Year balance', exact: true }).click();
-    for (const f of ['Employee no', NLK, 'Leave / shift', 'Document', 'Year']) await expect(l.dialog.getByRole('textbox', { name: f })).toBeVisible();
-    for (const b of ['Back', 'Next']) await expect(l.dialog.getByRole('button', { name: b })).toBeVisible();
-  });
-
-  await qa.step(3, async () => {
-    expect(await l.save({ ...YEAR, 'Employee no': no, 'Leave / shift': type }, 'Year balance')).toContain(SAVED);
-    expect((await l.list(no)).some((r) => r.join(' ').includes(no))).toBe(true);
-  });
-
-  await qa.step(4, async () => {
-    const from = '2027-03-01';
-    expect(await l.save({ 'Employee no': no, 'Leave / shift': type, Year: '2027', From: from, To: '2027-03-02', Days: '2' }, 'Apply')).toContain(SAVED);
-    app = await idOf(l, no, from);
-    expect(app).toMatch(/^[0-9a-f-]{36}$/);
-  });
-
-  await qa.step(5, async () => {
-    expect(await l.save({ Document: app }, 'Approve')).toContain(SAVED);
-  });
-
-  await qa.step(6, async () => {
-    expect(await l.save({ Document: app }, 'Cancel approved')).toContain(SAVED);
-    qa.note(6, `rows of ${no}: ${(await l.list(no)).map((r) => `${r[0]} ${r[1]}`).join(' ; ')} (TBD in the workbook: whether the days return to the balance)`);
-  });
-});
+qaTest('TC-APP010-042', TC_APP010_042);
 
 qaTest('TC-APP010-043', async ({ page, qa }) => {
   const l = leave(page);
@@ -198,8 +83,14 @@ qaTest('TC-APP010-043', async ({ page, qa }) => {
   await qa.step(1, async () => refusedNote(1, 'no dates', await l.save({ ...YEAR, 'Employee no': no, 'Leave / shift': type, From: '', To: '' }, 'Year balance'), 'defineresetdate'));
   await qa.step(2, async () => refusedNote(2, '"To" before "From"', await l.save({ ...YEAR, 'Employee no': no, 'Leave / shift': type, From: '2027-12-31', To: '2027-01-01' }, 'Year balance'), 'to date is before from'));
   await qa.step(3, async () => refusedNote(3, 'days 0', await l.save({ ...YEAR, 'Employee no': no, 'Leave / shift': type, Days: '0' }, 'Year balance'), 'employee, type and days are required'));
+  const opened = await l.save({ ...YEAR, 'Employee no': no, 'Leave / shift': type }, 'Year balance');
+  if (!opened.includes(SAVED)) {
+    // The year balance answers HTTP 500 (found blocker 43): no balance for the second-balance refusal.
+    qa.note(4, `the balance of the test: "${opened.join(' / ').slice(0, 80)}"`);
+    qa.blocked(4, 43);
+    return;
+  }
   await qa.step(4, async () => {
-    expect(await l.save({ ...YEAR, 'Employee no': no, 'Leave / shift': type }, 'Year balance')).toContain(SAVED);
     expect(await l.save({ 'Employee no': no, 'Leave / shift': type, Year: '2027', From: '2027-04-01', To: '2027-04-01', Days: '1' }, 'Apply')).toContain(SAVED);
     refusedNote(4, 'a second balance while an application waits', await l.save({ ...YEAR, 'Employee no': no, 'Leave / shift': type }, 'Year balance'), 'pending approval');
   });
@@ -233,8 +124,12 @@ qaTest('TC-APP010-045', async ({ page, qa }) => {
   await qa.step(1, async () => {
     expect(await l.save({ 'Employee no': no, From: day, To: day }, 'Comp-off')).toContain(SAVED);
     id = await idOf(l, no);
-    expect(id).toMatch(/^[0-9a-f-]{36}$/);
+    if (!id) qa.deviation(1, 'Toast "Saved."; a row for the comp-off with an id', `"Saved.", but the list shows no row of ${no}`);
   });
+  if (!id) {
+    qa.notRun(2, 'the saved comp-off is listed nowhere, so its id for "Approve comp-off" is not known');
+    return;
+  }
 
   await qa.step(2, async () => {
     expect(await l.save({ Document: id }, 'Approve comp-off')).toContain(SAVED);

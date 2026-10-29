@@ -6,6 +6,9 @@ import { Desk, SAVED, refused } from '../shared/desk';
 import { auditEntries, menuScreens, saveIfOffered, userPage } from '../shared/access';
 import { screenOpens } from '../shared/screen-opens';
 import { AI, approvedOrder, assetAccount, buy, CH, masters, NO_STOCK, register, registerRows, SLR, TC_APP027_001, TC_APP027_003 } from './cases';
+import { newItem } from '../07-inventory/cases';
+import { raise } from '../09-procurement/cases';
+import { ProcurementDeskPage } from '../../../pages/procurement/ProcurementPages';
 
 /**
  * 27-fixed-assets.xlsx: classification, register and movement. Codes and
@@ -56,7 +59,8 @@ qaTest('TC-APP027-004', async ({ page, qa }) => {
   const r = register(page);
   await qa.step(1, async () => refused(qa, 1, await r.save({ Number: qa.code('X-FA-001'), [AI]: qa.code('X-USG-01'), Document: '', Quantity: '1' }), 'document is missing'));
   await qa.step(2, async () => {
-    const draft = await approvedOrder(page, 'draft');
+    // A purchase request of the test, saved and not sent: the list shows its first rows only, so a draft row of it may be absent.
+    const draft = await raise(new ProcurementDeskPage(page), await newItem(page, qa));
     const toasts = await r.save({ Number: qa.code('X-FA-001'), [AI]: qa.code('X-USG-01'), Document: draft, Quantity: '1' });
     expect(toasts).not.toContain(SAVED);
     qa.note(2, `an order that is not approved: "${toasts.join(' / ').slice(0, 100)}"`);
@@ -109,7 +113,7 @@ qaTest('TC-APP027-008', async ({ qa }) => {
 qaTest('TC-APP027-009', async ({ page, qa }) => {
   const m = moves(page);
   await qa.step(1, async () => {
-    await page.goto('/en/fixed-assets');
+    await page.goto('/id/fixed-assets');
     await page.getByRole('main').getByRole('link', { name: 'Movement' }).click();
     await expect(m.main.getByRole('heading', { level: 1, name: 'Movement' })).toBeVisible();
     await expect(m.main.getByRole('button', { name: 'Move', exact: true })).toBeVisible();

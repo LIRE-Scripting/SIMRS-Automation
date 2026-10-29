@@ -2,6 +2,7 @@ import type { Page } from '@playwright/test';
 import { expect, qaTest, test, type Qa } from '../../../fixtures/e2e';
 import { installToastRecorder, toastLocator, toastMark, toastsSince } from '../../../lib/assertions';
 import { AdmissionsPage, BedsPage, DischargesPage } from '../../../pages/inpatient/InpatientPages';
+import { NotOffered } from '../../../lib/not-offered';
 
 /**
  * 04-inpatient.xlsx, features "Bed management (/adt/beds)", "Admissions
@@ -49,7 +50,7 @@ qaTest('TC-APP004-001', async ({ page, qa }) => {
   const d = beds.dialog();
 
   await qa.step(1, async () => {
-    await page.goto('/en/apps');
+    await page.goto('/id/apps');
     await page.getByRole('link', { name: /^Inpatient\b/ }).first().click();
     await page.getByRole('main').getByRole('link', { name: 'Bed management', exact: true }).click();
     await expect(beds.heading).toBeVisible();
@@ -357,7 +358,7 @@ qaTest('TC-APP004-004', async ({ page, qa }) => {
   const before = await adm.census();
 
   await qa.step(1, async () => {
-    await page.goto('/en/adt');
+    await page.goto('/id/adt');
     await page.getByRole('main').getByRole('link', { name: 'Open admissions' }).click();
     await adm.admitButton.click();
     await expect(w).toBeVisible();
@@ -392,7 +393,7 @@ qaTest('TC-APP004-004', async ({ page, qa }) => {
     const row = await adm.stay(name);
     expect(await adm.admissionNo(row)).toMatch(/^ADM-/);
     await expect(await adm.cell(row, 'Bed')).toHaveText(bed1);
-    await expect(await adm.cell(row, 'Admitted')).toHaveText(/\d{1,2}:\d{2}/);
+    await expect(await adm.cell(row, 'Admitted')).toHaveText(/\d{1,2}[:.]\d{2}/);
     await expect(await adm.cell(row, 'Status')).toContainText('On a bed');
   });
 
@@ -472,7 +473,7 @@ qaTest('TC-APP004-006', async ({ page, qa }) => {
     await adm.transfer(await adm.stay(name), bed3);
     const row = await adm.stay(name);
     await expect(await adm.cell(row, 'Bed')).toHaveText(bed3);
-    await expect(await adm.cell(row, 'Admitted')).toHaveText(/\d{1,2}:\d{2}/);
+    await expect(await adm.cell(row, 'Admitted')).toHaveText(/\d{1,2}[:.]\d{2}/);
     await expect(await adm.cell(row, 'Status')).toContainText('On a bed');
     await expect(row.getByRole('button', { name: 'Discharge' })).toBeEnabled();
   });
@@ -589,10 +590,25 @@ qaTest('TC-APP004-010', async ({ page, qa }) => {
     await expect(d.getByRole('button', { name: 'Transfer' })).toBeDisabled();
   });
 
+  let offered = true;
   await qa.step(2, async () => {
-    await adm.pickBed(d.getByRole('combobox', { name: 'New bed' }), bed3);
+    try {
+      await adm.pickBed(d.getByRole('combobox', { name: 'New bed' }), bed3);
+    } catch (e) {
+      if (!(e instanceof NotOffered)) throw e;
+      offered = false;
+      return qa.note(2, `the new bed ${bed3} is not offered under "New bed": the picker filters only the first 50 beds it loaded`);
+    }
     await expect(d.getByRole('button', { name: 'Transfer' })).toBeEnabled();
   });
+  if (!offered) {
+    // No transfer, so nothing for steps 3 to 5 to read (found blocker 40).
+    qa.blocked(2, 40);
+    qa.blocked(3, 40);
+    qa.notRun(4, 'needs the transfer of step 3 (found blocker 40)');
+    qa.notRun(5, 'needs the transfer of step 3 (found blocker 40)');
+    return;
+  }
 
   await qa.step(3, async () => {
     await d.getByRole('button', { name: 'Transfer' }).click();
@@ -710,7 +726,7 @@ qaTest('TC-APP004-013', async ({ page, qa }) => {
   const dis = new DischargesPage(page);
 
   await qa.step(1, async () => {
-    await page.goto('/en/adt');
+    await page.goto('/id/adt');
     await page.getByRole('main').getByRole('link', { name: 'Discharge', exact: true }).click();
     await expect(dis.heading).toBeVisible();
     await expect(dis.main.getByText('Patients who have left, with length of stay.')).toBeVisible();

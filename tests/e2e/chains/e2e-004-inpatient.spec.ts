@@ -52,7 +52,7 @@ chainTest('E2E-004', async ({ page, chain }) => {
   await chain.step(4, async (qa) => {
     const w = new Ward(page);
     await qa.step(1, async () => {
-      await page.goto('/en/adt');
+      await page.goto('/id/adt');
       await page.getByRole('main').getByRole('link', { name: 'Ward', exact: true }).click();
       await expect(w.heading).toBeVisible();
     });

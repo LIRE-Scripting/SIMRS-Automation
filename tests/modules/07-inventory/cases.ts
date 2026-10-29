@@ -18,7 +18,7 @@ export const TC_APP007_001 = async ({ page, qa }: CaseArgs): Promise<void> => {
   const d = items.dialog('Add Item');
 
   await qa.step(1, async () => {
-    await page.goto('/en/apps');
+    await page.goto('/id/apps');
     await page.getByRole('link', { name: /^Inventory\b/ }).first().click();
     await page.getByRole('main').getByRole('link', { name: 'Item Master' }).first().click();
     await expect(items.heading).toBeVisible();
@@ -42,6 +42,17 @@ export const TC_APP007_001 = async ({ page, qa }: CaseArgs): Promise<void> => {
     await expect(toastLocator(page, /^Item added\.$/)).toBeVisible();
   });
 
+  // The list leaves a new item out for a while now and then (found blocker 51): it is looked for three times, a minute apart.
+  let listed = false;
+  for (let i = 0; i < 3 && !listed; i++) {
+    if (i) await page.waitForTimeout(60_000);
+    await items.open();
+    listed = (await (await items.findRow(it.code)).count()) > 0;
+  }
+  if (!listed) {
+    qa.note(4, `${it.code} is on none of the pages of Item Master after "Item added.", also two minutes later`);
+    return qa.blocked(4, 51);
+  }
   await qa.step(4, async () => {
     await items.open();
     const row = await items.findRow(it.code);
@@ -110,7 +121,7 @@ export const TC_APP007_010 = async ({ page, qa }: CaseArgs): Promise<void> => {
 
   try {
     await qa.step(1, async () => {
-      await page.goto('/en/inventory');
+      await page.goto('/id/inventory');
       await page.getByRole('main').getByRole('link', { name: 'Stores', exact: true }).click();
       await expect(stores.heading).toBeVisible();
       await expect(stores.main.getByText('Warehouses on this branch.')).toBeVisible();

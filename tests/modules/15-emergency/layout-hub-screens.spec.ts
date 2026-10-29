@@ -1,8 +1,9 @@
+import { asOnSite } from '../../../lib/i18n';
 import type { Locator, Page } from '@playwright/test';
 import { expect, qaTest, test } from '../../../fixtures/e2e';
 import { installToastRecorder, toastMark, toastsSince } from '../../../lib/assertions';
 import { asAllBranches } from '../shared/access';
-import { backToEnglish, switchLanguage } from '../shared/language';
+import { backToIndonesian, switchLanguage } from '../shared/language';
 import { screenOpens } from '../shared/screen-opens';
 
 /**
@@ -19,7 +20,7 @@ test.beforeEach(async ({ page }) => {
 });
 
 test.afterEach(async ({ page }) => {
-  await backToEnglish(page);
+  await backToIndonesian(page);
 });
 
 async function toastsAfter(page: Page, mark: number, timeout = 8_000): Promise<string[]> {
@@ -34,7 +35,7 @@ async function toastsAfter(page: Page, mark: number, timeout = 8_000): Promise<s
 qaTest('TC-APP015-007', async ({ page, qa }) => {
   const main = page.getByRole('main');
   await qa.step(1, async () => {
-    await page.goto('/en/apps');
+    await page.goto('/id/apps');
     await page.getByRole('link', { name: /^Emergency\b/ }).first().click();
     await expect(main.getByRole('navigation', { name: 'Breadcrumb' })).toHaveText(/^Home\s*\/\s*Apps\s*\/\s*Emergency$/);
     await expect(main.getByRole('heading', { level: 1, name: 'Emergency' })).toBeVisible();
@@ -48,13 +49,13 @@ qaTest('TC-APP015-007', async ({ page, qa }) => {
     qa.note(2, `sidebar: ${side.join(', ')}`);
     if (!side.includes('Visits')) qa.deviation(2, 'The tile and the sidebar item "Visits" open Visits', 'neither the hub nor the sidebar has "Visits"; the screen opens only by its address');
   });
-  await qa.step(3, async () => {
+  await qa.step(3, () => asOnSite(async () => {
     await switchLanguage(page, 'ID');
     await page.goto('/id/emergency/visits');
     const h1 = (await page.getByRole('heading', { level: 1 }).innerText()).trim();
     qa.note(3, `heading "${h1}"`);
     if (h1 === 'Visits') qa.deviation(3, 'Headings, column names, statuses and toasts are Indonesian ("Kunjungan", …)', `heading "${h1}"`);
-  });
+  }));
 });
 
 class Board {
@@ -65,7 +66,7 @@ class Board {
     this.dialog = page.getByRole('dialog');
   }
   async open(): Promise<void> {
-    await this.page.goto('/en/emergency/layout');
+    await this.page.goto('/id/emergency/layout');
     await expect(this.main.getByRole('heading', { level: 1, name: 'Emergency Layout' })).toBeVisible();
     await this.page.waitForLoadState('networkidle').catch(() => {});
   }
@@ -89,7 +90,7 @@ qaTest('TC-APP015-053', async ({ page, qa }) => {
   const b = new Board(page);
   const name = qa.name('X Pasien Papan');
   await qa.step(1, async () => {
-    await page.goto('/en/emergency/patients');
+    await page.goto('/id/emergency/patients');
     await page.getByRole('complementary').getByRole('link', { name: 'Emergency Layout', exact: true }).first().click();
     await expect(b.main.getByRole('heading', { level: 1, name: 'Emergency Layout' })).toBeVisible();
     await expect(b.main.getByText('Choose a department and service centre. Tiles sit on the saved layout and show name, age, gender, and triage colour.', { exact: true })).toBeVisible();
@@ -155,7 +156,7 @@ qaTest('TC-APP015-055', async ({ qa, browser }) => {
 qaTest('TC-APP015-056', async ({ page, qa }) => {
   const main = page.getByRole('main');
   await qa.step(1, async () => {
-    await page.goto('/en/emergency/patients');
+    await page.goto('/id/emergency/patients');
     await page.getByRole('complementary').getByRole('link', { name: 'Emergency Layout Design' }).first().click();
     await expect(main.getByRole('heading', { level: 1, name: 'Emergency Layout Design' })).toBeVisible();
     await expect(main.getByText('Place each bed of this service centre. A bed with no plot is not configured.', { exact: true })).toBeVisible();

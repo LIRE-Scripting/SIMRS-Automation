@@ -24,7 +24,7 @@ qaTest('TC-APP008-001', async ({ page, qa }) => {
   const p = procedure(qa);
 
   await qa.step(1, async () => {
-    await page.goto('/en/apps');
+    await page.goto('/id/apps');
     await page.getByRole('link', { name: /^Operation Theater\b/ }).first().click();
     await page.getByRole('main').getByRole('link', { name: 'Open requests' }).click();
     await expect(ot.heading).toBeVisible();
@@ -193,7 +193,7 @@ qaTest('TC-APP008-010', async ({ page, qa }) => {
   });
 
   await qa.step(3, async () => {
-    await page.goto('/en/ot/calendar');
+    await page.goto('/id/ot/calendar');
     await expect(page.getByRole('main').getByRole('heading', { level: 1, name: 'Calendar' })).toBeVisible();
     const slots = await page.getByRole('main').getByRole('button').filter({ hasText: /OT-\d+/ }).allInnerTexts();
     qa.note(3, `Calendar exists (a day picker with the slots placed through "Place on calendar"); the two scheduled requests have no slot: ${slots.some((s) => s.includes(a) || s.includes(b)) ? 'listed' : 'not listed'}`);

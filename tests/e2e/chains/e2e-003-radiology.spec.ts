@@ -44,12 +44,20 @@ chainTest('E2E-003', async ({ page, chain }) => {
       qa.note(1, `row: ${c.join(' | ')}`);
       expect(c[1]).toBe(study);
     });
+    let offered = true;
     await qa.step(2, async () => {
       await s.open();
       await expect(s.order.locator('option').first()).toBeAttached();
-      qa.note(2, `"Schedule and report" lists ${await s.order.locator('option').count()} orders`);
+      const n = await s.order.locator('option').count();
+      qa.note(2, `"Schedule and report" lists ${n} orders`);
+      // The list holds only its first 20 orders: a new order past them cannot be chosen (found blocker 40).
+      if (n >= 20 && !(await s.order.locator('option', { hasText: study }).count())) {
+        offered = false;
+        return;
+      }
       await expect(s.order.locator('option', { hasText: study }), `the order "${study}" can be chosen in "Schedule and report"`).toBeAttached();
     });
+    if (!offered) qa.blocked(2, 40);
     await qa.step(3, async () => {
       qa.note(3, `the order row: ${(await o.cells(await o.row(study))).join(' | ')}`);
     });
@@ -59,7 +67,7 @@ chainTest('E2E-003', async ({ page, chain }) => {
     // "Start" holds an ISO time in UTC: tomorrow 09:00 WIB is 02:00Z.
     const start = `${addDays(todayWib(), 1)}T02:00:00Z`;
     await qa.step(1, async () => {
-      await page.goto('/en/radiology');
+      await page.goto('/id/radiology');
       await page.getByRole('complementary').getByRole('link', { name: 'Study schedule' }).first().click();
       await expect(s.main.getByRole('heading', { level: 1, name: 'Schedule and report' })).toBeVisible();
     });

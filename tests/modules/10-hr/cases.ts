@@ -2,7 +2,7 @@ import { submitLeave, toastsAfter, leaveCells, employeeData, employee, decide } 
 import { todayWib } from '../../../lib/dates';
 import { toastMark } from '../../../lib/assertions';
 import { expect } from '../../../fixtures/e2e';
-import { STEPS, LeavePage, EmployeesPage } from '../../../pages/hr/HrPages';
+import { STEPS, LeavePage, EmployeesPage, NotOffered } from '../../../pages/hr/HrPages';
 import { STAND_IN_STORE } from '../../../lib/inventory-data';
 import { SC_STAND_IN, HR } from '../../../lib/hr-data';
 import type { Page } from '@playwright/test';
@@ -20,7 +20,7 @@ export const TC_APP010_001 = async ({ page, qa }: CaseArgs): Promise<void> => {
   const d = p.dialog('Create employee');
 
   await qa.step(1, async () => {
-    await page.goto('/en/apps');
+    await page.goto('/id/apps');
     await page.getByRole('link', { name: /^HR\b/ }).first().click();
     await page.getByRole('main').getByRole('link', { name: 'Employees', exact: true }).click();
     await expect(p.heading).toBeVisible();
@@ -146,7 +146,7 @@ export const TC_APP010_007 = async ({ page, qa }: CaseArgs): Promise<void> => {
   const d = l.typeDialog;
 
   await qa.step(1, async () => {
-    await page.goto('/en/hr');
+    await page.goto('/id/hr');
     await page.getByRole('main').getByRole('link', { name: 'Leave applications', exact: true }).click();
     await l.openTypes();
     await expect(d.getByText('This type’s own number of leaves. There is no maximum across types.', { exact: true })).toBeVisible();
@@ -212,10 +212,21 @@ export const TC_APP010_008 = async ({ page, qa }: CaseArgs): Promise<void> => {
     await expect(s.getByRole('textbox', { name: 'Reason' })).toBeVisible();
   });
 
+  let offered = true;
   await qa.step(2, async () => {
-    await l.fillLeave({ employee: emp.no });
+    try {
+      await l.fillLeave({ employee: emp.no });
+    } catch (e) {
+      if (!(e instanceof NotOffered)) throw e;
+      offered = false;
+      return qa.note(2, `the new employee ${emp.no} is not offered: the picker filters only the first 50 employees it loaded`);
+    }
     await expect(s.getByRole('combobox', { name: 'Employee' })).toHaveValue(`${emp.no} ${emp.name}`);
   });
+  if (!offered) {
+    for (const st of [2, 3, 4]) qa.blocked(st, 40);
+    return;
+  }
 
   await qa.step(3, async () => {
     await l.fillLeave({ type: HR.annual.name, from: '2027-03-01', to: '2027-03-03', days: '3', reason: r });
@@ -233,7 +244,17 @@ export const TC_APP010_008 = async ({ page, qa }: CaseArgs): Promise<void> => {
 };
 
 export const TC_APP010_009 = async ({ page, qa }: CaseArgs): Promise<void> => {
-  const { r } = await pending(page, qa);
+  let r = '';
+  try {
+    r = (await pending(page, qa)).r;
+  } catch (e) {
+    if (!(e instanceof NotOffered)) throw e;
+    // No application of a new employee can be submitted: the picker does not offer it (found blocker 40).
+    qa.note(1, `precondition: ${e.message}`);
+    qa.blocked(1, 40);
+    qa.blocked(2, 40);
+    return;
+  }
   qa.note(1, 'LV-PEND is an application of this test');
   await qa.step(1, async () => {
     expect(await decide(page, r, 'Approve')).toContain('Leave approved');

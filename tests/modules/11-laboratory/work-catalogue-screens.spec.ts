@@ -1,7 +1,8 @@
+import { asOnSite } from '../../../lib/i18n';
 import { expect, qaTest, test } from '../../../fixtures/e2e';
 import { installToastRecorder } from '../../../lib/assertions';
 import { SampleWorkflowPage, WorklistPage } from '../../../pages/lab/LabPages';
-import { backToEnglish, switchLanguage } from '../shared/language';
+import { backToIndonesian, switchLanguage } from '../shared/language';
 import { screenOpens } from '../shared/screen-opens';
 import { catalogue, cellsOf, certified, labelOf, order, press, qc, resulted, work } from './helpers';
 
@@ -21,7 +22,7 @@ test.beforeEach(async ({ page }) => {
 });
 
 test.afterEach(async ({ page }) => {
-  await backToEnglish(page);
+  await backToIndonesian(page);
 });
 
 qaTest('TC-APP011-010', async ({ page, qa }) => {
@@ -30,7 +31,7 @@ qaTest('TC-APP011-010', async ({ page, qa }) => {
   const tiles = ['Serviceorder', 'Sample', 'Accept Sample', 'Capture Result'];
 
   await qa.step(1, async () => {
-    await page.goto('/en/apps');
+    await page.goto('/id/apps');
     await page.getByRole('link', { name: /^Laboratory\b/ }).first().click();
     await expect(main.getByRole('navigation', { name: 'Breadcrumb' })).toHaveText(/^Home\s*\/\s*Apps\s*\/\s*Laboratory$/);
     await expect(main.getByRole('heading', { level: 1, name: 'Laboratory' })).toBeVisible();
@@ -43,20 +44,20 @@ qaTest('TC-APP011-010', async ({ page, qa }) => {
 
   await qa.step(2, async () => {
     for (const t of tiles) {
-      await page.goto('/en/laboratory');
+      await page.goto('/id/laboratory');
       await main.getByRole('link', { name: t, exact: true }).click();
       await expect(w.heading).toBeVisible();
     }
   });
 
-  await qa.step(3, async () => {
+  await qa.step(3, () => asOnSite(async () => {
     await switchLanguage(page, 'ID');
     await page.goto('/id/laboratory/orders');
     const h1 = (await page.getByRole('heading', { level: 1 }).innerText()).trim();
     const buttons = (await main.getByRole('button').allInnerTexts()).map((b) => b.trim()).filter(Boolean);
     qa.note(3, `heading "${h1}"; buttons ${[...new Set(buttons)].slice(0, 8).join(', ')}`);
     if (h1 === 'Lab order worklist' || buttons.includes('New lab order')) qa.deviation(3, 'Headings, field names, buttons and toasts are Indonesian ("Worklist order lab", "Order lab baru", …)', `English: heading "${h1}"`);
-  });
+  }));
 });
 
 qaTest('TC-APP011-030', async ({ page, qa }) => {
@@ -65,7 +66,7 @@ qaTest('TC-APP011-030', async ({ page, qa }) => {
   const name = qa.name('X Hemoglobin');
 
   await qa.step(1, async () => {
-    await page.goto('/en/laboratory');
+    await page.goto('/id/laboratory');
     await page.getByRole('complementary').getByRole('link', { name: 'Specimens' }).first().click();
     await expect(c.main.getByRole('heading', { level: 1, name: 'Specimens and tests' })).toBeVisible();
     await expect(c.main.getByText('Lookup stays the sample id.', { exact: true })).toBeVisible();
@@ -101,7 +102,7 @@ qaTest('TC-APP011-030', async ({ page, qa }) => {
 qaTest('TC-APP011-031', async ({ page, qa }) => {
   const c = catalogue(page);
   await qa.step(1, async () => {
-    await page.goto('/en/laboratory/catalogue');
+    await page.goto('/id/laboratory/catalogue');
     await c.kind.selectOption('test');
     await c.code.fill('');
     await c.name.fill(qa.name('X Hemoglobin'));
@@ -114,14 +115,14 @@ qaTest('TC-APP011-031', async ({ page, qa }) => {
 qaTest('TC-APP011-032', async ({ page, qa }) => {
   const c = catalogue(page);
   const code = qa.code('X-HB');
-  await page.goto('/en/laboratory/catalogue');
+  await page.goto('/id/laboratory/catalogue');
   await c.kind.selectOption('test');
   await c.code.fill(code);
   await c.name.fill(qa.name('X Hemoglobin'));
   expect(await press(page, c.saveMaster)).toContain('Saved');
   for (const [step, low, high] of [[1, '16', '12'], [2, '12', '12']] as const) {
     await qa.step(step, async () => {
-      await page.goto('/en/laboratory/catalogue');
+      await page.goto('/id/laboratory/catalogue');
       await c.test.fill(code);
       await c.low.fill(low);
       await c.high.fill(high);
@@ -139,7 +140,7 @@ qaTest('TC-APP011-033', async ({ page, qa }) => {
   const label = await labelOf(page, type);
 
   await qa.step(1, async () => {
-    await page.goto('/en/laboratory');
+    await page.goto('/id/laboratory');
     await page.getByRole('complementary').getByRole('link', { name: 'Workflow' }).first().click();
     await expect(s.heading).toBeVisible();
     await expect(s.main.getByText(/^Sign and print stay on the handover dialog\./)).toBeVisible();
@@ -276,11 +277,18 @@ qaTest('TC-APP011-041', async ({ page, qa }) => {
   const label = await labelOf(page, type);
   expect((await work(page, label, 'Review')).toasts).toContain('Saved');
   qa.note(1, 'the last step of the order is "Review", made just before');
+  let failed = false;
   await qa.step(1, async () => {
     const r = await work(page, label, 'Revert latest stamp');
+    if (r.toasts.some((t) => /React error #441/.test(t))) {
+      // "Revert latest stamp" answers HTTP 500 (found blocker 53).
+      failed = true;
+      return qa.note(1, `"Revert latest stamp": "${r.toasts.join(' / ').slice(0, 60)}" (HTTP 500); line "${r.line}"`);
+    }
     expect(r.toasts).toContain('Saved');
     qa.note(1, `line after the revert: "${r.line}"; worklist Result status "${(await cellsOf(page, type))[5]}"`);
   });
+  if (failed) qa.blocked(1, 53);
 });
 
 qaTest('TC-APP011-042', async ({ page, qa }) => {
@@ -325,7 +333,7 @@ qaTest('TC-APP011-043', async ({ page, qa }) => {
 
 qaTest('TC-APP011-046', async ({ page, qa }) => {
   await qa.step(1, async () => {
-    await page.goto('/en/laboratory');
+    await page.goto('/id/laboratory');
     await page.getByRole('main').getByRole('link', { name: 'BMHP', exact: true }).click();
     await expect(page.getByRole('main').getByRole('heading', { level: 1, name: 'BMHP' })).toBeVisible();
     await expect(

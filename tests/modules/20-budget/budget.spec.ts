@@ -7,7 +7,8 @@ import { screenOpens } from '../shared/screen-opens';
 import { invalidFields } from '../18-settings/helpers';
 import { addMonths } from '../19-finance/helpers';
 import { payrollEmployee } from '../17-payroll/helpers';
-import { addToChart, book, books, chart, chartRow, choose, deactivate, head, heads, Master, projects, TC_APP020_001, TC_APP020_003, TC_APP020_005, YEAR } from './cases';
+import { addToChart, book, books, chart, chartRow, choose, deactivate, head, heads, Master, projects, TC_APP020_001, TC_APP020_003, TC_APP020_005, TC_APP020_013, TC_APP020_015, TC_APP020_019, YEAR } from './cases';
+import { asOnSite, sourceOnSite } from '../../../lib/i18n';
 
 /**
  * 20-budget.xlsx: the masters (books, heads, chart, utilisation types,
@@ -84,7 +85,8 @@ qaTest('TC-APP020-004', async ({ page, qa }) => {
   await qa.step(2, async () => {
     await h.openAdd();
     const box = h.dialog.getByRole('combobox', { name: 'Financial year' });
-    const locked = (await box.locator('option').allInnerTexts()).find((o) => o.endsWith('(locked)'))!;
+    // "2025 (locked)": the site writes "(terkunci)"; the label is kept as the site shows it.
+    const locked = (await asOnSite(() => box.locator('option').allInnerTexts())).find((o) => new RegExp(`${sourceOnSite('(locked)')}$`).test(o))!;
     const disabled = await box.locator('option', { hasText: locked }).isDisabled();
     if (disabled) {
       qa.note(2, `"${locked}" cannot be chosen (the option is disabled)`);
@@ -104,7 +106,7 @@ qaTest('TC-APP020-007', async ({ page, qa }) => {
   const t = types(page);
   const code = qa.code('X-JASA');
   await qa.step(1, async () => {
-    await page.goto('/en/budget');
+    await page.goto('/id/budget');
     await page.getByRole('main').getByRole('link', { name: 'Utilisation types' }).click();
     await expect(t.main.getByRole('heading', { level: 1, name: 'Utilisation types' })).toBeVisible();
     await expect(t.main.getByText('Classify utilisation lines and the taxes they carry. PPN and PPh may apply together.', { exact: true })).toBeVisible();
@@ -159,7 +161,7 @@ qaTest('TC-APP020-009', async ({ page, qa }) => {
   const name = qa.name('X Proyek uji');
   const end = addMonths(todayWib(), 3);
   await qa.step(1, async () => {
-    await page.goto('/en/budget');
+    await page.goto('/id/budget');
     await page.getByRole('main').getByRole('link', { name: 'Projects' }).click();
     await expect(p.main.getByRole('heading', { level: 1, name: 'Projects' })).toBeVisible();
     await expect(p.main.getByRole('button', { name: 'Add project' })).toBeVisible();
@@ -213,7 +215,7 @@ qaTest('TC-APP020-011', async ({ page, qa }) => {
   const b = await book(page, qa);
   const question = qa.name('X Apakah TOR sudah dilampirkan?');
   await qa.step(1, async () => {
-    await page.goto('/en/budget');
+    await page.goto('/id/budget');
     await page.getByRole('main').getByRole('link', { name: 'Sanction checklist' }).click();
     await expect(q.main.getByRole('heading', { level: 1, name: 'Sanction checklist' })).toBeVisible();
     await expect(q.main.getByRole('combobox', { name: 'Book' })).toBeVisible();
@@ -235,7 +237,7 @@ qaTest('TC-APP020-011', async ({ page, qa }) => {
     expect(c.slice(0, 3)).toEqual([b.code, '1', question]);
   });
   await qa.step(4, async () => {
-    await page.goto('/en/budget/sanctions');
+    await page.goto('/id/budget/sanctions');
     await page.getByRole('main').getByRole('button', { name: /New proposal/ }).click();
     const d = page.getByRole('dialog');
     await choose(d.getByRole('combobox', { name: /Budget book|Book/ }).first(), b.code);
@@ -275,6 +277,13 @@ qaTest('TC-APP020-012', async ({ page, qa }) => {
 });
 
 qaTest('TC-APP020-005', TC_APP020_005);
+
+// Declared through a wrapper: qaTest passes testInfo as the second argument, the chain passes its book there.
+qaTest('TC-APP020-013', ({ page, qa }) => TC_APP020_013({ page, qa }));
+qaTest('TC-APP020-015', async ({ page, qa }) => {
+  await TC_APP020_015({ page, qa });
+});
+qaTest('TC-APP020-019', ({ page, qa }) => TC_APP020_019({ page, qa }));
 
 qaTest('TC-APP020-006', async ({ page, qa }) => {
   const b = await book(page, qa);

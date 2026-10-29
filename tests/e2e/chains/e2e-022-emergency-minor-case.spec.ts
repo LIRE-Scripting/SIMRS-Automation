@@ -10,6 +10,7 @@ import { RadOrdersPage, StudiesPage } from '../../modules/12-ris/helpers';
 import { pay } from '../../modules/14-hospital-accounts/helpers';
 import { attach, encounter, Patients, patient, pdf, VisitsPage } from '../../modules/15-emergency/helpers';
 import { bedWithId } from '../../modules/shared/internal-ids';
+import { escapeText, sourceOnSite } from '../../../lib/i18n';
 
 /**
  * E2E-022: an emergency visit of a registered patient is triaged and put in a
@@ -85,7 +86,7 @@ chainTest('E2E-022', async ({ page, chain }) => {
     const t = labType(qa);
     const d = page.getByRole('dialog', { name: 'Create lab order' });
     await qa.step(1, async () => {
-      await page.goto('/en/apps');
+      await page.goto('/id/apps');
       await page.getByRole('link', { name: /^Laboratory\b/ }).first().click();
       await page.getByRole('main').getByRole('link', { name: 'Open worklist' }).click();
       await expect(w.heading).toBeVisible();
@@ -117,7 +118,8 @@ chainTest('E2E-022', async ({ page, chain }) => {
       const row = await w.row(type);
       sample = (await w.cells(row))[0];
       await w.press(row, 'Capture result', w.capture);
-      await expect(w.capture.getByText(`${type} · Accepted · ${sample}`, { exact: true })).toBeVisible();
+      // One text of three parts; the site writes the status in Indonesian.
+      await expect(w.capture.getByText(new RegExp(`^${escapeText(type)} · ${sourceOnSite('Accepted')} · ${escapeText(sample)}$`))).toBeVisible();
     });
     await qa.step(2, async () => {
       await w.field('Lab result').fill(LAB.result);
@@ -144,7 +146,7 @@ chainTest('E2E-022', async ({ page, chain }) => {
       study: `${RIS.full.study} ${t}`,
     };
     await qa.step(1, async () => {
-      await page.goto('/en/apps');
+      await page.goto('/id/apps');
       await page.getByRole('link', { name: /^RIS\b|^Radiology/ }).first().click();
       await page.getByRole('main').getByRole('link', { name: 'Open orders' }).click();
       await expect(o.heading).toBeVisible();
@@ -185,7 +187,7 @@ chainTest('E2E-022', async ({ page, chain }) => {
     const s = new StudiesPage(page);
     const start = `${addDays(todayWib(), 1)}T02:00:00Z`;
     await qa.step(1, async () => {
-      await page.goto('/en/radiology');
+      await page.goto('/id/radiology');
       await page.getByRole('complementary').getByRole('link', { name: 'Study schedule' }).first().click();
       await expect(s.main.getByRole('heading', { level: 1, name: 'Schedule and report' })).toBeVisible();
       qa.note(1, `"Schedule and report" lists ${await s.order.locator('option').count()} orders`);
@@ -234,7 +236,7 @@ chainTest('E2E-022', async ({ page, chain }) => {
     let invoice = '';
     let cashBefore = 0;
     await qa.step(1, async () => {
-      await page.goto('/en/apps');
+      await page.goto('/id/apps');
       await page.getByRole('link', { name: /^Hospital Accounts\b/ }).first().click();
       await page.getByRole('main').getByRole('link', { name: 'Fast Cashier' }).first().click();
       await expect(c.heading).toBeVisible();

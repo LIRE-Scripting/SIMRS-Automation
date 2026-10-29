@@ -1,3 +1,4 @@
+import { asOnSite } from '../../../lib/i18n';
 import type { Browser, Page } from '@playwright/test';
 import { expect, qaTest, test, type Qa } from '../../../fixtures/e2e';
 import { installToastRecorder, toastMark, toastsSince } from '../../../lib/assertions';
@@ -13,7 +14,10 @@ import { ItemMasterPage } from '../../../pages/inventory/InventoryE2EPages';
 import { LoginPage } from '../../../pages/LoginPage';
 import { switchLanguage } from '../shared/language';
 import { compact, DispenseWizard, typeAhead, IssueLinesPage } from '../../../pages/pharmacy/PharmacyE2EPages';
-import { backToEnglish, CONFIRMED, confirm, expectRefused, ownItem, patient, sell, stock, storeNote, toastsAfter, toConfirm, type Patient } from './helpers';
+import { backToIndonesian, CONFIRMED, confirm, expectRefused, ownItem, patient, sell, stock, storeNote, toastsAfter, toConfirm, type Patient } from './helpers';
+
+/** An answer of HTTP 500: the toast "Minified React error #441". */
+const serverError = (toasts: string[]) => toasts.some((t) => /React error #441/.test(t));
 
 /**
  * 05-pharmacy.xlsx, feature "Dispense (/pharmacy/dispense)": counter sales.
@@ -27,7 +31,7 @@ test.beforeEach(async ({ page }) => {
 });
 
 test.afterEach(async ({ page }) => {
-  await backToEnglish(page);
+  await backToIndonesian(page);
 });
 
 const para = PHARMACY.para;
@@ -74,7 +78,7 @@ qaTest('TC-APP005-007', async ({ page, qa }) => {
   const before = await stockOf(page, para.code);
 
   await qa.step(1, async () => {
-    await page.goto('/en/pharmacy');
+    await page.goto('/id/pharmacy');
     await page.getByRole('main').getByRole('link', { name: 'Dispense', exact: true }).first().click();
     await expect(w.marker('Select items')).toBeVisible();
     await expect(w.main.getByText('No medical record selected.', { exact: true })).toBeVisible();
@@ -93,7 +97,7 @@ qaTest('TC-APP005-007', async ({ page, qa }) => {
 
   await qa.step(4, async () => {
     await w.addItem(para.code);
-    await expect(w.selectedCount()).toHaveText(/^Selected \(1\)$/i);
+    await expect(w.selectedCount()).toHaveText(/^(Selected|Dipilih) \(1\)$/i);
     await expect(w.selected()).toContainText([para.name]);
   });
 
@@ -192,14 +196,14 @@ qaTest('TC-APP005-009', async ({ page, qa }) => {
     await w.pickPatient(pt1);
     await w.addItem(para.code);
     await w.addItem(PHARMACY.ibu.code);
-    await expect(w.selectedCount()).toHaveText(/^Selected \(2\)$/i);
+    await expect(w.selectedCount()).toHaveText(/^(Selected|Dipilih) \(2\)$/i);
   });
 
   await qa.step(2, async () => {
     await w.selected().filter({ hasText: PHARMACY.ibu.code }).getByRole('button', { name: 'Remove' }).click();
-    await expect(w.selectedCount()).toHaveText(/^Selected \(1\)$/i);
+    await expect(w.selectedCount()).toHaveText(/^(Selected|Dipilih) \(1\)$/i);
     await w.addItem(PHARMACY.ibu.code);
-    await expect(w.selectedCount()).toHaveText(/^Selected \(2\)$/i);
+    await expect(w.selectedCount()).toHaveText(/^(Selected|Dipilih) \(2\)$/i);
   });
 
   await qa.step(3, async () => {
@@ -361,7 +365,8 @@ qaTest('TC-APP005-021', async ({ page, qa }) => {
 
   await qa.step(1, async () => {
     w = await toConfirm(page, pt1, [{ item: para, requested: '5', issued: '3', discount: '5', generic: true }]);
-    expect(await w.summaryCompact()).toEqual([compact(`${para.name} 3/5 · Generic`)]);
+    // The site writes "Generik"; the line is compared in English.
+    expect((await w.summaryCompact()).map((l) => l.replace(/Generik$/, 'Generic'))).toEqual([compact(`${para.name} 3/5 · Generic`)]);
   });
 
   await qa.step(2, async () => {
@@ -402,7 +407,7 @@ qaTest('TC-APP005-026', async ({ page, qa }) => {
   await qa.step(1, async () => {
     await w.open();
     await w.addItem(para.code);
-    await expect(w.selectedCount()).toHaveText(/^Selected \(1\)$/i);
+    await expect(w.selectedCount()).toHaveText(/^(Selected|Dipilih) \(1\)$/i);
     await expect(w.main.getByText('No medical record selected.', { exact: true })).toBeVisible();
   });
 
@@ -443,6 +448,7 @@ qaTest('TC-APP005-028', async ({ page, qa }) => {
   const [pt2, pt3] = await twins(page, qa);
   await admit(page, qa, pt3.fullName);
   const w = new DispenseWizard(page);
+  let blocked = false;
 
   await qa.step(1, async () => {
     await w.open();
@@ -463,11 +469,17 @@ qaTest('TC-APP005-028', async ({ page, qa }) => {
     await w.goNext('Drug order alerts');
     await w.goNext('Confirm');
     const toasts = await confirm(page, w);
+    if (serverError(toasts)) {
+      // "Confirm" answers HTTP 500 for PT-2 while PT-3 of the same name is admitted (found blocker 52).
+      blocked = true;
+      return qa.note(3, `Confirm for PT-2: "${toasts.join(' / ').slice(0, 60)}" (HTTP 500; PT-3 of the same name is admitted)`);
+    }
     if (!toasts.includes(CONFIRMED)) {
       qa.deviation(3, 'The sale goes through for PT-2', `refused: "${toasts.join(' / ')}" (PT-3 of the same name is admitted)`);
     }
     expect(toasts).toContain(CONFIRMED);
   });
+  if (blocked) qa.blocked(3, 52);
 });
 
 qaTest('TC-APP005-029', async ({ page, qa }) => {
@@ -492,7 +504,7 @@ qaTest('TC-APP005-029', async ({ page, qa }) => {
     await w.goBack('Set quantities');
     await w.goBack('Select items');
     await w.selected().filter({ hasText: PHARMACY.amlo.code }).getByRole('button', { name: 'Remove' }).click();
-    await expect(w.selectedCount()).toHaveText(/^Selected \(1\)$/i);
+    await expect(w.selectedCount()).toHaveText(/^(Selected|Dipilih) \(1\)$/i);
   });
 
   await qa.step(4, async () => {
@@ -605,7 +617,7 @@ qaTest('TC-APP005-033', async ({ page, qa }) => {
   // Freeze days of BR-A (Podomoro): the Branch field is a type-ahead that opens on another branch.
   const field = () => page.getByRole('main').getByRole('spinbutton', { name: 'Freeze days' });
   const onPodomoro = async () => {
-    await page.goto('/en/inventory/stores');
+    await page.goto('/id/inventory/stores');
     await typeAhead(page, page.getByRole('main').getByRole('combobox', { name: 'Branch' }), 'Podomoro');
   };
   const freeze = async (days: string) => {
@@ -625,13 +637,21 @@ qaTest('TC-APP005-033', async ({ page, qa }) => {
       expectRefused(qa, 1, await sell(page, pt1, [{ item: exp }]), 'not enough stock');
     });
 
+    let sold = true;
     await qa.step(2, async () => {
       const toasts = await sell(page, pt1, [{ item: frz, requested: '5', issued: '5' }]);
+      if (serverError(toasts)) {
+        // "Confirm" answers HTTP 500 (found blocker 52): with Freeze days set no sale goes through.
+        sold = false;
+        return qa.note(2, `Confirm with Freeze days ${INVENTORY.freezeDays}: "${toasts.join(' / ').slice(0, 60)}" (HTTP 500), as on every run since 2026-10-15`);
+      }
       if (!toasts.includes(CONFIRMED)) qa.deviation(2, 'Confirmed toast', `refused ("${toasts.join(' / ')}"): with Freeze days ${INVENTORY.freezeDays} no sale goes through, not even from a batch expiring in 400 days (seen on 2026-10-15)`);
       expect(toasts).toContain(CONFIRMED);
     });
-
-    await qa.step(3, async () => {
+    if (!sold) {
+      qa.blocked(2, 52);
+      qa.blocked(3, 52);
+    } else await qa.step(3, async () => {
       const s = await stockOf(page, frz.code);
       qa.note(3, `QA-FRZ batches: ${[...s].map(([b, q]) => `${b}=${q}`).join(', ')}`);
       if (s.get(frz.batches[0]) === 0) qa.deviation(3, 'The batch expiring in 31 days is 0; the one expiring in exactly 30 days is still 5', 'the sale was taken from the batch expiring in 30 days (received first), which Freeze days 30 should hold back');
@@ -647,9 +667,12 @@ qaTest('TC-APP005-033', async ({ page, qa }) => {
       expect(await freeze('29')).toContain('Freeze limit saved.');
     });
 
+    let again: string[] = [];
     await qa.step(6, async () => {
-      expect(await sell(page, pt1, [{ item: frz }])).toContain(CONFIRMED);
+      again = await sell(page, pt1, [{ item: frz }]);
+      if (!serverError(again)) expect(again).toContain(CONFIRMED);
     });
+    if (serverError(again)) qa.blocked(6, 52);
   } finally {
     await freeze(before || '0');
   }
@@ -703,7 +726,7 @@ qaTest('TC-APP005-034', async ({ page, qa }) => {
     });
 
     await qa.step(4, async () => {
-      await page.goto('/en/inventory/stores');
+      await page.goto('/id/inventory/stores');
       await typesButton().click();
       await visitDialog.getByRole('checkbox', { name: 'Outpatient' }).uncheck();
       const m = await toastMark(page);
@@ -719,7 +742,7 @@ qaTest('TC-APP005-034', async ({ page, qa }) => {
       qa.note(5, `Store placeholder "${await w.store.getAttribute('placeholder')}", offers: ${opts.join(' | ') || 'nothing'}`);
     });
   } finally {
-    await page.goto('/en/inventory/stores');
+    await page.goto('/id/inventory/stores');
     await typesButton().click();
     const out = visitDialog.getByRole('checkbox', { name: 'Outpatient' });
     const inp = visitDialog.getByRole('checkbox', { name: 'Inpatient' });
@@ -752,7 +775,7 @@ qaTest('TC-APP005-049', async ({ page, qa }) => {
     if (r.some((x) => /advanceDispense|React error|\d{3} /.test(x))) qa.deviation(1, 'A short sentence without technical words', `raw server text: ${r.join('; ')}`);
   });
 
-  await qa.step(2, async () => {
+  await qa.step(2, () => asOnSite(async () => {
     try {
       await switchLanguage(page, 'ID');
       // The wizard is Indonesian here; it is driven by the labels seen on 2026-10-15
@@ -786,9 +809,9 @@ qaTest('TC-APP005-049', async ({ page, qa }) => {
       qa.note(2, `Indonesian: ${r.map((x) => `"${x}"`).join('; ')}`);
       if (r.some((x) => /advanceDispense|React error|not enough stock|Patient has been admitted/.test(x))) qa.deviation(2, 'The same sentences in Indonesian', `English server text: ${r.join('; ')}`);
     } finally {
-      await backToEnglish(page);
+      await backToIndonesian(page);
     }
-  });
+  }));
 });
 
 /** A page signed in afresh as U1 in its own browser context (signing out there leaves the shared session alone). */
@@ -815,7 +838,7 @@ qaTest('TC-APP005-050', async ({ page, browser, qa }) => {
 
   try {
     await qa.step(1, async () => {
-      await other.goto('/en');
+      await other.goto('/id');
       await new AppHeader(other).signOut();
       await expect(other).toHaveURL(/login|sign-?in/i);
     });

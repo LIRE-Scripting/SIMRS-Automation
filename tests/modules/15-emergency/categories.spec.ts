@@ -43,7 +43,7 @@ class Categories {
     this.dialog = page.getByRole('dialog');
   }
   async open(): Promise<void> {
-    await this.page.goto('/en/emergency/triage-categories');
+    await this.page.goto('/id/emergency/triage-categories');
     await expect(this.main.getByRole('heading', { level: 1, name: 'Triage Category' })).toBeVisible();
     await this.page.waitForLoadState('networkidle').catch(() => {});
   }
@@ -96,7 +96,7 @@ qaTest('TC-APP015-024', async ({ page, qa }) => {
   const colour = colourOf(qa);
 
   await qa.step(1, async () => {
-    await page.goto('/en/emergency/patients');
+    await page.goto('/id/emergency/patients');
     await page.getByRole('complementary').getByRole('link', { name: 'Triage Category' }).first().click();
     await expect(c.main.getByRole('heading', { level: 1, name: 'Triage Category' })).toBeVisible();
     await expect(c.main.getByText('Description, colour, and the minutes allowed before consultation is overdue.', { exact: true })).toBeVisible();
@@ -130,7 +130,7 @@ qaTest('TC-APP015-024', async ({ page, qa }) => {
     expect(await c.save()).toContain(SAVED);
     await c.open();
     expect((await c.cells(description))[3]).toBe('Inactive');
-    await page.goto('/en/emergency/patients');
+    await page.goto('/id/emergency/patients');
     const row = page.getByRole('main').getByRole('row').filter({ has: page.getByRole('button', { name: 'Triage' }) }).first();
     if (await row.count()) {
       await row.getByRole('button', { name: 'Triage', exact: true }).click();
@@ -179,7 +179,7 @@ qaTest('TC-APP015-026', async ({ page, qa }) => {
   const description = qa.name('X Merah');
   expect(await c.create({ description, colour: colourOf(qa), minutes: '5', active: false })).toContain(SAVED);
   await qa.step(1, async () => {
-    await page.goto('/en/emergency/layout');
+    await page.goto('/id/emergency/layout');
     const tile = page.getByRole('main').getByRole('listitem').getByRole('button').first();
     if (!(await tile.count())) {
       qa.note(1, 'no tile on Emergency Layout');

@@ -1,3 +1,4 @@
+import { asOnSite } from '../../../lib/i18n';
 import type { Page } from '@playwright/test';
 import { expect, qaTest, test, type Qa } from '../../../fixtures/e2e';
 import { installToastRecorder } from '../../../lib/assertions';
@@ -5,8 +6,8 @@ import { BILLING } from '../../../lib/billing-data';
 import { PHARMACY } from '../../../lib/pharmacy-data';
 import { CashierPage, rupiah } from '../../../pages/billing/CashierPage';
 import { patient, sell, stock } from '../05-pharmacy/helpers';
-import { backToEnglish, switchLanguage } from '../shared/language';
-import { counterClosed, ensureSettings, paidSale, pay, sale, select } from './helpers';
+import { backToIndonesian, switchLanguage } from '../shared/language';
+import { counterClosed, ensureSettings, newRxInvoice, paidSale, pay, rxInvoices, sale, select } from './helpers';
 import { TC_APP014_003, TC_APP014_005, TC_APP014_006, TC_APP014_008 } from './cases';
 
 /**
@@ -28,7 +29,7 @@ test.beforeEach(async ({ page }) => {
 });
 
 test.afterEach(async ({ page }) => {
-  await backToEnglish(page);
+  await backToIndonesian(page);
 });
 
 /** A refusal: the expected message, or the server-error toast recorded as a deviation. */
@@ -40,31 +41,11 @@ async function refused(qa: Qa, step: number, c: CashierPage, message: string): P
 
 /** An RX- invoice of a pharmacy sale made by this test (the new RX- invoice of the cashier search). */
 async function rxSale(page: Page, qa: Qa, line: { requested?: string; issued?: string; discount?: string }): Promise<{ rx: string; pt: { mrn: string; fullName: string } }> {
-  // The RX- invoices offered by the cashier search for "RX-" (the pharmacist's screen does not show the number).
-  // The list of hits is capped: a prefix whose list is full is split into its 16 longer prefixes.
-  const openRx = async () => {
-    const c = new CashierPage(page);
-    await c.open();
-    const all = new Set<string>();
-    const read = async (prefix: string): Promise<void> => {
-      await c.search.fill(`RX-${prefix}`);
-      await c.button('Search').click();
-      const hits = page.getByRole('listbox').getByRole('button');
-      await hits.first().waitFor({ timeout: 5_000 }).catch(() => {});
-      const found = (await hits.allInnerTexts()).map((t) => t.match(/RX-[0-9a-f]{8}/)?.[0]).filter((x): x is string => !!x);
-      found.forEach((x) => all.add(x));
-      if (found.length >= 10 && prefix.length < 3) for (const d of '0123456789abcdef') await read(prefix + d);
-    };
-    for (const d of '0123456789abcdef') await read(d);
-    return all;
-  };
   await stock(page, qa);
   const pt = await patient(page, qa);
-  const before = await openRx();
+  const before = await rxInvoices(page);
   expect(await sell(page, pt, [{ item: PHARMACY.para, ...line }])).toContain('Dispense confirmed — issue lines saved.');
-  const added = [...(await openRx())].filter((x) => !before.has(x));
-  expect(added, 'one new RX- invoice in the cashier search').toHaveLength(1);
-  return { rx: added[0], pt };
+  return { rx: await newRxInvoice(page, before), pt };
 }
 
 async function rxInvoice(page: Page, qa: Qa, line: { requested?: string; issued?: string; discount?: string }): Promise<string> {
@@ -77,7 +58,7 @@ qaTest('TC-APP014-001', async ({ page, qa }) => {
   let cashBefore = 0;
 
   await qa.step(1, async () => {
-    await page.goto('/en/apps');
+    await page.goto('/id/apps');
     await page.getByRole('link', { name: /^Hospital Accounts\b/ }).first().click();
     await page.getByRole('main').getByRole('link', { name: 'Fast Cashier' }).first().click();
     await expect(c.heading).toBeVisible();
@@ -272,7 +253,7 @@ qaTest('TC-APP014-021', async ({ page, qa }) => {
   const main = page.getByRole('main');
   const c = new CashierPage(page);
   await qa.step(1, async () => {
-    await page.goto('/en/apps');
+    await page.goto('/id/apps');
     await page.getByRole('link', { name: /^Hospital Accounts\b/ }).first().click();
     await expect(main.getByRole('navigation', { name: 'Breadcrumb' })).toHaveText(/^Home\s*\/\s*Apps\s*\/\s*Hospital Accounts$/);
     await expect(main.getByRole('heading', { level: 1, name: 'Hospital Accounts' })).toBeVisible();
@@ -281,21 +262,21 @@ qaTest('TC-APP014-021', async ({ page, qa }) => {
   });
   await qa.step(2, async () => {
     for (const t of ['Fast Cashier', 'Insurance / BPJS']) {
-      await page.goto('/en/billing');
+      await page.goto('/id/billing');
       await main.getByRole('link', { name: t, exact: true }).last().click();
       await expect(c.heading).toBeVisible();
     }
     await page.getByRole('navigation', { name: 'Billing' }).getByRole('link', { name: 'Fast Cashier' }).click();
     await expect(c.heading).toBeVisible();
   });
-  await qa.step(3, async () => {
+  await qa.step(3, () => asOnSite(async () => {
     await switchLanguage(page, 'ID');
     await page.goto('/id/billing/cashier');
     const h1 = (await page.getByRole('heading', { level: 1 }).innerText()).trim();
     const pay = (await page.getByRole('heading', { level: 2 }).allInnerTexts()).join(', ');
     qa.note(3, `heading "${h1}"; sections ${pay}`);
     if (/1\. Charge lookup|2\. Payment/.test(pay)) qa.deviation(3, 'Headings, field names, buttons and messages are Indonesian', `English sections: ${pay}`);
-  });
+  }));
   await qa.step(4, async () => {
     const id = new CashierPage(page);
     // In Indonesian the labels differ: the walk-in form is the first input and button after its heading.

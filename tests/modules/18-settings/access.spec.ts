@@ -2,9 +2,10 @@ import type { Locator, Page } from '@playwright/test';
 import { expect, qaTest, test, type Qa } from '../../../fixtures/e2e';
 import { installToastRecorder } from '../../../lib/assertions';
 import { everyPage } from '../../../pages/paging';
-import { asUser, BR_A, BR_B, headerOneBranch, userPage } from '../shared/access';
-import { backToEnglish } from '../shared/language';
+import { asUser, BR_A, BR_B, headerOneBranch, routesRefused, rowCount, screenRefuses, toastsOf, userPage } from '../shared/access';
+import { backToIndonesian } from '../shared/language';
 import { chosen } from './cases';
+import { PROCESS, Processes } from './process-cases';
 import { countries, departments, ensureSiteNew, serviceCenters, SITE_NEW, sites, taxCodes, type Mdm } from './helpers';
 
 /**
@@ -23,7 +24,7 @@ test.beforeEach(async ({ page }) => {
 });
 
 test.afterEach(async ({ page }) => {
-  await backToEnglish(page);
+  await backToIndonesian(page);
 });
 
 /** A department of this test on the user's branch (or the given site, for U2). */
@@ -325,4 +326,51 @@ qaTest('TC-APP018-026', async ({ page, qa, browser }) => {
   });
 
   await qa.step(4, () => headerOneBranch(page, qa, 4));
+});
+
+qaTest('TC-APP018-060', async ({ qa, browser }) => {
+  const staff = await userPage(browser, 'U3');
+  const main = staff.getByRole('main');
+  try {
+    await qa.step(1, async () => {
+      await staff.goto('/id/apps');
+      await staff.waitForLoadState('networkidle').catch(() => {});
+      const card = main.getByRole('link', { name: /^Settings\b/ });
+      if (!(await card.count())) return qa.note(1, 'U3 (no right) is not offered the Settings card');
+      await card.first().click();
+      await staff.waitForLoadState('networkidle').catch(() => {});
+      qa.note(1, `Settings for U3: groups ${(await main.getByRole('heading', { level: 2 }).allInnerTexts()).map((t) => t.trim()).join(', ')} (TBD in the workbook)`);
+    });
+    await qa.step(2, () => routesRefused(staff, qa, 2, ['/identity/users', '/identity/roles', '/identity/rights', '/identity/site-maps']));
+    await qa.step(3, async () => {
+      await staff.goto('/id/identity/branding');
+      await staff.waitForLoadState('networkidle').catch(() => {});
+      const name = main.getByRole('textbox', { name: 'Product name' });
+      const save = main.getByRole('button', { name: 'Save branding' });
+      if (!(await save.isVisible().catch(() => false))) return qa.note(3, 'U3 is offered no "Save branding"');
+      // The current name is saved again: if the save goes through, nothing of the hospital's brand changes.
+      if (await name.count()) await name.fill(await name.inputValue());
+      const toasts = await toastsOf(staff, () => save.click());
+      qa.note(3, `Save branding (the name unchanged): "${toasts.join(' / ') || 'no toast'}" (TBD in the workbook: refused for lack of BRANDING_WRITE)`);
+      if (toasts.some((t) => /saved|tersimpan/i.test(t))) qa.deviation(3, 'Refused for lack of BRANDING_WRITE', `saved by U3: "${toasts.join(' / ')}"`);
+    });
+    await qa.step(4, async () => {
+      const p = new Processes(staff);
+      await p.edit(PROCESS).catch(() => {});
+      if (!(await p.dialog.isVisible().catch(() => false))) return qa.note(4, 'U3 is offered no "Edit chain"');
+      // The chain is saved unchanged: a save that goes through changes nothing.
+      await p.next().click();
+      const toasts = await p.save();
+      qa.note(4, `the purchase order chain saved unchanged by U3: "${toasts.join(' / ') || 'no toast'}" (TBD in the workbook: refused for lack of WORKFLOW_WRITE)`);
+      if (toasts.includes('Approval chain saved.')) qa.deviation(4, 'Refused for lack of WORKFLOW_WRITE', 'the chain is saved by U3');
+    });
+    qa.notRun(5, 'a change of the own password of U3 would change the password every run signs in with (QA_PASSWORD, .env)');
+    await qa.step(6, async () => {
+      await staff.goto('/id/audit');
+      await staff.waitForLoadState('networkidle').catch(() => {});
+      qa.note(6, `Audit trail for U3: ${(await screenRefuses(staff)) ? 'refused' : `shown (${await rowCount(staff)} rows)`} (TBD in the workbook: refused for lack of AUDIT_READ)`);
+    });
+  } finally {
+    await staff.context().close();
+  }
 });

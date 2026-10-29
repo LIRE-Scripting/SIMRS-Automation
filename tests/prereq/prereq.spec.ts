@@ -3,6 +3,7 @@ import path from 'node:path';
 import { expect, test, type Browser, type Page } from '@playwright/test';
 import { installToastRecorder, toastMark } from '../../lib/assertions';
 import { PASSWORD, SCREENSHOT_DIR } from '../../lib/config';
+import { installSiteLanguage } from '../../lib/i18n';
 import { todayWib } from '../../lib/dates';
 import { Desk } from '../modules/shared/desk';
 import { createUser, pick, roles, signInAs, toastsAfter, users } from '../modules/18-settings/helpers';
@@ -83,14 +84,14 @@ async function shot(page: Page, r: PrereqItem, label: string): Promise<void> {
 
 /** Picks a role on User Rights (the typed list of role names). */
 async function pickRole(page: Page, name: string): Promise<void> {
-  await page.goto('/en/identity/rights');
+  await page.goto('/id/identity/rights');
   await pick(page.getByRole('main').getByRole('combobox', { name: 'Role' }), name);
   await page.waitForLoadState('networkidle').catch(() => {});
 }
 
 /** Role names known on User Rights that start with the text. */
 async function roleExists(page: Page, name: string): Promise<boolean> {
-  await page.goto('/en/identity/rights');
+  await page.goto('/id/identity/rights');
   const box = page.getByRole('main').getByRole('combobox', { name: 'Role' });
   await box.fill(name);
   const list = page.locator('#rights-role-list').getByRole('option');
@@ -117,6 +118,9 @@ const NEW_ROLES: NewRole[] = [
 
 /** Roles whose rights could not be given (blocker 38): their accounts are not made. */
 const unusableRoles = new Set<string>();
+
+// The site runs in Indonesian; the specs keep the English texts (lib/i18n).
+test.beforeAll(async ({ browser }) => installSiteLanguage(browser));
 
 // ------------------------------------------------------------ users
 
@@ -195,7 +199,7 @@ async function proveSignIn(browser: Browser, a: NewAccount, r: PrereqItem): Prom
     await s.context.close();
     return null;
   }
-  await s.page.goto('/en/me');
+  await s.page.goto('/id/me');
   await expect(s.page.getByRole('main').getByText(/active branch/i)).toBeVisible();
   const profile = (await s.page.getByRole('main').innerText()).replace(/\s+/g, ' ');
   const m = profile.match(/ROLES (.*?) ACTIVE BRANCH (.*?) ACTIVE STORE/i);
@@ -220,7 +224,7 @@ async function linkEmployee(me: Page, r: PrereqItem): Promise<void> {
   if (!t2.includes('Saved.')) r.result = 'Failed';
   await desk.open();
   await shot(me, r, 'hr-desk-linked');
-  await me.goto('/en/hr/desk/attendance');
+  await me.goto('/id/hr/desk/attendance');
   await me.waitForLoadState('networkidle').catch(() => {});
   await shot(me, r, 'punch-screen');
 }
@@ -252,7 +256,7 @@ test('00 go-ahead, patients, deferred users', async ({ page }) => {
     r.notes.push('needs the requester to confirm that the patients on the site are made up; the journeys make their own "X " patients');
   });
   await item(page, { id: 'U9', sheet: 'Users', ref: 'Users | U9', item: 'Account with the licensing right', action: 'Checked User Rights' }, async (r) => {
-    await page.goto('/en/identity/rights');
+    await page.goto('/id/identity/rights');
     await page.waitForLoadState('networkidle').catch(() => {});
     const has = await page.getByRole('main').getByRole('checkbox', { name: /^LICENSING_WRITE\b/ }).count();
     await shot(page, r, 'rights-list');
@@ -353,7 +357,7 @@ test('03 set-up and data', async ({ page }) => {
   });
 
   await item(page, { id: 'S05', sheet: 'Set-up and data', ref: 'Set-up and data | 5', item: 'Item below its minimum stock (Reorder, Podomoro)', action: 'Checked Reorder' }, async (r) => {
-    await page.goto('/en/procurement/reorder');
+    await page.goto('/id/procurement/reorder');
     await page.waitForLoadState('networkidle').catch(() => {});
     const text = (await main.innerText()).replace(/\s+/g, ' ');
     const items = text.match(/[A-Z0-9-]+ \d+ ·/g) ?? [];
@@ -369,7 +373,7 @@ test('03 set-up and data', async ({ page }) => {
   });
 
   await item(page, { id: 'S07', sheet: 'Set-up and data', ref: 'Set-up and data | 7', item: 'Emergency registration configuration (type 7, Podomoro)', action: 'Checked the screen' }, async (r) => {
-    await page.goto('/en/emergency/registration?type=7');
+    await page.goto('/id/emergency/registration?type=7');
     await page.waitForLoadState('networkidle').catch(() => {});
     const msg = await main.getByText(/registration configuration/).allInnerTexts();
     await shot(page, r, 'emergency-registration');
@@ -378,7 +382,7 @@ test('03 set-up and data', async ({ page }) => {
   });
 
   await item(page, { id: 'S08', sheet: 'Set-up and data', ref: 'Set-up and data | 8', item: 'Finance configuration of Podomoro', action: 'Finance configuration, Save' }, async (r) => {
-    await page.goto('/en/finance/configuration');
+    await page.goto('/id/finance/configuration');
     await expect(main.getByRole('heading', { level: 1, name: 'Finance configuration' })).toBeVisible();
     await main.getByRole('combobox', { name: 'Branch' }).selectOption({ label: BR_A });
     await page.waitForLoadState('networkidle').catch(() => {});
@@ -424,7 +428,7 @@ test('03 set-up and data', async ({ page }) => {
     r.notes.push(`Save: toast "${t.join(' / ')}"`);
     if (!t.includes('Configuration saved.')) r.result = 'Failed';
     await shot(page, r, 'finance-configuration');
-    await page.goto('/en/finance/collections');
+    await page.goto('/id/finance/collections');
     await page.waitForLoadState('networkidle').catch(() => {});
     const still = await main.getByText(/has no finance configuration/).count();
     r.notes.push(`Patient collections (Podomoro): ${still ? 'still "This branch has no finance configuration."' : 'no longer says the branch has no finance configuration'}`);
@@ -456,7 +460,7 @@ test('03 set-up and data', async ({ page }) => {
     }
     await rules.open(BR_A);
     await shot(page, r, 'posting-rules');
-    await page.goto('/en/workflow/process-definitions');
+    await page.goto('/id/workflow/process-definitions');
     await page.waitForLoadState('networkidle').catch(() => {});
     await shot(page, r, 'process-definitions');
     r.notes.push('Process definitions: each budget chain has 1 step ("Persetujuan"); the chain editor names steps only and has no field for an approver, so the approver is whoever holds BUDGET_APPROVE (U5 qa.approver, U8 qa.budget)');
@@ -464,7 +468,7 @@ test('03 set-up and data', async ({ page }) => {
 
   await item(page, { id: 'S10', sheet: 'Set-up and data', ref: 'Set-up and data | 10', item: 'CSSD: passed Bowie Dick today, category KITS, drug form KIT', action: 'Bowie Dick, Save; Inventory set-up, category' }, async (r) => {
     const today = todayWib();
-    await page.goto('/en/cssd/bowie-tests');
+    await page.goto('/id/cssd/bowie-tests');
     await page.waitForLoadState('networkidle').catch(() => {});
     const autoclave = await main.getByRole('combobox', { name: 'Autoclave' }).evaluate((s) => (s as HTMLSelectElement).selectedOptions[0]?.text ?? '');
     const passedToday = main.locator('tr').filter({ hasText: today }).filter({ hasText: autoclave }).filter({ hasText: 'Pass' });
@@ -483,7 +487,7 @@ test('03 set-up and data', async ({ page }) => {
     }
     await shot(page, r, 'bowie-dick');
 
-    await page.goto('/en/inventory/setup');
+    await page.goto('/id/inventory/setup');
     await page.waitForLoadState('networkidle').catch(() => {});
     if (/\bKITS\b/.test(await main.innerText())) r.notes.push('item category KITS already on Inventory set-up');
     else {

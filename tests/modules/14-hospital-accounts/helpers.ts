@@ -85,3 +85,32 @@ export async function paidSale(page: Page, amount = '150000'): Promise<string> {
   await expect(new CashierPage(page).bar).toContainText(new RegExp(`Paid\\s*${invoice}`));
   return invoice;
 }
+
+/**
+ * Every RX- invoice the cashier search offers (the pharmacist's screen does
+ * not show the number of a sale). The list of hits is capped: a prefix whose
+ * list is full is split into its 16 longer prefixes.
+ */
+export async function rxInvoices(page: Page): Promise<Set<string>> {
+  const c = new CashierPage(page);
+  await c.open();
+  const all = new Set<string>();
+  const read = async (prefix: string): Promise<void> => {
+    await c.search.fill(`RX-${prefix}`);
+    await c.button('Search').click();
+    const hits = page.getByRole('listbox').getByRole('button');
+    await hits.first().waitFor({ timeout: 5_000 }).catch(() => {});
+    const found = (await hits.allInnerTexts()).map((t) => t.match(/RX-[0-9a-f]{8}/)?.[0]).filter((x): x is string => !!x);
+    found.forEach((x) => all.add(x));
+    if (found.length >= 10 && prefix.length < 3) for (const d of '0123456789abcdef') await read(prefix + d);
+  };
+  for (const d of '0123456789abcdef') await read(d);
+  return all;
+}
+
+/** The one RX- invoice the cashier search offers now and did not offer `before` (a sale made in between). */
+export async function newRxInvoice(page: Page, before: Set<string>): Promise<string> {
+  const added = [...(await rxInvoices(page))].filter((x) => !before.has(x));
+  expect(added, 'one new RX- invoice in the cashier search').toHaveLength(1);
+  return added[0];
+}

@@ -329,6 +329,8 @@ export const CASES = {
       await appts.showRange(dDay);
       const ours = (await appts.allRowTexts()).filter((r) => r.Patient.endsWith(t));
       expect(ours.map((r) => r.When)).toEqual([whenText(dDay, '09:00'), whenText(dDay, '08:30'), whenText(dDay, '08:00')]);
+      // allRowTexts ends on the last page (the day may hold more than one page of rows): the summary of the first page is read.
+      await appts.firstPage();
       await expect(appts.pagingSummary).toHaveText(/^Showing 1–\d+ of \d+$/);
       qa.blocked(2, 18);
     });
@@ -377,13 +379,15 @@ export const CASES = {
       await appts.tab('Calendar').click();
       await appts.goToWeekOf(dDay, todayWib());
       await expect(appts.calendarDays()).toHaveCount(7);
+      // The day names, as /id writes them too (Min, Sen, Sel, Rab, Kam, Jum, Sab).
+      const ID_DAYS = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'];
       for (const [i, day] of ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].entries()) {
-        await expect(appts.calendarDays().nth(i)).toContainText(day);
+        await expect(appts.calendarDays().nth(i)).toContainText(new RegExp(`^(?:${day}|${ID_DAYS[i]})`));
       }
       // A box lists four bookings, then "+N" for the rest: the badge counts both.
       const shown = await appts.dayItems(appts.calendarDays()).count();
       const more = (await appts.calendarDays().getByText(/^\+\s*\d+/).allInnerTexts()).reduce((sum, t) => sum + Number(t.replace(/\D/g, '')), 0);
-      await expect(appts.weekBadge()).toHaveText(`${shown + more} appointments`);
+      await expect(appts.weekBadge()).toHaveText(AppointmentsPage.badge(shown + more));
     });
 
     await qa.step(2, async () => {

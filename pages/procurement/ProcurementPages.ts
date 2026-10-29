@@ -1,7 +1,7 @@
 import { expect, type Locator, type Page } from '@playwright/test';
 
 /**
- * Procurement (/en/procurement): Purchase orders (no <main> landmark on this
+ * Procurement (/id/procurement): Purchase orders (no <main> landmark on this
  * screen and on the hub), Suppliers and requests, Purchase requests
  * (/procurement/requests, titled "Purchase orders"), Receipts and Reorder.
  * Read from the live screens on 2026-10-15.
@@ -32,7 +32,7 @@ export class PurchaseOrdersPage {
   }
 
   async open(): Promise<void> {
-    await this.page.goto('/en/procurement/purchase-orders');
+    await this.page.goto('/id/procurement/purchase-orders');
     await expect(this.heading).toBeVisible();
   }
 
@@ -65,7 +65,8 @@ export class PurchaseOrdersPage {
       await expect(this.rows().first()).not.toHaveText(top);
     }
     for (let i = 0; i < 50; i++) {
-      if (await this.row(docNo).count()) return this.row(docNo);
+      // A page renders twice after paging: its rows are given a moment.
+      if (await this.row(docNo).first().waitFor({ timeout: 2_500 }).then(() => true, () => false)) return this.row(docNo);
       if (!(await next.isVisible()) || (await next.isDisabled())) break;
       const first = await this.rows().first().innerText();
       // Toasts sit over the pager, so the button is pressed with the keyboard.
@@ -124,12 +125,14 @@ export class ProcurementDeskPage {
   }
 
   async open(route: 'suppliers' | 'requests' | 'receipts' | 'reorder', heading: string): Promise<void> {
-    await this.page.goto(`/en/procurement/${route}`);
+    await this.page.goto(`/id/procurement/${route}`);
     await expect(this.main.getByRole('heading', { level: 1, name: heading })).toBeVisible();
   }
 
   input(name: string): Locator {
-    return this.main.getByRole('textbox', { name, exact: true });
+    // On /id "Amount" is "Nilai" or "Jumlah", and "Jumlah" is also "Quantity", the input before it: the last match is Amount.
+    const box = this.main.getByRole('textbox', { name, exact: true });
+    return name === 'Amount' ? box.last() : box;
   }
 
   button(name: string): Locator {

@@ -1,7 +1,8 @@
 import { expect, type Locator, type Page } from '@playwright/test';
+import { NotOffered } from '../../lib/not-offered';
 
 /**
- * HR (/en/hr): Employees and Leave applications (both without a <main>
+ * HR (/id/hr): Employees and Leave applications (both without a <main>
  * landmark) and the HR desk screens (/hr/desk…). Read from the live screens
  * on 2026-10-15.
  */
@@ -29,11 +30,15 @@ export interface Employee {
 export type StepRow = Record<string, string>;
 export const STEPS = ['File', 'Dependents', 'Contacts', 'Qualifications', 'Employment', 'Licences'] as const;
 
-/** A type-ahead with hits "code · name" in `#<aria-controls>`; the hit containing `pick` is clicked. */
+export { NotOffered };
+
+/** A type-ahead with hits "code · name" in `#<aria-controls>`; the hit containing `pick` is clicked (NotOffered when there is none). */
 export async function pickHit(page: Page, field: Locator, typed: string, pick: string = typed): Promise<void> {
   await field.fill(typed);
   const list = page.locator(`#${await field.getAttribute('aria-controls')}`);
-  await list.getByRole('option').filter({ hasText: pick }).first().getByRole('button').click();
+  const hit = list.getByRole('option').filter({ hasText: pick }).first();
+  if (!(await hit.waitFor({ timeout: 10_000 }).then(() => true, () => false))) throw new NotOffered(`"${pick}" is not offered by the picker (found blocker 40)`);
+  await hit.getByRole('button').click();
 }
 
 export class EmployeesPage {
@@ -48,7 +53,7 @@ export class EmployeesPage {
   }
 
   async open(): Promise<void> {
-    await this.page.goto('/en/hr/employees');
+    await this.page.goto('/id/hr/employees');
     await expect(this.heading).toBeVisible();
   }
 
@@ -151,7 +156,7 @@ export class LeavePage {
   }
 
   async open(): Promise<void> {
-    await this.page.goto('/en/hr/leave-applications');
+    await this.page.goto('/id/hr/leave-applications');
     await expect(this.heading).toBeVisible();
   }
 

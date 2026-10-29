@@ -16,7 +16,7 @@ import { FollowUps } from '../../modules/03-patient-care/helpers';
  * gets a follow-up, and the visit is closed. The QA bookings of the claimed
  * week are cancelled at the end, as in the appointment specs.
  */
-const SCHEDULE = '/en/appointment/schedule';
+const SCHEDULE = '/id/appointment/schedule';
 const TYPE = bookSettings().types[0].name;
 const pad = (n: number) => String(n).padStart(3, '0');
 
@@ -76,7 +76,7 @@ chainTest('E2E-020', async ({ page, chain }) => {
     const code = qa.code('X-01');
     const name = qa.name('X Tipe uji 01');
     await qa.step(1, async () => {
-      await page.goto('/en/apps');
+      await page.goto('/id/apps');
       await page.getByRole('link', { name: /^Appointment\b/ }).first().click();
       await page.getByRole('complementary').filter({ hasText: 'Appointment' }).getByRole('link', { name: 'Referral types', exact: true }).click();
       await expect(list.heading).toBeVisible();
@@ -91,11 +91,18 @@ chainTest('E2E-020', async ({ page, chain }) => {
       await expect(toastLocator(page, /^Saved$/)).toBeVisible();
       await expect(list.dialog).toBeHidden();
     });
-    await qa.step(4, async () => {
-      await page.reload();
-      await expect(list.row(code)).toHaveCount(1);
-      await expect(list.row(code).getByRole('cell').nth(2)).toHaveText('Yes');
-    });
+    // The list shows its first 24 types only, with no paging (found blocker 24): a new type is often not listed.
+    await page.reload();
+    await expect(list.rows().first()).toBeVisible();
+    if (!(await list.row(code).isVisible()) && (await list.rows().count()) >= 24) {
+      qa.note(4, `${code} is saved but not among the ${await list.rows().count()} types the list shows`);
+      qa.blocked(4, 24);
+    } else {
+      await qa.step(4, async () => {
+        await expect(list.row(code)).toHaveCount(1);
+        await expect(list.row(code).getByRole('cell').nth(2)).toHaveText('Yes');
+      });
+    }
     await qa.step(5, async () => {
       await appts.open();
       const d = await appts.openBook();
@@ -190,7 +197,7 @@ chainTest('E2E-020', async ({ page, chain }) => {
     const last = await arrival.lastNumber(SHARED.dep1.name);
     if (last) qa.note(2, `precondition "no arrival in ${SHARED.dep1.name} today" not met on the shared site (last No. ${pad(last)}); expected the next number`);
     await qa.step(1, async () => {
-      await page.goto('/en/registration');
+      await page.goto('/id/registration');
       await page.getByRole('main').getByRole('link', { name: 'Arrival', exact: true }).click();
       await expect(arrival.heading).toBeVisible();
     });
@@ -212,7 +219,7 @@ chainTest('E2E-020', async ({ page, chain }) => {
 
   await chain.step(6, async (qa) => {
     await qa.step(1, async () => {
-      await page.goto('/en/apps');
+      await page.goto('/id/apps');
       await page.getByRole('link', { name: /^Patient Care\b/ }).first().click();
       await page.getByRole('main').getByRole('link', { name: 'Open Consultation' }).click();
       await expect(c.heading).toBeVisible();
@@ -279,7 +286,7 @@ chainTest('E2E-020', async ({ page, chain }) => {
     const f = new FollowUps(page);
     const note = qa.name('QA Pasien dihubungi, kontrol minggu depan');
     await qa.step(1, async () => {
-      await page.goto('/en/clinical');
+      await page.goto('/id/clinical');
       await page.getByRole('main').getByRole('link', { name: 'Follow-up', exact: true }).click();
       await expect(f.heading).toBeVisible();
     });

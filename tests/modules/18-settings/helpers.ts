@@ -41,7 +41,7 @@ export class Mdm {
     this.dialog = page.getByRole('dialog');
   }
   async open(): Promise<void> {
-    await this.page.goto(`/en${this.route}`);
+    await this.page.goto(`/id${this.route}`);
     await expect(this.main.getByRole('heading', { level: 1, name: this.heading })).toBeVisible();
     await this.page.waitForLoadState('networkidle').catch(() => {});
   }
@@ -175,13 +175,13 @@ export async function signInAs(browser: Browser, login: string, password: string
   const page = await context.newPage();
   await installToastRecorder(page);
   const l = new LoginPage(page);
-  await page.goto('/en/login?next=%2Fapps');
+  await page.goto('/id/login?next=%2Fapps');
   await l.username.fill(login);
   await l.password.fill(password);
   const mark = await toastMark(page);
   await l.submit.click();
   const ok = await page
-    .waitForURL(/\/en\/apps$/, { timeout: 15_000 })
+    .waitForURL(/\/(id|en)\/apps$/, { timeout: 15_000 })
     .then(() => true)
     .catch(() => false);
   let message = '';

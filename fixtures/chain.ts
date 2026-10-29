@@ -141,6 +141,8 @@ const test = e2e.extend<{ chain: ChainRun; chainId: string }>({
       stopAsPlanned: (k) => {
         const tc = chain.steps[k - 1]?.tc;
         if (!tc) throw new Error(`${chain.id} has no step ${k}`);
+        // A chain already stopped by a blocker of an earlier step does not reach this one.
+        if (stoppedAt) return;
         const plan = planFor(testCaseRef(tc));
         if (plan.disposition === 'automate') throw new Error(`${tc} is planned to run; stop the chain with its blocked step instead`);
         const causes = plan.reasons.map((r) =>

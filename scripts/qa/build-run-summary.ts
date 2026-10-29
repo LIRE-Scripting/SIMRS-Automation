@@ -1,7 +1,8 @@
 /**
  * Builds the summary of one full run of the suite:
- *   reports/summary/simrs-run-summary.xlsx  sheets Overview, Modules, E2E chains,
- *                                           Failures, Blockers, HTTP 5xx, Test cases
+ *   reports/summary/simrs-run-summary.xlsx  in Indonesian (scripts/qa/report-language.ts): sheets
+ *                                           Ringkasan, Modul, Rantai E2E, Gagal & Deviasi, Blocker,
+ *                                           HTTP 5xx, Kasus uji, Tangkapan layar
  *   reports/summary/run-summary.json        the same figures, for docs/qa/run-summary-*.md
  *
  * Inputs: the Playwright JSON of the run (reports/e2e/results*.json for the
@@ -33,26 +34,29 @@ import { blockers, modules, testCaseRef } from '../../lib/qa-data';
 import { CHAINS } from '../../lib/qa-data/e2e-chains';
 import { FOUND_BLOCKERS } from '../../lib/qa-data/found-blockers';
 import { planFor } from '../../lib/qa-data/plan';
+import { BLOCKER_TITLE_ID } from './blocker-titles-id';
+import { CHAIN_NAME_ID } from './chain-names-id';
+import { sentenceId, statusFromId, statusId } from './report-language';
 import { TRIAGE, type Triage } from './run-triage';
 
 const OUT_DIR = 'reports/summary';
 const THUMBS = '.qa-state/summary-thumbs';
-const SERVER_ERRORS = process.env.QA_SERVER_ERRORS ?? '.qa-state/run-2026-10-21/http-5xx.jsonl';
+const SERVER_ERRORS = process.env.QA_SERVER_ERRORS ?? '.qa-state/http-5xx.jsonl';
 const PREVIOUS = process.env.PREVIOUS_RESULTS ?? '.qa-state/old-results/2026-10-18';
 
 type Status = 'Passed' | 'Deviation' | 'Failed' | 'Blocked' | 'Not run';
 const STATUSES: Status[] = ['Passed', 'Deviation', 'Failed', 'Blocked', 'Not run'];
 
-/** The columns of sheet Modules (Passed, Deviation and Failed side by side: the formulas sum them as a range). */
+/** The columns of sheet Modul (Lulus, Deviasi and Gagal side by side: the formulas sum them as a range). */
 const MODULE_COLUMNS = [
-  { header: 'Module', key: 'module', width: 30 },
-  { header: 'Test cases', key: 'total', width: 11 },
-  ...STATUSES.map((x) => ({ header: x, key: x, width: 10 })),
-  { header: 'Of Not run: no test yet', key: 'noTest', width: 10 },
-  { header: 'Of Not run: written, not run yet', key: 'notRunYet', width: 10 },
-  { header: 'Pass rate (Passed / test cases)', key: 'rate', width: 13 },
-  { header: 'Coverage (run / test cases)', key: 'coverage', width: 13 },
-  { header: 'Blockers', key: 'blockers', width: 30 },
+  { header: 'Modul', key: 'module', width: 30 },
+  { header: 'Kasus uji', key: 'total', width: 11 },
+  ...STATUSES.map((x) => ({ header: statusId(x), key: x, width: 10 })),
+  { header: 'Dari Belum dijalankan: belum ada test', key: 'noTest', width: 10 },
+  { header: 'Dari Belum dijalankan: sudah ditulis, belum dijalankan', key: 'notRunYet', width: 12 },
+  { header: 'Tingkat lulus (Lulus / kasus uji)', key: 'rate', width: 13 },
+  { header: 'Cakupan (dijalankan / kasus uji)', key: 'coverage', width: 13 },
+  { header: 'Blocker', key: 'blockers', width: 30 },
   { header: 'HTTP 5xx', key: 'http5xx', width: 9 },
 ];
 
@@ -197,16 +201,23 @@ function outcome(kind: TestOutcome['kind'], id: string, spec: PwSpec, errors: Se
   return { ...base, status: 'Passed', reason: base.notRun.length ? `Passed; not run: ${base.notRun.join('; ')}` : '' };
 }
 
+/**
+ * The HTTP 5xx answers of every run (each .qa-state/**\/http-5xx.jsonl, and
+ * QA_SERVER_ERRORS): an answer counts for a test when it came during the
+ * test's newest result (see outcome), so older runs do not inflate a figure.
+ */
 function serverErrors(): ServerError[] {
-  if (!fs.existsSync(SERVER_ERRORS)) return [];
-  return fs.readFileSync(SERVER_ERRORS, 'utf8').split('\n').filter(Boolean).map((l) => JSON.parse(l) as ServerError);
+  const files = new Set<string>(fs.existsSync(SERVER_ERRORS) ? [SERVER_ERRORS] : []);
+  for (const f of fs.readdirSync('.qa-state', { recursive: true }) as string[]) if (f.endsWith('http-5xx.jsonl')) files.add(path.join('.qa-state', f));
+  const seen = new Set<string>();
+  return [...files].flatMap((f) => fs.readFileSync(f, 'utf8').split('\n').filter(Boolean)).filter((l) => !seen.has(l) && !!seen.add(l)).map((l) => JSON.parse(l) as ServerError);
 }
 
 const blockerTitle = (no: number): { title: string; source: string; fix: string; who: string; category: string } => {
   const c = blockers().blockers.find((b) => b.no === no);
-  if (c) return { title: c.blocker, source: `00-blockers-checklist-linked.xlsx row ${c.row}`, fix: c.fix, who: c.who, category: c.category };
+  if (c) return { title: BLOCKER_TITLE_ID[no] ?? c.blocker, source: `00-blockers-checklist-linked.xlsx row ${c.row}`, fix: c.fix, who: c.who, category: c.category };
   const f = FOUND_BLOCKERS.find((b) => b.no === no);
-  if (f) return { title: f.blocker, source: 'docs/qa/blockers-found.md', fix: f.fix, who: f.who, category: f.category };
+  if (f) return { title: BLOCKER_TITLE_ID[no] ?? f.blocker, source: 'docs/qa/blockers-found.md', fix: f.fix, who: f.who, category: f.category };
   return { title: '(unknown)', source: '', fix: '', who: '', category: '' };
 };
 
@@ -313,11 +324,11 @@ function main(): void {
         ? 'Negative/boundary test (input wrong on purpose or at a limit; check the request): a refusal should be a message, not HTTP 500'
         : 'Positive test (input meant to be valid): server error, not a known blocker';
     return { ...e, id, testType, kind, testStatus: o?.status ?? '', counted: counted ? '' : 'earlier run of the test (rerun later)' };
-  });
+  }).filter((e) => !e.counted);
 
   const summary = {
     run: { start: runStart, built: new Date().toISOString(), site: 'https://rs.showcase.atklik.xyz', branch: 'Podomoro', serverErrors: SERVER_ERRORS, previous: PREVIOUS },
-    totals: { modules: count(mods), chains: count(chains), testCases: mods.length, noTest: mods.filter((o) => o.noTest).length, notRunYet: mods.filter((o) => o.notRunYet).length, chainCount: chains.length, http5xx: errors.length },
+    totals: { modules: count(mods), chains: count(chains), testCases: mods.length, noTest: mods.filter((o) => o.noTest).length, notRunYet: mods.filter((o) => o.notRunYet).length, chainCount: chains.length, http5xx: classified.length },
     perModule,
     perBlocker,
     outcomes,
@@ -335,7 +346,7 @@ function main(): void {
     fs.mkdirSync(OUT_DIR, { recursive: true });
     fs.writeFileSync(path.join(OUT_DIR, 'run-summary.json'), JSON.stringify(summary, null, 2));
     await writeWorkbook(summary);
-    console.log(`${OUT_DIR}/simrs-run-summary.xlsx: ${mods.length} test cases, ${chains.length} chains, ${errors.length} HTTP 5xx`);
+    console.log(`${OUT_DIR}/simrs-run-summary.xlsx: ${mods.length} test cases, ${chains.length} chains, ${classified.length} HTTP 5xx`);
   });
 }
 
@@ -369,15 +380,15 @@ async function checkResultWorkbooks(mods: TestOutcome[], dirs: string[]): Promis
     const steps = new Map<string, { status: string; actual: string }[]>();
     ws.eachRow((row, i) => {
       const id = row.getCell(idCol).text;
-      if (i > 1 && id) steps.set(id, [...(steps.get(id) ?? []), { status: row.getCell(statusCol).text, actual: row.getCell(actualCol).text }]);
+      if (i > 1 && id) steps.set(id, [...(steps.get(id) ?? []), { status: statusFromId(row.getCell(statusCol).text), actual: row.getCell(actualCol).text }]);
     });
     for (const [id, st] of steps) {
       const has = (x: string) => st.some((s) => s.status === x);
       const status = byId.get(id)?.status;
       const agrees = {
         Passed: has('Passed') && !has('Failed') && !has('Blocked'),
-        Deviation: has('Failed') && !st.some((s) => /E2E failed/.test(s.actual)),
-        Failed: st.some((s) => /E2E failed/.test(s.actual)),
+        Deviation: has('Failed') && !st.some((s) => /E2E (failed|gagal)/.test(s.actual)),
+        Failed: st.some((s) => /E2E (failed|gagal)/.test(s.actual)),
         Blocked: has('Blocked'),
         'Not run': st.every((s) => s.status === 'Not Run' || !s.status),
       }[status ?? 'Not run'];
@@ -396,7 +407,9 @@ type Summary = {
   errors: (ServerError & { id: string; testType: string; kind: string; testStatus: string; counted: string })[];
 };
 
-const FILL: Record<string, string> = { Passed: 'FFD9EAD3', Deviation: 'FFFFF2CC', Failed: 'FFF4CCCC', Blocked: 'FFFCE5CD', 'Not run': 'FFEFEFEF' };
+const FILL_EN: Record<string, string> = { Passed: 'FFD9EAD3', Deviation: 'FFFFF2CC', Failed: 'FFF4CCCC', Blocked: 'FFFCE5CD', 'Not run': 'FFEFEFEF' };
+/** The fill of a status cell, by its Indonesian (or English) status. */
+const FILL: Record<string, string> = { ...FILL_EN, ...Object.fromEntries(Object.entries(FILL_EN).map(([k, v]) => [statusId(k), v])) };
 
 function sheet(wb: ExcelJS.Workbook, name: string, columns: { header: string; key: string; width: number }[], rows: Record<string, unknown>[], statusKey?: string): ExcelJS.Worksheet {
   const ws = wb.addWorksheet(name, { views: [{ state: 'frozen', ySplit: 1 }] });
@@ -427,20 +440,32 @@ function thumbnail(png: string): { file: string; width: number; height: number }
   return { file, width, height };
 }
 
-/** Sheet Screenshots: one row per failed test, test with a deviation and chain not passed (row i + 2), with its screenshot. */
+/** Sheet names of the workbook (Indonesian). */
+const SHEET = {
+  overview: 'Ringkasan',
+  modules: 'Modul',
+  chains: 'Rantai E2E',
+  failures: 'Gagal & Deviasi',
+  blockers: 'Blocker',
+  http5xx: 'HTTP 5xx',
+  testCases: 'Kasus uji',
+  screenshots: 'Tangkapan layar',
+};
+
+/** Sheet Tangkapan layar: one row per failed test, test with a deviation and chain not passed (row i + 2), with its screenshot. */
 function screenshots(wb: ExcelJS.Workbook, rows: TestOutcome[]): void {
-  const ws = sheet(wb, 'Screenshots', [
+  const ws = sheet(wb, SHEET.screenshots, [
     { header: 'Id', key: 'id', width: 15 },
     { header: 'Status', key: 'status', width: 11 },
-    { header: 'Test case / chain', key: 'title', width: 36 },
-    { header: 'Cause / why', key: 'cause', width: 50 },
-    { header: 'Screenshot (at the failure, else at the end of the test)', key: 'shot', width: 92 },
+    { header: 'Kasus uji / rantai', key: 'title', width: 36 },
+    { header: 'Penyebab / alasan', key: 'cause', width: 50 },
+    { header: 'Tangkapan layar (saat gagal, selain itu di akhir test)', key: 'shot', width: 92 },
   ], rows.map((o) => ({
     id: o.id,
-    status: o.status,
+    status: statusId(o.status),
     title: o.title,
-    cause: [o.triage ? `${o.triage.cause}: ${o.triage.finding}` : o.error || o.reason.slice(0, 600), o.triage?.next ? `Next: ${o.triage.next}` : ''].filter(Boolean).join('\n\n'),
-    shot: o.screenshot ? '' : 'no screenshot',
+    cause: [o.triage ? `${o.triage.cause}: ${o.triage.finding}` : o.error || sentenceId(o.reason).slice(0, 600), o.triage?.next ? `Berikutnya: ${o.triage.next}` : ''].filter(Boolean).join('\n\n'),
+    shot: o.screenshot ? '' : sentenceId('no screenshot'),
   })), 'status');
   rows.forEach((o, i) => {
     const row = i + 2;
@@ -451,41 +476,138 @@ function screenshots(wb: ExcelJS.Workbook, rows: TestOutcome[]): void {
   });
 }
 
+/** The evidence picture of a chain: a screenshot it saved itself (reports/screenshots/E2E-001-receipt.png), else its last screenshot. */
+function chainPicture(o: TestOutcome): string | undefined {
+  const dir = 'reports/screenshots';
+  const own = fs.existsSync(dir) ? fs.readdirSync(dir).filter((f) => f.startsWith(`${o.id}-`) && f.endsWith('.png')).sort() : [];
+  return own.length ? path.join(dir, own[0]) : o.screenshot;
+}
+
+/** One line on how far a chain got: every step, the step and blocker it stopped at, its deviations, or its error. */
+function chainLine(o: TestOutcome): string {
+  if (o.status === 'Passed') return 'Semua langkah lulus';
+  if (o.status === 'Failed') return `Gagal${o.failedStep ? ` di ${o.failedStep.replace(/^Chain step (\d+).*$/, 'langkah $1')}` : ''}: ${o.error.slice(0, 160)}`;
+  const stop = o.reason.match(/Step (\d+): (?:Blocker (\d+)|User (U\d+)|([A-Z-]+))(?::\s*([^;]*))?/);
+  if (o.status === 'Blocked' && stop) {
+    const detail = (stop[5] ?? '').replace(/^TC-APP\d{3}-\d{3} step \d+( is not run)?:?\s*/, '').slice(0, 140);
+    const why = stop[2]
+      ? `blocker ${stop[2]} – ${blockerTitle(Number(stop[2])).title}`
+      : stop[3]
+        ? `butuh user ${stop[3]} yang belum disiapkan`
+        : stop[4] === 'NEEDS-EVALUATION'
+          ? 'langkah ini di referensi bertanda "Needs Evaluation" (belum diputuskan untuk otomasi)'
+          : `langkah tidak dijalankan${detail ? `: ${sentenceId(detail)}` : ''}`;
+    const dev = o.deviations.length ? `; ${o.deviations.length} deviasi sebelumnya` : '';
+    const n = Number(stop[1]);
+    const ran = n > 2 ? `Langkah 1–${n - 1} berjalan, berhenti` : n === 2 ? 'Langkah 1 berjalan, berhenti' : 'Berhenti';
+    return `${ran} di langkah ${n}: ${why}${dev}`;
+  }
+  if (o.status === 'Deviation') return `Semua langkah berjalan; ${o.deviations.length} deviasi, mis. ${sentenceId(o.deviations[0] ?? '').slice(0, 160)}`;
+  return sentenceId(o.reason).slice(0, 200);
+}
+
+/**
+ * Sheet Ringkasan: the main figures (formulas over sheet Modul), every chain
+ * with its screenshot, one line per module and the blockers that stop the
+ * most test cases. The other sheets hold the details.
+ */
+function overview(wb: ExcelJS.Workbook, s: Summary): void {
+  const ws = wb.addWorksheet(SHEET.overview, { views: [{ showGridLines: false }] });
+  ws.columns = [{ width: 30 }, { width: 58 }, { width: 14 }, { width: 62 }, { width: 50 }];
+  const bold = (row: ExcelJS.Row, size = 11) => (row.font = { bold: true, size });
+  const header = (row: ExcelJS.Row) => {
+    row.eachCell((c) => {
+      c.font = { bold: true, color: { argb: 'FFFFFFFF' } };
+      c.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF34495E' } };
+    });
+  };
+  const fillStatus = (cell: ExcelJS.Cell) => {
+    const f = FILL[String(cell.value)];
+    if (f) cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: f } };
+  };
+  const wib = new Date(Date.now() + 7 * 3600_000).toISOString().replace('T', ' ').slice(0, 16);
+
+  bold(ws.addRow(['Ringkasan pengujian SIMRS (KlikMed HMIS)']), 16);
+  ws.addRow(['Diperbarui', `${wib} WIB (otomatis setelah setiap run)`]);
+  ws.addRow(['Situs', `${s.run.site}/id (bahasa Indonesia), cabang ${s.run.branch}`]);
+  ws.addRow(['Hasil yang dipakai', 'hasil terbaru setiap kasus uji dan rantai dari semua run']);
+  ws.addRow([]);
+
+  bold(ws.addRow(['Angka utama']), 13);
+  header(ws.addRow(['Status', 'Kasus uji modul', 'Rantai E2E']));
+  for (const x of STATUSES) {
+    const row = ws.addRow([statusId(x), s.totals.modules[x], s.totals.chains[x]]);
+    fillStatus(row.getCell(1));
+  }
+  bold(ws.addRow(['Total', s.totals.testCases, s.totals.chainCount]));
+  const letter = (key: string) => String.fromCharCode(65 + MODULE_COLUMNS.findIndex((c) => c.key === key));
+  const sum = (key: string) => `SUM(${SHEET.modules}!${letter(key)}:${letter(key)})`;
+  const m = s.totals.modules;
+  ws.addRow(['Tingkat lulus (lulus / semua kasus uji)', { formula: `${sum('Passed')}/${sum('total')}`, result: m.Passed / s.totals.testCases }]).getCell(2).numFmt = '0%';
+  ws.addRow(['Cakupan (dijalankan / semua kasus uji)', { formula: `(${sum('Passed')}+${sum('Deviation')}+${sum('Failed')})/${sum('total')}`, result: (m.Passed + m.Deviation + m.Failed) / s.totals.testCases }]).getCell(2).numFmt = '0%';
+  ws.addRow(['Jawaban HTTP 5xx dari situs', s.totals.http5xx]);
+  for (let r = 8; r <= ws.rowCount; r++) ws.getRow(r).getCell(2).alignment = { horizontal: 'left' };
+  ws.addRow([]);
+
+  bold(ws.addRow(['Skenario end-to-end (rantai)']), 13);
+  const outpatient = s.outcomes.find((o) => o.kind === 'chain' && o.id === 'E2E-001');
+  if (outpatient) {
+    const row = ws.addRow(['Pasien sampai invoice (E2E-001)', `${chainLine(outpatient)}. Langkah 1–9: daftar, janji temu, kedatangan, konsultasi, resep, obat diserahkan, invoice RX di kasir, dibayar, struk dicetak (gambar struk di baris E2E-001).`]);
+    row.font = { bold: true };
+    row.alignment = { vertical: 'top', wrapText: true };
+  }
+  header(ws.addRow(['Rantai', 'Skenario', 'Status', 'Sampai mana', 'Tangkapan layar']));
+  const chains = s.outcomes.filter((o) => o.kind === 'chain').sort((x, y) => x.id.localeCompare(y.id));
+  for (const o of chains) {
+    const row = ws.addRow([o.id, CHAIN_NAME_ID[o.id] ?? o.title, statusId(o.status), chainLine(o), '']);
+    row.alignment = { vertical: 'top', wrapText: true };
+    fillStatus(row.getCell(3));
+    const pic = chainPicture(o);
+    if (!pic) {
+      row.getCell(5).value = 'tidak ada';
+      continue;
+    }
+    const t = thumbnail(pic);
+    const width = Math.min(340, t.width);
+    const height = Math.round((t.height * width) / t.width);
+    row.height = Math.max(40, height * 0.75 + 6);
+    ws.addImage(wb.addImage({ filename: t.file, extension: 'jpeg' }), { tl: { col: 4, row: row.number - 1 }, ext: { width, height }, editAs: 'oneCell' });
+  }
+  ws.addRow([]);
+
+  bold(ws.addRow(['Per modul']), 13);
+  header(ws.addRow(['Modul', 'Hasil kasus uji', 'Tingkat lulus', 'Blocker yang menghentikan langkah']));
+  for (const pm of s.perModule as unknown as (Record<Status, number> & { module: string; total: number; blockers: number[] })[]) {
+    const parts = STATUSES.filter((x) => pm[x]).map((x) => `${pm[x]} ${statusId(x).toLowerCase()}`);
+    const row = ws.addRow([pm.module, `${parts.join(' · ')} (dari ${pm.total})`, pm.total ? pm.Passed / pm.total : 0, pm.blockers.join(', ')]);
+    row.getCell(3).numFmt = '0%';
+    row.alignment = { vertical: 'top', wrapText: true };
+  }
+  ws.addRow([]);
+
+  bold(ws.addRow(['Blocker yang paling banyak menghentikan pengujian']), 13);
+  header(ws.addRow(['Blocker', 'Masalah', 'Kasus uji terblokir', 'Perbaikan', 'Rantai yang berhenti']));
+  for (const b of [...s.perBlocker].sort((x, y) => y.testCases + y.chains.length - (x.testCases + x.chains.length)).slice(0, 10)) {
+    ws.addRow([`Blocker ${b.no}`, b.title, b.testCases, b.fix, b.chains.join(', ')]).alignment = { vertical: 'top', wrapText: true };
+  }
+  ws.addRow([]);
+  bold(ws.addRow(['Arti status']), 13);
+  for (const [x, text] of [
+    ['Passed', 'setiap langkah memenuhi hasil yang diharapkan'],
+    ['Deviation', 'berjalan sampai akhir, ada langkah yang hasilnya berbeda dari referensi (dicatat)'],
+    ['Failed', `berhenti karena error; rinciannya di sheet ${SHEET.failures}`],
+    ['Blocked', `berhenti karena masalah situs yang sudah diketahui; rinciannya di sheet ${SHEET.blockers}`],
+    ['Not run', 'tidak dijalankan (butuh user/role yang belum siap, atau tidak diotomasi)'],
+  ] as [Status, string][]) {
+    fillStatus(ws.addRow([statusId(x), text]).getCell(1));
+  }
+}
+
 async function writeWorkbook(s: Summary): Promise<void> {
   const wb = new ExcelJS.Workbook();
-  const ov = wb.addWorksheet('Overview');
-  ov.columns = [{ width: 34 }, { width: 14 }, { width: 14 }, { width: 14 }, { width: 14 }, { width: 14 }, { width: 14 }];
-  const add = (...v: unknown[]) => ov.addRow(v);
-  add('SIMRS (KlikMed HMIS) – full run summary').font = { bold: true, size: 14 };
-  add('Site', s.run.site);
-  add('Branch', s.run.branch);
-  add('Run started', s.run.start);
-  add('Built', s.run.built);
-  add('Writes', 'QA_ALLOW_WRITES=1; every saved value carries "QA-" and a token new per run (lib/qa-data/names.ts)');
-  add();
-  add('', ...STATUSES, 'Total').font = { bold: true };
-  add('Module test cases', ...STATUSES.map((x) => s.totals.modules[x]), s.totals.testCases);
-  add('  of Not run: no test written yet', '', '', '', '', (s.totals as unknown as { noTest: number }).noTest);
-  add('  of Not run: test written, not run yet', '', '', '', '', (s.totals as unknown as { notRunYet: number }).notRunYet);
-  add('E2E chains', ...STATUSES.map((x) => s.totals.chains[x]), s.totals.chainCount);
-  add('HTTP 5xx answers of the site', s.totals.http5xx);
-  // Over every module test case, as formulas on sheet Modules (column letters of MODULE_COLUMNS).
-  const letter = (key: string) => String.fromCharCode(65 + MODULE_COLUMNS.findIndex((c) => c.key === key));
-  const sum = (key: string) => `SUM(Modules!${letter(key)}:${letter(key)})`;
-  const all = s.totals.testCases;
-  const ran = s.totals.modules.Passed + s.totals.modules.Deviation + s.totals.modules.Failed;
-  add('Pass rate (Passed / all test cases)', { formula: `${sum('Passed')}/${sum('total')}`, result: s.totals.modules.Passed / all }).getCell(2).numFmt = '0%';
-  add('Coverage (run / all test cases)', { formula: `(${sum('Passed')}+${sum('Deviation')}+${sum('Failed')})/${sum('total')}`, result: ran / all }).getCell(2).numFmt = '0%';
-  add();
-  add('Status meanings').font = { bold: true };
-  add('Passed', 'every step met the Expected Result of the workbook');
-  add('Deviation', 'ran to the end, a step differs from the Expected Result (site behaviour noted)');
-  add('Failed', 'stopped on an error: see sheet Failures for the cause and next action, and sheet Screenshots for what the screen showed');
-  add('Blocked', 'a known blocker stopped steps: see sheet Blockers');
-  add('Not run', 'not run for another reason (Automation Candidate = No, needs a user/role that is not ready, ...)');
-  ov.getColumn(2).alignment = { wrapText: false };
+  overview(wb, s);
 
-  const modules = sheet(wb, 'Modules', MODULE_COLUMNS, (s.perModule as unknown as Record<string, unknown>[]).map((m) => {
+  const modules = sheet(wb, SHEET.modules, MODULE_COLUMNS, (s.perModule as unknown as Record<string, unknown>[]).map((m) => {
     const all = Number(m.total);
     const ran = Number(m.Passed) + Number(m.Deviation) + Number(m.Failed);
     return { ...m, rate: all ? Number(m.Passed) / all : '-', coverage: all ? ran / all : '-', blockers: (m.blockers as number[]).join(', ') };
@@ -506,13 +628,13 @@ async function writeWorkbook(s: Summary): Promise<void> {
     id: o.id,
     group: o.group,
     title: o.title,
-    status: o.status,
-    previous: o.previous ?? '',
+    status: statusId(o.status),
+    previous: o.previous ? statusId(o.previous) : '',
     blockers: o.blockers.join(', '),
-    reason: o.reason.slice(0, 2000),
+    reason: sentenceId(o.reason).slice(0, 2000),
     failedStep: o.failedStep,
     error: o.error.slice(0, 1000),
-    cause: o.triage ? `${o.triage.cause}: ${o.triage.finding}` : o.cause,
+    cause: o.triage ? `${o.triage.cause}: ${o.triage.finding}` : sentenceId(o.cause),
     next: o.triage?.next ?? '',
     owner: o.triage?.owner ?? '',
     http5xx: o.http5xx.join('\n'),
@@ -520,44 +642,44 @@ async function writeWorkbook(s: Summary): Promise<void> {
   });
   const cols = [
     { header: 'Id', key: 'id', width: 15 },
-    { header: 'Module', key: 'group', width: 24 },
-    { header: 'Test case / chain', key: 'title', width: 44 },
+    { header: 'Modul', key: 'group', width: 24 },
+    { header: 'Kasus uji / rantai', key: 'title', width: 44 },
     { header: 'Status', key: 'status', width: 11 },
-    { header: 'Status 2026-10-18', key: 'previous', width: 11 },
-    { header: 'Blockers', key: 'blockers', width: 10 },
+    { header: 'Status run sebelumnya', key: 'previous', width: 11 },
+    { header: 'Blocker', key: 'blockers', width: 10 },
   ];
   const shotRows = s.outcomes.filter((o) => (o.kind === 'chain' && o.status !== 'Passed') || (o.kind === 'module' && (o.status === 'Failed' || o.status === 'Deviation')));
   const shotAt = new Map(shotRows.map((o, i) => [o.id, i + 2]));
-  const link = (o: TestOutcome) => (shotAt.has(o.id) ? { text: o.screenshot ? 'screenshot' : 'none', hyperlink: `#'Screenshots'!E${shotAt.get(o.id)}` } : '');
-  sheet(wb, 'E2E chains', [...cols, { header: 'Screenshot', key: 'shot', width: 12 }, { header: 'Why (stop / deviation)', key: 'reason', width: 70 }, { header: 'Failed step', key: 'failedStep', width: 40 }, { header: 'Error', key: 'error', width: 50 }, { header: 'Cause', key: 'cause', width: 50 }, { header: 'Next action', key: 'next', width: 50 }, { header: 'HTTP 5xx', key: 'http5xx', width: 40 }], s.outcomes.filter((o) => o.kind === 'chain').map((o) => ({ ...outcomeRow(o), shot: link(o) })), 'status');
-  sheet(wb, 'Failures', [...cols, { header: 'Screenshot', key: 'shot', width: 12 }, { header: 'Failed step', key: 'failedStep', width: 50 }, { header: 'Error', key: 'error', width: 60 }, { header: 'Cause', key: 'cause', width: 60 }, { header: 'Next action', key: 'next', width: 60 }, { header: 'Owner', key: 'owner', width: 16 }, { header: 'HTTP 5xx', key: 'http5xx', width: 40 }], s.outcomes.filter((o) => o.status === 'Failed' || o.status === 'Deviation').map((o) => ({ ...outcomeRow(o), shot: link(o), error: o.error || o.reason })), 'status');
-  sheet(wb, 'Blockers', [
+  const link = (o: TestOutcome) => (shotAt.has(o.id) ? { text: o.screenshot ? 'tangkapan layar' : 'tidak ada', hyperlink: `#'${SHEET.screenshots}'!E${shotAt.get(o.id)}` } : '');
+  sheet(wb, SHEET.chains, [...cols, { header: 'Tangkapan layar', key: 'shot', width: 12 }, { header: 'Alasan (berhenti / deviasi)', key: 'reason', width: 70 }, { header: 'Langkah gagal', key: 'failedStep', width: 40 }, { header: 'Pesan error', key: 'error', width: 50 }, { header: 'Penyebab', key: 'cause', width: 50 }, { header: 'Tindak lanjut', key: 'next', width: 50 }, { header: 'HTTP 5xx', key: 'http5xx', width: 40 }], s.outcomes.filter((o) => o.kind === 'chain').map((o) => ({ ...outcomeRow(o), shot: link(o) })), 'status');
+  sheet(wb, SHEET.failures, [...cols, { header: 'Tangkapan layar', key: 'shot', width: 12 }, { header: 'Langkah gagal', key: 'failedStep', width: 50 }, { header: 'Pesan error', key: 'error', width: 60 }, { header: 'Penyebab', key: 'cause', width: 60 }, { header: 'Tindak lanjut', key: 'next', width: 60 }, { header: 'Penanggung jawab', key: 'owner', width: 16 }, { header: 'HTTP 5xx', key: 'http5xx', width: 40 }], s.outcomes.filter((o) => o.status === 'Failed' || o.status === 'Deviation').map((o) => ({ ...outcomeRow(o), shot: link(o), error: o.error || o.reason })), 'status');
+  sheet(wb, SHEET.blockers, [
     { header: 'No', key: 'no', width: 6 },
     { header: 'Blocker', key: 'title', width: 60 },
-    { header: 'Category', key: 'category', width: 14 },
-    { header: 'Defined in', key: 'source', width: 26 },
-    { header: 'Test cases blocked', key: 'testCases', width: 10 },
-    { header: 'Chains stopped', key: 'chains', width: 22 },
-    { header: 'Modules', key: 'modules', width: 40 },
-    { header: 'HTTP 5xx seen in this run', key: 'seen', width: 10 },
-    { header: 'Fix (next action)', key: 'fix', width: 70 },
-    { header: 'Who', key: 'who', width: 24 },
-  ], s.perBlocker.map((b) => ({ ...b, chains: b.chains.join(', '), modules: b.modules.join('\n'), seen: b.seenHttp5xx ? 'Yes' : '' })));
-  sheet(wb, 'HTTP 5xx', [
-    { header: 'At', key: 'at', width: 22 },
+    { header: 'Kategori', key: 'category', width: 14 },
+    { header: 'Didefinisikan di', key: 'source', width: 26 },
+    { header: 'Kasus uji terblokir', key: 'testCases', width: 10 },
+    { header: 'Rantai berhenti', key: 'chains', width: 22 },
+    { header: 'Modul', key: 'modules', width: 40 },
+    { header: 'HTTP 5xx terlihat di run ini', key: 'seen', width: 10 },
+    { header: 'Perbaikan (tindak lanjut)', key: 'fix', width: 70 },
+    { header: 'Siapa', key: 'who', width: 24 },
+  ], s.perBlocker.map((b) => ({ ...b, chains: b.chains.join(', '), modules: b.modules.join('\n'), seen: b.seenHttp5xx ? 'Ya' : '' })));
+  sheet(wb, SHEET.http5xx, [
+    { header: 'Waktu', key: 'at', width: 22 },
     { header: 'Test', key: 'test', width: 50 },
-    { header: 'Test type', key: 'testType', width: 10 },
-    { header: 'Test status', key: 'testStatus', width: 10 },
-    { header: 'Kind', key: 'kind', width: 50 },
-    { header: 'Note', key: 'counted', width: 20 },
+    { header: 'Jenis test', key: 'testType', width: 10 },
+    { header: 'Status test', key: 'testStatus', width: 10 },
+    { header: 'Jenis', key: 'kind', width: 50 },
+    { header: 'Catatan', key: 'counted', width: 20 },
     { header: 'Status', key: 'status', width: 7 },
-    { header: 'Method', key: 'method', width: 7 },
+    { header: 'Metode', key: 'method', width: 7 },
     { header: 'Path', key: 'path', width: 40 },
     { header: 'Digest', key: 'digest', width: 14 },
-    { header: 'Request body', key: 'request', width: 70 },
-    { header: 'Response', key: 'response', width: 50 },
-  ], s.errors.map((e) => ({ ...e, test: e.test.replace(/ \[[^\]]+\].*$/, ''), path: new URL(e.url).pathname })));
-  sheet(wb, 'Test cases', [...cols, { header: 'Why', key: 'reason', width: 70 }, { header: 'Error', key: 'error', width: 50 }, { header: 'Seconds', key: 'seconds', width: 9 }], s.outcomes.filter((o) => o.kind === 'module').map(outcomeRow), 'status');
+    { header: 'Isi request', key: 'request', width: 70 },
+    { header: 'Respons', key: 'response', width: 50 },
+  ], s.errors.map((e) => ({ ...e, test: e.test.replace(/ \[[^\]]+\].*$/, ''), path: new URL(e.url).pathname, testStatus: e.testStatus ? statusId(e.testStatus) : '', kind: sentenceId(e.kind), counted: sentenceId(e.counted) })));
+  sheet(wb, SHEET.testCases, [...cols, { header: 'Alasan', key: 'reason', width: 70 }, { header: 'Pesan error', key: 'error', width: 50 }, { header: 'Detik', key: 'seconds', width: 9 }], s.outcomes.filter((o) => o.kind === 'module').map(outcomeRow), 'status');
   screenshots(wb, shotRows);
   await wb.xlsx.writeFile(path.join(OUT_DIR, 'simrs-run-summary.xlsx'));
 }

@@ -34,7 +34,7 @@ qaTest('TC-APP017-039', async ({ page, qa }) => {
   qa.note(3, `period "${period}" of this test stands in for "2026-10", so the real month is never locked`);
 
   await qa.step(1, async () => {
-    await page.goto('/en/payroll');
+    await page.goto('/id/payroll');
     await page.getByRole('complementary').getByRole('link', { name: 'Calculate' }).first().click();
     await expect(d.main.getByRole('heading', { level: 1, name: 'Re-run' })).toBeVisible();
     await expect(d.main.getByRole('textbox', { name: 'Search' })).toBeVisible();
@@ -56,13 +56,14 @@ qaTest('TC-APP017-039', async ({ page, qa }) => {
     expect(await d.calculate({ Code: e.no, Period: period, Amount: '8000000' }, 'Correct')).toContain(SAVED);
     const row = await slip(d, e.no);
     expect(row).toContain(period);
-    expect(row).toContain('earning 8000000 deduction 0 net 8000000');
+    // The amounts read with or without cents ("8000000.00" on the Indonesian site).
+    expect(row).toMatch(/earning 8000000(\.00)? deduction 0(\.00)? net 8000000(\.00)?/);
     expect(row).toContain(e.no);
   });
 
   await qa.step(4, async () => {
     expect(await d.calculate({ Code: e.no, Period: period, Amount: '8500000' }, 'Correct')).toContain(SAVED);
-    expect(await slip(d, e.no)).toContain('earning 8500000 deduction 0 net 8500000');
+    expect(await slip(d, e.no)).toMatch(/earning 8500000(\.00)? deduction 0(\.00)? net 8500000(\.00)?/);
   });
 
   await qa.step(5, async () => {

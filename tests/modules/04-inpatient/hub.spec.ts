@@ -1,3 +1,4 @@
+import { asOnSite } from '../../../lib/i18n';
 import { expect, qaTest } from '../../../fixtures/e2e';
 import { AppHeader } from '../../../pages/AppHeader';
 
@@ -7,7 +8,7 @@ qaTest('TC-APP004-020', async ({ page, qa }) => {
   const screens: [string, string][] = [['Admit', 'Admissions'], ['Bed management', 'Bed management'], ['Discharge', 'Discharges']];
 
   await qa.step(1, async () => {
-    await page.goto('/en/apps');
+    await page.goto('/id/apps');
     await page.getByRole('link', { name: /^Inpatient\b/ }).first().click();
     await expect(main.getByRole('navigation', { name: 'Breadcrumb' })).toHaveText(/^Home\s*\/\s*Inpatient$/);
     await expect(main.getByRole('heading', { level: 1, name: 'Inpatient' })).toBeVisible();
@@ -20,7 +21,7 @@ qaTest('TC-APP004-020', async ({ page, qa }) => {
 
   await qa.step(2, async () => {
     for (const [tile, heading] of screens) {
-      await page.goto('/en/adt');
+      await page.goto('/id/adt');
       await main.getByRole('link', { name: tile, exact: true }).click();
       await expect(main.getByRole('heading', { level: 1, name: heading })).toBeVisible();
     }
@@ -31,7 +32,7 @@ qaTest('TC-APP004-020', async ({ page, qa }) => {
     }
   });
 
-  await qa.step(3, async () => {
+  await qa.step(3, () => asOnSite(async () => {
     const header = new AppHeader(page);
     try {
       await header.selectLanguage('ID');
@@ -44,7 +45,7 @@ qaTest('TC-APP004-020', async ({ page, qa }) => {
       qa.note(3, `Indonesian headings: ${seen.join(', ')}`);
       if (seen.includes('Admissions')) qa.note(3, 'the title "Admissions" stays English (known risk in the workbook)');
     } finally {
-      await header.selectLanguage('EN');
+      await header.selectLanguage('ID');
     }
-  });
+  }));
 });

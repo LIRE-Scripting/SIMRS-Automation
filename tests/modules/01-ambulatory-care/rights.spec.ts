@@ -167,7 +167,7 @@ qaTest('TC-APP001-062', async ({ qa, browser }) => {
   const main = staff.getByRole('main');
   try {
     await qa.step(1, async () => {
-      await staff.goto('/en/apps');
+      await staff.goto('/id/apps');
       const card = main.getByRole('link', { name: /Ambulatory Care/ });
       if (await card.count()) {
         await card.first().click();
@@ -178,8 +178,8 @@ qaTest('TC-APP001-062', async ({ qa, browser }) => {
     });
 
     for (const [step, routes] of [
-      [2, ['/en/registration/patients']],
-      [3, ['/en/registration/appointments', '/en/registration/department-queue']],
+      [2, ['/id/registration/patients']],
+      [3, ['/id/registration/appointments', '/id/registration/department-queue']],
     ] as const) {
       await qa.step(step, async () => {
         const shown: string[] = [];

@@ -1,5 +1,6 @@
 import { expect, test as setup } from '@playwright/test';
 import { authFileOf, PASSWORD } from '../../lib/config';
+import { installSiteLanguage } from '../../lib/i18n';
 import { prerequisites, userLogin } from '../../lib/qa-data';
 import { LoginPage } from '../../pages/LoginPage';
 
@@ -13,6 +14,9 @@ import { LoginPage } from '../../pages/LoginPage';
  */
 const prepared = prerequisites().users.filter((u) => u.prepared === 'Done');
 
+// The site runs in Indonesian; the login page is found by its English texts (lib/i18n).
+setup.beforeAll(async ({ browser }) => installSiteLanguage(browser));
+
 for (const user of prepared) {
   const login = userLogin(user.key);
   setup(`sign in ${user.key} [00-prerequisites.xlsx | Users | row ${user.row} | ${user.key}]`, async ({ page }) => {
@@ -20,8 +24,8 @@ for (const user of prepared) {
     await new LoginPage(page).signIn(login!, PASSWORD);
 
     // The header hydrates after load; it must not settle on "Not signed in".
-    await page.goto('/en/apps');
-    await expect(page.getByRole('banner').getByRole('button', { name: 'Language' })).toHaveText(/EN/);
+    await page.goto('/id/apps');
+    await expect(page.getByRole('banner').getByRole('button', { name: 'Language' })).toHaveText(/ID/);
     await expect(page.getByRole('banner').getByRole('button', { name: /not signed in/i })).toHaveCount(0);
 
     await page.context().storageState({ path: authFileOf(user.key) });

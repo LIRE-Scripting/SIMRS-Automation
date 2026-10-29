@@ -20,7 +20,7 @@ export const TC_APP006_020 = async ({ page, qa }: CaseArgs): Promise<void> => {
   const d = req.dialog('New request');
 
   await qa.step(1, async () => {
-    await page.goto('/en/bloodbank');
+    await page.goto('/id/bloodbank');
     await page.getByRole('main').getByRole('link', { name: 'Blood request', exact: true }).click();
     await req.button('New request').click();
     await expect(d).toBeVisible();

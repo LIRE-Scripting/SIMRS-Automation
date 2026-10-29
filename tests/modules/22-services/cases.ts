@@ -3,6 +3,7 @@ import { toastMark } from '../../../lib/assertions';
 import type { Locator, Page } from '@playwright/test';
 import { expect } from '../../../fixtures/e2e';
 import type { Qa } from '../../../fixtures/e2e';
+import { NotOffered } from '../../../lib/not-offered';
 
 /**
  * Test cases of 22-services that end-to-end chains run too (tests/e2e/chains/):
@@ -15,7 +16,7 @@ export const TC_APP022_001 = async ({ page, qa }: CaseArgs): Promise<void> => {
   const code = qa.code('X-LDR');
   const child = qa.code('X-LDR-CUCI');
   await qa.step(1, async () => {
-    await page.goto('/en/services');
+    await page.goto('/id/services');
     await page.getByRole('main').getByRole('link', { name: 'Service category' }).click();
     await expect(d.main.getByRole('heading', { level: 1, name: 'Service category' })).toBeVisible();
     await expect(d.main.getByRole('button', { name: 'Save category' })).toBeVisible();
@@ -28,13 +29,24 @@ export const TC_APP022_001 = async ({ page, qa }: CaseArgs): Promise<void> => {
     for (const f of ['Code', 'Name', 'Parent', 'Purchase account', 'Service center']) await expect(d.dialog.getByRole('textbox', { name: f })).toBeVisible();
     await expect(d.dialog.getByRole('combobox', { name: 'Action' }).locator('option')).toHaveText(['Save category', 'Deactivate', 'Delete category']);
   });
+  let listed = true;
   await qa.step(3, async () => {
     expect(await d.save({ Code: code, Name: qa.name('X Laundry uji') })).toContain(SAVED);
-    const c = (await (await d.row(code)).getByRole('cell').allInnerTexts()).map((t) => t.trim());
+    const row = await d.find(code);
+    if (!row) {
+      listed = false;
+      return qa.note(3, `${code} is saved but not among the rows the list shows, and the search narrows only those rows (found blocker 40)`);
+    }
+    const c = (await row.getByRole('cell').allInnerTexts()).map((t) => t.trim());
     expect(c[0]).toBe('active');
     expect(c[1]).toContain(code);
     expect(c[2]).toMatch(/^[0-9a-f-]{36}$/);
   });
+  if (!listed) {
+    // The category of the test cannot be read on its list, nor its child's status (found blocker 40).
+    for (const st of [3, 4, 5, 6]) qa.blocked(st, 40);
+    return;
+  }
   await qa.step(4, async () => {
     expect(await d.save({ Code: child, Name: qa.name('X Cuci laundry uji'), Parent: code })).toContain(SAVED);
   });
@@ -54,7 +66,7 @@ export const TC_APP022_003 = async ({ page, qa }: CaseArgs): Promise<void> => {
   const cat = await category(page, qa);
   const code = qa.code('X-CUCI');
   await qa.step(1, async () => {
-    await page.goto('/en/services');
+    await page.goto('/id/services');
     await page.getByRole('main').getByRole('link', { name: 'Service item' }).click();
     await expect(d.main.getByRole('heading', { level: 1, name: 'Service item' })).toBeVisible();
     await expect(d.main.getByRole('button', { name: 'Save item' })).toBeVisible();
@@ -85,7 +97,7 @@ export const TC_APP022_005 = async ({ page, qa }: CaseArgs): Promise<void> => {
   const it = await item(page, qa, cat);
   let no = '';
   await qa.step(1, async () => {
-    await page.goto('/en/services');
+    await page.goto('/id/services');
     await page.getByRole('main').getByRole('link', { name: 'Service request' }).click();
     await expect(d.main.getByRole('heading', { level: 1, name: 'Service request' })).toBeVisible();
     await expect(d.main.getByRole('button', { name: 'Create request' })).toBeVisible();
@@ -122,7 +134,7 @@ export const TC_APP022_009 = async ({ page, qa }: CaseArgs): Promise<void> => {
   const it = await item(page, qa, await category(page, qa));
   let id = '';
   await qa.step(1, async () => {
-    await page.goto('/en/services');
+    await page.goto('/id/services');
     await page.getByRole('main').getByRole('link', { name: 'Service purchase request' }).click();
     await expect(d.main.getByRole('heading', { level: 1, name: 'Service purchase request' })).toBeVisible();
     await expect(d.main.getByRole('button', { name: 'Create purchase request' })).toBeVisible();
@@ -153,7 +165,7 @@ export const TC_APP022_012 = async ({ page, qa }: CaseArgs): Promise<void> => {
   const pr = await approvedPr(page, it);
   const v = ORDER(qa, it, pr);
   await qa.step(1, async () => {
-    await page.goto('/en/services');
+    await page.goto('/id/services');
     await page.getByRole('main').getByRole('link', { name: 'Service purchase order' }).click();
     await expect(d.main.getByRole('heading', { level: 1, name: 'Service purchase order' })).toBeVisible();
     await expect(d.main.getByRole('button', { name: 'Create order' })).toBeVisible();
@@ -258,7 +270,7 @@ export class Desk {
     this.dialog = page.getByRole('dialog');
   }
   async open(): Promise<void> {
-    await this.page.goto(`/en/services/${this.route}`);
+    await this.page.goto(`/id/services/${this.route}`);
     await expect(this.main.getByRole('heading', { level: 1, name: SCREENS[this.route].heading })).toBeVisible();
     await this.page.waitForLoadState('networkidle').catch(() => {});
   }
@@ -294,8 +306,17 @@ export class Desk {
     const search = this.main.getByRole('textbox', { name: 'Search' }).or(this.main.getByRole('searchbox'));
     if (await search.count()) await search.first().fill(text);
     const r = this.rows().filter({ hasText: text });
-    await expect(r.first()).toBeVisible();
+    // The list shows its first rows only and the search narrows those (found blocker 40).
+    if (!(await r.first().waitFor({ timeout: 10_000 }).then(() => true, () => false))) throw new NotOffered(`${text} is not among the rows the list shows (found blocker 40)`);
     return r.first();
+  }
+  /** The row of a number or code, or null when the list does not show it (found blocker 40). */
+  async find(text: string): Promise<Locator | null> {
+    await this.open();
+    const search = this.main.getByRole('textbox', { name: 'Search' }).or(this.main.getByRole('searchbox'));
+    if (await search.count()) await search.first().fill(text);
+    const r = this.rows().filter({ hasText: text }).first();
+    return (await r.waitFor({ timeout: 10_000 }).then(() => true, () => false)) ? r : null;
   }
   async status(text: string): Promise<string> {
     return (await (await this.row(text)).getByRole('cell').first().innerText()).trim();

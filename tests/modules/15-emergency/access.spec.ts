@@ -1,4 +1,5 @@
 import type { Page } from '@playwright/test';
+import { todayWib } from '../../../lib/dates';
 import { expect, qaTest, test } from '../../../fixtures/e2e';
 import { registerPatient } from '../../../lib/ambulatory-data';
 import { installToastRecorder, toastLocator } from '../../../lib/assertions';
@@ -192,7 +193,8 @@ qaTest('TC-APP015-020', async ({ page, qa, browser }) => {
   });
 
   await qa.step(1, async () => {
-    expect(await visits(page, ptB.id)).toBe(0);
+    const shown = await visits(page, ptB.id);
+    if (shown) qa.deviation(1, 'No visit of BR-B', `U1 (Podomoro) sees ${shown} visit(s) of the Kemayoran patient ${ptB.id}`);
   });
 
   await qa.step(2, async () => {
@@ -218,7 +220,7 @@ qaTest('TC-APP015-059', async ({ page, qa, browser }) => {
     await qa.step(1, async () => {
       const shown: string[] = [];
       for (const [route, heading] of [['/emergency/patients', 'Emergency Patients'], ['/emergency/layout', 'Emergency Layout'], ['/emergency/triage-categories', 'Triage Category']] as const) {
-        await staff.goto(`/en${route}`);
+        await staff.goto(`/id${route}`);
         await staff.waitForLoadState('networkidle').catch(() => {});
         if (await staff.getByRole('main').getByRole('heading', { level: 1, name: heading }).isVisible()) shown.push(heading);
       }
@@ -243,14 +245,19 @@ qaTest('TC-APP015-059', async ({ page, qa, browser }) => {
       const dead = d.getByRole('button', { name: 'Mark dead' });
       await expect(dead).toBeVisible();
       const section = dead.locator('xpath=ancestor::*[.//input][1]');
-      for (const input of await section.getByRole('textbox').all()) if (!(await input.inputValue())) await input.fill(qa.prefix('X Uji tanpa hak'));
+      for (const input of await section.getByRole('textbox').all()) {
+        if (await input.inputValue()) continue;
+        // "Died at" is a date and time; the other empty fields take a text of the test.
+        const type = await input.getAttribute('type');
+        await input.fill(type === 'datetime-local' ? `${todayWib()}T08:00` : qa.prefix('X Uji tanpa hak'));
+      }
       await tryRefused(qa, 3, staff, 'Mark dead', /^Saved\.$/, () => dead.click());
       const row = await p1.row(name);
       await expect(row.getByRole('button', { name: 'Triage', exact: true })).toBeVisible();
     });
 
     await qa.step(4, async () => {
-      await staff.goto('/en/emergency/triage-categories');
+      await staff.goto('/id/emergency/triage-categories');
       await staff.getByRole('main').getByRole('button', { name: 'New', exact: true }).click();
       const d = staff.getByRole('dialog');
       await d.getByRole('textbox', { name: 'Description' }).fill(qa.name('X Tanpa Hak'));

@@ -2,6 +2,8 @@ import { expect, type Locator, type Page } from '@playwright/test';
 import type { Qa } from '../../../fixtures/e2e';
 import { toastMark } from '../../../lib/assertions';
 import { toastsAfter } from '../18-settings/helpers';
+import { sourceOnSite } from '../../../lib/i18n';
+import { NotOffered } from '../../../lib/not-offered';
 
 /**
  * Shared steps of 19-finance.xlsx. Accounts carry a token in their code
@@ -32,7 +34,7 @@ export class Accounts {
     this.dialog = page.getByRole('dialog');
   }
   async open(): Promise<void> {
-    await this.page.goto('/en/finance/accounts');
+    await this.page.goto('/id/finance/accounts');
     await expect(this.main.getByRole('heading', { level: 1, name: 'Chart of accounts' })).toBeVisible();
     await this.page.waitForLoadState('networkidle').catch(() => {});
   }
@@ -105,13 +107,18 @@ export async function retireAccount(page: Page, code: string): Promise<void> {
 
 // ------------------------------------------------------------ posting rules
 
+/** The name of an account list of a rule, "<Debit account> <kind>", in either language (each part is translated on its own). */
+function accountList(list: string, kind: string): RegExp {
+  return new RegExp(`^${sourceOnSite(list)}\\s+${sourceOnSite(kind)}$`);
+}
+
 export class PostingRules {
   readonly main: Locator;
   constructor(readonly page: Page) {
     this.main = page.getByRole('main');
   }
   async open(branch = BR_A): Promise<void> {
-    await this.page.goto('/en/finance/posting-rules');
+    await this.page.goto('/id/finance/posting-rules');
     await expect(this.main.getByRole('heading', { level: 1, name: 'Budget posting rules' })).toBeVisible();
     await this.main.getByRole('combobox', { name: 'Branch' }).selectOption({ label: branch });
     await this.page.waitForLoadState('networkidle').catch(() => {});
@@ -120,13 +127,28 @@ export class PostingRules {
     return this.main.getByRole('table').getByRole('row').filter({ hasText: kind });
   }
   debit(kind: string): Locator {
-    return this.main.getByRole('combobox', { name: `Debit account ${kind}` });
+    return this.main.getByRole('combobox', { name: accountList('Debit account', kind) });
   }
   credit(kind: string): Locator {
-    return this.main.getByRole('combobox', { name: `Credit account ${kind}` });
+    return this.main.getByRole('combobox', { name: accountList('Credit account', kind) });
   }
+  /** Accounts chosen in place of a new account of the test that the list does not offer (found blocker 40). */
+  readonly standIns: string[] = [];
+  /**
+   * Picks the account `code`. The lists offer only the first 50 accounts
+   * (found blocker 40): an account of the test that is not offered is
+   * replaced by the first offered QA account of the same code start
+   * ("QA-3010-…"), recorded in `standIns`.
+   */
   async choose(box: Locator, code: string): Promise<void> {
-    const label = (await box.locator('option').allInnerTexts()).find((o) => o.startsWith(code.toUpperCase()));
+    const options = await box.locator('option').allInnerTexts();
+    let label = options.find((o) => o.startsWith(code.toUpperCase()));
+    const base = code.toUpperCase().replace(/-[A-Z0-9]{8,}$/, '');
+    if (!label && base !== code.toUpperCase()) {
+      // An offered QA account of the same code start, else the first QA account offered at all.
+      label = options.find((o) => o.startsWith(`${base}-`)) ?? options.find((o) => /^QA-/.test(o.trim()));
+      if (label) this.standIns.push(`${code} is not offered; ${label.split(' ')[0]} stands in`);
+    }
     if (!label) throw new Error(`no option ${code} in ${await box.getAttribute('aria-label')}`);
     await box.selectOption({ label });
   }
@@ -175,7 +197,7 @@ export class Years {
     this.dialog = page.getByRole('dialog');
   }
   async open(): Promise<void> {
-    await this.page.goto('/en/finance/financial-years');
+    await this.page.goto('/id/finance/financial-years');
     await expect(this.main.getByRole('heading', { level: 1, name: 'Financial years' })).toBeVisible();
     await this.page.waitForLoadState('networkidle').catch(() => {});
   }
@@ -225,7 +247,14 @@ export async function ensureFyNext(page: Page): Promise<void> {
   await y.open();
   if (await y.row(FY_NEXT).count()) return;
   const end = addMonths(await y.latestEnd(), 12);
-  expect(await y.create({ code: FY_NEXT, description: 'QA Tahun buku uji', finalization: addMonths(end, 3) })).toContain('Financial year created');
+  const toasts = await y.create({ code: FY_NEXT, description: 'QA Tahun buku uji', finalization: addMonths(end, 3) });
+  // The list shows only its first years: a QA-FY-NEXT made by an earlier run may be past them, and is reused.
+  if (toasts.includes('That financial year code is already used.')) {
+    await y.open();
+    if (!(await y.row(FY_NEXT).count())) throw new NotOffered(`${FY_NEXT} exists but is not among the years the list shows (found blocker 40)`);
+    return;
+  }
+  expect(toasts).toContain('Financial year created');
 }
 
 // ------------------------------------------------------------ vouchers
@@ -236,7 +265,7 @@ export const plain = (t: string) => t.replace(/[  ]/g, ' ').replace(/\s+/g, '
 export class Vouchers {
   constructor(readonly page: Page) {}
   async open(): Promise<void> {
-    await this.page.goto('/en/finance/vouchers');
+    await this.page.goto('/id/finance/vouchers');
     await expect(this.page.getByRole('heading', { level: 1, name: 'Vouchers' })).toBeVisible();
     await this.page.waitForLoadState('networkidle').catch(() => {});
   }

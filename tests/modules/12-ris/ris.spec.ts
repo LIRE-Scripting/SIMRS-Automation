@@ -1,8 +1,9 @@
+import { asOnSite } from '../../../lib/i18n';
 import { expect, qaTest, test, type Qa } from '../../../fixtures/e2e';
 import { installToastRecorder, toastMark } from '../../../lib/assertions';
 import { addDays, todayWib } from '../../../lib/dates';
 import { RIS } from '../../../lib/ris-data';
-import { backToEnglish, switchLanguage } from '../shared/language';
+import { backToIndonesian, switchLanguage } from '../shared/language';
 import { screenOpens } from '../shared/screen-opens';
 import { RadOrdersPage, StudiesPage, toastsAfter, type RadOrder } from './helpers';
 
@@ -20,7 +21,7 @@ test.beforeEach(async ({ page }) => {
 });
 
 test.afterEach(async ({ page }) => {
-  await backToEnglish(page);
+  await backToIndonesian(page);
 });
 
 /** The Full order of the catalogue with a token, study today at the catalogue times. */
@@ -63,7 +64,7 @@ qaTest('TC-APP012-001', async ({ page, qa, context }) => {
   const f = fullOrder(qa);
 
   await qa.step(1, async () => {
-    await page.goto('/en/apps');
+    await page.goto('/id/apps');
     await page.getByRole('link', { name: /^RIS\b|^Radiology/ }).first().click();
     await page.getByRole('main').getByRole('link', { name: 'Open orders' }).click();
     await expect(o.heading).toBeVisible();
@@ -153,7 +154,7 @@ qaTest('TC-APP012-006', async ({ page, qa }) => {
   const o = new RadOrdersPage(page);
 
   await qa.step(1, async () => {
-    await page.goto('/en/apps');
+    await page.goto('/id/apps');
     await page.getByRole('link', { name: /^RIS\b|^Radiology/ }).first().click();
     await expect(main.getByRole('navigation', { name: 'Breadcrumb' })).toHaveText(/^Home\s*\/\s*Apps\s*\/\s*Radiology \(RIS\)$/);
     await expect(main.getByRole('heading', { level: 1, name: 'Radiology (RIS)' })).toBeVisible();
@@ -167,19 +168,19 @@ qaTest('TC-APP012-006', async ({ page, qa }) => {
   await qa.step(2, async () => {
     await main.getByRole('link', { name: 'Orders', exact: true }).click();
     await expect(o.heading).toBeVisible();
-    await page.goto('/en/radiology');
+    await page.goto('/id/radiology');
     await page.getByRole('complementary').getByRole('link', { name: 'Orders', exact: true }).first().click();
     await expect(o.heading).toBeVisible();
   });
 
-  await qa.step(3, async () => {
+  await qa.step(3, () => asOnSite(async () => {
     await switchLanguage(page, 'ID');
     await page.goto('/id/radiology/orders');
     const h1 = (await page.getByRole('heading', { level: 1 }).innerText()).trim();
     const button = (await main.getByRole('button').first().innerText()).trim();
     qa.note(3, `heading "${h1}", button "${button}"`);
     if (h1 === 'Orders' || button === 'New order') qa.deviation(3, 'Headings, field names, buttons and toasts are Indonesian ("Order baru", …)', `English: heading "${h1}", button "${button}"`);
-  });
+  }));
 });
 
 qaTest('TC-APP012-007', async ({ page, qa }) => {
@@ -223,7 +224,7 @@ qaTest('TC-APP012-010', async ({ page, qa }) => {
     if (!(await o.main.getByRole('combobox').count())) qa.deviation(2, 'A filter by status', 'no filter');
   });
   await qa.step(3, async () => {
-    await page.goto('/en/radiology');
+    await page.goto('/id/radiology');
     const side = (await page.getByRole('complementary').getByRole('link').allInnerTexts()).map((t) => t.trim()).join(', ');
     qa.note(3, `RIS menu: ${side}`);
     if (!/calendar|schedule|jadwal/i.test(side)) qa.deviation(3, 'A calendar by machine or room', 'no schedule screen');
@@ -377,7 +378,7 @@ qaTest('TC-APP012-025', async ({ page, qa }) => {
   const start = `${addDays(todayWib(), 1)}T02:00:00Z`;
 
   await qa.step(1, async () => {
-    await page.goto('/en/radiology');
+    await page.goto('/id/radiology');
     // The workbook names the menu item "Jadwal studi"; the English menu reads "Study schedule".
     await page.getByRole('complementary').getByRole('link', { name: 'Study schedule' }).first().click();
     await expect(s.main.getByRole('heading', { level: 1, name: 'Schedule and report' })).toBeVisible();

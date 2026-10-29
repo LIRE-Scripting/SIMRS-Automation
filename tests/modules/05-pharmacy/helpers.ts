@@ -75,7 +75,7 @@ export async function outpatientOrder(page: Page, p: Patient): Promise<void> {
 export type Line = { item: PharmacyItem; requested?: string; issued?: string; discount?: string; generic?: boolean };
 
 /** A counter sale up to Confirm: patient, items, quantities, alerts. */
-export async function toConfirm(page: Page, p: Patient | null, lines: Line[], lang: 'en' | 'id' = 'en'): Promise<DispenseWizard> {
+export async function toConfirm(page: Page, p: Patient | null, lines: Line[], lang: 'en' | 'id' = 'id'): Promise<DispenseWizard> {
   const w = new DispenseWizard(page, lang);
   await w.open();
   if (p) await w.pickPatient(p);
@@ -101,7 +101,7 @@ export async function confirm(page: Page, w: DispenseWizard): Promise<string[]> 
 export const CONFIRMED = 'Dispense confirmed — issue lines saved.';
 
 /** A whole counter sale; returns the toasts. */
-export async function sell(page: Page, p: Patient | null, lines: Line[], lang: 'en' | 'id' = 'en'): Promise<string[]> {
+export async function sell(page: Page, p: Patient | null, lines: Line[], lang: 'en' | 'id' = 'id'): Promise<string[]> {
   const w = await toConfirm(page, p, lines, lang);
   return confirm(page, w);
 }
@@ -120,7 +120,7 @@ export function expectRefused(qa: Qa, step: number, toasts: string[], expected: 
 }
 
 
-export { backToEnglish } from '../shared/language';
+export { backToIndonesian } from '../shared/language';
 
 /** An item made for this test only (code + token), with one batch in the stand-in store. */
 export async function ownItem(page: Page, qa: Qa, base: string, name: string, batches: { quantity: string; expiry: string }[]): Promise<PharmacyItem & { batches: string[] }> {

@@ -59,7 +59,7 @@ qaTest('TC-APP007-011', async ({ page, qa }) => {
   const d = sr.dialog;
 
   await qa.step(1, async () => {
-    await page.goto('/en/inventory');
+    await page.goto('/id/inventory');
     await page.getByRole('main').getByRole('link', { name: 'Stock Requests', exact: true }).click();
     await sr.main.getByRole('button', { name: 'New Stock Request' }).click();
     await expect(d.getByText('Request stock for a department. List the items in remarks.')).toBeVisible();
@@ -119,7 +119,7 @@ qaTest('TC-APP007-012', async ({ page, qa }) => {
 
 qaTest('TC-APP007-025', async ({ page, qa }) => {
   await qa.step(1, async () => {
-    await page.goto('/en/inventory');
+    await page.goto('/id/inventory');
     const links = await page.getByRole('main').getByRole('link').allInnerTexts();
     if (!links.some((l) => /transfer|mutasi/i.test(l))) qa.deviation(1, 'A transfer with source, destination, batch and quantity', `no transfer on the Inventory hub (links: ${links.join(', ')}); Store documents has a "transfer" document (TC-APP007-045)`);
   });

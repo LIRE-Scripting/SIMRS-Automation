@@ -20,7 +20,7 @@ export class FollowUps {
   }
 
   async open() {
-    await this.page.goto('/en/clinical/follow-ups');
+    await this.page.goto('/id/clinical/follow-ups');
     await expect(this.heading).toBeVisible();
   }
 

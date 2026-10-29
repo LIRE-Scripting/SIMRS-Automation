@@ -1,10 +1,11 @@
+import { asOnSite } from '../../../lib/i18n';
 import { expect, qaTest, test } from '../../../fixtures/e2e';
 import { installToastRecorder, toastMark } from '../../../lib/assertions';
 import { PHARMACY } from '../../../lib/pharmacy-data';
 import { DispenseWizard, OrdersPage } from '../../../pages/pharmacy/PharmacyE2EPages';
 import { switchLanguage } from '../shared/language';
 import { screenOpens } from '../shared/screen-opens';
-import { backToEnglish, CONFIRMED, outpatientOrder, patient, sell, stock, toastsAfter } from './helpers';
+import { backToIndonesian, CONFIRMED, outpatientOrder, patient, sell, stock, toastsAfter } from './helpers';
 
 /**
  * 05-pharmacy.xlsx: hub and language (022, 024), the desk screens Cost
@@ -18,7 +19,7 @@ test.beforeEach(async ({ page }) => {
 });
 
 test.afterEach(async ({ page }) => {
-  await backToEnglish(page);
+  await backToIndonesian(page);
 });
 
 qaTest('TC-APP005-024', async ({ page, qa }) => {
@@ -26,7 +27,7 @@ qaTest('TC-APP005-024', async ({ page, qa }) => {
   const cards = ['Orders', 'Dispense', 'Issue Lines'];
 
   await qa.step(1, async () => {
-    await page.goto('/en/apps');
+    await page.goto('/id/apps');
     await page.getByRole('link', { name: /^Pharmacy\b/ }).first().click();
     await expect(main.getByRole('navigation', { name: 'Breadcrumb' })).toHaveText(/^Home\s*\/\s*Apps\s*\/\s*Pharmacy$/);
     await expect(main.getByRole('heading', { level: 1, name: 'Pharmacy' })).toBeVisible();
@@ -38,7 +39,7 @@ qaTest('TC-APP005-024', async ({ page, qa }) => {
 
   await qa.step(2, async () => {
     for (const c of cards) {
-      await page.goto('/en/pharmacy');
+      await page.goto('/id/pharmacy');
       await main.getByRole('link', { name: c, exact: true }).last().click();
       await expect(main.getByRole('heading', { level: 1, name: c })).toBeVisible();
     }
@@ -54,7 +55,7 @@ qaTest('TC-APP005-024', async ({ page, qa }) => {
   await qa.step(3, async () => {
     await main.getByRole('navigation', { name: 'Breadcrumb' }).getByRole('link', { name: 'Pharmacy' }).click();
     await expect(main.getByRole('heading', { level: 1, name: 'Pharmacy' })).toBeVisible();
-    await expect(page).toHaveURL(/\/en\/pharmacy$/);
+    await expect(page).toHaveURL(/\/id\/pharmacy$/);
   });
 });
 
@@ -65,22 +66,22 @@ qaTest('TC-APP005-022', async ({ page, qa }) => {
   try {
     await switchLanguage(page, 'ID');
 
-    await qa.step(1, async () => {
+    await qa.step(1, () => asOnSite(async () => {
       await page.goto('/id/pharmacy');
       const h = await main.getByRole('heading', { level: 1 }).innerText();
       const desc = await main.getByText(/^Orders, dispense & issue lines$/).count();
       if (h === 'Pharmacy' || desc) qa.deviation(1, 'Heading, description, cards, sidebar and breadcrumb in Indonesian', `heading "${h}"${desc ? ', "Orders, dispense & issue lines"' : ''} stay English (known risk)`);
-    });
+    }));
 
-    await qa.step(2, async () => {
+    await qa.step(2, () => asOnSite(async () => {
       await page.goto('/id/pharmacy/dispense');
       const want = ['Penyerahan obat bertahap, dengan pemeriksaan interaksi klinis.', 'Cari rekam medis', 'Cari nama atau kode', 'Lanjut', 'Kembali'];
       const text = await main.innerText();
       const missing = want.filter((w) => !text.includes(w));
       if (missing.length) qa.deviation(2, want.map((w) => `"${w}"`).join(', '), `missing: ${missing.join(', ')}; the screen reads "${(await main.getByRole('paragraph').first().innerText()).trim()}"`);
-    });
+    }));
 
-    await qa.step(3, async () => {
+    await qa.step(3, () => asOnSite(async () => {
       const w = new DispenseWizard(page, 'id');
       await w.open();
       const steps = (await main.getByRole('list').first().getByRole('listitem').allInnerTexts()).map((s) => s.replace(/\s+/g, ' ').trim());
@@ -94,16 +95,16 @@ qaTest('TC-APP005-022', async ({ page, qa }) => {
         qa.note(3, `step names "${steps.join(' / ')}"`);
         qa.notRun(3, 'the wizard is in Indonesian; the sale itself is covered in English (TC-APP005-007)');
       }
-    });
+    }));
 
-    await qa.step(4, async () => {
+    await qa.step(4, () => asOnSite(async () => {
       await page.goto('/id/pharmacy/issue-lines');
       const cols = (await main.getByRole('columnheader').allInnerTexts()).map((c) => c.trim());
       const h2 = await main.getByRole('heading', { level: 2 }).first().innerText();
       if (cols.includes('Requested') || h2 === 'Which lines may be returned') qa.deviation(4, 'Indonesian headings and column names', `"${h2}"; columns ${cols.join(', ')}`);
-    });
+    }));
   } finally {
-    await backToEnglish(page);
+    await backToIndonesian(page);
   }
 });
 
@@ -113,7 +114,7 @@ qaTest('TC-APP005-058', async ({ page, qa }) => {
   const est = { patient: `X Pasien Estimasi 01 ${t}`, item: 'X Parasetamol', quantity: '10', amount: '500' };
 
   await qa.step(1, async () => {
-    await page.goto('/en/pharmacy');
+    await page.goto('/id/pharmacy');
     await page.getByRole('navigation', { name: 'Pharmacy' }).getByRole('link', { name: 'Estimate' }).click();
     await expect(main.getByRole('heading', { level: 1, name: 'Cost estimate' })).toBeVisible();
     await expect(main.getByRole('textbox', { name: 'Patient' })).toHaveValue('');
@@ -145,7 +146,7 @@ qaTest('TC-APP005-058', async ({ page, qa }) => {
 qaTest('TC-APP005-059', async ({ page, qa }) => {
   const main = page.getByRole('main');
   const t = qa.token();
-  await page.goto('/en/pharmacy/estimate');
+  await page.goto('/id/pharmacy/estimate');
   await expect(main.getByRole('heading', { level: 1, name: 'Cost estimate' })).toBeVisible();
   const save = async (v: { patient: string; quantity?: string; amount?: string }) => {
     await main.getByRole('textbox', { name: 'Patient' }).fill(v.patient);
@@ -188,7 +189,7 @@ qaTest('TC-APP005-060', async ({ page, qa }) => {
   };
 
   await qa.step(1, async () => {
-    await page.goto('/en/pharmacy');
+    await page.goto('/id/pharmacy');
     await page.getByRole('navigation', { name: 'Pharmacy' }).getByRole('link', { name: 'Patient issues' }).click();
     await expect(main.getByRole('heading', { level: 1, name: 'Issues for one patient' })).toBeVisible();
     await expect(main.getByRole('textbox', { name: 'Patient' })).toBeVisible();
@@ -216,7 +217,7 @@ qaTest('TC-APP005-060', async ({ page, qa }) => {
 qaTest('TC-APP005-061', async ({ page, qa }) => {
   const main = page.getByRole('main');
   await qa.step(1, async () => {
-    await page.goto('/en/pharmacy/issues');
+    await page.goto('/id/pharmacy/issues');
     await main.getByRole('textbox', { name: 'Patient' }).fill('');
     const mark = await toastMark(page);
     await main.getByRole('button', { name: 'Look up' }).click();
@@ -229,7 +230,7 @@ qaTest('TC-APP005-061', async ({ page, qa }) => {
 qaTest('TC-APP005-062', async ({ page, qa }) => {
   const main = page.getByRole('main');
   await qa.step(1, async () => {
-    await page.goto('/en/pharmacy');
+    await page.goto('/id/pharmacy');
     await page.getByRole('navigation', { name: 'Pharmacy' }).getByRole('link', { name: 'Price & TPN' }).click();
     await expect(main.getByRole('heading', { level: 1, name: 'Price and TPN' })).toBeVisible();
     await expect(main.getByText('Price, tax, and margin stay on Billing. Pharmacy has no second price list.', { exact: true })).toBeVisible();
@@ -278,7 +279,7 @@ qaTest('TC-APP005-063', async ({ page, qa }) => {
   qa.note(3, `the patient id is not shown on any screen; the MRN ${pt1.mrn} is typed. Order id ${order} is read from the Orders link`);
 
   await qa.step(1, async () => {
-    await page.goto('/en/pharmacy');
+    await page.goto('/id/pharmacy');
     await page.getByRole('navigation', { name: 'Pharmacy' }).getByRole('link', { name: 'Dose record' }).click();
     await expect(main.getByRole('heading', { level: 1, name: 'Dose record' })).toBeVisible();
     await expect(main.getByText('Given or not given. A missed dose needs a reason. The row stays in pharmacy.', { exact: true }).first()).toBeVisible();
@@ -320,7 +321,7 @@ qaTest('TC-APP005-063', async ({ page, qa }) => {
 qaTest('TC-APP005-064', async ({ page, qa }) => {
   const { pt1, order } = await doseIds(page, qa);
   await qa.step(1, async () => {
-    await page.goto('/en/pharmacy/doses');
+    await page.goto('/id/pharmacy/doses');
     const toasts = await recordDose(page, { patient: pt1.mrn, order, status: 'Not given' });
     expect(toasts).not.toContain('Dose recorded');
     if (!toasts.includes('A missed dose needs a reason')) qa.deviation(1, 'Toast "A missed dose needs a reason"', `toast "${toasts.join(' / ') || 'none'}"`);
@@ -330,7 +331,7 @@ qaTest('TC-APP005-064', async ({ page, qa }) => {
 qaTest('TC-APP005-065', async ({ page, qa }) => {
   const pt1 = await patient(page, qa);
   await qa.step(1, async () => {
-    await page.goto('/en/pharmacy/doses');
+    await page.goto('/id/pharmacy/doses');
     const toasts = await recordDose(page, { patient: pt1.fullName, order: PHARMACY.para.name, status: 'Given' });
     expect(toasts).not.toContain('Dose recorded');
     if (!toasts.includes('The dose could not be recorded')) qa.deviation(1, 'Toast "The dose could not be recorded"', `toast "${toasts.join(' / ') || 'none'}"`);

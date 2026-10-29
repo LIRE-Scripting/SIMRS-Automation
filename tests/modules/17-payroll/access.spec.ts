@@ -1,7 +1,7 @@
 import type { Page } from '@playwright/test';
 import { expect, qaTest, test } from '../../../fixtures/e2e';
 import { installToastRecorder } from '../../../lib/assertions';
-import { HR } from '../../../lib/hr-data';
+import { DEP_B_HIT, HR } from '../../../lib/hr-data';
 import { everyPage } from '../../../pages/paging';
 import { appsCardRefused, asUser, BR_B, headerOneBranch, routesRefused, tryRefused, userPage } from '../shared/access';
 import { Batches, Desk, payrollEmployee, plain, RAN, SAVED } from './helpers';
@@ -37,7 +37,7 @@ async function offered(b: Batches, text: string): Promise<string[]> {
 
 qaTest('TC-APP017-005', async ({ page, qa, browser }) => {
   // EMP-B: an employee of BR-B, made by U6 in HR.
-  const empB = await asUser(browser, 'U6', (u6) => payrollEmployee(u6, qa, { ...HR.emp1, no: 'QA-EMP-B01' }));
+  const empB = await asUser(browser, 'U6', (u6) => payrollEmployee(u6, qa, { ...HR.emp1, no: 'QA-EMP-B01' }, { department: DEP_B_HIT }));
   const b = new Batches(page);
   const branch = page.getByRole('combobox', { name: 'Branch' });
 
@@ -124,7 +124,7 @@ qaTest('TC-APP017-022', async ({ qa, browser }) => {
 qaTest('TC-APP017-023', async ({ page, qa, browser }) => {
   // Preconditions (made by U6): EMP-B and a batch of BR-B.
   const { empB, number } = await asUser(browser, 'U6', async (u6) => {
-    const e = await payrollEmployee(u6, qa, { ...HR.emp1, no: 'QA-EMP-B01' });
+    const e = await payrollEmployee(u6, qa, { ...HR.emp1, no: 'QA-EMP-B01' }, { department: DEP_B_HIT });
     const b = new Batches(u6);
     await b.open();
     const hits = await offered(b, e.no);
@@ -168,7 +168,7 @@ qaTest('TC-APP017-052', async ({ page, qa, browser }) => {
     await qa.step(1, async () => {
       const shown: string[] = [];
       for (const link of ['Payslip', 'Calculate', 'Tax']) {
-        await staff.goto('/en/payroll');
+        await staff.goto('/id/payroll');
         const l = staff.getByRole('complementary').getByRole('link', { name: link }).first();
         if (!(await l.count())) continue;
         await l.click();

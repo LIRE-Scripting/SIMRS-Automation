@@ -25,30 +25,31 @@ export class LoginPage {
   }
 
   /** Pin the UI to English; the choice persists with the saved session. */
-  async useEnglish(): Promise<void> {
+  async useIndonesian(): Promise<void> {
     const toggle = this.page.getByRole('button', { name: /^(bahasa|language)$/i });
     if ((await toggle.count()) > 0) {
       await toggle.click();
-      await this.page.getByRole('menuitemradio', { name: 'EN', exact: true }).click();
+      await this.page.getByRole('menuitemradio', { name: 'ID', exact: true }).click();
       await this.page
-        .waitForURL(/\/en\//, { timeout: 5_000 })
+        .waitForURL(/\/id\//, { timeout: 5_000 })
         .catch(() => {});
     }
   }
 
   /**
-   * Signs in on the English site and lands on /en/apps.
+   * Signs in on the Indonesian site and lands on /id/apps (/en/apps for an
+   * account saved on English, until its page reads the pinned language).
    *
    * Blocker 1 (00-blockers-checklist-linked.xlsx | Checklist | row 5): from
    * the default target the sign-in stays on the login page; "with the target
    * /apps it goes on in half a second". So the login opens with next=/apps.
    */
   async signIn(username: string, password: string): Promise<void> {
-    await this.page.goto('/en/login?next=%2Fapps');
+    await this.page.goto('/id/login?next=%2Fapps');
     await this.username.fill(username);
     await this.password.fill(password);
     await this.submit.click();
-    await expect(this.page).toHaveURL(/\/en\/apps$/, { timeout: 20_000 });
+    await expect(this.page).toHaveURL(/\/(id|en)\/apps$/, { timeout: 20_000 });
   }
 
   /**
@@ -61,7 +62,7 @@ export class LoginPage {
   async login(
     username: string,
     password: string,
-    opts: { english?: boolean } = {},
+    opts: { indonesian?: boolean } = {},
   ): Promise<void> {
     // Staging auth is intermittent: the submit sometimes silently fails.
     // Retry up to 3 times; the session takes effect when redirecting to /id.
@@ -81,8 +82,8 @@ export class LoginPage {
       }
       if (authed) break;
     }
-    if (opts.english !== false) {
-      await this.useEnglish();
+    if (opts.indonesian !== false) {
+      await this.useIndonesian();
     }
   }
 }

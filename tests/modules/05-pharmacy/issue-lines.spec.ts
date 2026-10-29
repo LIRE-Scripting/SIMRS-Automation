@@ -4,6 +4,7 @@ import { addDays, todayWib } from '../../../lib/dates';
 import { PHARMACY, stockOf } from '../../../lib/pharmacy-data';
 import { IssueLinesPage } from '../../../pages/pharmacy/PharmacyE2EPages';
 import { CONFIRMED, ownItem, patient, sell, toastsAfter } from './helpers';
+import { NotOffered } from '../../../lib/not-offered';
 
 /**
  * 05-pharmacy.xlsx, feature "Issue Lines (/pharmacy/issue-lines)". The list
@@ -30,7 +31,7 @@ qaTest('TC-APP005-017', async ({ page, qa }) => {
   const row = () => il.rows().filter({ has: page.getByRole('cell', { name: it.name, exact: true }) });
   const show = async () => {
     await il.open();
-    await il.search.fill(it.name);
+    await il.showRow(row, it.name);
     await expect(row()).toHaveCount(1);
     // The list loads twice (page, then data); typing into Qty before that is reset to 1.
     await il.page.waitForLoadState('networkidle').catch(() => {});
@@ -90,7 +91,9 @@ qaTest('TC-APP005-042', async ({ page, qa }) => {
 
   await qa.step(1, async () => {
     await il.open();
-    await il.search.fill(it.name);
+    await il.showRow(() => rows, it.name);
+    // The two lines of the item can be on two pages, and the search narrows only the page on screen (found blocker 40).
+    if ((await rows.count()) < 2) throw new NotOffered(`the two lines of ${it.name} are not on one page of Issue Lines (found blocker 40)`);
     await expect(rows).toHaveCount(2);
     for (const r of await rows.all()) expect((await il.cells(r)).slice(0, 3)).toEqual([it.name, '10', '10']);
   });

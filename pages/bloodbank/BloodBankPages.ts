@@ -2,9 +2,9 @@ import { expect, type Locator, type Page } from '@playwright/test';
 import { toastLocator } from '../../lib/assertions';
 
 /**
- * Transfusion Medicine (/en/bloodbank): Stock, Blood request and Quality
+ * Transfusion Medicine (/id/bloodbank): Stock, Blood request and Quality
  * control. Read from the live screens on 2026-10-15. Donors
- * (/en/bloodbank/donors) answers HTTP 500 (checklist blocker 2).
+ * (/id/bloodbank/donors) answers HTTP 500 (checklist blocker 2).
  */
 
 abstract class Screen {
@@ -50,7 +50,7 @@ export class StockPage extends Screen {
   readonly table = this.page.getByRole('main').getByRole('table');
 
   async open(): Promise<void> {
-    await this.page.goto('/en/bloodbank/stock');
+    await this.page.goto('/id/bloodbank/stock');
     await expect(this.heading).toBeVisible();
   }
 
@@ -84,7 +84,7 @@ export class RequestsPage extends Screen {
   readonly heading = this.page.getByRole('main').getByRole('heading', { level: 1, name: 'Blood request' });
 
   async open(): Promise<void> {
-    await this.page.goto('/en/bloodbank/requisitions');
+    await this.page.goto('/id/bloodbank/requisitions');
     await expect(this.heading).toBeVisible();
   }
 
@@ -113,7 +113,7 @@ export class QcPage extends Screen {
   readonly heading = this.page.getByRole('main').getByRole('heading', { level: 1, name: 'Quality control' });
 
   async open(): Promise<void> {
-    await this.page.goto('/en/bloodbank/qc');
+    await this.page.goto('/id/bloodbank/qc');
     await expect(this.heading).toBeVisible();
   }
 }

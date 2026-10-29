@@ -1,9 +1,10 @@
 import { expect, type Locator, type Page } from '@playwright/test';
 import { toastLocator } from '../../lib/assertions';
+import { asOnSite } from '../../lib/i18n';
 import { escapeRe } from '../ambulatory/RegisteredPatientsPage';
 
 /**
- * Patient Care > Consultation (/en/clinical/consultation). Read from the live
+ * Patient Care > Consultation (/id/clinical/consultation). Read from the live
  * screen on 2026-10-15: a patient picker, then a left pane (complementary:
  * name, MRN, Drug orders, Problem list, Allergies) and the tabs Order, SOAP
  * and Prescription. Order and Prescription share the group "Formulary".
@@ -48,7 +49,7 @@ export class ConsultationPage {
   }
 
   async open(): Promise<void> {
-    await this.page.goto('/en/clinical/consultation');
+    await this.page.goto('/id/clinical/consultation');
     await expect(this.heading).toBeVisible();
   }
 
@@ -98,10 +99,11 @@ export class ConsultationPage {
     }
   }
 
-  /** The value under the formulary: "Quantity: 10 dose × clock times × days" -> "10" ("—" when it cannot be worked out). */
+  /** The value under the formulary: "Quantity: 10 dose × clock times × days" (in Indonesian "Jumlah: 10 dosis × jumlah jam × hari") -> "10" ("—" when it cannot be worked out). */
   async quantity(): Promise<string> {
-    const text = await this.panel.getByText(/^Quantity:/).locator('xpath=..').innerText();
-    return text.replace(/^Quantity:\s*/, '').replace(/\s*dose × clock times × days\s*$/, '').trim();
+    // Read as the site shows it: the rule's words are separate elements and are not translated one by one.
+    const text = await asOnSite(() => this.panel.getByText(/^(Quantity|Jumlah):/).locator('xpath=..').innerText());
+    return text.replace(/^(Quantity|Jumlah):\s*/, '').replace(/\s*(dose × clock times × days|dosis × jumlah jam × hari)\s*$/, '').trim();
   }
 
   checkInteractions(): Locator {

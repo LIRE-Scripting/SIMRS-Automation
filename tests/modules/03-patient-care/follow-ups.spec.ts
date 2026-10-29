@@ -26,7 +26,7 @@ qaTest('TC-APP003-052', async ({ page, qa }) => {
   const note = qa.name('QA Pasien dihubungi, kontrol minggu depan');
 
   await qa.step(1, async () => {
-    await page.goto('/en/clinical');
+    await page.goto('/id/clinical');
     await page.getByRole('main').getByRole('link', { name: 'Follow-up', exact: true }).click();
     await expect(f.heading).toBeVisible();
     await expect(f.main.getByText('A remark, a call, or a note for one patient.')).toBeVisible();

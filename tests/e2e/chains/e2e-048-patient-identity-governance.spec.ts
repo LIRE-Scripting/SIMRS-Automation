@@ -144,7 +144,7 @@ chainTest('E2E-048', async ({ page, chain }) => {
       return (await main.innerText()).replace(/\s+/g, ' ');
     };
     await qa.step(1, async () => {
-      await page.goto('/en/pharmacy');
+      await page.goto('/id/pharmacy');
       await page.getByRole('navigation', { name: 'Pharmacy' }).getByRole('link', { name: 'Patient issues' }).click();
       await expect(main.getByText('Nothing here yet.', { exact: true })).toBeVisible();
     });

@@ -2,7 +2,7 @@ import { expect, type Locator, type Page } from '@playwright/test';
 import { toastLocator } from '../../lib/assertions';
 
 /**
- * Ambulatory Care > Registered Patients (/en/registration/patients).
+ * Ambulatory Care > Registered Patients (/id/registration/patients).
  * Locators were read from the live screen on 2026-10-14 (roles and
  * accessible names; the screen has no test ids).
  */
@@ -75,7 +75,7 @@ export class RegisteredPatientsPage {
   }
 
   async open(query = ''): Promise<void> {
-    await this.page.goto(`/en/registration/patients${query}`);
+    await this.page.goto(`/id/registration/patients${query}`);
     await expect(this.heading).toBeVisible();
   }
 

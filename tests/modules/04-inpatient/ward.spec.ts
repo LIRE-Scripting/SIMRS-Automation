@@ -52,7 +52,7 @@ qaTest('TC-APP004-065', async ({ page, qa }) => {
   const pt1 = await admitted(page, qa, 'QA-INP Pasien Satu');
 
   await qa.step(1, async () => {
-    await page.goto('/en/adt');
+    await page.goto('/id/adt');
     await page.getByRole('main').getByRole('link', { name: 'Ward', exact: true }).click();
     await expect(w.heading).toBeVisible();
     await expect(w.main.getByText('Receive onto a bed, daily note, transfer, swap, doctor change, and exceptional exit. Payment stays at the cashier. Housekeeping turns the bed over.')).toBeVisible();

@@ -24,7 +24,7 @@ chainTest('E2E-029', async ({ page, chain }) => {
     const no = qa.code('QA-101');
     const d = beds.dialog();
     await qa.step(1, async () => {
-      await page.goto('/en/apps');
+      await page.goto('/id/apps');
       await page.getByRole('link', { name: /^Inpatient\b/ }).first().click();
       await page.getByRole('main').getByRole('link', { name: 'Bed management', exact: true }).click();
       await expect(beds.heading).toBeVisible();
@@ -103,7 +103,7 @@ chainTest('E2E-029', async ({ page, chain }) => {
     qa.note(3, `the room of bed ${second} is logged on the location ${loc} of this run (a location is not tied to a bed on the site)`);
     let id = '';
     await qa.step(1, async () => {
-      await page.goto('/en/housekeeping');
+      await page.goto('/id/housekeeping');
       await page.getByRole('main').getByRole('link', { name: 'Daily logs' }).click();
       await expect(g.main.getByRole('heading', { level: 1, name: 'Daily logs' })).toBeVisible();
     });

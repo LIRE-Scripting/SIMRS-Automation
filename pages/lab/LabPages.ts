@@ -1,7 +1,7 @@
 import { expect, type Locator, type Page } from '@playwright/test';
 
 /**
- * Laboratory (/en/laboratory): the Lab order worklist, the Sample workflow
+ * Laboratory (/id/laboratory): the Lab order worklist, the Sample workflow
  * (/laboratory/work) and Specimens and tests (/laboratory/catalogue). Read
  * from the live screens on 2026-10-15.
  */
@@ -28,7 +28,7 @@ export class WorklistPage {
   }
 
   async open(): Promise<void> {
-    await this.page.goto('/en/laboratory/orders');
+    await this.page.goto('/id/laboratory/orders');
     await expect(this.heading).toBeVisible();
   }
 
@@ -116,7 +116,7 @@ export class SampleWorkflowPage {
   }
 
   async open(): Promise<void> {
-    await this.page.goto('/en/laboratory/work');
+    await this.page.goto('/id/laboratory/work');
     await expect(this.heading).toBeVisible();
   }
 

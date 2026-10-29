@@ -4,6 +4,7 @@ import { todayWib } from '../../../lib/dates';
 import { LAB } from '../../../lib/lab-data';
 import { WorklistPage } from '../../../pages/lab/LabPages';
 import { advance, capture, cellsOf, create, labType, order, resulted, toastsAfter } from './helpers';
+import { escapeText, sourceOnSite } from '../../../lib/i18n';
 
 /** 11-laboratory.xlsx, feature "Lab order worklist (/laboratory/orders)". Orders are made per test. */
 
@@ -23,7 +24,7 @@ qaTest('TC-APP011-001', async ({ page, qa }) => {
   const d = page.getByRole('dialog', { name: 'Create lab order' });
 
   await qa.step(1, async () => {
-    await page.goto('/en/apps');
+    await page.goto('/id/apps');
     await page.getByRole('link', { name: /^Laboratory\b/ }).first().click();
     await page.getByRole('main').getByRole('link', { name: 'Open worklist' }).click();
     await expect(w.heading).toBeVisible();
@@ -93,7 +94,8 @@ qaTest('TC-APP011-004', async ({ page, qa }) => {
     const row = await w.row(type);
     sample = (await w.cells(row))[0];
     await w.press(row, 'Capture result', w.capture);
-    await expect(w.capture.getByText(`${type} · Accepted · ${sample}`, { exact: true })).toBeVisible();
+    // One text of three parts; the site writes the status in Indonesian.
+      await expect(w.capture.getByText(new RegExp(`^${escapeText(type)} · ${sourceOnSite('Accepted')} · ${escapeText(sample)}$`))).toBeVisible();
     for (const f of ['Lab result', 'Result range', 'Remarks'] as const) await expect(w.field(f)).toBeVisible();
     await expect(w.capture.getByText('Note on this order.', { exact: true })).toBeVisible();
     await expect(w.capture.getByText('The lab result and result range are written only once the sample is accepted.', { exact: true })).toBeVisible();
@@ -242,7 +244,7 @@ qaTest('TC-APP011-014', async ({ page, qa }) => {
     const mark = await toastMark(page);
     await w.capture.getByRole('button', { name: 'Save result' }).click();
     expect(await toastsAfter(page, mark, 3_000)).not.toContain('Result captured');
-    await expect(w.capture.getByText(/is still open/)).toBeVisible();
+    await expect(w.capture.getByText(/is still open|masih terbuka/)).toBeVisible();
     await w.capture.getByRole('button', { name: 'Cancel' }).click();
     expect((await cellsOf(page, ordered))[3]).toBe('—');
   });

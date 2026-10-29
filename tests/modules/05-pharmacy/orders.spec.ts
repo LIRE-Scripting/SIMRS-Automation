@@ -48,7 +48,7 @@ qaTest('TC-APP005-001', async ({ page, qa }) => {
   const linesBefore = await linesOf(il, drug);
 
   await qa.step(1, async () => {
-    await page.goto('/en/apps');
+    await page.goto('/id/apps');
     await page.getByRole('link', { name: /^Pharmacy\b/ }).first().click();
     await page.getByRole('main').getByRole('link', { name: 'Orders', exact: true }).first().click();
     await expect(o.heading).toBeVisible();

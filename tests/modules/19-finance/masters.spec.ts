@@ -19,6 +19,8 @@ import {
   ruleNow,
 } from './helpers';
 import { CAPITAL, category, centre, currencies, OPERATING, pickByPrefix, preAllocation, saveCurrency, saveRate, tariff, TC_APP019_001, TC_APP019_004, TC_APP019_007, TC_APP019_038, TC_APP019_040, TC_APP019_062, WITHDRAWAL } from './cases';
+import { sourceOnSite } from '../../../lib/i18n';
+import { NotOffered } from '../../../lib/not-offered';
 
 /**
  * 19-finance.xlsx: financial years, chart of accounts, budget posting rules,
@@ -184,6 +186,8 @@ qaTest('TC-APP019-021', async ({ page, qa }) => {
   });
   await qa.step(3, async () => {
     await y.open();
+    // The list shows its first years only; the years the tests make each run can push 2026 off it (found blocker 40).
+    if (!(await y.row(todayWib().slice(0, 4)).count())) throw new NotOffered(`${todayWib().slice(0, 4)} is not among the years the list shows (found blocker 40)`);
     await y.row(todayWib().slice(0, 4)).getByRole('button', { name: 'Periods' }).click();
     const lines = await y.dialog.getByRole('listitem').count();
     const locks = await y.dialog.getByRole('button', { name: 'Lock' }).count();
@@ -310,7 +314,7 @@ const CONFIG_BRANCH = 'BR02 · Daan Mogot';
 
 async function configuration(page: Page, branch = CONFIG_BRANCH) {
   const main = page.getByRole('main');
-  await page.goto('/en/finance/configuration');
+  await page.goto('/id/finance/configuration');
   await expect(main.getByRole('heading', { level: 1, name: 'Finance configuration' })).toBeVisible();
   await main.getByRole('combobox', { name: 'Branch' }).selectOption({ label: branch });
   await page.waitForLoadState('networkidle').catch(() => {});
@@ -321,7 +325,7 @@ qaTest('TC-APP019-035', async ({ page, qa }) => {
   const bank = await createAccount(page, account(qa, 'QA-1010', 'QA Bank Uji', 'Bank'));
   let main = page.getByRole('main');
   await qa.step(1, async () => {
-    await page.goto('/en/finance');
+    await page.goto('/id/finance');
     await page.getByRole('complementary').getByRole('link', { name: 'Configuration' }).first().click();
     await expect(main.getByRole('heading', { level: 1, name: 'Finance configuration' })).toBeVisible();
     for (const l of ['Branch', 'Current financial year']) await expect(main.getByRole('combobox', { name: l })).toBeVisible();
@@ -335,7 +339,8 @@ qaTest('TC-APP019-035', async ({ page, qa }) => {
   });
   await qa.step(2, async () => {
     main = await configuration(page);
-    const text = (await main.getByText(/This branch (has no|already has a) finance configuration|This branch already has a configuration/).first().innerText()).trim();
+    const said = new RegExp(['This branch has no finance configuration.', 'This branch already has a configuration. Saving updates it.'].map(sourceOnSite).join('|'));
+    const text = (await main.getByText(said).first().innerText()).trim();
     qa.note(2, `Daan Mogot: "${text}"`);
   });
   await qa.step(3, async () => {
@@ -369,7 +374,7 @@ qaTest('TC-APP019-035', async ({ page, qa }) => {
     expect(await clickFor(page, main.getByRole('button', { name: 'Save' }).last())).toContain('Configuration saved.');
   });
   await qa.step(6, async () => {
-    for (const route of ['/en/finance/collections', '/en/finance/year-end']) {
+    for (const route of ['/id/finance/collections', '/id/finance/year-end']) {
       await page.goto(route);
       const branch = page.getByRole('main').getByRole('combobox', { name: 'Branch' });
       await page.waitForLoadState('networkidle').catch(() => {});
@@ -423,7 +428,10 @@ qaTest('TC-APP019-036', async ({ page, qa }) => {
     else await type.fill(qa.code('X-ATK'));
     const toasts = await clickFor(page, main.getByRole('button', { name: 'Save' }).last());
     const shown = await main.getByText(/needs a type, an amount|Imprest eligibility needs/i).count();
-    expect(toasts).not.toContain('Configuration saved.');
+    if (toasts.includes('Configuration saved.')) {
+      qa.deviation(3, 'The text that imprest eligibility needs a type, an amount, an account and a department, employee or party', 'the row with only a type is saved ("Configuration saved.")');
+      return;
+    }
     if (!shown) {
       const invalid = await invalidFields(main);
       qa.deviation(3, 'The text that imprest eligibility needs a type, an amount, an account and a department, employee or party', invalid.length ? `the browser stops the click (${invalid.join('; ')})` : `toast "${toasts.join(' / ')}"`);
@@ -494,7 +502,7 @@ qaTest('TC-APP019-041', async ({ page, qa }) => {
 
 async function accountMaps(page: Page) {
   const main = page.getByRole('main');
-  await page.goto('/en/finance/account-maps');
+  await page.goto('/id/finance/account-maps');
   await expect(main.getByRole('heading', { level: 1, name: 'Account maps' })).toBeVisible();
   await page.waitForLoadState('networkidle').catch(() => {});
   return main;
@@ -508,7 +516,7 @@ qaTest('TC-APP019-042', async ({ page, qa }) => {
   const exp = await createAccount(page, account(qa, 'QA-5010', 'QA Beban Uji', 'Expense'));
   const atk = qa.code('X-ATK');
   await qa.step(1, async () => {
-    await page.goto('/en/finance');
+    await page.goto('/id/finance');
     await page.getByRole('complementary').getByRole('link', { name: 'Account maps' }).first().click();
     const main = page.getByRole('main');
     await expect(main.getByRole('heading', { level: 1, name: 'Account maps' })).toBeVisible();
@@ -541,7 +549,7 @@ qaTest('TC-APP019-042', async ({ page, qa }) => {
     await s.getByRole('textbox', { name: 'Description' }).fill(qa.name('X Alat tulis'));
     await pickByPrefix(s.getByRole('combobox', { name: 'Account' }), exp.code);
     expect(await clickFor(page, s.getByRole('button', { name: 'Save' }))).toContain('Saved.');
-    await page.goto('/en/finance/imprest');
+    await page.goto('/id/finance/imprest');
     await page.waitForLoadState('networkidle').catch(() => {});
     const offered = (await page.getByRole('main').getByRole('combobox', { name: /Transaction type/i }).locator('option').allInnerTexts().catch(() => [])).some((o) => o.includes(atk.toUpperCase()));
     qa.note(4, `the type is ${offered ? '' : 'not '}offered on Imprest under "Transaction type"`);
@@ -582,7 +590,7 @@ qaTest('TC-APP019-043', async ({ page, qa }) => {
 
 qaTest('TC-APP019-056', async ({ page, qa }) => {
   await qa.step(1, async () => {
-    await page.goto('/en/finance');
+    await page.goto('/id/finance');
     await page.getByRole('complementary').getByRole('link', { name: 'Bill adjustment' }).first().click();
     const main = page.getByRole('main');
     await expect(main.getByRole('heading', { level: 1, name: 'Bill adjustment' })).toBeVisible();
@@ -596,7 +604,7 @@ qaTest('TC-APP019-056', async ({ page, qa }) => {
 qaTest('TC-APP019-057', async ({ page, qa }) => {
   for (const s of [1, 2, 3]) qa.notRun(s, 'needs a party account with an approved advance and open bills (Payments, U5)');
   await qa.step(4, async () => {
-    await page.goto('/en/finance/bill-adjustments');
+    await page.goto('/id/finance/bill-adjustments');
     const main = page.getByRole('main');
     const save = main.getByRole('button', { name: 'Save' });
     if (await save.isDisabled()) qa.note(4, '"Save" is disabled with nothing chosen');
