@@ -20,7 +20,7 @@ const DESCRIPTION = 'QA Kelas 1';
 
 async function newBed(page: Page, qa: Qa, excelNo: string): Promise<string> {
   const beds = new BedsPage(page);
-  const no = qa.code(excelNo);
+  const no = qa.bed(excelNo);
   await beds.open();
   await beds.add({ no, description: DESCRIPTION });
   return no;
@@ -163,7 +163,7 @@ qaTest('TC-APP004-049', async ({ page, qa, browser }) => {
       const beds = new BedsPage(staff);
       await beds.open();
       await beds.main.getByRole('button', { name: 'Add bed' }).click();
-      const other = qa.code('QA-109');
+      const other = qa.bed('QA-109');
       await beds.fill(beds.dialog(), { no: other, description: DESCRIPTION });
       await tryRefused(qa, 3, staff, 'Add bed', /^Bed created$/, () => beds.dialog().getByRole('button', { name: /^(Save|Saving…)$/ }).click());
       await beds.open();

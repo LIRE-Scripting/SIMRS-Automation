@@ -5,7 +5,7 @@ import { authFileOf, SCREENSHOT_DIR } from '../lib/config';
 import { installSiteLanguage } from '../lib/i18n';
 import { blockers, testCaseRef, type TestCaseRef } from '../lib/qa-data';
 import { foundBlocker } from '../lib/qa-data/found-blockers';
-import { qaCode, qaName, qaPrefix, uniqueMrn, uniqueToken } from '../lib/qa-data/names';
+import { firstCode, qaCode, qaName, qaPrefix, uniqueMrn, uniqueToken } from '../lib/qa-data/names';
 import { journeyTag, planFor, traceTag, type Plan } from '../lib/qa-data/plan';
 import { NotOffered } from '../lib/not-offered';
 
@@ -28,6 +28,8 @@ export interface Qa {
   name(excelName: string): string;
   /** A code ("X-01" in the workbook) with the prefix and a new token: "QA-01-<token>". */
   code(excelValue: string): string;
+  /** A bed number (workbook "QA-101") that sorts before the earlier test beds (lib/qa-data/names.ts firstCode). */
+  bed(excelValue: string): string;
   /** Only the "QA-" prefix rule, for fields that cannot take a token. */
   prefix(excelName: string): string;
   /** A new token for every call (run id + counter): makes each saved value unique. */
@@ -107,6 +109,7 @@ const test = base.extend<Fixtures & { qaId: string }, { siteLanguage: void }>({
       },
       name: qaName,
       code: qaCode,
+      bed: firstCode,
       prefix: qaPrefix,
       token: uniqueToken,
       mrn: () => uniqueMrn(),

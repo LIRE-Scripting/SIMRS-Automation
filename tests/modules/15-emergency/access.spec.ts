@@ -37,6 +37,8 @@ async function visits(page: Page, patientId: string): Promise<number> {
 qaTest('TC-APP015-005', async ({ page, qa, browser }) => {
   const ptB = await asUser(browser, 'U6', patientB);
   const before = await asUser(browser, 'U6', (u6) => visits(u6, ptB.id));
+  // U1 may already list visits of PT-B made at its own branch by other tests (TC-APP015-010): only a new one counts.
+  const beforeU1 = await asUser(browser, 'U1', (u1) => visits(u1, ptB.id));
   const v = new VisitsPage(page);
   const d = page.getByRole('dialog', { name: 'Create visit' });
   const branch = d.getByRole('combobox', { name: 'Branch' });
@@ -70,7 +72,7 @@ qaTest('TC-APP015-005', async ({ page, qa, browser }) => {
   await qa.step(5, async () => {
     const after = await asUser(browser, 'U6', (u6) => visits(u6, ptB.id));
     expect(after).toBeGreaterThan(before);
-    expect(await asUser(browser, 'U1', (u1) => visits(u1, ptB.id))).toBe(0);
+    expect(await asUser(browser, 'U1', (u1) => visits(u1, ptB.id))).toBe(beforeU1);
     qa.note(5, `PT-B (${ptB.fullName}, a seed patient of ${BR_B}) is listed for U6 and not for U1`);
   });
 });

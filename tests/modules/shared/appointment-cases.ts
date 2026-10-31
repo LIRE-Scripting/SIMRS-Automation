@@ -342,9 +342,15 @@ export const CASES = {
     });
 
     await qa.step(4, async () => {
-      await appts.pageWith([pts[0].fullName, pts[1].fullName]);
-      await appts.row(pts[0].fullName).getByRole('checkbox').check();
-      await appts.row(pts[1].fullName).getByRole('checkbox').check();
+      // The three patients of the test follow each other in the list; a page break may fall between two of them.
+      let pair: string[] = [];
+      for (const [a, b] of [[0, 1], [1, 2]]) {
+        pair = [pts[a].fullName, pts[b].fullName];
+        if (await appts.pageWith(pair).then(() => true, () => false)) break;
+        pair = [];
+      }
+      expect(pair, 'two patients of the test on one page').toHaveLength(2);
+      for (const p of pair) await appts.row(p).getByRole('checkbox').check();
       await expect(appts.selectionBar()).toHaveText('2 selected');
       await expect(appts.rescheduleButton()).toBeVisible();
       await expect(appts.cancelSelectedButton()).toBeVisible();

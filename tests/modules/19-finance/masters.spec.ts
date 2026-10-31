@@ -6,7 +6,6 @@ import { invalidFields } from '../18-settings/helpers';
 import {
   Accounts,
   BR_A,
-  FY_NEXT,
   PostingRules,
   Years,
   account,
@@ -40,15 +39,15 @@ qaTest('TC-APP019-001', TC_APP019_001);
 
 qaTest('TC-APP019-002', async ({ page, qa }) => {
   const y = new Years(page);
-  await ensureFyNext(page);
+  const fy = await ensureFyNext(page);
   await qa.step(1, async () => {
     await y.open();
-    await y.row(FY_NEXT).getByRole('button', { name: 'Periods' }).click();
-    await expect(y.dialog).toHaveAccessibleName(`Periods of ${FY_NEXT}`);
+    await y.row(fy).getByRole('button', { name: 'Periods' }).click();
+    await expect(y.dialog).toHaveAccessibleName(`Periods of ${fy}`);
     await expect(y.dialog.getByRole('listitem')).toHaveCount(12);
   });
   await qa.step(2, async () => {
-    const [, , start, end] = await y.cells(FY_NEXT);
+    const [, , start, end] = await y.cells(fy);
     // A line reads "1 2028-01-01 – 2028-01-31" with the buttons "Lock" and "Mark adjustment" (an open period).
     const lines = (await y.dialog.getByRole('listitem').allInnerTexts()).map((t) => t.match(/(\d+)\s+(\d{4}-\d{2}-\d{2})\s+–\s+(\d{4}-\d{2}-\d{2})/)!.slice(1));
     for (const [i, l] of lines.entries()) {
@@ -64,23 +63,23 @@ qaTest('TC-APP019-002', async ({ page, qa }) => {
 
 qaTest('TC-APP019-003', async ({ page, qa }) => {
   const y = new Years(page);
-  await ensureFyNext(page);
+  const fy = await ensureFyNext(page);
   try {
     await qa.step(1, async () => {
       await y.open();
-      expect(await clickFor(page, y.row(FY_NEXT).getByRole('button', { name: 'Lock' }))).toContain('Financial year locked');
+      expect(await clickFor(page, y.row(fy).getByRole('button', { name: 'Lock' }))).toContain('Financial year locked');
       await y.open();
-      expect((await y.cells(FY_NEXT))[6]).toBe('Locked');
-      await expect(y.row(FY_NEXT).getByRole('button', { name: 'Unlock' })).toBeVisible();
+      expect((await y.cells(fy))[6]).toBe('Locked');
+      await expect(y.row(fy).getByRole('button', { name: 'Unlock' })).toBeVisible();
     });
     await qa.step(2, async () => {
-      expect(await clickFor(page, y.row(FY_NEXT).getByRole('button', { name: 'Unlock' }))).toContain('Financial year unlocked');
+      expect(await clickFor(page, y.row(fy).getByRole('button', { name: 'Unlock' }))).toContain('Financial year unlocked');
       await y.open();
-      expect((await y.cells(FY_NEXT))[6]).toBe('Open');
+      expect((await y.cells(fy))[6]).toBe('Open');
     });
   } finally {
     await y.open();
-    if (await y.row(FY_NEXT).getByRole('button', { name: 'Unlock' }).count()) await clickFor(page, y.row(FY_NEXT).getByRole('button', { name: 'Unlock' }));
+    if (await y.row(fy).getByRole('button', { name: 'Unlock' }).count()) await clickFor(page, y.row(fy).getByRole('button', { name: 'Unlock' }));
   }
 });
 
@@ -174,14 +173,14 @@ qaTest('TC-APP019-020', async ({ page, qa }) => {
 
 qaTest('TC-APP019-021', async ({ page, qa }) => {
   const y = new Years(page);
-  await ensureFyNext(page);
+  const fy = await ensureFyNext(page);
   await qa.step(1, async () => {
     await y.open();
-    const buttons = (await y.row(FY_NEXT).getByRole('button').allInnerTexts()).map((b) => b.trim());
+    const buttons = (await y.row(fy).getByRole('button').allInnerTexts()).map((b) => b.trim());
     if (!buttons.some((b) => /edit/i.test(b))) qa.deviation(1, 'The year can be edited while nothing is booked in it', `the row offers ${buttons.join(', ')}`);
   });
   await qa.step(2, async () => {
-    const buttons = (await y.row(FY_NEXT).getByRole('button').allInnerTexts()).map((b) => b.trim());
+    const buttons = (await y.row(fy).getByRole('button').allInnerTexts()).map((b) => b.trim());
     if (!buttons.some((b) => /delete|remove/i.test(b))) qa.deviation(2, 'A delete, offered while the year is empty', `the row offers ${buttons.join(', ')}`);
   });
   await qa.step(3, async () => {
@@ -197,11 +196,11 @@ qaTest('TC-APP019-021', async ({ page, qa }) => {
   await qa.step(4, async () => {
     qa.note(4, 'run on FY-NEXT instead of FY-OPEN: locking the open year would stop the postings of every other module');
     await y.open();
-    const toasts = await clickFor(page, y.row(FY_NEXT).getByRole('button', { name: 'Lock' }));
+    const toasts = await clickFor(page, y.row(fy).getByRole('button', { name: 'Lock' }));
     const asked = await page.getByRole('alertdialog').count();
     if (!asked) qa.deviation(4, 'A question to confirm before the year is locked', `locked at once ("${toasts.join(' / ')}")`);
     await y.open();
-    if (await y.row(FY_NEXT).getByRole('button', { name: 'Unlock' }).count()) await clickFor(page, y.row(FY_NEXT).getByRole('button', { name: 'Unlock' }));
+    if (await y.row(fy).getByRole('button', { name: 'Unlock' }).count()) await clickFor(page, y.row(fy).getByRole('button', { name: 'Unlock' }));
   });
 });
 

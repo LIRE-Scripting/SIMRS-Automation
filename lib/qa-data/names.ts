@@ -54,3 +54,16 @@ export function uniqueMrn(year = new Date().getFullYear()): string {
 export function qaCode(excelValue: string): string {
   return `${qaPrefix(excelValue)}-${uniqueToken()}`;
 }
+
+/**
+ * A code for the workbook's "QA-101" that sorts before every earlier one: "QA-0<countdown>-101<worker><counter>".
+ * Pickers and strips that list records in code order show only the first ones (found blocker 40), so a record made with
+ * qaCode (whose token grows with time) sorts after hundreds of earlier test records and is not offered. Used for beds
+ * (vacant-bed strip, bed pickers) and for accounts (account pickers of Finance documents).
+ */
+export function firstCode(excelValue: string): string {
+  counter += 1;
+  const countdown = (36 ** 8 - Date.now()).toString(36).toUpperCase().padStart(8, '0');
+  const worker = process.env.TEST_WORKER_INDEX ?? '0';
+  return `QA-0${countdown}-${qaPrefix(excelValue).slice(3)}${worker}${counter.toString(36).toUpperCase()}`;
+}

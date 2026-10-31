@@ -10,7 +10,7 @@ import { Ward } from './helpers';
 export async function admitted(page: Page, qa: Qa, excelName: string, excelBed = 'QA-101'): Promise<{ name: string; bed: string }> {
   const beds = new BedsPage(page);
   const adm = new AdmissionsPage(page);
-  const bed = qa.code(excelBed);
+  const bed = qa.bed(excelBed);
   const name = qa.name(excelName);
   await beds.open();
   await beds.add({ no: bed, description: 'QA Kelas 1' });

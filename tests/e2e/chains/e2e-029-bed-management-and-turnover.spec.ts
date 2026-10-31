@@ -21,7 +21,7 @@ chainTest('E2E-029', async ({ page, chain }) => {
   let second = '';
 
   const bed = await chain.step(1, async (qa) => {
-    const no = qa.code('QA-101');
+    const no = qa.bed('QA-101');
     const d = beds.dialog();
     await qa.step(1, async () => {
       await page.goto('/id/apps');

@@ -24,7 +24,7 @@ const DESCRIPTION = 'QA Kelas 1';
 /** Adds the workbook's bed (QA-101, QA-102, …) made unique, and returns its number. */
 async function newBed(page: Page, qa: Qa, excelNo: string, extra: { active?: boolean; availability?: string } = {}): Promise<string> {
   const beds = new BedsPage(page);
-  const no = qa.code(excelNo);
+  const no = qa.bed(excelNo);
   await beds.open();
   await beds.add({ no, description: DESCRIPTION, ...extra });
   return no;
@@ -46,7 +46,7 @@ const n = (s: string) => Number(s.replace(/[^\d.-]/g, ''));
 qaTest('TC-APP004-001', async ({ page, qa }) => {
   const beds = new BedsPage(page);
   const adm = new AdmissionsPage(page);
-  const no = qa.code('QA-101');
+  const no = qa.bed('QA-101');
   const d = beds.dialog();
 
   await qa.step(1, async () => {
@@ -211,7 +211,7 @@ qaTest('TC-APP004-029', async ({ page, qa }) => {
   const name = qa.name('QA-INP Pasien Satu');
   await adm.open();
   await adm.admit(name, bed1);
-  const renamed = qa.code('QA-111');
+  const renamed = qa.bed('QA-111');
   await beds.open();
   await beds.search(bed1);
   const edit = beds.row(bed1).getByRole('button', { name: 'Edit' });

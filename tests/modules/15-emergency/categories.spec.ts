@@ -52,6 +52,7 @@ class Categories {
   }
   async cells(description: string): Promise<string[]> {
     await this.main.getByRole('searchbox', { name: 'Search' }).fill(description);
+    await this.row(description).first().waitFor();
     return (await this.row(description).getByRole('cell').allInnerTexts()).map((t) => t.trim());
   }
   async fill(v: { description?: string; colour?: string; minutes?: string; active?: boolean }): Promise<void> {

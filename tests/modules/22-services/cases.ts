@@ -304,7 +304,10 @@ export class Desk {
   async row(text: string): Promise<Locator> {
     await this.open();
     const search = this.main.getByRole('textbox', { name: 'Search' }).or(this.main.getByRole('searchbox'));
-    if (await search.count()) await search.first().fill(text);
+    if (await search.count()) {
+      await search.first().fill(text);
+      await search.first().press('Enter');
+    }
     const r = this.rows().filter({ hasText: text });
     // The list shows its first rows only and the search narrows those (found blocker 40).
     if (!(await r.first().waitFor({ timeout: 10_000 }).then(() => true, () => false))) throw new NotOffered(`${text} is not among the rows the list shows (found blocker 40)`);
@@ -314,7 +317,10 @@ export class Desk {
   async find(text: string): Promise<Locator | null> {
     await this.open();
     const search = this.main.getByRole('textbox', { name: 'Search' }).or(this.main.getByRole('searchbox'));
-    if (await search.count()) await search.first().fill(text);
+    if (await search.count()) {
+      await search.first().fill(text);
+      await search.first().press('Enter');
+    }
     const r = this.rows().filter({ hasText: text }).first();
     return (await r.waitFor({ timeout: 10_000 }).then(() => true, () => false)) ? r : null;
   }

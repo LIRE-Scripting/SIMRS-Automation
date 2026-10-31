@@ -124,7 +124,7 @@ chainTest('E2E-024', async ({ page, chain }) => {
   await chain.step(5, async (qa) => {
     const adm = new AdmissionsPage(page);
     const beds = new BedsPage(page);
-    const bed2 = qa.code('QA-102');
+    const bed2 = qa.bed('QA-102');
     await beds.open();
     await beds.add({ no: bed2, description: DESCRIPTION });
     const name = victims[0].fullName;

@@ -468,6 +468,7 @@ export const FOUND_BLOCKERS: FoundBlocker[] = [
     who: 'Development',
     howFound: 'Seen on the site (full run of 2026-10-21, docs/qa/run-summary-2026-10-21.md)',
     testCases: [
+      { id: 'TC-APP022-005', steps: [3, 4, 5, 6] },
       { id: 'TC-APP022-006', steps: [3] },
       { id: 'TC-APP005-017', steps: [1, 2, 3, 4, 5] },
       { id: 'TC-APP007-008', steps: [3, 4] },
@@ -760,6 +761,7 @@ export const FOUND_BLOCKERS: FoundBlocker[] = [
     testCases: [
       { id: 'TC-APP007-001', steps: [4] },
       { id: 'TC-APP005-040', steps: [2, 5] },
+      { id: 'TC-APP005-044', steps: [2] },
     ],
   },
   {

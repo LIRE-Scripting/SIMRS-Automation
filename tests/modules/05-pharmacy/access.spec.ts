@@ -126,11 +126,16 @@ qaTest('TC-APP005-044', async ({ page, qa, browser }) => {
       }
     });
 
+    let listed = true;
     await qa.step(2, async () => {
       const il = new IssueLinesPage(staff);
       await il.open();
       await il.search.fill(it.name);
       const r = lineRow(il, it.name);
+      if (!(await r.first().waitFor({ timeout: 15_000 }).then(() => true, () => false))) {
+        listed = false;
+        return qa.note(2, `Issue Lines does not list the sale of ${it.name} made just before (found blocker 51)`);
+      }
       await expect(r).toHaveCount(1);
       await staff.waitForLoadState('networkidle').catch(() => {});
       await r.getByRole('spinbutton', { name: 'Qty' }).fill('1');
@@ -140,6 +145,7 @@ qaTest('TC-APP005-044', async ({ page, qa, browser }) => {
       await mine.search.fill(it.name);
       await expect.poll(async () => (await mine.cells(lineRow(mine, it.name)))[5]).toBe('0');
     });
+    if (!listed) qa.blocked(2, 51);
 
     await qa.step(3, async () => {
       const il = new IssueLinesPage(staff);

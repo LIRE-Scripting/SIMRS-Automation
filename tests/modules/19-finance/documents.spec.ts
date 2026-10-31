@@ -2,7 +2,8 @@ import type { Locator, Page } from '@playwright/test';
 import { expect, qaTest, test, type Qa } from '../../../fixtures/e2e';
 import { installToastRecorder, toastMark } from '../../../lib/assertions';
 import { addDays, todayWib } from '../../../lib/dates';
-import { clickFor, toastsAfter } from './helpers';
+import { clickFor, createAccount, toastsAfter } from './helpers';
+import { firstCode } from '../../../lib/qa-data/names';
 
 /**
  * 19-finance.xlsx, the vouchers of Finance (/finance/documents/<kind>: bank
@@ -111,8 +112,14 @@ function headerOf(qa: Qa, date = todayWib()): Record<string, string> {
  * first offered QA bank account, 4101 · Pendapatan and the first offered QA
  * equity account are used, by the start of their codes.
  */
-async function accountsOf(_page: Page, _qa: Qa): Promise<{ bank: string; income: string; equity: string }> {
-  return { bank: 'QA-1010', income: '4101', equity: 'QA-3010' };
+/**
+ * The accounts of the lines: a test bank account, the seed income account and an equity account of this test. The
+ * account picker offers only the first accounts in code order (found blocker 40); the many QA-1010/1501/2110 accounts
+ * of earlier runs push QA-3010 past them, so the equity account gets a code that sorts first.
+ */
+async function accountsOf(page: Page, qa: Qa): Promise<{ bank: string; income: string; equity: string }> {
+  const equity = await createAccount(page, { code: firstCode('QA-3010'), name: qa.name('QA Modal Uji'), kind: 'Equity' });
+  return { bank: 'QA-1010', income: '4101', equity: equity.code };
 }
 
 /** A saved document of a kind; returns its number (new in the list) and the toasts. */

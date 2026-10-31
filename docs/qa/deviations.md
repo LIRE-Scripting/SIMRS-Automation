@@ -1,35 +1,36 @@
 # Deviasi: langkah yang berjalan tetapi hasilnya berbeda dari workbook
 
-Dibangun 2026-10-31 12:33 UTC dari `reports/summary/run-summary.json` (hasil terbaru tiap test case dan rantai). Bangun ulang: `npm run qa:run-summary && npm run qa:findings-md`.
+Dibangun 2026-10-31 16:44 UTC dari `reports/summary/run-summary.json` (hasil terbaru tiap test case dan rantai). Bangun ulang: `npm run qa:run-summary && npm run qa:findings-md`.
 
 Deviasi = langkah **bisa dijalankan**, tetapi yang tampil di site tidak sama dengan *Expected Result* workbook. Di workbook hasil, langkahnya berstatus **Failed** dengan perilaku site di *Actual Result*. Blocker (langkah tidak bisa dijalankan sama sekali) ada di `docs/qa/blockers-found.md`.
 
-**698 deviasi** di **347 test case** dan **15 rantai E2E**.
+**705 deviasi** di **348 test case** dan **15 rantai E2E**.
 
 | Modul | Test case / rantai dengan deviasi | Jumlah deviasi |
 |---|---:|---:|
-| [01 Ambulatory Care](#01-ambulatory-care) | 35 | 68 |
+| [01 Ambulatory Care](#01-ambulatory-care) | 34 | 67 |
 | [02 Appointment](#02-appointment) | 13 | 22 |
-| [03 Patient Care](#03-patient-care) | 21 | 27 |
-| [04 Inpatient](#04-inpatient) | 23 | 35 |
+| [03 Patient Care](#03-patient-care) | 21 | 28 |
+| [04 Inpatient](#04-inpatient) | 22 | 35 |
 | [05 Pharmacy](#05-pharmacy) | 20 | 28 |
-| [06 Transfusion Medicine](#06-transfusion-medicine) | 9 | 12 |
+| [06 Transfusion Medicine](#06-transfusion-medicine) | 9 | 13 |
 | [07 Inventory](#07-inventory) | 21 | 37 |
-| [08 Operation Theater](#08-operation-theater) | 17 | 33 |
+| [08 Operation Theater](#08-operation-theater) | 17 | 32 |
 | [09 Procurement](#09-procurement) | 18 | 42 |
 | [10 HR](#10-hr) | 17 | 39 |
 | [11 Laboratory](#11-laboratory) | 13 | 29 |
-| [12 RIS](#12-ris) | 13 | 22 |
-| [13 Dietary](#13-dietary) | 17 | 51 |
-| [14 Hospital Accounts](#14-hospital-accounts) | 15 | 20 |
+| [12 RIS](#12-ris) | 13 | 21 |
+| [13 Dietary](#13-dietary) | 18 | 54 |
+| [14 Hospital Accounts](#14-hospital-accounts) | 14 | 19 |
 | [15 Emergency](#15-emergency) | 17 | 36 |
 | [16 MRD](#16-mrd) | 18 | 48 |
 | [17 Payroll](#17-payroll) | 4 | 8 |
-| [18 Settings](#18-settings) | 21 | 50 |
-| [19 Finance](#19-finance) | 23 | 41 |
+| [18 Settings](#18-settings) | 21 | 52 |
+| [19 Finance](#19-finance) | 25 | 44 |
 | [20 Budget](#20-budget) | 5 | 7 |
 | [21 CSSD](#21-cssd) | 4 | 11 |
 | [22 Services](#22-services) | 1 | 1 |
+| [23 Sourcing](#23-sourcing) | 1 | 1 |
 | [24 Housekeeping](#24-housekeeping) | 2 | 2 |
 | [Rantai E2E](#rantai-e2e) | 15 | 29 |
 
@@ -40,7 +41,6 @@ Deviasi = langkah **bisa dijalankan**, tetapi yang tampil di site tidak sama den
 | TC-APP001-006 | Registering a newborn with the mother | 5 | "Mother" shows PT-MOM's MRN and name as a link | "Mother" shows an internal id (UUID) as plain text |
 | TC-APP001-006 | Registering a newborn with the mother | 6 | The dialog changes to PT-MOM | there is no mother link to click |
 | TC-APP001-019 | Arrival: number issued and patient called | 4 | the button is replaced by the word "Called" | the button is replaced by "Start encounter" (actions: Start encounter Set MLC Record document) |
-| TC-APP001-021 | Called patient on the queue board | 2 | Within a few seconds the board row moves to the top with status "CALLED", without a reload | no row of PT-1 appears on the open board within 10 s |
 | TC-APP001-026 | Hub, navigation and Indonesian | 1 | a button "New Registration" | "New Registration" is a link |
 | TC-APP001-027 | Same person registered twice when duplicate fields are set | 1 | Toast "A patient already matches the duplicate fields" | toast "Registration failed" (HTTP 500) |
 | TC-APP001-028 | Same person registered twice with the default settings | 1 | A warning that a patient with these details exists, before or instead of saving | saved without a warning (toast "Patient registered") |
@@ -70,13 +70,13 @@ Deviasi = langkah **bisa dijalankan**, tetapi yang tampil di site tidak sama den
 | TC-APP001-040 | Identity details the form does not ask for | 2 | Shown in the details and in the list | not shown (no such data is kept) |
 | TC-APP001-042 | Merge made by mistake | 1 | A question to confirm, naming both patients, before anything changes | merged at once (toast "Patients merged") |
 | TC-APP001-042 | Merge made by mistake | 2 | An undo or a merge history | neither exists on Registered Patients |
-| TC-APP001-042 | Merge made by mistake | 3 | PT-DUP-B's arrival is shown under PT-DUP-A | the arrival still shows PT-DUP-B's MRN MRN-2026-336EA82D |
+| TC-APP001-042 | Merge made by mistake | 3 | PT-DUP-B's arrival is shown under PT-DUP-A | the arrival still shows PT-DUP-B's MRN MRN-2026-707F8C2A |
 | TC-APP001-043 | Patient registered at another branch | 1 | PT-1 is found | searching PT-1's MRN and name on Kemayoran finds nothing |
 | TC-APP001-043 | Patient registered at another branch | 2 | PT-1 is offered | PT-1 is not offered in Book and Arrive on Kemayoran |
 | TC-APP001-045 | Daily quota used up | 2 | Toast "The daily quota is full" | the toast says "Booking failed", with no word of the quota |
 | TC-APP001-046 | Two bookings in the same open time | 2 | 08:00 is no longer offered | 08:00 is still offered and chosen first |
 | TC-APP001-046 | Two bookings in the same open time | 3 | A warning that PT-1 already has this appointment | booked a second time (toast "Appointment booked") |
-| TC-APP001-047 | Booking for a day that has passed | 1 | The past day cannot be chosen, or no open time is offered | 2026-10-28 can be chosen and offers 08:00, 08:30, 09:00, 09:30, 10:00, 10:30, 11:00, 11:30 |
+| TC-APP001-047 | Booking for a day that has passed | 1 | The past day cannot be chosen, or no open time is offered | 2026-10-30 can be chosen and offers 08:00, 08:30, 09:00, 09:30, 10:00, 10:30, 11:00, 11:30 |
 | TC-APP001-048 | Booking form that is not complete | 2 | A message that the department is missing | the click does nothing: no message, the dialog stays open |
 | TC-APP001-048 | Booking form that is not complete | 3 | A message that the department is missing | the click does nothing: no message, the dialog stays open |
 | TC-APP001-049 | Reschedule that must be refused | 3 | Refused: a cancelled appointment cannot be moved | refused with toast "Booking failed" |
@@ -91,20 +91,20 @@ Deviasi = langkah **bisa dijalankan**, tetapi yang tampil di site tidak sama den
 | TC-APP001-052 | Block that is wrong or must be lifted | 2 | A warning that PT-1 is booked in that time | blocked without a warning; PT-1 stays booked |
 | TC-APP001-052 | Block that is wrong or must be lifted | 3 | The block is listed and can be removed | no list of blocks and no way to remove one |
 | TC-APP001-054 | Date range that is too long or the wrong way round | 3 | A message that the From date is after the To date | no message; the list is empty ("No appointments in this view.") |
-| TC-APP001-055 | Appointment that turns into a visit | 1 | PT-1's appointment is offered for check-in | Arrival shows no appointments; the patient is searched and the department picked again |
-| TC-APP001-055 | Appointment that turns into a visit | 3 | PT-1's row no longer reads "Waiting" | the appointment still reads "Waiting" |
 | TC-APP001-056 | Arrive form: patient already waiting, department not chosen | 1 | Toast "This patient is already waiting in that department". No new number | toast "Arrival failed" |
 | TC-APP001-056 | Arrive form: patient already waiting, department not chosen | 3 | The button is disabled until a department is picked | "Arrive" is enabled; the empty field already holds a department (id set) |
 | TC-APP001-057 | Calling twice, out of turn, or by mistake | 2 | A warning that 002 is before 003, or the call is not offered | 003 is called with no warning |
 | TC-APP001-057 | Calling twice, out of turn, or by mistake | 3 | Present: call again, mark as not present, end the visit, undo a call | the rows offer Start encounter, Set MLC, Record document, Call |
-| TC-APP001-060 | What the public queue board shows | 1 | The patient's name shortened or hidden, and no MRN | full name "QA-AMB Pasien Satu MVSUD3FL504" and MRN shown |
+| TC-APP001-060 | What the public queue board shows | 1 | The patient's name shortened or hidden, and no MRN | full name "QA-AMB Pasien Satu MVWK3JL2004" and MRN shown |
 | TC-APP001-060 | What the public queue board shows | 2 | A word such as "Waiting" | Status "A" |
+| TC-APP001-060 | What the public queue board shows | 3 | The board does not change | a row for the booking of 2026-11-09 appears at once, with its token, name and MRN |
 | TC-APP001-062 | User with no front-desk role reads the register | 1 | No "Ambulatory Care" card, or the card opens a "no access" page | the card is shown to U3 (no rights) and opens /id/registration |
 | TC-APP001-062 | User with no front-desk role reads the register | 2 | Access refused | U3 (no rights) reads /id/registration/patients ("Registered Patients", 10 rows) |
-| TC-APP001-062 | User with no front-desk role reads the register | 3 | Access refused | U3 (no rights) reads /id/registration/appointments ("Appointments", 4 rows) and /id/registration/department-queue ("Arrival", 10 rows) |
+| TC-APP001-062 | User with no front-desk role reads the register | 3 | Access refused | U3 (no rights) reads /id/registration/appointments ("Appointments", 1 rows) and /id/registration/department-queue ("Arrival", 10 rows) |
 | TC-APP001-065 | Opening the register without being signed in | 3 | The page that was asked for | after signing in: /id/login |
 | TC-APP001-068 | Double click, two clerks at once, and reload | 2 | One is saved; the other gets "MRN already exists for this tenant" | 0 saved |
 | TC-APP001-068 | Double click, two clerks at once, and reload | 4 | The entries are kept, or the clerk is warned before leaving | the half-filled form is lost with no warning |
+| TC-APP001-071 | Without the write privilege: "Tambah" | 1 | Refused for lack of the right | saved by U3 |
 
 ## 02 Appointment
 
@@ -113,7 +113,7 @@ Deviasi = langkah **bisa dijalankan**, tetapi yang tampil di site tidak sama den
 | TC-APP002-009 | Daily quota used up | 2 | Toast "The daily quota is full" | the toast says "Booking failed", with no word of the quota |
 | TC-APP002-010 | Two bookings in the same open time | 2 | 08:00 is no longer offered | 08:00 is still offered and chosen first |
 | TC-APP002-010 | Two bookings in the same open time | 3 | A warning that PT-1 already has this appointment | booked a second time (toast "Appointment booked") |
-| TC-APP002-011 | Booking for a day that has passed | 1 | The past day cannot be chosen, or no open time is offered | 2026-10-28 can be chosen and offers 08:00, 08:30, 09:00, 09:30, 10:00, 10:30, 11:00, 11:30 |
+| TC-APP002-011 | Booking for a day that has passed | 1 | The past day cannot be chosen, or no open time is offered | 2026-10-30 can be chosen and offers 08:00, 08:30, 09:00, 09:30, 10:00, 10:30, 11:00, 11:30 |
 | TC-APP002-012 | Booking form that is not complete | 2 | A message that the department is missing | the click does nothing: no message, the dialog stays open |
 | TC-APP002-012 | Booking form that is not complete | 3 | A message that the department is missing | the click does nothing: no message, the dialog stays open |
 | TC-APP002-013 | Reschedule that must be refused | 3 | Refused: a cancelled appointment cannot be moved | refused with toast "Booking failed" |
@@ -142,14 +142,15 @@ Deviasi = langkah **bisa dijalankan**, tetapi yang tampil di site tidak sama den
 | TC-APP003-014 | Hub, navigation and Indonesian | 1 | Button "Open Consultation" | "Open Consultation" is a link |
 | TC-APP003-016 | Order form that is not complete | 3 | The empty field is marked | no field is marked and no message is shown; "Submit order" is only disabled |
 | TC-APP003-020 | Doctor authorises their own restricted order | 1 | Refused: the person who ordered cannot authorise | authorised at once (toast "Order authorised.") |
-| TC-APP003-021 | Restricted orders of other patients in the list | 1 | Only PT-1's waiting orders | the list also shows 8 order(s) of other patients, by name only (e.g. "QA-PCR Pasien Satu MVT2MD7F002 — Meropenem 1g Injection") |
+| TC-APP003-021 | Restricted orders of other patients in the list | 1 | Only PT-1's waiting orders | the list also shows 3 order(s) of other patients, by name only (e.g. "QA-PCR Pasien Satu MVWKJZQZ002 — Meropenem 1g Injection") |
 | TC-APP003-022 | SOAP note when the patient is opened again | 1 | The SOAP tab shows the saved text | the four areas are empty |
 | TC-APP003-022 | SOAP note when the patient is opened again | 2 | The SOAP tab shows the saved text | the four areas are empty |
 | TC-APP003-023 | SOAP note as a medical record | 2 | A second note; the earlier note is kept with its date and author | Doctor 2 sees no earlier note: the draft is kept in the first session only |
 | TC-APP003-023 | SOAP note as a medical record | 3 | A sign or finalise control, after which the note is read-only | no sign or finalise control on SOAP |
 | TC-APP003-025 | Vitals and diagnosis | 2 | A vitals form | no place to record vital signs on Consultation |
 | TC-APP003-025 | Vitals and diagnosis | 3 | A diagnosis field or list | no coded diagnosis on Consultation |
-| TC-APP003-026 | Ordering a drug the patient is allergic to | 1 | An allergy warning | no allergy warning (toast "Add at least one item name.") |
+| TC-APP003-026 | Ordering a drug the patient is allergic to | 1 | An allergy warning | no allergy warning (toast "No drug interactions detected.") |
+| TC-APP003-026 | Ordering a drug the patient is allergic to | 2 | The order is blocked or needs an acknowledgement | placed at once (toast "Order placed.") |
 | TC-APP003-027 | Two patients with the same name | 2 | A row that shows which of the two patients the order is for | the row names the patient only, with no MRN |
 | TC-APP003-028 | Misspelt drug name | 1 | Suggestions from the drug list | no list of matching drugs |
 | TC-APP003-028 | Misspelt drug name | 2 | The misspelling is refused or corrected | the order is placed with "Paracetmol 500 mg tab" |
@@ -162,7 +163,7 @@ Deviasi = langkah **bisa dijalankan**, tetapi yang tampil di site tidak sama den
 | TC-APP003-036 | User with no clinical role opens a consultation | 1 | No "Patient Care" card, or the card opens a "no access" page | the card is shown to U3 (no right) and opens /id/clinical |
 | TC-APP003-036 | User with no clinical role opens a consultation | 2 | Access refused | U3 (no right) reads /clinical/consultation ("Consultation", 0 rows; the patient search offers 8 patients) |
 | TC-APP003-040 | Session ends or the page reloads during a consultation | 1 | The entries are kept, or the doctor is warned before leaving | the page returns to the empty "Select patient" screen with no warning |
-| TC-APP003-051 | Radiology order without a patient | 1 | The patient's name and MRN on the order | the order row has no patient: "RAD-1793255668 QA Foto toraks PA MVT631KZ104 — — — —" |
+| TC-APP003-051 | Radiology order without a patient | 1 | The patient's name and MRN on the order | the order row has no patient: "RAD-1793461715 QA Foto toraks PA MVWKLNRE010 — — — —" |
 | TC-APP003-053 | Follow-up without a note | 1 | The browser asks for the note (required field); nothing is sent | "Save" stays disabled while Note is empty; nothing can be sent |
 
 ## 04 Inpatient
@@ -177,7 +178,7 @@ Deviasi = langkah **bisa dijalankan**, tetapi yang tampil di site tidak sama den
 | TC-APP004-021 | Admitting someone who is not a registered patient | 1 | A search of registered patients by MRN or name, not a free text field | "Patient name" is a free text field |
 | TC-APP004-021 | Admitting someone who is not a registered patient | 2 | Refused: the person must be registered first | admitted (toast "Patient admitted") |
 | TC-APP004-021 | Admitting someone who is not a registered patient | 3 | The MRN is shown with the name | the stay has no MRN |
-| TC-APP004-024 | Same patient admitted twice | 1 | A warning that this patient already has an open stay on QA-101-MVTN3VWI402 | admitted a second time with no warning |
+| TC-APP004-024 | Same patient admitted twice | 1 | A warning that this patient already has an open stay on QA-0D43DDQBW-10102 | admitted a second time with no warning |
 | TC-APP004-024 | Same patient admitted twice | 2 | PT-1 on one bed | 2 open stays |
 | TC-APP004-025 | Admit form that is not complete | 3 | Refused with a message that names the length limit | refused with "failed to admit" |
 | TC-APP004-028 | Bed number used twice or left empty | 1 | Refused: the number is already used in this branch | saved a second bed with the same number (toast "Bed created") |
@@ -188,7 +189,8 @@ Deviasi = langkah **bisa dijalankan**, tetapi yang tampil di site tidak sama den
 | TC-APP004-031 | Admission details the form does not ask for | 2 | The admission time can be set to the real time | no time field: the admission time is the moment of saving |
 | TC-APP004-032 | Admission or discharge made by mistake | 1 | A cancel action with a reason | no cancel; "Discharge" is disabled without a bed |
 | TC-APP004-032 | Admission or discharge made by mistake | 3 | A reopen action, or a note that the patient must be admitted again | only the barcode button is left |
-| TC-APP004-033 | Admission and discharge numbers | 1 | Refused: the number is in use | admitted with QA-RI-VWI406 a second time |
+| TC-APP004-033 | Admission and discharge numbers | 1 | Refused: the number is in use | admitted with QA-RI-84Q004 a second time |
+| TC-APP004-033 | Admission and discharge numbers | 2 | Two different numbers | both got ADM-1793464796 |
 | TC-APP004-038 | Billing marked cleared without a settled bill | 1 | Refused: the bill is not settled, or only a cashier may do this | the nurse marks the billing cleared |
 | TC-APP004-038 | Billing marked cleared without a settled bill | 3 | Present: a way to take a wrong mark back | the row offers , , Discharge |
 | TC-APP004-042 | Discharge takes effect before it is approved | 1 | The stay shows that a discharge is waiting for approval; the patient still holds the bed | the stay reads "Discharged" at once |
@@ -202,7 +204,6 @@ Deviasi = langkah **bisa dijalankan**, tetapi yang tampil di site tidak sama den
 | TC-APP004-058 | Putting a patient on the admission waiting list | 1 | A field "Branch" | no Branch field (U1 works on one branch) |
 | TC-APP004-060 | Request with an inactive type | 1 | A type shown with "(No)" can be chosen | inactive types are not offered |
 | TC-APP004-061 | Request with all branches active | 1 | Toast "Failed to save"; nothing is sent | nothing is sent and no message is shown |
-| TC-APP004-064 | Request already decided in another session | 1 | Toast "That request is no longer waiting" | toast "Failed to save" |
 | TC-APP004-077 | Recording a dose on the ward | 2 | "Branch", "Patient", "Order", "Status" and "Reason" | no "Branch" field (U1 works on one branch) |
 
 ## 05 Pharmacy
@@ -233,9 +234,9 @@ Deviasi = langkah **bisa dijalankan**, tetapi yang tampil di site tidak sama den
 | TC-APP005-046 | Pharmacist sees and touches only their own branch | 5 | Stores of Podomoro only | stores of Kemayoran offered to U1: FB-DRI, FI01-01-01, FE03-00-02 |
 | TC-APP005-049 | Messages the pharmacist sees when a sale is refused | 1 | A short sentence without technical words | raw server text: advanceDispense: 400 pharmacy: not enough stock inventory: not enough stock (QA-PARA-MVWAEN2800P); advanceDispense: 400 Patient has been admitted |
 | TC-APP005-049 | Messages the pharmacist sees when a sale is refused | 2 | The same sentences in Indonesian | English server text: advanceDispense: 400 pharmacy: not enough stock inventory: not enough stock (QA-PARA-MVWAEN2800P); advanceDispense: 400 Patient has been admitted |
-| TC-APP005-051 | Adding a generic drug and a dosing frequency to the catalogue | 1 | Pharmacy has "Catalogue" | the Pharmacy hub has no "Catalogue" (links: Home, Ambulatory Care Pendaftaran pasien, check-in, MRN, Appointment Jadwal, reschedule, blok konsultan, Patient Care SOAP, vitals, diagnosis, Inpatient Admission, transfer, discharge, Pharmacy Dispense, OTC, retur, Transfusion Medicine Donor, crossmatch, issue, Inventory Stok, GRN, mutasi, Operation Theater Jadwal & konsumsi OT, Procurement PR, PO, tender, HR Karyawan & cuti, Laboratory Sampel, hasil, sertifikasi, RIS Order & jadwal modality, Dietary Diet pasien rawat inap, Hospital Accounts Invoice, deposit, kasir, Emergency Triage & bay IGD, MRD Berkas & peminjaman RM, Payroll Gaji & payslip, Settings Master Data — sites, departments, service centers, Finance Voucher & GL, Budget Ceilings, allocation, sanction, CSSD Set steril, siklus, distribusi, Services Jasa internal, tanpa stok, Sourcing Tender sampai perjanjian, Housekeeping Lokasi, kontrak, catatan, tagihan, Linen Toko, resep, sirkulasi, Maintenance Rencana, perintah kerja, AMC, Fixed assets Register, susut, penitipan); /pharmacy/catalogue opened by its address |
+| TC-APP005-051 | Adding a generic drug and a dosing frequency to the catalogue | 1 | Pharmacy has "Catalogue" | the Pharmacy hub has no "Catalogue" (links: Home, Apps, Dispense, Orders, Dispense, Issue Lines); /pharmacy/catalogue opened by its address |
 | TC-APP005-054 | Adding an alert rule and a vaccine type | 1 | Pharmacy has "Alerts" | the Pharmacy hub has no "Alerts" (links: Home, Ambulatory Care Pendaftaran pasien, check-in, MRN, Appointment Jadwal, reschedule, blok konsultan, Patient Care SOAP, vitals, diagnosis, Inpatient Admission, transfer, discharge, Pharmacy Dispense, OTC, retur, Transfusion Medicine Donor, crossmatch, issue, Inventory Stok, GRN, mutasi, Operation Theater Jadwal & konsumsi OT, Procurement PR, PO, tender, HR Karyawan & cuti, Laboratory Sampel, hasil, sertifikasi, RIS Order & jadwal modality, Dietary Diet pasien rawat inap, Hospital Accounts Invoice, deposit, kasir, Emergency Triage & bay IGD, MRD Berkas & peminjaman RM, Payroll Gaji & payslip, Settings Master Data — sites, departments, service centers, Finance Voucher & GL, Budget Ceilings, allocation, sanction, CSSD Set steril, siklus, distribusi, Services Jasa internal, tanpa stok, Sourcing Tender sampai perjanjian, Housekeeping Lokasi, kontrak, catatan, tagihan, Linen Toko, resep, sirkulasi, Maintenance Rencana, perintah kerja, AMC, Fixed assets Register, susut, penitipan); /pharmacy/alerts opened by its address |
-| TC-APP005-060 | Looking up what was issued to one patient | 2 | The block lists item names with the issued quantity | nothing is listed for the name or the MRN ("QA-PHA Pasien Satu MVT33CWN50I": toast "Saved", Nothing here yet.; "MRN-2026-5BE81AD6": toast "Saved", Nothing here yet.) |
+| TC-APP005-060 | Looking up what was issued to one patient | 2 | The block lists item names with the issued quantity | nothing is listed for the name or the MRN ("QA-PHA Pasien Satu MVWLDNCG007": toast "Saved", Nothing here yet.; "MRN-2026-90B35B54": toast "Saved", Nothing here yet.) |
 | TC-APP005-063 | Recording a dose in Pharmacy | 2 | Fields "Branch", "Patient", "Order", "Status" and "Reason" | no "Branch" field |
 
 ## 06 Transfusion Medicine
@@ -253,6 +254,7 @@ Deviasi = langkah **bisa dijalankan**, tetapi yang tampil di site tidak sama den
 | TC-APP006-055 | Patient's blood group typed by hand | 2 | Refused, or checked against an earlier group of this patient | saved (toast "Group saved") |
 | TC-APP006-062 | Quality-control value outside its limit | 1 | Toast "Quality control saved"; the line is marked as failed | refused: "bloodbank: invalid input: value is outside the limit" |
 | TC-APP006-064 | User with no blood bank role reads donor and patient data | 1 | No "Transfusion Medicine" card, or the card opens a "no access" page | the card is shown to U3 (no right) and opens /id/bloodbank |
+| TC-APP006-064 | User with no blood bank role reads donor and patient data | 2 | Access refused | U3 (no right) reads /bloodbank/donors ("", 0 rows) |
 | TC-APP006-064 | User with no blood bank role reads donor and patient data | 3 | Access refused | U3 (no right) reads /bloodbank/stock ("Stock", 10 rows) and /bloodbank/requisitions ("Blood request", 20 rows) |
 
 ## 07 Inventory
@@ -273,7 +275,7 @@ Deviasi = langkah **bisa dijalankan**, tetapi yang tampil di site tidak sama den
 | TC-APP007-021 | Batch that is already expired when received | 1 | Refused: the batch is expired | saved (toast "Batch quantity added.") |
 | TC-APP007-021 | Batch that is already expired when received | 2 | The batch is not listed | the expired batch is listed under "Stock on hand" |
 | TC-APP007-022 | Expiry of a batch changed by receiving it again | 1 | Refused: this batch is in stock with another expiry date | accepted (toast "Batch quantity added.") |
-| TC-APP007-022 | Expiry of a batch changed by receiving it again | 2 | QA-B002: 50, expiry in 20 days | the line reads "FI01-00-00 · QA-B002-MVT3RJDF02A 51 · 2028-10-28" |
+| TC-APP007-022 | Expiry of a batch changed by receiving it again | 2 | QA-B002: 50, expiry in 20 days | the line reads "FI01-00-00 · QA-B002-MVWJZP2E00J 51 · 2028-10-30" |
 | TC-APP007-023 | Correcting stock: adjustment, write-off and count | 1 | An adjustment with quantity and reason | the dialog offers only: Add batch, Add component, Save kit, Cancel, Save |
 | TC-APP007-023 | Correcting stock: adjustment, write-off and count | 2 | A reversal or an edit of the receipt | none on the item |
 | TC-APP007-023 | Correcting stock: adjustment, write-off and count | 3 | A disposal with a reason | none on the item |
@@ -288,13 +290,13 @@ Deviasi = langkah **bisa dijalankan**, tetapi yang tampil di site tidak sama den
 | TC-APP007-028 | Stock request form at its limits | 4 | Refused, or picked from a list | saved: the currency is free text |
 | TC-APP007-029 | Minimum and maximum stock | 2 | A list of items below minimum, with the quantity to order | no reorder list in Inventory |
 | TC-APP007-029 | Minimum and maximum stock | 3 | A warning that the maximum is passed | toast "Batch quantity added." |
-| TC-APP007-030 | Oldest received first, not first to expire | 2 | QA-NEW (B2-MVTNZ0P6204), which expires first, went down by 10 | B1-MVTNZ0P6204 40, B2-MVTNZ0P6204 50: the batch received first is issued first |
+| TC-APP007-030 | Oldest received first, not first to expire | 2 | QA-NEW (B2-MVWJQCAA006), which expires first, went down by 10 | B1-MVWJQCAA006 40, B2-MVWJQCAA006 50: the batch received first is issued first |
 | TC-APP007-031 | Freeze days at their limits | 1 | BR-A, the branch the user works on | the field shows "BR02 Daan Mogot" |
 | TC-APP007-031 | Freeze days at their limits | 3 | Refused: at most 3650 | toast "saveFreezeDays: 400 inventory: invalid stock" |
 | TC-APP007-033 | User with no warehouse role reads stock and costs | 1 | No "Inventory" card, or the card opens a "no access" page | the card is shown to U3 (no right) and opens /id/inventory |
 | TC-APP007-033 | User with no warehouse role reads stock and costs | 2 | Access refused | U3 (no right) reads /inventory/items ("Item Master", 25 rows; IT-1 (QA-INV-XSS-MV8QXF17100M) opens with its stock lines) |
 | TC-APP007-034 | Stores, stock and requests of another branch | 2 | Stores of Podomoro only under "Add batch" | stores of Kemayoran are offered too: FB-DRI, FI01-01-01, FE03-00-02 |
-| TC-APP007-038 | Double click, two users at once, and reload | 3 | The other is refused with "not enough stock" | the other reads "Minified React error #441; visit https://react.dev/errors/441 for the full message or use the non-minified dev environment for full errors and additional helpful warnings." |
+| TC-APP007-038 | Double click, two users at once, and reload | 3 | The other is refused with "not enough stock" | the other reads "advanceDispense: 400 pharmacy: dispense without stock detail is not allowed inventory: dispense without stock detail is not allowed (QA-INV-PARA-L-MVWJQCAA00A)" |
 | TC-APP007-038 | Double click, two users at once, and reload | 5 | The entries are kept, or the user is warned | the half-filled item is lost with no warning |
 
 ## 08 Operation Theater
@@ -325,7 +327,6 @@ Deviasi = langkah **bisa dijalankan**, tetapi yang tampil di site tidak sama den
 | TC-APP008-015 | Request form at its limits | 3 | Refused with a message that names the limit of 1,024, or the field stops there | toast "failed to create OT request" |
 | TC-APP008-016 | Finding a request and the new request after saving | 1 | The new request is the first row | the list starts with the lowest request number ("QA Appendektomi laparoskopi PRBMV8WIZEFA"); the new one is on the last page |
 | TC-APP008-016 | Finding a request and the new request after saving | 2 | A search by number or procedure | the list has no search field, only paging |
-| TC-APP008-016 | Finding a request and the new request after saving | 3 | Two different request numbers | both requests got OT-1793288277 |
 | TC-APP008-017 | Changing or cancelling a request | 1 | The request opens for editing | clicking the row opens nothing |
 | TC-APP008-017 | Changing or cancelling a request | 3 | A remarks field | no remarks field (only Reason, Operation note and Dossier id above the list) |
 | TC-APP008-019 | User with no theatre role reads the requests | 1 | No "Operation Theater" card, or the card opens a "no access" page | the card is shown to U3 (no right) and opens /id/ot |
@@ -333,7 +334,7 @@ Deviasi = langkah **bisa dijalankan**, tetapi yang tampil di site tidak sama den
 | TC-APP008-024 | Double click, two nurses at once, and reload | 3 | The text is kept, or the nurse is warned | the half-typed procedure is lost with no warning |
 | TC-APP008-025 | Request with patient, room, times and surgeon, placed on the calendar | 1 | A dialog with "Branch", … | no "Branch" field (the request takes the branch of the session) |
 | TC-APP008-037 | Billing policy: percentage per incision and department type | 2 | A dialog with "Branch", … | no "Branch" field |
-| TC-APP008-038 | Policy that must be refused | 1 | Refused: "incision, department type, and percentage are required" | "Saved." with the percentage empty (policy "QA-sama MVT6ABMP101") |
+| TC-APP008-038 | Policy that must be refused | 1 | Refused: "incision, department type, and percentage are required" | "Saved." with the percentage empty (policy "QA-sama MVWJVGTP004") |
 
 ## 09 Procurement
 
@@ -363,20 +364,20 @@ Deviasi = langkah **bisa dijalankan**, tetapi yang tampil di site tidak sama den
 | TC-APP009-020 | Changing or cancelling a purchase order, and paying the advance later | 2 | A cancellation with a reason | no cancel |
 | TC-APP009-020 | Changing or cancelling a purchase order, and paying the advance later | 3 | A payment entry; the balance drops by 1000000 | no payment entry; amount paid stays as typed at creation |
 | TC-APP009-020 | Changing or cancelling a purchase order, and paying the advance later | 4 | A printable purchase order | no print or send |
-| TC-APP009-022 | Advance payment and Finance | 1 | A payment voucher or a vendor advance for the order | no voucher names QA-PO-001-MVTODRND005 |
-| TC-APP009-022 | Advance payment and Finance | 2 | An amount owed to the vendor, or a commitment | no entry of 4,000,000 for QA-PO-001-MVTODRND005 |
+| TC-APP009-022 | Advance payment and Finance | 1 | A payment voucher or a vendor advance for the order | no voucher names QA-PO-001-MVWL1MYC005 |
+| TC-APP009-022 | Advance payment and Finance | 2 | An amount owed to the vendor, or a commitment | no entry of 4,000,000 for QA-PO-001-MVWL1MYC005 |
 | TC-APP009-022 | Advance payment and Finance | 3 | A warning or a refusal (larger than the department's budget) | created with no warning |
 | TC-APP009-023 | Amounts at their limits | 4 | Refused: an order needs an amount | saved with IDR 0,00 |
 | TC-APP009-023 | Amounts at their limits | 5 | Refused with a message about the size | toast "ERROR: numeric field overflow (SQLSTATE 22003)" |
 | TC-APP009-024 | Purchase order form at its limits | 2 | A message that the currency is missing | saved; Amount reads "IDR 100.000,00" |
 | TC-APP009-024 | Purchase order form at its limits | 3 | Refused, or the currency is chosen from a list | saved; Amount reads "xyz 5.000.000,00" |
 | TC-APP009-024 | Purchase order form at its limits | 5 | Refused, or a warning about the date | saved without a word: 1900-01-01, 2099-12-31 |
-| TC-APP009-025 | Two purchase orders with the same number | 1 | Refused: the number is already in use | a second order "QA-PO-001-MVTODRND007" is created |
-| TC-APP009-025 | Two purchase orders with the same number | 3 | Every number appears once | QA-PO-001-MVTODRND007, PO-1793286534 appear more than once |
+| TC-APP009-025 | Two purchase orders with the same number | 1 | Refused: the number is already in use | a second order "QA-PO-001-MVWL1MYC007" is created |
+| TC-APP009-025 | Two purchase orders with the same number | 3 | Every number appears once | QA-PO-001-MVWL1MYC007, PO-1793462392 appear more than once |
 | TC-APP009-026 | Finding a purchase order and the orders that wait for me | 1 | A search by document number or vendor | the list has no search |
 | TC-APP009-026 | Finding a purchase order and the orders that wait for me | 2 | A filter is present | the list has no filter by approval step or "waiting for me" |
 | TC-APP009-026 | Finding a purchase order and the orders that wait for me | 3 | The list sorts by that column | a click on a heading changes nothing |
-| TC-APP009-026 | Finding a purchase order and the orders that wait for me | 4 | The first row of the list | the first row is QA-PO-001-MVHTT7UV620C; QA-PO-001-MVS2VA99104 is on a later page |
+| TC-APP009-026 | Finding a purchase order and the orders that wait for me | 4 | The first row of the list | the first row is QA-PO-001-MVWB83UI00B; QA-PO-001-MVWKTWSG004 is on a later page |
 | TC-APP009-031 | User with no procurement role reads the purchase orders | 1 | No "Procurement" card, or the card opens a "no access" page | the card is shown to U3 (no right) and opens /id/procurement |
 | TC-APP009-031 | User with no procurement role reads the purchase orders | 2 | Access refused | U3 (no right) reads /procurement/purchase-orders ("Purchase orders", 10 rows) |
 | TC-APP009-036 | Double click, two approvers at once, and reload | 3 | The text is kept, or the officer is warned | the half-filled order is lost with no warning |
@@ -418,13 +419,13 @@ Deviasi = langkah **bisa dijalankan**, tetapi yang tampil di site tidak sama den
 | TC-APP010-033 | User without the HR right | 1 | Refused with a message that the user may not do this | toast "Could not save employee" |
 | TC-APP010-034 | User with no HR role reads every employee file | 1 | No "HR" card, or the card opens a "no access" page | the card is shown to U3 (no right) and opens /id/hr |
 | TC-APP010-034 | User with no HR role reads every employee file | 2 | Access refused | U3 (no right) reads /hr/employees ("Employee", 10 rows) |
-| TC-APP010-034 | User with no HR role reads every employee file | 3 | Not possible | U3 opens QA-EMP-001-MVS2XS0Z205 and walks through the six steps of the file |
+| TC-APP010-034 | User with no HR role reads every employee file | 3 | Not possible | U3 opens QA-EMP-001-MVWK8UBK00C and walks through the six steps of the file |
 | TC-APP010-034 | User with no HR role reads every employee file | 4 | Not possible | "Download" gives U3 the file employees.csv |
 | TC-APP010-034 | User with no HR role reads every employee file | 5 | Access refused | U3 (no right) reads /hr/leave-applications ("Leave applications", 10 rows) |
 | TC-APP010-038 | Script text in the file and formulas in the downloaded list | 3 | The second name is shown as text, not run as a formula | the cell begins with "=" as typed |
 | TC-APP010-039 | Double click, two admins at once, and reload | 1 | One employee. The button is disabled while it reads "Saving…" | 0 employees |
 | TC-APP010-040 | HR desk, My profile: adding an employee, linking my account, reading my profile | 4 | Toast "Saved." | refused: "hr: invalid input: duplicate": U1 is linked to the employee of an earlier run of this test, and the link is not moved to QA-EMP-01-MVW7XW2T001 |
-| TC-APP010-045 | HR desk, Year balance: comp-off for a worked day off | 1 | Toast "Saved."; a row for the comp-off with an id | "Saved.", but the list shows no row of QA-EMP-01-MVS3V1QW001 |
+| TC-APP010-045 | HR desk, Year balance: comp-off for a worked day off | 1 | Toast "Saved."; a row for the comp-off with an id | "Saved.", but the list shows no row of QA-EMP-01-MVWKC4JR001 |
 
 ## 11 Laboratory
 
@@ -441,7 +442,7 @@ Deviasi = langkah **bisa dijalankan**, tetapi yang tampil di site tidak sama den
 | TC-APP011-013 | Order form that is not complete, and free-text tests | 3 | The test is picked from the laboratory's list, so a misspelt name cannot be saved | the result type is free text; "Hemoglobn" is saved |
 | TC-APP011-013 | Order form that is not complete, and free-text tests | 4 | A warning about the repeated order, or both are kept on purpose | both are saved without a warning |
 | TC-APP011-015 | Step clicked by mistake | 1 | A question to confirm before the step is saved | saved at once (toast "") |
-| TC-APP011-015 | Step clicked by mistake | 2 | An undo, or a step back with a reason | no way back on the row (buttons: LAB-20261029-51692C0D, Accepted, Result status, Capture result, Handover, Print barcode); the Sample workflow has "Revert latest stamp" (TC-APP011-041) |
+| TC-APP011-015 | Step clicked by mistake | 2 | An undo, or a step back with a reason | no way back on the row (buttons: LAB-20261031-1F72F9EB, Accepted, Result status, Capture result, Handover, Print barcode); the Sample workflow has "Revert latest stamp" (TC-APP011-041) |
 | TC-APP011-016 | Sample that cannot be used, order that is not needed | 1 | "Reject sample" with a reason, which asks for a new sample | no "Reject sample" on the row; a reject is inside "Result status" |
 | TC-APP011-016 | Sample that cannot be used, order that is not needed | 2 | A cancellation with a reason | no cancel on the row |
 | TC-APP011-016 | Sample that cannot be used, order that is not needed | 3 | Rejected and cancelled orders have their own status | the status list holds All statuses, Ordered, Generated, Sent, Accepted, Resulted |
@@ -466,7 +467,7 @@ Deviasi = langkah **bisa dijalankan**, tetapi yang tampil di site tidak sama den
 |---|---|---:|---|---|
 | TC-APP012-006 | Hub, navigation and Indonesian | 1 | A button "Open orders" | "Open orders" is a link |
 | TC-APP012-007 | Radiology order without a patient | 1 | A patient must be picked from the register | the form has no patient field |
-| TC-APP012-007 | Radiology order without a patient | 2 | Each row shows the patient's name and MRN | the rows show reference and study only: RAD-1793259752 QA Thorax PA MVT8IVXP103 — — — — |
+| TC-APP012-007 | Radiology order without a patient | 2 | Each row shows the patient's name and MRN | the rows show reference and study only: RAD-1793460866 QA Thorax PA MVWK94RM003 — — — — |
 | TC-APP012-009 | Completing or correcting an order later | 1 | The order opens for editing | a row cannot be opened |
 | TC-APP012-010 | Status of an examination and the modality schedule | 1 | A status per order | columns: Order ref, Study, Study date, Accession, Reported by, Links |
 | TC-APP012-010 | Status of an examination and the modality schedule | 2 | A filter by status | no filter |
@@ -475,16 +476,15 @@ Deviasi = langkah **bisa dijalankan**, tetapi yang tampil di site tidak sama den
 | TC-APP012-012 | Dates that cannot be right | 1 | Refused, or a warning | saved with toast "Order created" |
 | TC-APP012-012 | Dates that cannot be right | 2 | Refused | saved with toast "Order created" |
 | TC-APP012-012 | Dates that cannot be right | 3 | Refused: a report needs a reporter | saved with toast "Order created" |
-| TC-APP012-013 | Study time shown on the list | 2 | Today 10:00 (2026-10-29) | "2026-10-29 03:00" |
-| TC-APP012-014 | Same reference or accession number twice | 1 | Refused: the reference is in use | a second order with QA-RAD-0001-MVTPO8X7001 is created |
-| TC-APP012-014 | Same reference or accession number twice | 2 | Refused, or a warning | a second order with QA-ACC-0001-MVTPO8X7001 is created with no warning |
-| TC-APP012-014 | Same reference or accession number twice | 3 | Two different references | both orders got RAD-1793288510 |
+| TC-APP012-013 | Study time shown on the list | 2 | Today 10:00 (2026-10-31) | "2026-10-31 03:00" |
+| TC-APP012-014 | Same reference or accession number twice | 1 | Refused: the reference is in use | a second order with QA-RAD-0001-MVWK6IRU002 is created |
+| TC-APP012-014 | Same reference or accession number twice | 2 | Refused, or a warning | a second order with QA-ACC-0001-MVWK6IRU002 is created with no warning |
 | TC-APP012-015 | Finding an order | 1 | A search by reference, accession number, study and date | no search |
 | TC-APP012-015 | Finding an order | 2 | A filter by date and study | no filter; only paging, 10 rows at a time |
 | TC-APP012-016 | Image and report links | 1 | Refused: only addresses of the hospital's viewer are accepted | saved |
 | TC-APP012-018 | User without the radiology right | 1 | The button "New order" is not offered, or the page is refused | "New order" is shown to U3 (no right) |
 | TC-APP012-019 | User with no radiology role reads the orders | 1 | No "RIS" card, or the card opens a "no access" page | the card is shown to U3 (no right) and opens /id/radiology |
-| TC-APP012-019 | User with no radiology role reads the orders | 2 | Access refused | U3 (no right) reads /radiology/orders ("Orders", 10 rows; "Report" of a row leads to https://pacs.example.test/report/QA-ACC-0001-MVHTT7UV750Q) |
+| TC-APP012-019 | User with no radiology role reads the orders | 2 | Access refused | U3 (no right) reads /radiology/orders ("Orders", 10 rows; "Report" of a row leads to https://pacs.example.test/report/QA-ACC-0001) |
 | TC-APP012-024 | Double click, two radiographers at once, and reload | 3 | The entries are kept, or the radiographer is warned | the half-filled order is lost with no warning |
 
 ## 13 Dietary
@@ -495,7 +495,10 @@ Deviasi = langkah **bisa dijalankan**, tetapi yang tampil di site tidak sama den
 | TC-APP013-012 | Diet request without a patient or a diet | 1 | A patient must be picked from the admitted patients | no patient field |
 | TC-APP013-012 | Diet request without a patient or a diet | 2 | Fields or lists for the diet type, the meal time and allergies | none; the diet can only be written into "Comments" |
 | TC-APP013-012 | Diet request without a patient or a diet | 3 | The beds of Inpatient are offered | "Bed no" is typed by hand |
-| TC-APP013-012 | Diet request without a patient or a diet | 4 | Each row shows the patient and the diet | the row shows numbers and dates only: QA-DIET-001-MVT8QDWW104 \| 2026-10-29 \| 2026-10-29 \| 1 line(s) \| Active |
+| TC-APP013-012 | Diet request without a patient or a diet | 4 | Each row shows the patient and the diet | the row shows numbers and dates only: QA-DIET-001-MVWKWOV4004 \| 2026-10-31 \| 2026-10-31 \| 1 line(s) \| Active |
+| TC-APP013-013 | Diet request and the patient's admission | 1 | A request for the new patient is proposed, or the admitted patients are offered | the form has free-text Bed no and Bed category only: no patient is offered |
+| TC-APP013-013 | Diet request and the patient's admission | 2 | The line shows the new bed | the line keeps QA-0D43F5LMM-RI-0102: the request is not linked to the stay |
+| TC-APP013-013 | Diet request and the patient's admission | 3 | The request is closed; Status is no longer "Active" | RQ-1 stays "Active" after the discharge |
 | TC-APP013-014 | Following a diet request: prepared, delivered, changed, cancelled | 1 | A button or a list of statuses | none; the line status is what was typed at creation ("ordered") |
 | TC-APP013-014 | Following a diet request: prepared, delivered, changed, cancelled | 2 | The line can be edited | no edit |
 | TC-APP013-014 | Following a diet request: prepared, delivered, changed, cancelled | 3 | A cancellation; Status then reads "Inactive" | no cancel |
@@ -508,7 +511,7 @@ Deviasi = langkah **bisa dijalankan**, tetapi yang tampil di site tidak sama den
 | TC-APP013-016 | Diet request form at its limits | 4 | Refused with a message that names the limit of 255 | toast "failed to create diet request" |
 | TC-APP013-016 | Diet request form at its limits | 5 | A request date can be chosen | no date field: document and request date are always today |
 | TC-APP013-017 | TPN saved on a typed patient name | 1 | A search of the registered or admitted patients, by name or MRN | "Patient" is a plain text field |
-| TC-APP013-017 | TPN saved on a typed patient name | 2 | The row shows the patient's MRN or bed next to the name | the row: QA-DIE Pasien Satu MVT8RMWB104 \| 24.22 · Normal \| 70 g \| 388.24 g \| 200 mL \| 2.1 L |
+| TC-APP013-017 | TPN saved on a typed patient name | 2 | The row shows the patient's MRN or bed next to the name | the row: QA-DIE Pasien Satu MVWKXN82004 \| 24.22 · Normal \| 70 g \| 388.24 g \| 200 mL \| 2.1 L |
 | TC-APP013-017 | TPN saved on a typed patient name | 3 | The two rows can be told apart | two identical rows |
 | TC-APP013-017 | TPN saved on a typed patient name | 4 | Refused | saved on a name that belongs to no patient |
 | TC-APP013-018 | Typing decimal numbers into the TPN fields | 1 | The field shows 1.7 | the field shows "17" |
@@ -524,7 +527,7 @@ Deviasi = langkah **bisa dijalankan**, tetapi yang tampil di site tidak sama den
 | TC-APP013-020 | TPN with missing inputs | 4 | A message that the code is missing | nothing happens, no message |
 | TC-APP013-022 | Clinical basis of the TPN calculation | 2 | Only the volume and weight of the lipid emulsion change | also changed: Dextrose 388.24 g / 1320 kcal → 447.06 g / 1520 kcal; Dextrose rate 3.85 mg/kg/min → 4.44 mg/kg/min |
 | TC-APP013-022 | Clinical basis of the TPN calculation | 3 | Each field and each result names its unit, for example mEq, mmol or units | fields read "Sodium / L, Potassium / L, Calcium / L, Magnesium / L, Phosphate / L, MVI-12 / L, Trace metals / L, Heparin / L, Insulin / L"; results "Na 84 · K 42 · Ca 10.5 · Mg 8.4 · PO4 21" and "MVI 21 · Trace 2.1 · Heparin 0 · Insulin 0" with no unit |
-| TC-APP013-023 | Compounding workbench does not show the whole prescription | 1 | Patient, protein, dextrose, lipid, volume, and the electrolytes and additives | the row: QA-DIE Pasien Satu MVT8RMWB109 \| 24.22 · Normal \| 70 g \| 388.24 g \| 200 mL \| 2.1 L |
+| TC-APP013-023 | Compounding workbench does not show the whole prescription | 1 | Patient, protein, dextrose, lipid, volume, and the electrolytes and additives | the row: QA-DIE Pasien Satu MVWKXN82009 \| 24.22 · Normal \| 70 g \| 388.24 g \| 200 mL \| 2.1 L |
 | TC-APP013-023 | Compounding workbench does not show the whole prescription | 2 | The full prescription opens | a row cannot be opened |
 | TC-APP013-023 | Compounding workbench does not show the whole prescription | 3 | The date, the time and the person who saved it | none is shown |
 | TC-APP013-023 | Compounding workbench does not show the whole prescription | 4 | A status, a button to mark it prepared and a print-out | none |
@@ -536,7 +539,7 @@ Deviasi = langkah **bisa dijalankan**, tetapi yang tampil di site tidak sama den
 | TC-APP013-026 | TPN templates: same code twice, stale list, no change | 1 | Refused: the code exists, or the dietitian is asked whether to replace it | saved; "QA-TPN-STD-MVWBFJ20001" is listed 1 times |
 | TC-APP013-026 | TPN templates: same code twice, stale list, no change | 3 | A template can be edited or removed | no edit or delete |
 | TC-APP013-026 | TPN templates: same code twice, stale list, no change | 4 | Refused with a message that names the limit of 64 | toast "tpn failed" |
-| TC-APP013-028 | User with no dietary role reads requests and TPN prescriptions | 1 | No "Dietary" card, or the card opens a "no access" page | the card is shown to U3 (no right) and opens /id/apps |
+| TC-APP013-028 | User with no dietary role reads requests and TPN prescriptions | 1 | No "Dietary" card, or the card opens a "no access" page | the card is shown to U3 (no right) and opens /id/diet |
 | TC-APP013-028 | User with no dietary role reads requests and TPN prescriptions | 2 | Access refused | U3 (no right) reads /diet/tpn ("Total parenteral nutrition", 10 rows) |
 | TC-APP013-028 | User with no dietary role reads requests and TPN prescriptions | 3 | Access refused | U3 (no right) reads /diet/requests ("Diet requests", 10 rows) |
 | TC-APP013-033 | Double click, two dietitians at once, and reload | 1 | One request. The button is disabled while it reads "Saving…" | 0 requests |
@@ -560,13 +563,12 @@ Deviasi = langkah **bisa dijalankan**, tetapi yang tampil di site tidak sama den
 | TC-APP014-037 | Closing the day with the declared amount left empty | 1 | The screen asks for the amount, or asks to confirm | the day of U4 is closed at once with no declared amount (Variance "-Rp 2.220.000") |
 | TC-APP014-040 | Giving the patient a receipt | 2 | A Print button or a printable page | no print or download control |
 | TC-APP014-040 | Giving the patient a receipt | 3 | The receipt can be shown again | the receipt is not shown when the paid sale is found again |
-| TC-APP014-045 | Sponsor shares that do not add up | 2 | Saved. The split line appears for the current charge | no split line 30 / 70 (panel: "hare must add up to 100. Patient share (%) Sponsor share (%) Save shares Patient share and sponsor share split this charge. Patient / pre-auth Check eligibility") |
 | TC-APP014-046 | Preparing an insured patient from the screens | 1 | A form or button to request a pre-authorisation | none: the panel only searches existing ones |
 | TC-APP014-046 | Preparing an insured patient from the screens | 2 | A form or button to add the referral and its SEP number | none: "Check SEP" checks an existing one |
 | TC-APP014-048 | User with no finance role looks at bills and the drawer | 1 | No "Hospital Accounts" card, or the card opens a "no access" page | the card is shown to U3 (no right) and opens /id/billing |
-| TC-APP014-048 | User with no finance role looks at bills and the drawer | 2 | Access refused | U3 (no right) reads /billing/cashier ("Fast Cashier", 0 rows; the invoice INV-1793193382-e6b07cf1 is found with its amounts) |
+| TC-APP014-048 | User with no finance role looks at bills and the drawer | 2 | Access refused | U3 (no right) reads /billing/cashier ("Fast Cashier", 0 rows; the invoice INV-1793459614-9ba2a260 is found with its amounts) |
 | TC-APP014-052 | Losing a sale on screen: Esc, session end, double click | 1 | The screen keeps the sale, or asks before clearing | Esc clears the whole screen at once, with no question |
-| TC-APP014-061 | Patient ledger: billing an inpatient service from the tariff | 4 | A row with the state "open" and "QA-RI-0001-MVT8X1TL111 deposit 0" | the list without a search does not show the new invoice (it lists some invoices only) |
+| TC-APP014-061 | Patient ledger: billing an inpatient service from the tariff | 4 | A row with the state "open" and "QA-RI-0001-MVWJK9A000D deposit 0" | the list without a search does not show the new invoice (it lists some invoices only) |
 
 ## 15 Emergency
 
@@ -594,15 +596,15 @@ Deviasi = langkah **bisa dijalankan**, tetapi yang tampil di site tidak sama den
 | TC-APP015-014 | Ending a visit | 2 | A hand-over to Inpatient that keeps the patient and the visit | the row of a visit "In bay" has no button |
 | TC-APP015-014 | Ending a visit | 3 | An outcome for each; the status "Death" for the fourth | the row of a visit "In bay" has no button |
 | TC-APP015-015 | Priority order across pages | 1 | The oldest waiting patient is the first row | the waiting patient is not on page 1 (pages are cut by arrival time, newest first) |
-| TC-APP015-016 | Times shown on the list | 1 | Today 15:09 (WIB) | "2026-10-29 08:09" (world time, seven hours behind) |
-| TC-APP015-016 | Times shown on the list | 2 | Today about 15:09 (WIB) | "2026-10-29 08:09" |
+| TC-APP015-016 | Times shown on the list | 1 | Today 22:53 (WIB) | "2026-10-31 15:53" (world time, seven hours behind) |
+| TC-APP015-016 | Times shown on the list | 2 | Today about 22:53 (WIB) | "2026-10-31 15:53" |
 | TC-APP015-017 | Clinical record and charges of an emergency visit | 1 | The complaint, vital signs, the doctor in charge and notes can be recorded on the visit | the visit has no form: only priority, bed, triage time and status |
 | TC-APP015-017 | Clinical record and charges of an emergency visit | 2 | The emergency visit is shown, and orders are tied to it | the consultation shows no emergency visit |
 | TC-APP015-019 | User with no emergency role reads the visits | 1 | No "Emergency" card, or the card opens a "no access" page | the card is shown to U3 (no right) and opens /id/emergency |
 | TC-APP015-019 | User with no emergency role reads the visits | 2 | Access refused | U3 (no right) reads /emergency/visits ("Visits", 10 rows) |
 | TC-APP015-020 | Visits of another branch | 1 | No visit of BR-B | U1 (Podomoro) sees 1 visit(s) of the Kemayoran patient 0dab9f2c-32a0-5946-bae7-d6890eb7c0fa |
 | TC-APP015-023 | Double click, two nurses at once, and reload | 2 | Nurse 2 is told that triage was already recorded | triage is recorded a second time |
-| TC-APP015-023 | Double click, two nurses at once, and reload | 3 | Nurse 2 is told that the visit already has a bay | the visit is moved to QA-IGD-02-MVTOX14G107 |
+| TC-APP015-023 | Double click, two nurses at once, and reload | 3 | Nurse 2 is told that the visit already has a bay | the visit is moved to QA-IGD-02-MVWJTWUP00C |
 | TC-APP015-023 | Double click, two nurses at once, and reload | 4 | The text is kept, or the nurse is warned | the half-typed id is lost with no warning |
 | TC-APP015-032 | Receiving that is refused | 1 | Toast "That registration is not valid for emergency." | "(no patient offered)" |
 | TC-APP015-032 | Receiving that is refused | 2 | Toast "This visit is already received." | "(no patient offered)" |
@@ -617,9 +619,9 @@ Deviasi = langkah **bisa dijalankan**, tetapi yang tampil di site tidak sama den
 | TC-APP016-008 | Hub, navigation and Indonesian | 3 | Column names, buttons, statuses and toasts are Indonesian | English: No. dokumen, Tanggal, Pasien, Status, Aksi |
 | TC-APP016-009 | File request without a patient or a requester | 1 | A patient must be picked from the registered patients | the form has Document number, Document date, Request type, Purpose |
 | TC-APP016-009 | File request without a patient or a requester | 2 | A field for the requester or the department | none |
-| TC-APP016-009 | File request without a patient or a requester | 3 | Each row shows the patient and the requester | the row: QA-REQ-011-MVT9JDJP107 \| 2026-10-29 \| QA Kontrol \| PKLM · Pinjam klaim \| Yes |
+| TC-APP016-009 | File request without a patient or a requester | 3 | Each row shows the patient and the requester | the row: QA-REQ-011-MVWL3M21007 \| 2026-10-31 \| QA Kontrol \| PKLM · Pinjam klaim \| Yes |
 | TC-APP016-010 | Request and issue are not connected | 1 | The request can be chosen; patient and purpose are taken from it | the issue dialog does not ask for a request |
-| TC-APP016-010 | Request and issue are not connected | 2 | REQ-1 shows a status such as "Fulfilled", with the record's number | the row still reads Active "Yes": QA-REQ-001-MVT9JDJP109 \| 2026-10-29 \| QA Kontrol poli penyakit dalam \| PKLM · Pinjam klaim \| Yes |
+| TC-APP016-010 | Request and issue are not connected | 2 | REQ-1 shows a status such as "Fulfilled", with the record's number | the row still reads Active "Yes": QA-REQ-001-MVWL3M21009 \| 2026-10-31 \| QA Kontrol poli penyakit dalam \| PKLM · Pinjam klaim \| Yes |
 | TC-APP016-010 | Request and issue are not connected | 3 | A button to reject or close, with a reason | none |
 | TC-APP016-011 | Issuing a file that is already out | 1 | A warning that PT-1's file is already out, with the number of the open loan | no warning when the patient is chosen |
 | TC-APP016-011 | Issuing a file that is already out | 2 | Refused: the file has not been returned | a second loan of the same file is issued |
@@ -652,11 +654,11 @@ Deviasi = langkah **bisa dijalankan**, tetapi yang tampil di site tidak sama den
 | TC-APP016-020 | Finding a request, a loan or the files that are out | 2 | A filter "Issued" | none |
 | TC-APP016-020 | Finding a request, a loan or the files that are out | 3 | The list sorts by that column | clicking a heading does nothing |
 | TC-APP016-020 | Finding a request, a loan or the files that are out | 4 | A search by number or purpose | none |
-| TC-APP016-021 | Patient merged after the record was issued | 1 | The row shows PT-1, the patient who remains, or a note about the merge | the row still names PT-2: "QA-MR-001-MVTP0T3Y00B 2026-10-29 QA-MRD Pasien Dua MVTP0T3Y00AMRN-2026-F6FFBA9B Dipinjam Movement Open review Return" |
+| TC-APP016-021 | Patient merged after the record was issued | 1 | The row shows PT-1, the patient who remains, or a note about the merge | the row still names PT-2: "QA-MR-001-MVWKZMMF00B 2026-10-31 QA-MRD Pasien Dua MVWKZMMF00AMRN-2026-AA2338F5 Dipinjam Movement Open review Return" |
 | TC-APP016-022 | User without the medical records right | 1 | Refused with a message that the user may not do this | toast "Failed to create request" |
 | TC-APP016-023 | User with no records role reads the loan list | 1 | No "MRD" card, or the card opens a "no access" page | the card is shown to U3 (no right) and opens /id/mrd |
 | TC-APP016-023 | User with no records role reads the loan list | 2 | Access refused | U3 (no right) reads /mrd/records ("Patient Records", 10 rows) |
-| TC-APP016-023 | User with no records role reads the loan list | 3 | No patients are shown to this user | "Find" with an empty box lists 10 patients to U3 (e.g. "QA-HAC Pasien Umum MVS3LBKR009 MRN-2026-D239DF7B") |
+| TC-APP016-023 | User with no records role reads the loan list | 3 | No patients are shown to this user | "Find" with an empty box lists 10 patients to U3 (e.g. "QA-PCR Pasien Satu MVWKU1F1004 MRN-2026-901B9D7A") |
 | TC-APP016-028 | Double click, two officers at once, and reload | 4 | The text is kept, or the officer is warned | the half-filled form is lost with no warning |
 | TC-APP016-030 | Type and request that are refused | 1 | Toast "That code already exists" | toast "Failed to create request" |
 | TC-APP016-030 | Type and request that are refused | 3 | Toast "Choose an active request type. Purpose stays." | the browser stops the click ("Please select an item in the list."); that text is the first line of the list |
@@ -717,9 +719,11 @@ Deviasi = langkah **bisa dijalankan**, tetapi yang tampil di site tidak sama den
 | TC-APP018-025 | Changing or retiring a tax code, and where rates apply | 1 | A valid-from date, so that older documents keep 11 | no date: the rate changes for every document |
 | TC-APP018-025 | Changing or retiring a tax code, and where rates apply | 2 | The rate of the tax code, if the sale uses it | a pharmacy sale names no tax code: its tax is "Tax rate (%)" of the Fast Cashier counter settings (11) |
 | TC-APP018-025 | Changing or retiring a tax code, and where rates apply | 3 | The rate of the tax code, if the invoice uses it | a cashier invoice names no tax code: its tax is "Tax rate (%)" of the counter settings (11) |
-| TC-APP018-030 | Double click, two admins at once, and reload | 2 | The second is told that the entry was changed in the meantime | saved with no warning; the row now reads QA-DEP-01-MVTP5TF7103 \| QA Zz Poli Admin Dua MVTP5TF7106 |
+| TC-APP018-030 | Double click, two admins at once, and reload | 2 | The second is told that the entry was changed in the meantime | saved with no warning; the row now reads QA-DEP-01-MVWL5QK500G \| QA Zz Poli Admin Dua MVWL5QK500J |
 | TC-APP018-030 | Double click, two admins at once, and reload | 3 | The text is kept, or the admin is warned | the half-filled form is lost with no warning |
 | TC-APP018-031 | Users: adding a user with roles at a branch and a store | 3 | a row with the role "perawat" | "Roles" reads "—" |
+| TC-APP018-031 | Users: adding a user with roles at a branch and a store | 5 | Only the chosen branch in the header | the header names no branch: "KlikMed Home Dashboard Preferences Apps Reports Analytics Notifications No notifications yet. ID Language ID EN AR Q QA-Perawat Uji MVWL9CEY002 QA-Perawat Uji MVWL9CEY002 perawat Profile Preferences Sign out" |
+| TC-APP018-031 | Users: adding a user with roles at a branch and a store | 6 | An entry user.create with the login | the entry does not name the login: "31/10/2026, 23.01.35 user.create platform/identity admin2 succeeded admin2" |
 | TC-APP018-032 | User the server refuses | 2 | Toast "Failed to save user." | the browser stops the click (Password: Please fill out this field.) |
 | TC-APP018-044 | Logo that is refused | 1 | The text "The logo is over 200 KB." | the file (300 KB) is dropped without a word; "No logo yet" stays |
 | TC-APP018-044 | Logo that is refused | 2 | The text "The logo must be PNG, JPEG, or WebP." | the GIF is dropped without a word |
@@ -734,42 +738,45 @@ Deviasi = langkah **bisa dijalankan**, tetapi yang tampil di site tidak sama den
 
 | Test case | Judul | Langkah | Workbook mengharapkan | Di site |
 |---|---|---:|---|---|
+| TC-APP019-002 | Reading the periods of a financial year | 2 | Each line has … "Open" | a line shows no status; an open period offers "Lock" and "Mark adjustment" |
 | TC-APP019-004 | Chart of accounts: a group and a leaf under it | 2 | "Branch restriction" ("All branches") | a list "Branches allowed to use this account" (none chosen: "Global account") and a list "Users allowed to use this account" |
 | TC-APP019-014 | Hub, navigation and Indonesian | 1 | five tiles: Financial years, Chart of accounts, Budget posting rules, Vouchers, ERP staging | 10 tiles under MASTER, BUKU BESAR: Financial years, Chart of accounts, Branch configuration, Currency, Cost centres, Account maps, Budget posting rules, Vouchers, Journals, ERP staging |
 | TC-APP019-015 | Voucher without accounts or debit and credit lines | 1 | The form asks for the bank account | the same fields for every type: Doc no, Doc date, Doc type 1. Journal 2. Cash Payment 3. Cash Receipt 4. Bank Payment 5. Bank Receipt 6. Contra 7. Credit Memo 8. Debit Memo 9. Opening Balance 10. Purchase 11. Sales 12. Payroll, Currency, Voucher value, Party, Narration |
 | TC-APP019-015 | Voucher without accounts or debit and credit lines | 2 | Lines can be added; the totals of both sides are shown and must be equal | no lines, no debit and no credit |
-| TC-APP019-015 | Voucher without accounts or debit and credit lines | 3 | The lines with their accounts | a header only: "VCH-1793263160 Bank Payment Close Doc date 2026-10-29 Voucher value IDR 1.500.000,00 Party QA PT Uji MVTAJXGN201 Status " |
+| TC-APP019-015 | Voucher without accounts or debit and credit lines | 3 | The lines with their accounts | a header only: "VCH-1793464166 Bank Payment Close Doc date 2026-10-31 Voucher value IDR 1.500.000,00 Party QA PT Uji MVWM87IQ003 Status " |
 | TC-APP019-016 | Voucher made by hand stays "Open" | 1 | The voucher can be edited while it is open | the row offers Open |
-| TC-APP019-016 | Voucher made by hand stays "Open" | 2 | An approval and a posting step; the status becomes "Posted" | the row offers Open; status "VCH-1793287792 2026-10-29 Journal QA Pihak Uji MVTP8B0U003 IDR 100.000,00 Terbuka Buka" |
+| TC-APP019-016 | Voucher made by hand stays "Open" | 2 | An approval and a posting step; the status becomes "Posted" | the row offers Open; status "VCH-1793463206 2026-10-31 Journal QA Pihak Uji MVWLN9WB003 IDR 100.000,00 Terbuka Buka" |
 | TC-APP019-016 | Voucher made by hand stays "Open" | 3 | A cancellation, or a reversal voucher | the row offers Open |
 | TC-APP019-017 | Vouchers in a locked year, or on a date outside every year | 2 | Refused: no financial year for this date | the voucher dated 2033-12-31 is created |
 | TC-APP019-018 | Voucher form at its limits | 1 | Refused: a voucher needs a value | a voucher of "IDR 0,00" is saved |
 | TC-APP019-018 | Voucher form at its limits | 4 | Refused: not a currency | saved; the detail reads "VCH-1793445763 Journal Close Doc date 2026-10-31 Voucher value XYZ 1.000,00 Party QA PT Uji MVWBA89G" |
-| TC-APP019-020 | Financial year that cannot be right | 5 | Refused, or a warning | the year QA-FY-MVTAC7N030E is saved; the finalization date is not compared with the year |
+| TC-APP019-020 | Financial year that cannot be right | 5 | Refused, or a warning | the year QA-FY-MVWLRTBS00K is saved; the finalization date is not compared with the year |
+| TC-APP019-021 | Changing, deleting or closing a financial year by periods | 1 | The year can be edited while nothing is booked in it | the row offers Periods, Lock |
+| TC-APP019-021 | Changing, deleting or closing a financial year by periods | 2 | A delete, offered while the year is empty | the row offers Periods, Lock |
 | TC-APP019-023 | Retiring an account that a posting rule uses | 1 | A warning that a posting rule uses the account | set inactive at once: toast "Account updated." and no warning |
 | TC-APP019-024 | General ledger, account balances and reports | 1 | The entries booked to the account and its balance | the row cannot be opened; it offers Edit |
 | TC-APP019-024 | General ledger, account balances and reports | 2 | Tiles or reports are present | the hub has Financial years, Chart of accounts, Branch configuration, Currency, Cost centres, Account maps, Budget posting rules, Vouchers, Journals, ERP staging; "Trial balance" is in the menu only |
 | TC-APP019-024 | General ledger, account balances and reports | 3 | A search, filters and an export | search 0, filters 0, export 0 |
-| TC-APP019-025 | Posting rules of another branch | 1 | BR-A only | the Branch list offers BR02 · Daan Mogot, BR01 · Kemayoran, HO · Podomoro, QA-SITE-01 · QA Klinik Uji, QA-SITE-01-MV9FG8HL201 · QA Klinik Uji MV9FG8HL202, qa-site-01 · QA Klinik Uji MV9FG8HL50D, QA-SITE-01-MVDE6HKD4804 · QA Klinik Uji MVDE6HKD4805, QA-SITE-01-MVDHF9E5610V · QA Klinik Uji MVDHF9E5610W, QA-SITE-01-MVHTT7UV9507 · QA Klinik Uji MVHTT7UV9508 |
+| TC-APP019-025 | Posting rules of another branch | 1 | BR-A only | the Branch list offers BR02 · Daan Mogot, BR01 · Kemayoran, HO · Podomoro, QA-SITE-01 · QA Klinik Uji, QA-SITE-01-MV9FG8HL201 · QA Klinik Uji MV9FG8HL202, qa-site-01 · QA Klinik Uji MV9FG8HL50D, QA-SITE-01-MVDE6HKD4804 · QA Klinik Uji MVDE6HKD4805, QA-SITE-01-MVDHF9E5610V · QA Klinik Uji MVDHF9E5610W, QA-SITE-01-MVHTT7UV9507 · QA Klinik Uji MVHTT7UV9508, QA-SITE-01-MVTA3XMZ201 · QA Klinik Uji MVTA3XMZ202 |
 | TC-APP019-027 | ERP staging: where the rows come from and what can be done with them | 1 | The invoice is listed as "Pending" | INV-1793445683-fdc520b1 is not listed |
 | TC-APP019-027 | ERP staging: where the rows come from and what can be done with them | 2 | A button to post one invoice or all pending ones | the screen offers , 1, |
 | TC-APP019-027 | ERP staging: where the rows come from and what can be done with them | 3 | A voucher for the invoice | no voucher names INV-1793445683-fdc520b1 |
 | TC-APP019-029 | User with no finance role reads vouchers and staged invoices | 1 | No "Finance" card, or the card opens a "no access" page | the card is shown to U3 (no right) and opens /id/finance |
 | TC-APP019-029 | User with no finance role reads vouchers and staged invoices | 2 | Access refused | U3 (no right) reads /finance/vouchers ("Vouchers", 10 rows) |
 | TC-APP019-029 | User with no finance role reads vouchers and staged invoices | 3 | Access refused | U3 (no right) reads /finance/erp-invoice-staging ("ERP invoice staging", 1 rows) |
-| TC-APP019-034 | Double click, two accountants at once, and reload | 2 | The second is told that the account was changed in the meantime | saved with no warning; the row reads QA-5010-MVTP8B0U102 \| QA Beban Uji MVTP8B0U103 \| Expense |
+| TC-APP019-034 | Double click, two accountants at once, and reload | 2 | The second is told that the account was changed in the meantime | saved with no warning; the row reads QA-5010-MVWLN9WB006 \| QA Beban Uji MVWLN9WB007 \| Expense |
 | TC-APP019-034 | Double click, two accountants at once, and reload | 3 | The input is kept, or the accountant is warned | the half-typed voucher is lost with no warning |
 | TC-APP019-035 | Branch configuration: year, control accounts, users and imprest eligibility | 4 | A line with the user, the limit and the tick box "Super user" | no line appears after "Add user"; there is no input for the limit |
 | TC-APP019-036 | Configuration that is refused | 1 | The text "A financial year is required." | the browser stops the click (Current financial year: Please select an item in the list.) |
 | TC-APP019-036 | Configuration that is refused | 2 | The text "At least one user must be allowed to transact." | toast "Configuration saved.": saved with no user ("Add user" adds no line, TC-APP019-035) |
 | TC-APP019-036 | Configuration that is refused | 3 | The text that imprest eligibility needs a type, an amount, an account and a department, employee or party | the row with only a type is saved ("Configuration saved.") |
 | TC-APP019-041 | Cost centre that is refused | 1 | The text "The shares must total 100%." | toast "Shares must total 100%." |
-| TC-APP019-045 | Journal the dialog refuses | 2 | The text "A journal needs at least two lines." | "5710D QA-RJ-MVHTT7UV10002 · QA-Rawat Jalan MVHTT7UV10005 QA-RJ-MVHTT7UV1000A · QA-Rawat Jalan MVHTT7UV1000D QA-RJ-MVI004U31908 · QA-Rawat Jalan MVI004U3190B Debit 1000000.00 · Kredit 0.00 Tutup Simpan" |
-| TC-APP019-045 | Journal the dialog refuses | 3 | The text "Narration is required." | "QA-RJ-MVHTT7UV10002 · QA-Rawat Jalan MVHTT7UV10005 QA-RJ-MVHTT7UV1000A · QA-Rawat Jalan MVHTT7UV1000D QA-RJ-MVI004U31908 · QA-Rawat Jalan MVI004U3190B Debit 1000000.00 · Kredit 1000000.00 Tutup Simpan" |
-| TC-APP019-045 | Journal the dialog refuses | 4 | The text "A reversible journal needs a reverse date." | "QA-RJ-MVHTT7UV10002 · QA-Rawat Jalan MVHTT7UV10005 QA-RJ-MVHTT7UV1000A · QA-Rawat Jalan MVHTT7UV1000D QA-RJ-MVI004U31908 · QA-Rawat Jalan MVI004U3190B Debit 1000000.00 · Kredit 1000000.00 Tutup Simpan" |
-| TC-APP019-051 | Document the dialog refuses | 1 | The text "Instrument number, type, date, and validity are required." | "E5680Z · QA Akun Uji 3010 MVDHF9E56810 QA-3010-MVHTT7UV980Z · QA Akun Uji 3010 MVHTT7UV9810 QA-3010-MVI96FSW503 · QA Akun Uji 3010 MVI96FSW504 QA-5010-MV9H0RI460K · QA Beban Uji MV9H0RI460L Close Save" |
-| TC-APP019-051 | Document the dialog refuses | 2 | The text "A cash receipt needs a beneficiary." | "E5680Z · QA Akun Uji 3010 MVDHF9E56810 QA-3010-MVHTT7UV980Z · QA Akun Uji 3010 MVHTT7UV9810 QA-3010-MVI96FSW503 · QA Akun Uji 3010 MVI96FSW504 QA-5010-MV9H0RI460K · QA Beban Uji MV9H0RI460L Close Save" |
-| TC-APP019-051 | Document the dialog refuses | 3 | The text "This voucher needs a party and a reference number." | "E5680Z · QA Akun Uji 3010 MVDHF9E56810 QA-3010-MVHTT7UV980Z · QA Akun Uji 3010 MVHTT7UV9810 QA-3010-MVI96FSW503 · QA Akun Uji 3010 MVI96FSW504 QA-5010-MV9H0RI460K · QA Beban Uji MV9H0RI460L Close Save" |
+| TC-APP019-045 | Journal the dialog refuses | 2 | The text "A journal needs at least two lines." | "lan MVTAC7N060D QA-RJ-MVTGO7QK40F · QA-Rawat Jalan MVTGO7QK40I QA-RJ-MVWLRTBS019 · QA-Rawat Jalan MVWLRTBS01C QA-RJ-MVWLRTBS01H · QA-Rawat Jalan MVWLRTBS01K Debit 1000000.00 · Kredit 0.00 Tutup Simpan" |
+| TC-APP019-045 | Journal the dialog refuses | 3 | The text "Narration is required." | "TAC7N060D QA-RJ-MVTGO7QK40F · QA-Rawat Jalan MVTGO7QK40I QA-RJ-MVWLRTBS019 · QA-Rawat Jalan MVWLRTBS01C QA-RJ-MVWLRTBS01H · QA-Rawat Jalan MVWLRTBS01K Debit 1000000.00 · Kredit 1000000.00 Tutup Simpan" |
+| TC-APP019-045 | Journal the dialog refuses | 4 | The text "A reversible journal needs a reverse date." | "TAC7N060D QA-RJ-MVTGO7QK40F · QA-Rawat Jalan MVTGO7QK40I QA-RJ-MVWLRTBS019 · QA-Rawat Jalan MVWLRTBS01C QA-RJ-MVWLRTBS01H · QA-Rawat Jalan MVWLRTBS01K Debit 1000000.00 · Kredit 1000000.00 Tutup Simpan" |
+| TC-APP019-051 | Document the dialog refuses | 1 | The text "Instrument number, type, date, and validity are required." | "uaran Uji MV9H0RI460P QA-2110-MVDE6HKD580I · QA PPN Keluaran Uji MVDE6HKD580J QA-2110-MVDE6HKD580O · QA PPN Keluaran Uji MVDE6HKD580P QA-2110-MVDHF9E5710I · QA PPN Keluaran Uji MVDHF9E5710J Close Save" |
+| TC-APP019-051 | Document the dialog refuses | 2 | The text "A cash receipt needs a beneficiary." | "uaran Uji MV9H0RI460P QA-2110-MVDE6HKD580I · QA PPN Keluaran Uji MVDE6HKD580J QA-2110-MVDE6HKD580O · QA PPN Keluaran Uji MVDE6HKD580P QA-2110-MVDHF9E5710I · QA PPN Keluaran Uji MVDHF9E5710J Close Save" |
+| TC-APP019-051 | Document the dialog refuses | 3 | The text "This voucher needs a party and a reference number." | "uaran Uji MV9H0RI460P QA-2110-MVDE6HKD580I · QA PPN Keluaran Uji MVDE6HKD580J QA-2110-MVDE6HKD580O · QA PPN Keluaran Uji MVDE6HKD580P QA-2110-MVDHF9E5710I · QA PPN Keluaran Uji MVDHF9E5710J Close Save" |
 | TC-APP019-055 | Payment that is refused | 2 | The text "A bank instrument is required." | "no toast" |
 | TC-APP019-069 | Request that is refused | 3 | The text "An approved legal agreement is required." | "no toast" |
 | TC-APP019-075 | Step that is refused | 1 | The text "This letter of credit step is not allowed yet." | "no toast" |
@@ -780,12 +787,12 @@ Deviasi = langkah **bisa dijalankan**, tetapi yang tampil di site tidak sama den
 
 | Test case | Judul | Langkah | Workbook mengharapkan | Di site |
 |---|---|---:|---|---|
-| TC-APP020-014 | Circular that is refused | 1 | The text "The due date is before the circular date." | "4 QA Poli Umum QA Zz Poli Uji MV9FG8HL305 QA Zz Poli Uji MV9FG8HL502 QA Zz Poli Uji MV9FG8HL504 QA Zz Poli Uji MV9FG8HL50G QA Zz Poli Uji MV9FG8HL50I In-charge Departments come from MDM and employees from HR. Cancel Save" |
+| TC-APP020-014 | Circular that is refused | 1 | The text "The due date is before the circular date." | "A Zz Poli Admin Dua MVTP5TF7106 QA Zz Poli Admin Dua MVWL5QK500J QA Zz Poli Cepat MVTP5TF7102 QA Zz Poli Cepat MVWL5QK500F QA Zz Poli Uji MV9FG8HL305 In-charge Departments come from MDM and employees from HR. Cancel Save" |
 | TC-APP020-014 | Circular that is refused | 7 | The text "The circular can be changed only while it is a draft." | no "Edit" on the row of the sent circular, so no text is shown |
 | TC-APP020-016 | Internal budget that is refused | 3 | The text "The circular does not ask this department for a budget." | a department the circular does not list is offered |
-| TC-APP020-016 | Internal budget that is refused | 7 | The text "Add at least one head" | "Internal budget BIB000011 saved as draft. / " |
-| TC-APP020-017 | Amounts | 2 | The text "Enter an amount above zero with at most two decimals." and no internal budget saved | the internal budget BIB000015 is saved with the amount "150,5" |
-| TC-APP020-020 | Consolidation that is refused | 5 | The internal budgets of the rejected request are listed again | BIB000018 is not offered after the reject |
+| TC-APP020-016 | Internal budget that is refused | 7 | The text "Add at least one head" | "Internal budget BIB000023 saved as draft. / " |
+| TC-APP020-017 | Amounts | 2 | The text "Enter an amount above zero with at most two decimals." and no internal budget saved | the internal budget BIB000024 is saved with the amount "150,5" |
+| TC-APP020-020 | Consolidation that is refused | 5 | The internal budgets of the rejected request are listed again | BIB000026 is not offered after the reject |
 | TC-APP020-038 | Position at its limits | 1 | The text "No budget lines yet. A line is created when an allocation is approved." | "r alokasi Allocated Transferred in Transferred out Reserved Utilised Balance History OBAT · 2026 B14-OPS · Belanja obat Pharmacy · DIPA-2026 DIPA 1.000.000 0 0 0 0 1.000.000 History Showing 1–1 of 1 1" |
 
 ## 21 CSSD
@@ -809,6 +816,12 @@ Deviasi = langkah **bisa dijalankan**, tetapi yang tampil di site tidak sama den
 | Test case | Judul | Langkah | Workbook mengharapkan | Di site |
 |---|---|---:|---|---|
 | TC-APP022-013 | Order that is refused | 2 | Refused (the server text ends in "document is missing") | saved ("Saved.") |
+
+## 23 Sourcing
+
+| Test case | Judul | Langkah | Workbook mengharapkan | Di site |
+|---|---|---:|---|---|
+| TC-APP023-021 | Sourcing without the sourcing right, and what is recorded | 3 | Refused; the bid stays "opened" | "missing required privilege", the bid reads "" |
 
 ## 24 Housekeeping
 

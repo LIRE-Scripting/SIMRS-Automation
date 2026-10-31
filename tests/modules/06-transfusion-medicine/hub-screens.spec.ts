@@ -26,7 +26,11 @@ qaTest('TC-APP006-032', async ({ page, qa }) => {
     }
     await page.goto('/id/bloodbank');
     await main.getByRole('link', { name: 'Donors', exact: true }).click();
-    await expect(main.getByRole('heading', { level: 1, name: "This page couldn't load" })).toBeVisible();
+    // HTTP 500 until 2026-10-30; since 2026-10-31 the page reads "failed to list donors" instead of the list.
+    await expect
+      .poll(async () => (await main.getByRole('heading', { level: 1, name: "This page couldn't load" }).count()) + (await asOnSite(() => main.getByText(/failed to list donors/i).count())))
+      .toBeGreaterThan(0);
+    if (await asOnSite(() => main.getByText(/failed to list donors/i).count())) qa.note(2, 'Donors opens with the red text "failed to list donors" (since 2026-10-31; before: HTTP 500)');
     qa.blocked(2, 2);
   });
 
@@ -40,7 +44,7 @@ qaTest('TC-APP006-032', async ({ page, qa }) => {
         seen.push(await main.getByRole('heading', { level: 1 }).innerText());
       }
       expect(seen).not.toEqual(['Blood request', 'Stock', 'Quality control']);
-      qa.note(3, `Indonesian headings: ${seen.join(', ')}; Donors not opened (HTTP 500)`);
+      qa.note(3, `Indonesian headings: ${seen.join(', ')}; Donors not opened (checklist blocker 2)`);
     } finally {
       await header.selectLanguage('ID');
     }

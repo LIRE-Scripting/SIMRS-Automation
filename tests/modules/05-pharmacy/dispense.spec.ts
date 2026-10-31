@@ -41,7 +41,7 @@ const NO_INTERACTIONS = 'No drug interactions detected for this order.';
 /** PT-3: a registered patient admitted by name on a new bed (04 Inpatient's Admissions). */
 async function admit(page: Page, qa: Qa, fullName: string): Promise<void> {
   const beds = new BedsPage(page);
-  const bed = qa.code('QA-101');
+  const bed = qa.bed('QA-101');
   await beds.open();
   await beds.add({ no: bed, description: 'QA Kelas 1' });
   const adm = new AdmissionsPage(page);

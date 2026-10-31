@@ -6,7 +6,8 @@ import { addDays, todayWib } from '../../../lib/dates';
 import { agreement, TC_APP019_066, TC_APP019_068 } from './cases';
 import { rowCount, screenRefuses, userPage } from '../shared/access';
 import { FinanceDesk } from './finance-desk';
-import { clickFor } from './helpers';
+import { clickFor, createAccount } from './helpers';
+import { firstCode } from '../../../lib/qa-data/names';
 
 /**
  * 19-finance.xlsx, treasury and audit: imprest (/finance/imprest), bank
@@ -265,7 +266,8 @@ qaTest('TC-APP019-074', async ({ page, qa }) => {
   // The account lists offer only the first 50 accounts (found blocker 40): the first offered QA bank account.
   const bank = { code: 'QA-1010' };
   const margin = { code: 'QA-1501' };
-  const charges = { code: 'QA-5010' };
+  // QA-5010 accounts of earlier runs are past the first 50 since 2026-10-31: an expense account whose code sorts first.
+  const charges = await createAccount(page, { code: firstCode('QA-5010'), name: qa.name('QA Beban Uji'), kind: 'Expense' });
   let open = { no: '', status: '', toasts: [] as string[] };
   await qa.step(1, async () => {
     const d = new FinanceDesk(page, 'letters-of-credit');

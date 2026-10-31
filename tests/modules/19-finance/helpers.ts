@@ -242,19 +242,27 @@ export function addMonths(iso: string, n: number): string {
 /** FY-NEXT (00-test-data.xlsx | Catalogue, 19): "QA-FY-NEXT", made once after the latest year and reused. */
 export const FY_NEXT = 'QA-FY-NEXT';
 
-export async function ensureFyNext(page: Page): Promise<void> {
+/**
+ * The code of FY-NEXT to use: the list shows only its newest years (latest start first, found blocker 40), so the plain
+ * QA-FY-NEXT of an earlier run may be past them; then the newest year whose code starts with QA-FY-NEXT stands in.
+ * Only when the list shows none is QA-FY-NEXT made, after the latest year.
+ */
+export async function ensureFyNext(page: Page): Promise<string> {
   const y = new Years(page);
   await y.open();
-  if (await y.row(FY_NEXT).count()) return;
+  if (await y.row(FY_NEXT).count()) return FY_NEXT;
+  const codes = (await y.rows().locator('td:first-child').allInnerTexts()).map((t) => t.trim());
+  const shown = codes.find((c) => c.startsWith(`${FY_NEXT}-`));
+  if (shown) return shown;
   const end = addMonths(await y.latestEnd(), 12);
   const toasts = await y.create({ code: FY_NEXT, description: 'QA Tahun buku uji', finalization: addMonths(end, 3) });
-  // The list shows only its first years: a QA-FY-NEXT made by an earlier run may be past them, and is reused.
   if (toasts.includes('That financial year code is already used.')) {
     await y.open();
     if (!(await y.row(FY_NEXT).count())) throw new NotOffered(`${FY_NEXT} exists but is not among the years the list shows (found blocker 40)`);
-    return;
+    return FY_NEXT;
   }
   expect(toasts).toContain('Financial year created');
+  return FY_NEXT;
 }
 
 // ------------------------------------------------------------ vouchers

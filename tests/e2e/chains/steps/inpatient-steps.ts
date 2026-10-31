@@ -15,7 +15,7 @@ const n = (s: string) => Number(s.replace(/[^\d.-]/g, ''));
 /** A bed of the run (the workbook's QA-101, QA-102 … made unique). */
 export async function newBed(page: Page, qa: Qa, excelNo: string): Promise<string> {
   const beds = new BedsPage(page);
-  const no = qa.code(excelNo);
+  const no = qa.bed(excelNo);
   await beds.open();
   await beds.add({ no, description: DESCRIPTION });
   return no;

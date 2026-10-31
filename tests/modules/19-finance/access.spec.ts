@@ -5,7 +5,7 @@ import { everyPage } from '../../../pages/paging';
 import { appsCardRefused, asUser, BR_B, headerOneBranch, routesRefused, toastsOf, userPage } from '../shared/access';
 import { backToIndonesian } from '../shared/language';
 import { CAPITAL } from './cases';
-import { Accounts, account, BR_A, createAccount, FY_NEXT, ensureFyNext, plain, PostingRules, retireAccount, Vouchers, Years } from './helpers';
+import { Accounts, account, BR_A, createAccount, ensureFyNext, plain, PostingRules, retireAccount, Vouchers, Years } from './helpers';
 
 /**
  * 19-finance.xlsx, the access test cases of Vouchers, ERP staging, financial
@@ -106,7 +106,7 @@ qaTest('TC-APP019-025', async ({ qa, browser }) => {
 
 qaTest('TC-APP019-028', async ({ page, qa, browser }) => {
   // Preconditions (made by U1): FY-NEXT stands in for FY-OPEN; ACC-EXP is an expense account of this test.
-  await ensureFyNext(page);
+  const fy = await ensureFyNext(page);
   const exp = await createAccount(page, account(qa, 'QA-5010', 'QA Beban Uji', 'Expense'));
   const staff = await userPage(browser, 'U3');
   try {
@@ -122,15 +122,15 @@ qaTest('TC-APP019-028', async ({ page, qa, browser }) => {
       const toasts = await y.create({ code: qa.code('QA-FY-TANPA-HAK'), description: 'QA Tahun tanpa hak' });
       expect(toasts.filter((t) => /created/i.test(t))).toEqual([]);
       await y.open();
-      const lock = await y.row(FY_NEXT).getByRole('button', { name: 'Lock' }).count();
-      const lockToasts = lock ? await toastsOf(staff, () => y.row(FY_NEXT).getByRole('button', { name: 'Lock' }).click()) : [];
+      const lock = await y.row(fy).getByRole('button', { name: 'Lock' }).count();
+      const lockToasts = lock ? await toastsOf(staff, () => y.row(fy).getByRole('button', { name: 'Lock' }).click()) : [];
       qa.note(2, `New financial year: "${toasts.join(' / ') || 'no toast'}"; Lock: "${lockToasts.join(' / ') || (lock ? 'no toast' : 'no button')}"`);
       const mine = new Years(page);
       await mine.open();
-      const state = (await mine.cells(FY_NEXT))[6];
+      const state = (await mine.cells(fy))[6];
       if (state === 'Locked') {
         // Put back what U3 changed.
-        await toastsOf(page, () => mine.row(FY_NEXT).getByRole('button', { name: 'Unlock' }).click());
+        await toastsOf(page, () => mine.row(fy).getByRole('button', { name: 'Unlock' }).click());
       }
       expect(state).not.toBe('Locked');
     });

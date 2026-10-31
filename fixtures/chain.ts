@@ -4,7 +4,7 @@ import { authFileOf } from '../lib/config';
 import { blockers, prerequisites, testCaseRef } from '../lib/qa-data';
 import { CHAINS, type Chain } from '../lib/qa-data/e2e-chains';
 import { foundBlocker } from '../lib/qa-data/found-blockers';
-import { qaCode, qaName, qaPrefix, uniqueMrn, uniqueToken } from '../lib/qa-data/names';
+import { firstCode, qaCode, qaName, qaPrefix, uniqueMrn, uniqueToken } from '../lib/qa-data/names';
 import { planFor, traceTag } from '../lib/qa-data/plan';
 import { test as e2e, type Qa } from './e2e';
 
@@ -114,6 +114,7 @@ const test = e2e.extend<{ chain: ChainRun; chainId: string }>({
         },
         name: qaName,
         code: qaCode,
+        bed: firstCode,
         prefix: qaPrefix,
         token: uniqueToken,
         mrn: () => uniqueMrn(),

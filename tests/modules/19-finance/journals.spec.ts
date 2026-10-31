@@ -3,16 +3,18 @@ import { expect, qaTest, test, type Qa } from '../../../fixtures/e2e';
 import { installToastRecorder } from '../../../lib/assertions';
 import { addDays, todayWib } from '../../../lib/dates';
 import { auditEntries, userPage } from '../shared/access';
-import { clickFor } from './helpers';
+import { firstCode } from '../../../lib/qa-data/names';
+import { clickFor, createAccount } from './helpers';
 
 /**
  * 19-finance.xlsx, Journals (/finance/journals): manual journals saved as a
  * balanced draft, sent, approved, rejected, cancelled, reversed and
  * pre-closed (Data: "debit expense 1000000; credit cash 1000000"). The
  * account lists of the dialog offer only the first 50 accounts (found
- * blocker 40), so a new account of a test cannot be chosen: the expense
- * account is the first QA-5010 expense account offered, the cash account
- * 1101 · Kas of the seed chart. U1 holds the write and the approval right,
+ * blocker 40) in code order: the expense account is a QA-5010 expense
+ * account made once per worker with a code that sorts first (firstCode;
+ * the QA-5010 accounts of earlier runs are past the first 50 since
+ * 2026-10-31), the cash account 1101 · Kas of the seed chart. U1 holds the write and the approval right,
  * so it approves too.
  */
 
@@ -24,8 +26,12 @@ test.beforeEach(async ({ page }) => {
 });
 
 const CASH = '1101';
-/** The code start of the expense accounts of the QA runs (the first one offered is used). */
-const EXPENSE = 'QA-5010';
+let expense: string | undefined;
+/** The expense account of this worker (QA-5010 of the workbook), made at its first use with a code the lists offer. */
+async function expenseOf(page: Page, qa: Qa): Promise<string> {
+  expense ??= (await createAccount(page, { code: firstCode('QA-5010'), name: qa.name('QA Beban Uji'), kind: 'Expense' })).code;
+  return expense;
+}
 const AMOUNT = '1000000';
 
 type Line = { account: string; debit?: string; credit?: string };
@@ -96,8 +102,8 @@ class Journals {
 const NO_PERIOD = 'No financial period covers this date.';
 
 /** A balanced draft journal of the test (expense debit, cash credit); returns its narration and expense account, or noPeriod. */
-async function draft(page: Page, qa: Qa, expense = EXPENSE): Promise<{ narration: string; expense: string; noPeriod: boolean }> {
-  const exp = expense;
+async function draft(page: Page, qa: Qa, account?: string): Promise<{ narration: string; expense: string; noPeriod: boolean }> {
+  const exp = account ?? (await expenseOf(page, qa));
   const j = new Journals(page);
   const narration = qa.prefix('X Jurnal uji');
   await j.openNew();
@@ -170,7 +176,7 @@ qaTest('TC-APP019-044', async ({ page, qa }) => {
 
 qaTest('TC-APP019-045', async ({ page, qa }) => {
   const j = new Journals(page);
-  const exp = EXPENSE;
+  const exp = await expenseOf(page, qa);
   const narration = qa.prefix('X Jurnal uji');
   const refused = async (step: number, v: Parameters<Journals['fill']>[0], message: string) => {
     await j.openNew();
@@ -189,7 +195,7 @@ qaTest('TC-APP019-045', async ({ page, qa }) => {
 
 qaTest('TC-APP019-046', async ({ page, qa }) => {
   const j = new Journals(page);
-  const exp = EXPENSE;
+  const exp = await expenseOf(page, qa);
   const lines: Line[] = [{ account: exp, debit: AMOUNT }, { account: CASH, credit: AMOUNT }];
   const dated = async (step: number, date: string, message: string) => {
     await j.openNew();

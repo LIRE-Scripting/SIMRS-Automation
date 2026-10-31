@@ -126,7 +126,7 @@ qaTest('TC-APP004-068', async ({ page, qa }) => {
   const beds = new BedsPage(page);
   const pt1 = await admitted(page, qa, 'QA-INP Pasien Satu');
   const other = await admitted(page, qa, 'QA-INP Pasien Dua', 'QA-102');
-  const blocked = qa.code('QA-103');
+  const blocked = qa.bed('QA-103');
   await beds.open();
   await beds.add({ no: blocked, description: 'QA Kelas 1', availability: 'Blocked' });
   if (!(await onStay(w, qa, pt1.name, [1, 2]))) return;

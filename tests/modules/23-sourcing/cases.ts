@@ -140,10 +140,10 @@ export class Desk {
     const toasts = await this.save(v, action).finally(() => this.page.off('response', listen));
     const bodies = await Promise.all(answers);
     // The answer of a save names the new record: 1:{"id":"…"} (a nil id 00000000-… is no id).
-    const answered = bodies.map((t) => /^1:\{"id":"([\w-]+)"\}/m.exec(t)?.[1]?.replace(/^[0-]+$/, '') ?? '').find(Boolean);
+    const key = v.Number || v.Code || '';
+    const answered = bodies.map((t) => /^1:\{"id":"([\w-]+)"\}/m.exec(t)?.[1]?.replace(/^[0-]+$/, '') ?? '').find(Boolean) || (key && itemIdOf(bodies, key));
     if (answered) return { toasts, id: answered };
     // Else the row that is new in the list, found by its number or code when the list is long.
-    const key = v.Number || v.Code || '';
     const after = await this.list(key || undefined);
     const id = after.find((r) => r[2] && !before.has(r[2]) && (!key || r[1].includes(key)))?.[2] ?? '';
     if (!id && toasts.includes(SAVED)) this.lastAnswer = bodies.map((t) => t.slice(0, 160)).join(' | ');
@@ -250,6 +250,29 @@ export const TC_APP023_001 = async ({ page, qa }: CaseArgs): Promise<{ category:
   return { category: cat, bidder, bidderName: qa.name('X PT Penawar Uji') };
 };
 
+
+/**
+ * Since 2026-10-31 a save of Tenders answers 1:{"held":"Mail to bidders stays out.","items":[…]} (the list with the
+ * new record) instead of 1:{"id":"…"}: the id of the item that carries the number or code typed.
+ */
+function itemIdOf(bodies: string[], key: string): string {
+  for (const body of bodies) {
+    for (const line of body.split('\n')) {
+      const json = /^\d+:(\{.*\})$/.exec(line)?.[1];
+      if (!json) continue;
+      let items: unknown;
+      try {
+        items = (JSON.parse(json) as { items?: unknown }).items;
+      } catch {
+        continue;
+      }
+      if (!Array.isArray(items)) continue;
+      const hit = (items as Record<string, unknown>[]).find((it) => Object.values(it).some((x) => typeof x === 'string' && x.toUpperCase() === key.toUpperCase()));
+      if (typeof hit?.id === 'string') return hit.id;
+    }
+  }
+  return '';
+}
 
 export const YESTERDAY = () => addDays(todayWib(), -1);
 
