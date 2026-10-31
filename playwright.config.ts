@@ -24,9 +24,18 @@ export default defineConfig({
   fullyParallel: false,
   workers: 1,
   retries: 0,
-  reporter: [['list'], ['html', { open: 'never' }]],
+  // Every run keeps its results (reports/e2e/results-run-<time>.json) and updates the result workbooks and
+  // the summary afterwards (scripts/qa/summary-reporter.ts; QA_SUMMARY=0 turns that off).
+  reporter: [
+    ['list'],
+    ['html', { open: 'never' }],
+    ['json', { outputFile: process.env.PLAYWRIGHT_JSON_OUTPUT_NAME ?? `reports/e2e/results-run-${new Date().toISOString().replace(/[:.]/g, '-')}.json` }],
+    ['./scripts/qa/summary-reporter.ts'],
+  ],
   use: {
     baseURL: 'https://rs.showcase.atklik.xyz/',
+    // A locator that never shows up fails after 15 s, not at the end of the 6-minute test timeout.
+    actionTimeout: 15_000,
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
     locale: 'en-US',

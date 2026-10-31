@@ -2,10 +2,12 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { test as base, type Page, type TestInfo } from '@playwright/test';
 import { authFileOf, SCREENSHOT_DIR } from '../lib/config';
+import { installSiteLanguage } from '../lib/i18n';
 import { blockers, testCaseRef, type TestCaseRef } from '../lib/qa-data';
 import { foundBlocker } from '../lib/qa-data/found-blockers';
 import { qaCode, qaName, qaPrefix, uniqueMrn, uniqueToken } from '../lib/qa-data/names';
 import { journeyTag, planFor, traceTag, type Plan } from '../lib/qa-data/plan';
+import { NotOffered } from '../lib/not-offered';
 
 /**
  * Workbook-driven tests. A spec names a test case id; everything else comes
@@ -62,8 +64,17 @@ function stepTitle(ref: TestCaseRef, n: number): string {
   return `Step ${n} [${ref.module.source} | Steps | row ${s.row}]: ${s.action} → ${s.expected}`;
 }
 
-const test = base.extend<Fixtures & { qaId: string }>({
+const test = base.extend<Fixtures & { qaId: string }, { siteLanguage: void }>({
   qaId: ['', { option: true }],
+
+  // The site runs in Indonesian (/id/...); the specs keep the English texts of the reference (lib/i18n).
+  siteLanguage: [
+    async ({ browser }, use) => {
+      await installSiteLanguage(browser);
+      await use();
+    },
+    { scope: 'worker', auto: true },
+  ],
 
   qa: async ({ qaId }, use, testInfo) => {
     const ref = testCaseRef(qaId);
@@ -76,6 +87,9 @@ const test = base.extend<Fixtures & { qaId: string }>({
       ref,
       plan,
       step: (n, body) => {
+        const at = testInfo as { qaStep?: number; qaInStep?: boolean; qaFailed?: number };
+        at.qaStep = n;
+        at.qaInStep = true;
         const title = stepTitle(ref, n);
         if (plan.partialSteps.includes(n)) {
           testInfo.annotations.push({
@@ -83,7 +97,13 @@ const test = base.extend<Fixtures & { qaId: string }>({
             description: `Step ${n}: Expected Result has "TBD"; only the stated part is asserted (Q8)`,
           });
         }
-        return base.step(title, body);
+        return base
+          .step(title, body)
+          .catch((e: unknown) => {
+            at.qaFailed ??= n;
+            throw e;
+          })
+          .finally(() => (at.qaInStep = false));
       },
       name: qaName,
       code: qaCode,
@@ -132,7 +152,8 @@ const test = base.extend<Fixtures & { qaId: string }>({
         if (res.status() < 500) return;
         seen.push((async () => {
           const req = res.request();
-          const body = await res.text().catch(() => '');
+          // A streamed answer may never end: its body is read for 10 s at most.
+          const body = await Promise.race([res.text().catch(() => ''), new Promise<string>((r) => setTimeout(() => r(''), 10_000))]);
           const entry = {
             at: new Date().toISOString(),
             test: testInfo.title,
@@ -150,7 +171,7 @@ const test = base.extend<Fixtures & { qaId: string }>({
         })());
       });
       await use();
-      await Promise.all(seen);
+      await Promise.race([Promise.all(seen), new Promise((r) => setTimeout(r, 15_000))]);
     },
     { auto: true },
   ],
@@ -165,8 +186,10 @@ const test = base.extend<Fixtures & { qaId: string }>({
 });
 
 async function attachScreenshot(page: Page, testInfo: TestInfo): Promise<void> {
-  const id = testInfo.title.match(/TC-APP\d{3}-\d{3}/)?.[0] ?? testInfo.title.replace(/\W+/g, '-');
+  // A module test case is named by its id (TC-APP001-003), a chain by its id (E2E-003).
+  const id = testInfo.title.match(/TC-APP\d{3}-\d{3}|^E2E-\d{3}/)?.[0] ?? testInfo.title.replace(/\W+/g, '-');
   const file = path.join(SCREENSHOT_DIR, `${id}.png`);
+  fs.mkdirSync(SCREENSHOT_DIR, { recursive: true });
   await page.screenshot({ path: file, fullPage: true }).catch(() => {});
   if (fs.existsSync(file)) await testInfo.attach('final screenshot', { path: file, contentType: 'image/png' });
 }
@@ -202,8 +225,35 @@ export function qaTest(id: string, body: Body): void {
       });
       return test.skip(title, details, body);
     }
-    test(title, details, body);
+    test(title, details, notOfferedIsBlocked(id, body));
   });
+}
+
+/**
+ * A picker that does not offer a record of the test (NotOffered: it filters
+ * only the first 50 records it loaded) stops the step it happened in and
+ * the steps after it: they are blocked by found blocker 40 when its list
+ * names them for the test case, else the error stands.
+ */
+function notOfferedIsBlocked(id: string, body: Body): Body {
+  const wrapped = async (args: Parameters<Body>[0], testInfo: Parameters<Body>[1]) => {
+    try {
+      await (body as (a: unknown, t: unknown) => Promise<void>)(args, testInfo);
+    } catch (e) {
+      if (!(e instanceof NotOffered)) throw e;
+      // Inside a step that step; between steps (a precondition of the next ones) the next step.
+      const at = testInfo as { qaStep?: number; qaInStep?: boolean; qaFailed?: number };
+      const from = at.qaFailed ?? (at.qaInStep ? (at.qaStep ?? 1) : (at.qaStep ?? 0) + 1);
+      const listed = foundBlocker(40).testCases.find((t) => t.id === id)?.steps?.filter((st) => st >= from) ?? [];
+      if (!listed.includes(from)) throw e;
+      const qa = (args as { qa: Qa }).qa;
+      qa.note(from, e.message);
+      for (const st of listed) qa.blocked(st, 40);
+    }
+  };
+  // Playwright reads the fixtures a test asks for from the text of its function: the wrapper asks for the body's.
+  wrapped.toString = () => (body as () => void).toString();
+  return wrapped as unknown as Body;
 }
 
 export { test };

@@ -20,14 +20,14 @@ export const BR_B = 'Kemayoran';
 export const REFUSAL = /no access|not allowed|forbidden|permission|missing required privilege|access denied|unauthori[sz]ed|tidak memiliki akses/i;
 
 /** A page of another prepared user, with the toast recorder. Close it with page.context().close(). */
-export async function userPage(browser: Browser, user: 'U1' | 'U2' | 'U3' | 'U6'): Promise<Page> {
+export async function userPage(browser: Browser, user: 'U1' | 'U2' | 'U3' | 'U4' | 'U5' | 'U6' | 'U7'): Promise<Page> {
   const page = await (await browser.newContext({ storageState: authFileOf(user) })).newPage();
   await installToastRecorder(page);
   return page;
 }
 
 /** Runs body with a page of user, closed at the end. */
-export async function asUser<T>(browser: Browser, user: 'U1' | 'U2' | 'U3' | 'U6', body: (page: Page) => Promise<T>): Promise<T> {
+export async function asUser<T>(browser: Browser, user: 'U1' | 'U2' | 'U3' | 'U4' | 'U5' | 'U6' | 'U7', body: (page: Page) => Promise<T>): Promise<T> {
   const page = await userPage(browser, user);
   try {
     return await body(page);
@@ -228,5 +228,52 @@ export async function saveIfOffered(desk: { save(v: Record<string, string>, acti
     const options = await desk.dialog.getByRole('combobox', { name: 'Action' }).locator('option').allInnerTexts().catch(() => [] as string[]);
     if (options.length && !options.map((o) => o.trim()).includes(action)) return null;
     throw e;
+  }
+}
+
+/**
+ * "Opening <screen> without being signed in": the address leads to the
+ * sign-in page with next=<route>; signing in there stays on the login page
+ * (checklist blocker 1: only the target /apps goes on), so step 2 is blocked
+ * by 1 and the user signs in through /apps to open the screen for step 3:
+ * signing out, then Back, shows the sign-in page again.
+ */
+export async function signedOutJourney(browser: Browser, qa: Qa, route: string, screen: RegExp): Promise<void> {
+  const { LoginPage } = await import('../../../pages/LoginPage');
+  const { PASSWORD } = await import('../../../lib/config');
+  const { userLogin } = await import('../../../lib/qa-data');
+  const context = await browser.newContext({ storageState: { cookies: [], origins: [] } });
+  context.setDefaultNavigationTimeout(30_000);
+  const page = await context.newPage();
+  const login = new LoginPage(page);
+  try {
+    await qa.step(1, async () => {
+      await page.goto(`/id${route}`);
+      await expect(page).toHaveURL(new RegExp(`/login\\?next=${encodeURIComponent(route).replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`), { timeout: 20_000 });
+    });
+    await qa.step(2, async () => {
+      await login.username.fill(userLogin('U1')!);
+      await login.password.fill(PASSWORD);
+      await login.submit.click();
+      await page.waitForURL(screen, { timeout: 20_000 }).catch(() => {});
+      if (/\/login/.test(page.url())) {
+        qa.note(2, `after "Sign in" the page stays on ${new URL(page.url()).pathname}${new URL(page.url()).search}`);
+        qa.blocked(2, 1);
+        await login.signIn(userLogin('U1')!, PASSWORD);
+        await page.goto(`/id${route}`);
+      } else if (!screen.test(page.url())) qa.deviation(2, 'The screen that was asked for', `after signing in: ${new URL(page.url()).pathname}`);
+    });
+    await qa.step(3, async () => {
+      await expect(page).toHaveURL(screen, { timeout: 20_000 });
+      await new AppHeader(page).signOut();
+      await page.waitForURL(/\/login/, { timeout: 20_000 }).catch(() => {});
+      // Back may wait for a load that never comes (the page is served from the cache): bounded.
+      await page.goBack({ timeout: 15_000 }).catch(() => {});
+      await page.waitForLoadState('networkidle', { timeout: 15_000 }).catch(() => {});
+      await expect(page).toHaveURL(/\/login/, { timeout: 15_000 });
+      await page.waitForLoadState('networkidle', { timeout: 15_000 }).catch(() => {});
+    });
+  } finally {
+    await context.close();
   }
 }

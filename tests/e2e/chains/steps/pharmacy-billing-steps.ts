@@ -123,7 +123,7 @@ export async function dispenseSteps(page: Page, qa: Qa, pt: Patient): Promise<{ 
  * the item price of the branch cannot be saved (found blocker 35): recorded
  * as a deviation, the chain goes on to the payment. Returns the RX number.
  */
-export async function saleSteps(page: Page, qa: Qa, sale: { before: Set<string>; toasts: string[] }): Promise<string> {
+export async function saleSteps(page: Page, qa: Qa, sale: { before: Set<string>; toasts: string[] }, recheck = false): Promise<string> {
   let rx = '';
   await qa.step(1, async () => {
     expect(sale.toasts).toContain(CONFIRMED);
@@ -152,7 +152,24 @@ export async function saleSteps(page: Page, qa: Qa, sale: { before: Set<string>;
     if (detail.includes(rx)) qa.note(3, `the newest sales voucher refers to ${rx}: "${detail.slice(0, 160)}"`);
     else qa.deviation(3, `One sales voucher referring to the invoice ${rx}`, `the newest SV- voucher does not name ${rx}: "${detail.slice(0, 160)}"`);
   });
-  qa.note(4, 'not repeated in the chain: the reload a minute later is TC-APP005-014 step 4 of the module run');
+  if (!recheck) {
+    qa.note(4, 'not repeated in the chain: the reload a minute later is TC-APP005-014 step 4 of the module run');
+    return rx;
+  }
+  await qa.step(4, async () => {
+    await page.waitForTimeout(60_000);
+    const v = new Vouchers(page);
+    await v.open();
+    const sv = v.rows().filter({ hasText: /^SV-/ });
+    let n = 0;
+    for (const r of (await sv.all()).slice(0, 10)) {
+      await r.getByRole('button', { name: 'Open' }).press('Enter');
+      await page.waitForLoadState('networkidle').catch(() => {});
+      if ((await v.detail.innerText()).includes(rx)) n++;
+    }
+    qa.note(4, `a minute later: ${n} of the 10 newest SV- vouchers refer to ${rx}`);
+    expect(n, `vouchers of ${rx}`).toBeLessThanOrEqual(1);
+  });
   return rx;
 }
 

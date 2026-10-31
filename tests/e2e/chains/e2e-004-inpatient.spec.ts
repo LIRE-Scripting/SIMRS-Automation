@@ -2,12 +2,16 @@ import { chainTest, expect } from '../../../fixtures/chain';
 import { installToastRecorder, toastLocator } from '../../../lib/assertions';
 import { newType, REQUEST, Requests, Ward } from '../../modules/04-inpatient/helpers';
 import { admitSteps, newBed } from './steps/inpatient-steps';
+import { inpatientOrder } from '../../modules/03-patient-care/cases';
+import { TC_APP005_005 } from '../../modules/05-pharmacy/evaluation-cases';
+import { TC_APP013_040 } from '../../modules/13-dietary/cases';
 
 /**
  * E2E-004: a patient is put on the admission waiting list, the request is
  * confirmed, the patient is admitted into a vacant bed and received on the
  * ward. The ward list "Ward care" does not offer the stay (found blocker 23),
- * so the chain stops at step 4 unless the list offers it.
+ * so the chain stops at step 4 unless the list offers it; then it goes on to
+ * the order, the ward supply and the diet, and stops at the kitchen (blocker 8).
  */
 chainTest('E2E-004', async ({ page, chain }) => {
   await installToastRecorder(page);
@@ -71,6 +75,11 @@ chainTest('E2E-004', async ({ page, chain }) => {
     });
   });
 
-  // Step 5: the doctor's order for the inpatient (TC-APP003-007) is marked "Needs Evaluation".
-  chain.stopAsPlanned(5);
+  // Steps 5-7 run their source test cases with their own records (an admitted patient with an inpatient order,
+  // the ward group, the diet prescription); step 8 (the diet order reaching the kitchen) is blocked by checklist
+  // blocker 8.
+  await chain.step(5, (qa) => inpatientOrder({ page, qa }));
+  await chain.step(6, (qa) => TC_APP005_005({ page, qa }));
+  await chain.step(7, (qa) => TC_APP013_040({ page, qa }));
+  chain.stopAsPlanned(8);
 });

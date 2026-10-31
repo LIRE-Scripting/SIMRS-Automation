@@ -255,10 +255,10 @@ export class IssueLinesPage {
    */
   async showRow(row: () => Locator, text: string): Promise<void> {
     await this.search.fill(text);
-    if (await row().first().waitFor({ timeout: 5_000 }).then(() => true, () => false)) return;
+    if (await row().first().waitFor({ timeout: 10_000 }).then(() => true, () => false)) return;
     await this.search.fill('');
     const next = this.main.getByRole('button', { name: 'Next page' });
-    for (let i = 0; i < 40; i++) {
+    for (let i = 0; i < 150; i++) {
       if (await row().first().waitFor({ timeout: 2_000 }).then(() => true, () => false)) return;
       if (!(await next.isVisible()) || (await next.isDisabled())) return;
       await next.click();

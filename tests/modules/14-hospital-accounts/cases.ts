@@ -3,6 +3,7 @@ import { toastsSince, toastMark } from '../../../lib/assertions';
 import { registerPatient } from '../../../lib/ambulatory-data';
 import { RegisteredPatientsPage } from '../../../pages/ambulatory/RegisteredPatientsPage';
 import { todayWib } from '../../../lib/dates';
+import { PHARMACY, stockOf, total } from '../../../lib/pharmacy-data';
 import { test, expect } from '../../../fixtures/e2e';
 import { select, sale, pay, paidSale, ensureSettings, counterClosed } from './helpers';
 import { rupiah, CashierPage } from '../../../pages/billing/CashierPage';
@@ -21,7 +22,7 @@ export const TC_APP014_053 = async ({ page, qa }: CaseArgs): Promise<void> => {
   const service = qa.code('X-VISITE');
 
   await qa.step(1, async () => {
-    await page.goto('/en/billing/cashier');
+    await page.goto('/id/billing/cashier');
     await page.getByRole('navigation', { name: 'Billing' }).getByRole('link', { name: 'Tarif' }).click();
     await expect(t.main.getByRole('heading', { level: 1, name: 'Tariff group' })).toBeVisible();
     await expect(t.main.getByRole('textbox', { name: 'Search' })).toBeVisible();
@@ -71,7 +72,7 @@ export const TC_APP014_057 = async ({ page, qa }: CaseArgs): Promise<void> => {
   const sponsor = qa.code('X-BPJS');
 
   await qa.step(1, async () => {
-    await page.goto('/en/billing/cashier');
+    await page.goto('/id/billing/cashier');
     await page.getByRole('navigation', { name: 'Billing' }).getByRole('link', { name: 'Rencana' }).click();
     await expect(pl.main.getByRole('heading', { level: 1, name: 'Patient plan' })).toBeVisible();
     await expect(pl.main.getByRole('columnheader')).toHaveText(['Status', 'Detail', 'Code', '']);
@@ -84,6 +85,11 @@ export const TC_APP014_057 = async ({ page, qa }: CaseArgs): Promise<void> => {
   await qa.step(3, async () => {
     expect(await pl.fillAndSave({ 'Group / plan code': code, 'Name / destination': sponsor, 'Patient / source': pt.id }, 'Plan')).toContain('Saved.');
     await pl.open();
+    if (!(await pl.row(code).first().waitFor({ timeout: 10_000 }).then(() => true, () => false))) {
+      // The list shows its first 21 plans with no paging or search (found blocker 40): the new plan is not there to be read.
+      qa.note(3, `the plan ${code} is saved but not among the ${(await pl.rows().count())} rows the list shows`);
+      return qa.blocked(3, 40);
+    }
     const c = await pl.cells(pl.row(code));
     expect(c[0]).toBe('active');
     expect(c[1]).toBe(`${code} ${sponsor}`);
@@ -108,7 +114,7 @@ export const TC_APP014_061 = async ({ page, qa }: CaseArgs): Promise<void> => {
   const invoice = qa.code('X-RI-0001');
 
   await qa.step(1, async () => {
-    await page.goto('/en/billing/cashier');
+    await page.goto('/id/billing/cashier');
     await page.getByRole('navigation', { name: 'Billing' }).getByRole('link', { name: 'Buku pasien' }).click();
     await expect(l.main.getByRole('heading', { level: 1, name: 'Patient ledger' })).toBeVisible();
     await expect(l.main.getByText('Tax and discount stay on the cashier. Sponsor and BPJS claims stay on the cashier insurance panel.', { exact: true })).toBeVisible();
@@ -311,8 +317,20 @@ export async function patientWithId(page: Page, qa: Qa): Promise<{ id: string; n
     body = (await (await answer)?.text()) ?? '';
   }
   expect(body, `an answer with the record of ${p.mrn}`).not.toBe('');
-  const items = JSON.parse(body.split('\n').find((l) => l.startsWith('1:'))!.slice(2)).items as { id: string; mrn: string }[];
-  const id = items.find((i) => i.mrn === p.mrn)!.id;
+  // The answer is a stream of lines; the record is in the one that holds a list of items with this MRN.
+  const found = body
+    .split('\n')
+    .map((l) => l.replace(/^\d+:/, ''))
+    .flatMap((l) => {
+      try {
+        return (JSON.parse(l).items ?? []) as { id: string; mrn: string }[];
+      } catch {
+        return [];
+      }
+    })
+    .find((i) => i.mrn === p.mrn);
+  expect(found, `the record of ${p.mrn} in the answer of the patient search`).toBeDefined();
+  const id = found!.id;
   qa.note(1, `test patient ${p.fullName} (${p.mrn}); its internal id ${id} is read from the answer of the patient search, as no screen shows it`);
   return { id, name: p.fullName, mrn: p.mrn };
 }
@@ -342,7 +360,7 @@ export class DeskScreen {
     this.dialog = page.getByRole('dialog', { name: dialogName });
   }
   async open(): Promise<void> {
-    await this.page.goto(`/en/billing/${this.route}`);
+    await this.page.goto(`/id/billing/${this.route}`);
     await expect(this.main.getByRole('heading', { level: 1, name: this.heading })).toBeVisible();
     await this.page.waitForLoadState('networkidle').catch(() => {});
   }
@@ -390,3 +408,48 @@ export class DeskScreen {
     return toastsAfter(this.page, mark);
   }
 }
+
+/** TC-APP014-016: Item price of Fast Cashier and an estimate (the price cannot be saved, found blocker 35). */
+export const TC_APP014_016 = async ({ page, qa }: CaseArgs): Promise<void> => {
+  const c = new CashierPage(page);
+  await c.open();
+  await qa.step(1, async () => {
+    await page.getByRole('combobox', { name: 'Visit' }).selectOption('Outpatient');
+    for (const f of ['Site margin', 'Tax (%)']) await expect(page.getByRole('textbox', { name: f })).toBeVisible();
+    await expect(page.getByRole('combobox', { name: 'Method' })).toBeVisible();
+    await expect(page.getByRole('checkbox', { name: 'Block a price below cost' })).toBeVisible();
+  });
+  qa.blocked(2, 35);
+  qa.note(2, '"Save price" answers HTTP 500 (found blocker 35): the price stays at cost with no tax');
+  const before = total(await stockOf(page, PHARMACY.para.code));
+  await c.open();
+  // The card of "Estimate": its heading sits in the card's header.
+  const estimate = page.getByRole('heading', { name: 'Estimate' }).locator('xpath=../..');
+  await qa.step(3, async () => {
+    const fields = await estimate.locator('input, select').evaluateAll((es) => es.map((e) => `${(e as HTMLInputElement).labels?.[0]?.innerText ?? ''}:${e.tagName}:${(e as HTMLInputElement).type}`));
+    qa.note(3, `the Estimate card: ${fields.join(', ')}`);
+    await estimate.getByRole('textbox', { name: 'Patient' }).fill(qa.name('X Pasien Estimasi'));
+    const item = estimate.getByRole('textbox', { name: 'Item code' }).or(estimate.getByRole('combobox', { name: 'Item code' })).first();
+    await item.fill(PHARMACY.para.code);
+    const list = await item.getAttribute('aria-controls');
+    if (list) await page.locator(`#${list}`).getByRole('option').first().click().catch(() => {});
+    const qty = estimate.getByRole('spinbutton').first();
+    if (await qty.count()) await qty.fill('10');
+    else qa.deviation(3, 'Picks QA-PARA, quantity 10', 'the card has no quantity field: each line is one unit');
+    await estimate.getByRole('button', { name: 'Add line' }).click();
+    await page.waitForLoadState('networkidle').catch(() => {});
+    const text = (await estimate.innerText()).replace(/\s+/g, ' ');
+    qa.note(3, `after "Add line": "${text.slice(-160)}"`);
+    expect(text).toMatch(new RegExp(`${PHARMACY.para.code}|${PHARMACY.para.name}`));
+  });
+  await qa.step(4, async () => {
+    await estimate.getByRole('button', { name: 'Estimate', exact: true }).click();
+    await page.waitForLoadState('networkidle').catch(() => {});
+    const text = (await estimate.innerText()).replace(/\s+/g, ' ');
+    qa.note(4, `estimate: "${text.slice(-160)}"`);
+    if (!text.includes('Rp 13.875')) qa.deviation(4, 'Patient net Rp 12.500, Tax Rp 1.375, Total Rp 13.875', 'priced at cost with no tax (found blocker 35)');
+  });
+  await qa.step(5, async () => {
+    expect(total(await stockOf(page, PHARMACY.para.code))).toBe(before);
+  });
+};

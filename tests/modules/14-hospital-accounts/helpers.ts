@@ -1,4 +1,4 @@
-import { expect, type Page } from '@playwright/test';
+import { expect, type Locator, type Page } from '@playwright/test';
 import { BILLING } from '../../../lib/billing-data';
 import { CashierPage } from '../../../pages/billing/CashierPage';
 
@@ -91,21 +91,21 @@ export async function paidSale(page: Page, amount = '150000'): Promise<string> {
  * not show the number of a sale). The list of hits is capped: a prefix whose
  * list is full is split into its 16 longer prefixes.
  */
+/**
+ * The newest RX- invoices: the cashier search for "RX-" lists the 20 newest
+ * first (seen 2026-10-30). Read before and after a sale, the one new number
+ * is the sale's invoice. (Walking every prefix of the numbers took thousands
+ * of searches once the site held a few thousand RX- invoices.)
+ */
 export async function rxInvoices(page: Page): Promise<Set<string>> {
   const c = new CashierPage(page);
   await c.open();
-  const all = new Set<string>();
-  const read = async (prefix: string): Promise<void> => {
-    await c.search.fill(`RX-${prefix}`);
-    await c.button('Search').click();
-    const hits = page.getByRole('listbox').getByRole('button');
-    await hits.first().waitFor({ timeout: 5_000 }).catch(() => {});
-    const found = (await hits.allInnerTexts()).map((t) => t.match(/RX-[0-9a-f]{8}/)?.[0]).filter((x): x is string => !!x);
-    found.forEach((x) => all.add(x));
-    if (found.length >= 10 && prefix.length < 3) for (const d of '0123456789abcdef') await read(prefix + d);
-  };
-  for (const d of '0123456789abcdef') await read(d);
-  return all;
+  await c.search.fill('RX-');
+  await c.button('Search').click();
+  const hits = page.getByRole('listbox').getByRole('button');
+  await hits.first().waitFor({ timeout: 10_000 }).catch(() => {});
+  await page.waitForLoadState('networkidle').catch(() => {});
+  return new Set((await hits.allInnerTexts()).map((t) => t.match(/RX-[0-9a-f]{8}/)?.[0]).filter((x): x is string => !!x));
 }
 
 /** The one RX- invoice the cashier search offers now and did not offer `before` (a sale made in between). */
@@ -113,4 +113,12 @@ export async function newRxInvoice(page: Page, before: Set<string>): Promise<str
   const added = [...(await rxInvoices(page))].filter((x) => !before.has(x));
   expect(added, 'one new RX- invoice in the cashier search').toHaveLength(1);
   return added[0];
+}
+
+/** The "Dispense discounts" panel of Fast Cashier and its waiting rows (each with "Approve" and "Reject"). */
+export async function holds(page: Page): Promise<{ panel: Locator; rows: Locator }> {
+  await new CashierPage(page).open();
+  const panel = page.getByRole('heading', { name: 'Dispense discounts' }).locator('xpath=..');
+  const rows = panel.locator('xpath=.//*[.//button[normalize-space()="Approve" or normalize-space()="Setujui"] and .//button[normalize-space()="Reject" or normalize-space()="Tolak"]][not(.//*[.//button[normalize-space()="Approve" or normalize-space()="Setujui"] and .//button[normalize-space()="Reject" or normalize-space()="Tolak"]])]');
+  return { panel, rows };
 }

@@ -3,7 +3,7 @@ import type { Qa } from '../../../fixtures/e2e';
 import { registerPatient } from '../../../lib/ambulatory-data';
 import { toastMark, toastsSince } from '../../../lib/assertions';
 import { CLINICAL } from '../../../lib/clinical-data';
-import { closeDialog, ensurePharmacyItems, PHARMACY, PHARMACY_STORE, receive, type PharmacyItem } from '../../../lib/pharmacy-data';
+import { closeDialog, ensurePharmacyItems, PHARMACY, PHARMACY_STORE, receive, stockOf, type PharmacyItem } from '../../../lib/pharmacy-data';
 import { ItemMasterPage } from '../../../pages/inventory/InventoryE2EPages';
 import { ConsultationPage } from '../../../pages/clinical/ConsultationPage';
 import { DispenseWizard } from '../../../pages/pharmacy/PharmacyE2EPages';
@@ -122,11 +122,11 @@ export function expectRefused(qa: Qa, step: number, toasts: string[], expected: 
 
 export { backToIndonesian } from '../shared/language';
 
-/** An item made for this test only (code + token), with one batch in the stand-in store. */
-export async function ownItem(page: Page, qa: Qa, base: string, name: string, batches: { quantity: string; expiry: string }[]): Promise<PharmacyItem & { batches: string[] }> {
+/** An item made for this test only (code + token), with its batches in the stand-in store; `lastCost` '' leaves the cost empty. */
+export async function ownItem(page: Page, qa: Qa, base: string, name: string, batches: { quantity: string; expiry: string }[], lastCost: string = para.lastCost): Promise<PharmacyItem & { batches: string[] }> {
   const items = new ItemMasterPage(page);
   const t = qa.token();
-  const it = { code: `${base}-${t}`, name: `${name} ${t}`, lastCost: para.lastCost };
+  const it = { code: `${base}-${t}`, name: `${name} ${t}`, lastCost };
   await items.open();
   const d = await items.openAdd();
   await items.fill(d, { ...it, batchTracked: true });
@@ -136,13 +136,20 @@ export async function ownItem(page: Page, qa: Qa, base: string, name: string, ba
   const names: string[] = [];
   if (batches.length) {
     await items.open();
-    const e = await items.openEdit(it);
+    let e = await items.openEdit(it);
     for (const [i, b] of batches.entries()) {
       const batch = `B${i + 1}-${t}`;
       const m = await toastMark(page);
       await items.addBatch(e, { store: PHARMACY_STORE.name, batch, expiry: b.expiry, quantity: b.quantity });
-      await expect.poll(() => toastsSince(page, m)).toContain('Batch quantity added.');
+      const added = await expect.poll(() => toastsSince(page, m), { timeout: 20_000 }).toContain('Batch quantity added.').then(() => true, () => false);
       names.push(batch);
+      if (!added) {
+        // No toast seen: the stock of the item tells whether the batch was received.
+        await closeDialog(page, e);
+        expect((await stockOf(page, it.code)).get(batch), `batch ${batch} received`).toBe(Number(b.quantity));
+        await items.open();
+        e = await items.openEdit(it);
+      }
     }
     await closeDialog(page, e);
   }

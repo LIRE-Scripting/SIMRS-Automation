@@ -190,7 +190,7 @@ qaTest('TC-APP018-004', TC_APP018_004);
 qaTest('TC-APP018-005', async ({ page, qa }) => {
   const d = departments(page);
   const dep = await department(page, qa);
-  const renamed = qa.name('QA Poli Uji Dua');
+  const renamed = qa.name('QA Zz Poli Uji Dua');
   await qa.step(1, async () => {
     await d.edit(dep.code);
     await expect(d.dialog).toHaveAccessibleName('Edit Department');
@@ -372,7 +372,7 @@ qaTest('TC-APP018-012', async ({ page, qa }) => {
     const labels = (await page.getByRole('dialog').locator('label').allInnerTexts()).map((t) => t.trim()).filter(Boolean);
     const d = departments(page);
     await d.dialog.locator('input').first().fill(qa.code('QA-DEP-01'));
-    await d.dialog.locator('input').nth(1).fill(qa.name('QA Poli Uji'));
+    await d.dialog.locator('input').nth(1).fill(qa.name('QA Zz Poli Uji'));
     const toasts = await d.save();
     qa.note(4, `button "${addText}", fields ${labels.slice(0, 3).join(', ')}, toast "${toasts.join(' / ')}"`);
     if (addText !== 'Tambah Departemen' || !toasts.includes('Departemen ditambahkan.')) {
@@ -396,7 +396,7 @@ qaTest('TC-APP018-015', async ({ page, qa }) => {
     if (!toasts.some((t) => /already|exists|used/i.test(t))) qa.deviation(s, expected, `toast "${toasts.join(' / ')}"`);
   };
   await qa.step(1, () => refused(1, sites(page), { 'Site code': SITE_NEW.code, 'Site name': qa.name('QA Klinik Uji') }, SITE_NEW.code, 'A message that the code already exists. No row is added'));
-  await qa.step(2, () => refused(2, departments(page), { 'Department code': dep.code, 'Department name': qa.name('QA Poli Uji') }, dep.code, 'A message that the code already exists'));
+  await qa.step(2, () => refused(2, departments(page), { 'Department code': dep.code, 'Department name': qa.name('QA Zz Poli Uji') }, dep.code, 'A message that the code already exists'));
   await qa.step(3, () => refused(3, countries(page), { 'Country code': country, 'Country name': qa.name('QA Negara Uji') }, country, 'A message that the code already exists'));
   await qa.step(4, async () => {
     expect(await addTax(page, { code: tax.toLowerCase(), name: qa.name('QA PPN 11 persen'), rate: '11' })).toContain('This code already exists.');
@@ -410,7 +410,7 @@ qaTest('TC-APP018-015', async ({ page, qa }) => {
 qaTest('TC-APP018-016', async ({ page, qa }) => {
   const d = departments(page);
   await qa.step(1, async () => {
-    for (const v of [{ 'Department name': qa.name('QA Poli Uji') }, { 'Department code': qa.code('QA-DEP-02') }] as Record<string, string>[]) {
+    for (const v of [{ 'Department name': qa.name('QA Zz Poli Uji') }, { 'Department code': qa.code('QA-DEP-02') }] as Record<string, string>[]) {
       const toasts = await d.add(v);
       expect(toasts.join(' ')).not.toMatch(/added/i);
       const invalid = await invalidFields(d.dialog);
@@ -419,14 +419,14 @@ qaTest('TC-APP018-016', async ({ page, qa }) => {
     }
   });
   await qa.step(2, async () => {
-    const toasts = await d.add({ 'Department code': '   ', 'Department name': qa.name('QA Poli Uji') });
+    const toasts = await d.add({ 'Department code': '   ', 'Department name': qa.name('QA Zz Poli Uji') });
     if (toasts.join(' ').match(/added/i)) qa.deviation(2, 'Refused: the code is missing', `toast "${toasts.join(' / ')}"`);
     else qa.note(2, `toast "${toasts.join(' / ')}"`);
   });
   await qa.step(3, async () => {
     const code = qa.code('QA-DEP-02');
-    const first = await d.add({ 'Department code': ` ${code} `, 'Department name': qa.name('QA Poli Uji') });
-    const second = await d.add({ 'Department code': code, 'Department name': qa.name('QA Poli Uji') });
+    const first = await d.add({ 'Department code': ` ${code} `, 'Department name': qa.name('QA Zz Poli Uji') });
+    const second = await d.add({ 'Department code': code, 'Department name': qa.name('QA Zz Poli Uji') });
     qa.note(3, `with spaces: "${first.join(' / ')}"; without: "${second.join(' / ')}"`);
     if (second.join(' ').match(/added/i)) qa.deviation(3, 'The first is saved without the spaces; the second is refused as a double', 'both are saved: the spaces are kept');
   });

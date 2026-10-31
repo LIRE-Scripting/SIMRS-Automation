@@ -7,7 +7,7 @@ import { CashierPage } from '../../../pages/billing/CashierPage';
 import { patient, sell, stock } from '../05-pharmacy/helpers';
 import { userPage } from '../shared/access';
 import { clickFor } from '../19-finance/helpers';
-import { counterClosed, ensureSettings } from './helpers';
+import { counterClosed, ensureSettings, holds } from './helpers';
 
 /**
  * 14-hospital-accounts.xlsx, Fast Cashier, "Dispense discounts": a line
@@ -26,14 +26,6 @@ test.beforeEach(async ({ page }) => {
 });
 
 const OVER = String(Number(BILLING.counter['Maximum line discount (%)']) * 2);
-
-/** The "Dispense discounts" panel of Fast Cashier and its waiting rows (each with "Approve" and "Reject"). */
-async function holds(page: Page): Promise<{ panel: Locator; rows: Locator }> {
-  await new CashierPage(page).open();
-  const panel = page.getByRole('heading', { name: 'Dispense discounts' }).locator('xpath=..');
-  const rows = panel.locator('xpath=.//*[.//button[normalize-space()="Approve" or normalize-space()="Setujui"] and .//button[normalize-space()="Reject" or normalize-space()="Tolak"]][not(.//*[.//button[normalize-space()="Approve" or normalize-space()="Setujui"] and .//button[normalize-space()="Reject" or normalize-space()="Tolak"]])]');
-  return { panel, rows };
-}
 
 /** Two dispenses of the test with a discount above the maximum; returns the toasts of each and the rows waiting before them. */
 async function twoHeld(page: Page, qa: Qa): Promise<{ before: number; toasts: string[][] }> {

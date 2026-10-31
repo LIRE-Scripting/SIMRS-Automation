@@ -21,5 +21,5 @@ export const PASSWORD = requiredEnv('QA_PASSWORD');
 /** Session files of the workbook users (00-prerequisites.xlsx | Users). */
 export const authFileOf = (userKey: string): string => `.auth/${userKey}.json`;
 
-/** Screenshots taken at the end of every test land here. */
-export const SCREENSHOT_DIR = 'screenshots';
+/** Screenshots taken at the end of every test (named by test case or chain) land here; linked from the result workbooks. */
+export const SCREENSHOT_DIR = 'reports/screenshots';

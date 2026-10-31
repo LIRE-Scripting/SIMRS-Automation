@@ -6,15 +6,21 @@ import { PHARMACY } from '../../../lib/pharmacy-data';
 import { RegisteredPatientsPage } from '../../../pages/ambulatory/RegisteredPatientsPage';
 import { ItemMasterPage } from '../../../pages/inventory/InventoryE2EPages';
 import { DispenseWizard } from '../../../pages/pharmacy/PharmacyE2EPages';
-import { CONFIRMED, confirm, patient, stock, toastsAfter } from '../../modules/05-pharmacy/helpers';
+import { CONFIRMED, confirm, patient, sell, stock, toastsAfter } from '../../modules/05-pharmacy/helpers';
+import { TC_APP005_013 } from '../../modules/05-pharmacy/evaluation-cases';
+import { TC_APP005_017 } from '../../modules/05-pharmacy/issue-cases';
+import { TC_APP007_008 } from '../../modules/07-inventory/evaluation-cases';
+import { rxInvoices } from '../../modules/14-hospital-accounts/helpers';
+import { TC_APP019_010 } from '../../modules/19-finance/evaluation-cases';
+import { paySteps, saleSteps } from './steps/pharmacy-billing-steps';
 
 /**
  * E2E-017: stock is received into the pharmacy store, items are found by
  * search and scan for PT-1, a new walk-in is registered from the counter and
  * buys, and PT-1 buys several items with labels. Each step uses the data of
- * its workbook (IT-1 in 07, QA-PARA and QA-IBU in 05). Step 5 (stock off the
- * right batch, TC-APP005-013) is marked "Needs Evaluation", so the chain stops
- * there. ST-1/ST-OP cannot be made (found blocker 26): the seed store stands in.
+ * its workbook (IT-1 in 07, QA-PARA and QA-IBU in 05). Steps 5-10 run their
+ * source test cases with their own records (batches, return, the sale at the
+ * cashier and in Finance). ST-1/ST-OP cannot be made (found blocker 26): the seed store stands in.
  */
 const para = PHARMACY.para;
 const NO_INTERACTIONS = 'No drug interactions detected for this order.';
@@ -187,5 +193,17 @@ chainTest('E2E-017', async ({ page, chain }) => {
     });
   });
 
-  chain.stopAsPlanned(5);
+  await chain.step(5, (qa) => TC_APP005_013({ page, qa }));
+  await chain.step(6, (qa) => TC_APP005_017({ page, qa }));
+  await chain.step(7, (qa) => TC_APP007_008({ page, qa }));
+  const rx = await chain.step(8, async (qa) => {
+    await stock(page, qa);
+    const p = await patient(page, qa);
+    const before = await rxInvoices(page);
+    const toasts = await sell(page, p, [{ item: para, requested: '10', issued: '10' }]);
+    qa.note(1, `the sale of this step: QA-PARA x 10 to ${p.fullName}`);
+    return saleSteps(page, qa, { before, toasts });
+  });
+  await chain.step(9, (qa) => paySteps(page, qa, rx));
+  await chain.step(10, (qa) => TC_APP019_010({ page, qa }));
 });

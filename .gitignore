@@ -3,6 +3,7 @@ test-results/
 playwright-report/
 .auth/
 screenshots/
+reports/screenshots/
 .playwright-mcp/
 .env
 

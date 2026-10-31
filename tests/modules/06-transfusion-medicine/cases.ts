@@ -116,7 +116,7 @@ export async function save(page: Page, d: import('@playwright/test').Locator, bu
 export const NO_UNIT = 'needs a screened, available unit (UNIT-1/UNIT-2/UNIT-F): a bag is numbered on Donors (HTTP 500) and released by a second user';
 
 /** A request saved for a new PT-1 with one line of `component`; returns the patient and the request number. */
-export async function savedRequest(page: Page, qa: Qa, component = 'PRC') {
+export async function savedRequest(page: Page, qa: Qa, component = 'PRC', approve = true) {
   const p = await registerPatient(page, BLOODBANK.pt1.name, qa.token());
   const req = new RequestsPage(page);
   await req.open();
@@ -136,7 +136,7 @@ export async function savedRequest(page: Page, qa: Qa, component = 'PRC') {
   const number = (await saved.getByText(/^RQ\d+$/).first().innerText()).trim();
   // Preconditions "an approved request": approved here by its author; today the site answers HTTP 500 (found blocker 25).
   let approved = (await saved.getByText('Approved', { exact: true }).count()) > 0;
-  if (!approved && (await saved.getByRole('button', { name: 'Approve' }).isVisible())) {
+  if (approve && !approved && (await saved.getByRole('button', { name: 'Approve' }).isVisible())) {
     const mark = await toastMark(page);
     await saved.getByRole('button', { name: 'Approve' }).click();
     const toasts = await toastsAfter(page, mark);

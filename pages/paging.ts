@@ -16,7 +16,11 @@ async function pressNext(main: Locator): Promise<boolean> {
   if (!(await pager.count()) || !(await next.count()) || !(await next.isVisible()) || (await next.isDisabled())) return false;
   const before = await pager.innerText();
   await next.press('Enter');
-  await expect(pager).not.toHaveText(before);
+  // A press that lands while the list is still drawn is lost now and then: it is pressed once more.
+  if (!(await expect(pager).not.toHaveText(before, { timeout: 8_000 }).then(() => true, () => false))) {
+    await next.press('Enter');
+    await expect(pager).not.toHaveText(before);
+  }
   return true;
 }
 

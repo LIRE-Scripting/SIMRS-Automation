@@ -7,6 +7,7 @@ import { defineAppointmentCases } from '../shared/appointment-cases';
  * tests/modules/shared/appointment-cases.ts and run here on /appointment/schedule.
  */
 defineAppointmentCases('/id/appointment/schedule', {
+  quotaFull: 'TC-APP002-009',
   bookSettings: 'TC-APP002-001',
   bookConsultant: 'TC-APP002-002',
   bookUnit: 'TC-APP002-003',

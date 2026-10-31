@@ -221,7 +221,10 @@ qaTest('TC-APP014-066', async ({ page, qa }) => {
 });
 
 qaTest('TC-APP014-067', async ({ qa }) => {
-  qa.notRun(1, 'needs two users saving at the same moment (U4 "Second user of the same role" is not made)');
+  // U4 can be the second user now, but the source of the move must be an invoice chosen on Patient ledger: an
+  // invoice of the test is not on the list and "Find patient" shows no rows (found blocker 36), and the seed
+  // invoices of the list are not moved.
+  qa.blocked(1, 36);
 });
 
 qaTest('TC-APP014-068', async () => {

@@ -188,6 +188,29 @@ export async function registerPatient(
   return reg.register({ visitType: 'Outpatient', firstName: words.join(' '), lastName: `${last} ${token}`, dateOfBirth });
 }
 
+/** Two registered patients with the same full name (the workbook name + token); returns both with their MRNs. */
+export async function registerTwins(page: Page, excelName: string, token: string): Promise<[{ mrn: string; fullName: string }, { mrn: string; fullName: string }]> {
+  const reg = new RegisteredPatientsPage(page);
+  const words = excelName.split(' ');
+  const last = `${words.pop()} ${token}`;
+  for (let i = 0; i < 2; i++) {
+    await reg.open();
+    const d = await reg.openRegister();
+    await reg.fillRegister({ visitType: 'Outpatient', firstName: words.join(' '), lastName: last }, d);
+    await reg.registerButton(d).click();
+    await expect(page.getByText('Patient registered', { exact: true }).first()).toBeVisible();
+    await expect(d).toBeHidden();
+  }
+  await reg.search(last);
+  const rows = reg.row(last);
+  await expect(rows).toHaveCount(2);
+  const out: { mrn: string; fullName: string }[] = [];
+  for (const r of await rows.all()) {
+    out.push({ mrn: (await (await reg.cell(r, 'MRN')).innerText()).trim(), fullName: (await (await reg.cell(r, 'Full name')).innerText()).trim() });
+  }
+  return [out[0], out[1]];
+}
+
 // ---------------------------------------------------------------- D-day
 
 /**

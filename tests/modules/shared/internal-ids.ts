@@ -13,7 +13,7 @@ import { BedsPage } from '../../../pages/inpatient/InpatientPages';
 async function answerWith(page: Page, marker: string, act: () => Promise<void>): Promise<string> {
   // The body is kept as soon as it is seen: a later navigation makes it unreadable.
   let body = '';
-  for (let i = 0; i < 3 && !body; i++) {
+  for (let i = 0; i < 5 && !body; i++) {
     const answer = page
       .waitForResponse(
         async (r) => {
@@ -59,6 +59,8 @@ export async function patientIdOf(page: Page, mrn: string): Promise<string> {
   const body = await answerWith(page, `"mrn":"${mrn}"`, async () => {
     await reg.open();
     await reg.search(mrn);
+    // The list draws the found patient after the answer; the wait keeps the answer that carries it.
+    await reg.row(mrn).first().waitFor({ timeout: 8_000 }).catch(() => {});
   });
   return itemOf<{ id: string; mrn: string }>(body, 'mrn', mrn).id as string;
 }

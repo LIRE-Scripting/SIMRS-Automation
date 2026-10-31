@@ -1,6 +1,9 @@
 import { expect, type Locator, type Page } from '@playwright/test';
 import type { Qa } from '../../../fixtures/e2e';
-import { toastLocator } from '../../../lib/assertions';
+import { toastLocator, toastMark, toastsSince } from '../../../lib/assertions';
+import { escapeRe } from '../../../pages/ambulatory/RegisteredPatientsPage';
+import { typeAhead } from '../../../pages/pharmacy/PharmacyE2EPages';
+import { NotOffered } from '../../../lib/not-offered';
 
 /** Shared screens of 04-inpatient.xlsx: admission requests and Ward care. */
 
@@ -100,5 +103,97 @@ export class Ward {
 
   control(name: string): Locator {
     return this.main.getByRole('button', { name, exact: true });
+  }
+}
+
+/**
+ * Admissions, tab "Ward supply": three cards. "Store" (a store type-ahead,
+ * "Pending inpatient orders" as tick boxes "<patient> — <drug> · <qty>",
+ * "Group for this store"), "Ward supply" (the groups, Receive or Refuse) and
+ * "Stay" (a stay type-ahead, then "Request return" on the issued lines).
+ * ST-IP cannot be made (found blocker 26): the seed store of the pharmacy
+ * tests (STAND_IN_STORE) stands in.
+ */
+export class WardSupply {
+  readonly main: Locator;
+  constructor(readonly page: Page) {
+    this.main = page.getByRole('main');
+  }
+
+  async open(): Promise<void> {
+    await this.page.goto('/id/adt/admissions');
+    await this.main.getByRole('tab', { name: 'Ward supply' }).click();
+    await expect(this.main.getByRole('heading', { level: 2, name: 'Stay' })).toBeVisible();
+    await this.page.waitForLoadState('networkidle').catch(() => {});
+  }
+
+  card(heading: 'Store' | 'Ward supply' | 'Stay'): Locator {
+    // The heading sits in the card's header, next to its description.
+    return this.main.getByRole('heading', { level: 2, name: heading, exact: true }).locator('xpath=../..');
+  }
+
+  store(): Locator {
+    return this.card('Store').getByRole('combobox', { name: 'Store' });
+  }
+
+  async pickStore(text: string): Promise<void> {
+    await typeAhead(this.page, this.store(), text);
+  }
+
+  /** The tick box of a pending order of the patient. */
+  pending(patient: string): Locator {
+    return this.card('Store').getByRole('checkbox', { name: new RegExp(escapeRe(patient)) });
+  }
+
+  /** Ticks the patient's pending orders and clicks "Group for this store"; returns the toasts. */
+  async group(patient: string): Promise<string[]> {
+    const boxes = this.pending(patient);
+    for (const b of await boxes.all()) await b.check();
+    const mark = await toastMark(this.page);
+    await this.card('Store').getByRole('button', { name: 'Group for this store' }).click();
+    await expect.poll(async () => (await toastsSince(this.page, mark)).length, { timeout: 10_000 }).toBeGreaterThan(0).catch(() => {});
+    return toastsSince(this.page, mark);
+  }
+
+  /** The Receive (or Refuse) buttons of the open groups in the "Ward supply" card. */
+  groupButtons(action: 'Receive' | 'Refuse'): Locator {
+    return this.card('Ward supply').getByRole('button', { name: action, exact: true });
+  }
+
+  /** The row of a group button: the badge and "patient — drug, …" next to the buttons' box. */
+  rowOf(button: Locator): Locator {
+    return button.locator('xpath=../..');
+  }
+
+  /** Clicks Receive or Refuse on the group of the button; returns the toasts. */
+  async decide(button: Locator, action: 'Receive' | 'Refuse'): Promise<string[]> {
+    const mark = await toastMark(this.page);
+    await button.click();
+    const confirm = this.page.getByRole('dialog').getByRole('button', { name: new RegExp(`^(${action}|Confirm|Yes)`) });
+    if (await confirm.first().isVisible({ timeout: 1500 }).catch(() => false)) await confirm.first().click();
+    await expect.poll(async () => (await toastsSince(this.page, mark)).length, { timeout: 10_000 }).toBeGreaterThan(0).catch(() => {});
+    return toastsSince(this.page, mark);
+  }
+
+  /**
+   * Picks a stay in the "Stay" card by the name, else by the admission number;
+   * NotOffered (found blocker 40) when neither finds it ("No matching stay").
+   */
+  async pickStay(patient: string, admissionNo?: string): Promise<void> {
+    const field = this.card('Stay').getByRole('combobox').first();
+    for (const text of [patient, admissionNo].filter((x): x is string => !!x)) {
+      const list = this.page.locator(`#${await field.getAttribute('aria-controls')}`);
+      await field.click();
+      await field.fill('');
+      await field.pressSequentially(text, { delay: 20 });
+      const option = list.getByRole('option').filter({ hasText: text }).first();
+      if (await option.waitFor({ timeout: 6_000 }).then(() => true, () => false)) {
+        const b = option.getByRole('button');
+        await ((await b.count()) ? b.first() : option).click();
+        await this.page.waitForLoadState('networkidle').catch(() => {});
+        return;
+      }
+    }
+    throw new NotOffered(`the stay "${patient}"${admissionNo ? ` (${admissionNo})` : ''} is not offered by "Stay" of Ward supply (found blocker 40)`);
   }
 }

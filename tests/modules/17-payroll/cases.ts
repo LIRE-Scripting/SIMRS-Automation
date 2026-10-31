@@ -1,3 +1,4 @@
+import { everyPage } from '../../../pages/paging';
 import { todayWib } from '../../../lib/dates';
 import { payrollEmployee, RAN, Batches } from './helpers';
 import { expect } from '../../../fixtures/e2e';
@@ -15,7 +16,7 @@ export const TC_APP017_001 = async ({ page, qa }: CaseArgs): Promise<void> => {
   const e = await payrollEmployee(page, qa);
   let head = '';
   await qa.step(1, async () => {
-    await page.goto('/en/apps');
+    await page.goto('/id/apps');
     await page.getByRole('link', { name: /^Payroll\b/ }).first().click();
     await page.getByRole('main').getByRole('link', { name: 'Batches' }).click();
     await expect(page.getByRole('heading', { level: 1, name: 'Payroll batches' })).toBeVisible();
@@ -49,11 +50,21 @@ export const TC_APP017_001 = async ({ page, qa }: CaseArgs): Promise<void> => {
   });
   await qa.step(5, async () => {
     await b.close();
-    const c = await b.cells(b.rows().first());
-    expect(c[0]).toBe(head.match(/^#(\d+)/)![1]);
-    expect(c[1]).toBe('COMPLETED');
-    expect(c[2]).toBe('0');
-    expect(c[3]).toMatch(/^[0-9a-f]{8}$/);
+    // The batch of this run is on the last page (the list is kept lowest number first): find it by its number.
+    const number = head.match(/^#(\d+)/)![1];
+    let c: string[] | undefined;
+    await expect.poll(async () => {
+      const listed = await everyPage(page.getByRole('main'), () =>
+        b.rows().evaluateAll((rs) => rs.map((r) => Array.from(r.querySelectorAll('td')).map((td) => td.textContent?.trim() ?? ''))),
+      );
+      c = listed.find((x) => x[0] === number);
+      return c !== undefined;
+    }, { timeout: 10_000 }).toBe(true);
+    expect(c, `batch #${number} is listed`).toBeDefined();
+    expect(c![0]).toBe(number);
+    expect(c![1]).toBe('COMPLETED');
+    expect(c![2]).toBe('0');
+    expect(c![3]).toMatch(/^[0-9a-f]{8}$/);
   });
 };
 

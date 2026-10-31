@@ -1,8 +1,10 @@
 import { clickFor, BR_A, ruleNow, retireAccount, restoreRule, createAccount, addMonths, account, Years, PostingRules, Accounts } from './helpers';
 import { todayWib, addDays } from '../../../lib/dates';
 import { expect } from '../../../fixtures/e2e';
+import { FinanceDesk } from './finance-desk';
 import type { Page } from '@playwright/test';
 import type { Qa } from '../../../fixtures/e2e';
+import { NotOffered } from '../../../lib/not-offered';
 
 /**
  * Test cases of 19-finance that end-to-end chains run too (tests/e2e/chains/):
@@ -15,7 +17,7 @@ export const TC_APP019_001 = async ({ page, qa }: CaseArgs): Promise<void> => {
   const code = qa.code('QA-FY-NEXT');
   let latest = '';
   await qa.step(1, async () => {
-    await page.goto('/en/apps');
+    await page.goto('/id/apps');
     await page.getByRole('link', { name: /^Finance\b/ }).first().click();
     await page.getByRole('main').getByRole('link', { name: 'Financial years' }).click();
     await expect(y.main.getByRole('heading', { level: 1, name: 'Financial years' })).toBeVisible();
@@ -51,7 +53,7 @@ export const TC_APP019_004 = async ({ page, qa }: CaseArgs): Promise<void> => {
   const bank = account(qa, 'QA-1010', 'QA Bank Uji', 'Bank');
   try {
     await qa.step(1, async () => {
-      await page.goto('/en/finance');
+      await page.goto('/id/finance');
       await page.getByRole('main').getByRole('link', { name: 'Chart of accounts' }).click();
       await expect(acc.main.getByRole('heading', { level: 1, name: 'Chart of accounts' })).toBeVisible();
       await expect(acc.main.getByText('Group and leaf accounts. Only active leaf accounts take postings; a branch restriction limits a leaf to one branch.', { exact: true })).toBeVisible();
@@ -98,7 +100,7 @@ export const TC_APP019_007 = async ({ page, qa }: CaseArgs): Promise<void> => {
   const was = await ruleNow(page, CAPITAL);
   try {
     await qa.step(1, async () => {
-      await page.goto('/en/finance');
+      await page.goto('/id/finance');
       await page.getByRole('main').getByRole('link', { name: 'Budget posting rules' }).click();
       await expect(r.main.getByRole('heading', { level: 1, name: 'Budget posting rules' })).toBeVisible();
       await expect(r.main.getByRole('combobox', { name: 'Branch' })).toBeVisible();
@@ -111,6 +113,7 @@ export const TC_APP019_007 = async ({ page, qa }: CaseArgs): Promise<void> => {
     });
     await qa.step(3, async () => {
       expect(await r.save(CAPITAL, bank.code, other.code)).toContain(`${CAPITAL} rule saved.`);
+      if (r.standIns.length) qa.note(3, `${r.standIns.join('; ')} (the account lists offer the first 50 accounts, found blocker 40)`);
       await r.open();
       expect(await r.status(CAPITAL)).toBe('Ready');
       await expect(r.row(CAPITAL).getByRole('button', { name: 'Remove' })).toBeVisible();
@@ -135,7 +138,7 @@ export const TC_APP019_007 = async ({ page, qa }: CaseArgs): Promise<void> => {
 export const TC_APP019_038 = async ({ page, qa }: CaseArgs): Promise<void> => {
   let main = page.getByRole('main');
   await qa.step(1, async () => {
-    await page.goto('/en/finance');
+    await page.goto('/id/finance');
     await page.getByRole('complementary').getByRole('link', { name: 'Currencies' }).first().click();
     await expect(main.getByRole('heading', { level: 1, name: 'Currencies' })).toBeVisible();
     await expect(main.getByRole('columnheader')).toHaveText(['Code', 'Name', 'Symbol', 'Lowest denomination', 'Base']);
@@ -145,10 +148,15 @@ export const TC_APP019_038 = async ({ page, qa }: CaseArgs): Promise<void> => {
     await expect(main.getByRole('combobox', { name: 'Branch' })).toBeVisible();
   });
   await qa.step(2, async () => {
-    expect(await saveCurrency(page, { code: XTS, name: qa.prefix('X Mata uang uji'), symbol: 'X', lowest: '0.01' })).toContain('Saved.');
-    main = await currencies(page);
+    // The code has three letters and cannot carry a token: a currency saved by an earlier run stays (the site keeps codes unique).
+    const exists = await main.getByRole('row').filter({ has: page.getByRole('cell', { name: XTS, exact: true }) }).count();
+    if (exists) {
+      qa.note(2, `"${XTS}" is already on the site from an earlier run; it is not saved again (the code is unique and has no room for a token)`);
+    } else {
+      expect(await saveCurrency(page, { code: XTS, name: qa.prefix('X Mata uang uji'), symbol: 'X', lowest: '0.01' })).toContain('Saved.');
+      main = await currencies(page);
+    }
     await expect(main.getByRole('row').filter({ has: page.getByRole('cell', { name: XTS, exact: true }) })).toHaveCount(1);
-    qa.note(2, `"${XTS}" has no room for a token (three letters); a later run saves it again`);
   });
   await qa.step(3, async () => {
     expect(await saveRate(page, XTS, '15500')).toContain('Rate saved.');
@@ -157,7 +165,8 @@ export const TC_APP019_038 = async ({ page, qa }: CaseArgs): Promise<void> => {
     main = await currencies(page);
     const listed = (await main.getByRole('list').last().getByRole('listitem').allInnerTexts()).join(' / ');
     qa.note(4, `rates shown: "${listed || 'none'}"; the screen says "Vouchers stay in IDR; the rate is stored only."`);
-    await expect(main.getByText('Vouchers stay in IDR; the rate is stored only.', { exact: false })).toBeVisible();
+    // A sentence in the middle of the screen's note: on /id "Voucher tetap dalam IDR; kurs hanya disimpan."
+    await expect(main.getByText(/Vouchers stay in IDR; the rate is stored only\.|Voucher tetap dalam IDR; kurs hanya disimpan\./)).toBeVisible();
   });
 };
 
@@ -166,7 +175,7 @@ export const TC_APP019_040 = async ({ page, qa }: CaseArgs): Promise<void> => {
   const rj = qa.code('X-RJ');
   const ri = qa.code('X-RI');
   await qa.step(1, async () => {
-    await page.goto('/en/finance');
+    await page.goto('/id/finance');
     await page.getByRole('complementary').getByRole('link', { name: 'Cost centres' }).first().click();
     const main = page.getByRole('main');
     await expect(main.getByRole('heading', { level: 1, name: 'Cost centres' })).toBeVisible();
@@ -200,7 +209,7 @@ export const TC_APP019_062 = async ({ page, qa }: CaseArgs): Promise<void> => {
   qa.note(2, 'debit 1101 Kas and credit 4101 Pendapatan stand in for "patient control" and "revenue" (HO has no finance configuration)');
   const service = qa.code('X-VISITE');
   await qa.step(1, async () => {
-    await page.goto('/en/finance');
+    await page.goto('/id/finance');
     await page.getByRole('complementary').getByRole('link', { name: 'Tariff mapping' }).first().click();
     await expect(main.getByRole('heading', { level: 1, name: 'Tariff account mapping' })).toBeVisible();
     await expect(main.getByRole('textbox', { name: 'Service code' })).toBeVisible();
@@ -243,7 +252,7 @@ export const WITHDRAWAL = 'Fund withdrawal';
 
 export async function currencies(page: Page) {
   const main = page.getByRole('main');
-  await page.goto('/en/finance/currencies');
+  await page.goto('/id/finance/currencies');
   await expect(main.getByRole('heading', { level: 1, name: 'Currencies' })).toBeVisible();
   await page.waitForLoadState('networkidle').catch(() => {});
   return main;
@@ -273,7 +282,7 @@ export const XTS = 'XTS';
 
 export async function costCentres(page: Page) {
   const main = page.getByRole('main');
-  await page.goto('/en/finance/cost-centres');
+  await page.goto('/id/finance/cost-centres');
   await expect(main.getByRole('heading', { level: 1, name: 'Cost centres' })).toBeVisible();
   await main.getByRole('combobox', { name: 'Branch' }).selectOption({ label: BR_A });
   await page.waitForLoadState('networkidle').catch(() => {});
@@ -322,7 +331,7 @@ export async function category(page: Page, code: string, name: string): Promise<
 
 export async function tariff(page: Page, v: { service: string; debit?: string; credit?: string; shares?: [string, string][] }): Promise<string[]> {
   const main = page.getByRole('main');
-  await page.goto('/en/finance/tariff-maps');
+  await page.goto('/id/finance/tariff-maps');
   await expect(main.getByRole('heading', { level: 1, name: 'Tariff account mapping' })).toBeVisible();
   await page.waitForLoadState('networkidle').catch(() => {});
   await main.getByRole('textbox', { name: 'Service code' }).fill(v.service);
@@ -337,6 +346,194 @@ export async function tariff(page: Page, v: { service: string; debit?: string; c
 
 export async function pickByPrefix(box: import('@playwright/test').Locator, prefix: string): Promise<void> {
   const label = (await box.locator('option').allInnerTexts()).find((o) => o.toUpperCase().startsWith(prefix.toUpperCase()));
-  if (!label) throw new Error(`no option ${prefix}`);
+  // The account lists offer only the first 50 accounts (found blocker 40).
+  if (!label) throw new NotOffered(`no option ${prefix}: the list offers the first 50 accounts (found blocker 40)`);
   await box.selectOption({ label });
 }
+
+/** A form of the Imprest screen ("Advance request", "Bill submission"); the list under it carries the same heading. */
+const imprestSection = (page: Page, heading: 'Advance request' | 'Bill submission') =>
+  page.getByRole('main').locator('form').filter({ has: page.getByRole('heading', { level: 2, name: heading }) });
+
+/** The selects of a section by their order (their labels wrap the options, so a label is not a usable name). */
+const sectionSelect = (section: ReturnType<typeof imprestSection>, n: number) => section.locator('select').nth(n);
+
+/** The rows of the imprest list as [number, amount, status, difference]. */
+async function imprestRows(page: Page): Promise<string[][]> {
+  await page.goto('/id/finance/imprest');
+  await page.waitForLoadState('networkidle').catch(() => {});
+  return page.getByRole('main').getByRole('table').first().getByRole('rowgroup').nth(1).getByRole('row')
+    .evaluateAll((rs) => rs.map((r) => Array.from(r.querySelectorAll('td')).map((c) => (c.textContent ?? '').replace(/\s+/g, ' ').trim())));
+}
+
+/** Clicks a row action of the imprest list on the row of `no`; returns the toasts. */
+async function imprestAction(page: Page, no: string, action: string): Promise<string[]> {
+  await page.goto('/id/finance/imprest');
+  await page.waitForLoadState('networkidle').catch(() => {});
+  const row = page.getByRole('main').getByRole('row').filter({ hasText: no }).first();
+  await expect(row).toBeVisible();
+  return clickFor(page, row.getByRole('button', { name: action, exact: true }));
+}
+
+/** Picks the first option of a select whose label starts with `start` (the labels as the site shows them). */
+async function pickStarting(select: ReturnType<typeof sectionSelect>, start: string): Promise<string> {
+  const labels = await select.locator('option').evaluateAll((os) => os.map((o) => (o.textContent ?? '').trim()));
+  const label = labels.find((l) => l.startsWith(start));
+  expect(label, `an option starting "${start}"`).toBeTruthy();
+  await select.selectOption({ label: label! });
+  return label!;
+}
+
+/**
+ * TC-APP019-066: an imprest advance of 2000000 for an employee, sent and
+ * approved, paid on Payments ("Imprest"), and a bill of 1800000 submitted
+ * against it (Data: bill "X-NOTA-1" of the type "X-ATK": the QA-ATK type of
+ * the journey "Account maps" stands in). Returns the imprest number.
+ */
+export const TC_APP019_066 = async ({ page, qa }: CaseArgs): Promise<string> => {
+  const main = page.getByRole('main');
+  const advance = imprestSection(page, 'Advance request');
+  const bill = imprestSection(page, 'Bill submission');
+  let no = '';
+  await qa.step(1, async () => {
+    await page.goto('/id/finance');
+    await page.getByRole('complementary').getByRole('link', { name: 'Imprest' }).or(main.getByRole('link', { name: 'Imprest' })).first().click();
+    await expect(main.getByRole('heading', { level: 1, name: 'Imprest' })).toBeVisible();
+    for (const s of [advance, bill]) await expect(s).toBeVisible();
+    await expect(advance.getByLabel('Amount', { exact: true })).toBeVisible();
+    await expect(advance.getByLabel('Remarks', { exact: true })).toBeVisible();
+    for (const f of ['Bill number', 'Supplier', 'Reason']) await expect(bill.getByLabel(f, { exact: true })).toBeVisible();
+    await expect(bill.getByRole('button', { name: 'Add line' })).toBeVisible();
+  });
+  await qa.step(2, async () => {
+    const before = new Set((await imprestRows(page)).map((r) => r[0]));
+    const type = await pickStarting(sectionSelect(advance, 0), 'QA-ATK');
+    const employee = await pickStarting(sectionSelect(advance, 1), 'QA-HRM');
+    await advance.getByLabel('Amount', { exact: true }).fill('2000000');
+    await advance.getByLabel('Remarks', { exact: true }).fill(qa.prefix('X Uang muka ATK'));
+    const toasts = await clickFor(page, advance.getByRole('button', { name: 'Save', exact: true }));
+    qa.note(2, `type ${type}, employee ${employee}: "${toasts.join(' / ')}"`);
+    if (toasts.some((t) => /exceeds the employee's imprest eligibility/.test(t))) return;
+    expect(toasts).toContain('Saved.');
+    const row = (await imprestRows(page)).find((r) => r[0] && !before.has(r[0]));
+    expect(row, 'a new row of the advance').toBeTruthy();
+    no = row![0];
+    expect(row![2].toLowerCase()).toBe('draft');
+  });
+  if (!no) {
+    // No eligibility can be set up for the branch (found blocker 42): no advance, so nothing follows.
+    for (const st of [2, 3, 4, 5]) qa.blocked(st, 42);
+    qa.notRun(6, 'TBD in the workbook: the settlement of the difference on Payments ("Imprest settlement")');
+    return no;
+  }
+  await qa.step(3, async () => {
+    qa.note(3, `Send: "${(await imprestAction(page, no, 'Send')).join(' / ')}"; Approve: "${(await imprestAction(page, no, 'Approve')).join(' / ')}"`);
+    expect((await imprestRows(page)).find((r) => r[0] === no)?.[2].toLowerCase()).toBe('approved');
+  });
+  await qa.step(4, async () => {
+    await page.goto('/id/finance/payments');
+    await page.waitForLoadState('networkidle').catch(() => {});
+    const selects = main.locator('select');
+    await selects.nth(1).selectOption({ index: 1 });
+    await selects.nth(2).selectOption({ label: 'Imprest' });
+    await main.getByRole('button', { name: 'Next', exact: true }).click();
+    const doc = main.locator('select').filter({ has: page.locator('option', { hasText: no }) }).first();
+    await expect(doc).toBeVisible();
+    await doc.selectOption({ label: (await doc.locator('option', { hasText: no }).first().textContent())!.trim() });
+    await main.getByLabel('Date', { exact: true }).fill(todayWib());
+    await main.getByLabel('Amount', { exact: true }).fill('2000000');
+    await main.getByLabel('Narration', { exact: true }).fill(qa.prefix('X Bayar uang muka'));
+    const toasts = await clickFor(page, main.getByRole('button', { name: 'Save', exact: true }));
+    qa.note(4, `payment of ${no}: "${toasts.join(' / ')}" (send and approval of the payment: TC-APP019-068)`);
+    expect(toasts).toContain('Saved.');
+  });
+  await qa.step(5, async () => {
+    await page.goto('/id/finance/imprest');
+    await page.waitForLoadState('networkidle').catch(() => {});
+    await bill.getByLabel('Bill number', { exact: true }).fill(qa.code('X-NOTA-1'));
+    await pickStarting(sectionSelect(bill, 0), 'QA-ATK');
+    await bill.getByLabel('Amount', { exact: true }).first().fill('1800000');
+    await bill.getByLabel('Supplier', { exact: true }).fill(qa.prefix('X Toko ATK'));
+    await bill.getByLabel('Reason', { exact: true }).fill(qa.prefix('X Pembelian ATK'));
+    const toasts = await clickFor(page, bill.getByRole('button', { name: 'Save', exact: true }));
+    qa.note(5, `bill against ${no}: "${toasts.join(' / ')}"; rows ${JSON.stringify((await imprestRows(page)).filter((r) => r[0] === no))}`);
+    expect(toasts).toContain('Saved.');
+  });
+  qa.notRun(6, 'TBD in the workbook: the settlement of the difference on Payments ("Imprest settlement")');
+  return no;
+};
+
+/** An approved legal agreement of the test; returns its number. */
+export async function agreement(page: Page, qa: Qa, ledger: string): Promise<{ no: string; toasts: string[]; status: string; refused?: boolean }> {
+  const d = new FinanceDesk(page, 'legal-agreements');
+  await d.open();
+  const r = await d.create({
+    Name: qa.prefix('X Sewa alat'),
+    Date: todayWib(),
+    'Beneficiary department': qa.prefix('X Radiologi'),
+    Party: qa.name('X Vendor'),
+    0: ledger,
+    Amount: '60000000',
+    Terms: qa.prefix('X 12 bulan'),
+  });
+  if (!r.no) return { ...r, status: '' };
+  const a = await d.sendApprove(r.no);
+  return { no: r.no, toasts: [...r.toasts, ...a.toasts], status: a.status, refused: a.refused };
+}
+
+/** TC-APP019-068: a payment request from an approved legal agreement of the test, approved, paid and closed. */
+export const TC_APP019_068 = async ({ page, qa }: CaseArgs): Promise<void> => {
+  const d = new FinanceDesk(page, 'payment-requests');
+  // The ledger list offers only the first 50 accounts (found blocker 40): the first offered QA liability account.
+  const ledger = { code: 'QA-2110' };
+  const ag = await agreement(page, qa, ledger.code);
+  qa.note(1, `precondition: agreement ${ag.no || '(not saved)'} "${ag.status}" ("${ag.toasts.join(' / ').slice(0, 120)}")`);
+  await qa.step(1, async () => {
+    await d.open();
+    await expect(d.main.getByRole('heading', { level: 1, name: 'Payment requests' })).toBeVisible();
+    for (const f of ['Source document', 'Party', 'Amount']) await expect(d.main.getByLabel(f, { exact: true })).toBeVisible();
+  });
+  let no = '';
+  await qa.step(2, async () => {
+    await d.choose(0, 'Agreement');
+    // For an agreement "Source document" is a list of the approved agreements (the second list of the form).
+    const offered = (await d.select(1).locator('option').allTextContents()).map((o) => o.trim());
+    if (!offered.some((o) => ag.no && o.includes(ag.no))) {
+      qa.note(2, `"Source document" offers: ${offered.join(', ') || 'nothing'}; the agreement ${ag.no || 'of the test'} is ${ag.status || 'not saved'}`);
+      if (ag.refused) {
+        // The agreement cannot be approved (found blocker 46): no approved agreement to request a payment for.
+        no = 'blocked';
+        return;
+      }
+      throw new Error(`the approved agreement ${ag.no} is not offered as source document`);
+    }
+    await d.choose(1, ag.no);
+    qa.note(2, `filled from the source: Party "${await d.main.getByLabel('Party', { exact: true }).inputValue()}", Amount "${await d.main.getByLabel('Amount', { exact: true }).inputValue()}"`);
+  });
+  if (no === 'blocked') {
+    for (const st of [2, 3]) qa.blocked(st, 46);
+    qa.notRun(4, 'needs an approved payment request of step 3 (found blocker 46)');
+    qa.notRun(5, 'needs the first half paid (step 4)');
+    qa.notRun(6, 'needs a payment request of step 3 (found blocker 46)');
+    return;
+  }
+  await qa.step(3, async () => {
+    const r = await d.create({ Amount: '5000000', Beneficiary: qa.name('X Vendor') });
+    no = r.no;
+    qa.note(3, `Save: "${r.toasts.join(' / ')}"`);
+    if (!no) {
+      qa.deviation(3, 'Toast "Saved."; Draft, Pending, Approved', `"${r.toasts.join(' / ') || 'no toast'}" and no new row`);
+      return;
+    }
+    const a = await d.sendApprove(no);
+    if (a.refused) return qa.blocked(3, 46);
+    if (a.status !== 'Approved') qa.deviation(3, 'The state goes from "Draft" to "Pending" to "Approved"', `"${a.toasts.join(' / ')}"; the state reads "${a.status}"`);
+  });
+  qa.notRun(4, 'the payment of a request on Payments ("Payment request") needs an approved request of step 3 and a bank payment approval (TC-APP019-054 records the payment wizard)');
+  qa.notRun(5, 'needs the first half paid (step 4)');
+  await qa.step(6, async () => {
+    if (!no) return qa.note(6, 'no request of the test to close');
+    const toasts = await d.act(no, 'Close');
+    qa.note(6, `Close: "${toasts.join(' / ')}"; state "${await d.status(no)}"`);
+  });
+};

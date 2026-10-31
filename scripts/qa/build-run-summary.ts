@@ -496,7 +496,9 @@ function chainLine(o: TestOutcome): string {
         ? `butuh user ${stop[3]} yang belum disiapkan`
         : stop[4] === 'NEEDS-EVALUATION'
           ? 'langkah ini di referensi bertanda "Needs Evaluation" (belum diputuskan untuk otomasi)'
-          : `langkah tidak dijalankan${detail ? `: ${sentenceId(detail)}` : ''}`;
+          : stop[4] === 'NOT-AUTOMATED'
+            ? 'langkah ini di referensi bertanda "Automation Candidate = No" (diuji manual)'
+            : `langkah tidak dijalankan${detail ? `: ${sentenceId(detail)}` : ''}`;
     const dev = o.deviations.length ? `; ${o.deviations.length} deviasi sebelumnya` : '';
     const n = Number(stop[1]);
     const ran = n > 2 ? `Langkah 1–${n - 1} berjalan, berhenti` : n === 2 ? 'Langkah 1 berjalan, berhenti' : 'Berhenti';

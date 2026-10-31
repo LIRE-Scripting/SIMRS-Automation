@@ -1,8 +1,9 @@
 import { expect, type Locator, type Page } from '@playwright/test';
 import { escapeRe } from '../ambulatory/RegisteredPatientsPage';
+import { pageToRow } from '../paging';
 
 /**
- * Operation Theater (/en/ot): OT requests, Dossiers, Billing policy,
+ * Operation Theater (/id/ot): OT requests, Dossiers, Billing policy,
  * Calendar, Pain and Surgical case. Read from the live screens on 2026-10-15.
  */
 
@@ -51,7 +52,7 @@ export class OtRequestsPage {
   }
 
   async open(): Promise<void> {
-    await this.page.goto('/en/ot/requests');
+    await this.page.goto('/id/ot/requests');
     await expect(this.heading).toBeVisible();
   }
 
@@ -103,23 +104,7 @@ export class OtRequestsPage {
   async row(procedure: string): Promise<Locator> {
     const match = () => this.rows().filter({ has: this.page.getByRole('cell', { name: procedure, exact: true }) });
     await expect(this.rows().first()).toBeVisible();
-    const next = this.main.getByRole('button', { name: 'Next page' });
-    // The list can move to another page when it reloads: start from page 1.
-    const prev = this.main.getByRole('button', { name: 'Previous page' });
-    for (let i = 0; i < 50 && (await prev.isVisible()) && (await prev.isEnabled()); i++) {
-      const top = await this.rows().first().innerText();
-      await prev.press('Enter');
-      await expect(this.rows().first()).not.toHaveText(top);
-    }
-    for (let i = 0; i < 50; i++) {
-      if (await match().count()) return match();
-      if (!(await next.isVisible()) || (await next.isDisabled())) break;
-      const first = await this.rows().first().innerText();
-      // Toasts sit over the pager, so the button is pressed with the keyboard.
-      await next.press('Enter');
-      await expect(this.rows().first()).not.toHaveText(first);
-    }
-    return match();
+    return pageToRow(this.main, match);
   }
 
   action(row: Locator, name: RowAction): Locator {
@@ -135,7 +120,7 @@ export class OtDeskPage {
   }
 
   async open(route: 'dossiers' | 'policies' | 'calendar' | 'pain' | 'case', heading: string): Promise<void> {
-    await this.page.goto(`/en/ot/${route}`);
+    await this.page.goto(`/id/ot/${route}`);
     await expect(this.main.getByRole('heading', { level: 1, name: heading })).toBeVisible();
   }
 

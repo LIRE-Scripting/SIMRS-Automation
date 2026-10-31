@@ -32,6 +32,11 @@ test.afterEach(async ({ page }) => {
   await backToIndonesian(page);
 });
 
+/** True when the red box of the screen holds the server error (HTTP 500). */
+async function serverError(c: CashierPage): Promise<boolean> {
+  return (await c.error().allInnerTexts().catch(() => [])).some((t) => /React error #441/.test(t));
+}
+
 /** A refusal: the expected message, or the server-error toast recorded as a deviation. */
 async function refused(qa: Qa, step: number, c: CashierPage, message: string): Promise<void> {
   await expect(c.error()).toBeVisible();
@@ -147,12 +152,18 @@ qaTest('TC-APP014-004', async ({ page, qa }) => {
     expect((await c.barState()).status).toBe('Draft');
     await expect(c.field('Cash amount (IDR)')).toHaveValue('0');
   });
+  let paid = true;
   await qa.step(2, async () => {
     await pay(page);
+    if (await serverError(c)) {
+      paid = false;
+      qa.note(2, '"Pay" with cash 0: red box "Minified React error #441" (HTTP 500, found blocker 56); the sale stays Draft');
+      return qa.blocked(2, 56);
+    }
     expect((await c.barState()).status).toBe('Paid');
     expect([await c.receiptValue('Paid'), await c.receiptValue('Remaining due'), await c.receiptValue('Status')]).toEqual(['Rp 0', 'Rp 0', 'PAID']);
   });
-  expect(await c.systemCash()).toBe(cash0);
+  if (paid) expect(await c.systemCash()).toBe(cash0);
 });
 
 qaTest('TC-APP014-005', TC_APP014_005);
@@ -177,10 +188,17 @@ qaTest('TC-APP014-010', async ({ page, qa }) => {
     await expect.poll(async () => (await c.lines())['Patient net']).toBe('Rp 144.300');
     expect([await c.barValue('Available'), await c.barValue('Amount due')]).toEqual(['Rp 166.500', 'Rp 0']);
   });
+  let paid = true;
   await qa.step(3, async () => {
     await pay(page, '0');
+    if (await serverError(c)) {
+      paid = false;
+      qa.note(3, '"Pay" with cash 0: red box "Minified React error #441" (HTTP 500, found blocker 56); the sale stays Draft');
+      return qa.blocked(3, 56);
+    }
     expect((await c.barState()).status).toBe('Paid');
   });
+  if (!paid) return qa.blocked(4, 56);
   await qa.step(4, async () => {
     await c.field('Refund (IDR)').fill('22200');
     await c.button('Refund payment').click();

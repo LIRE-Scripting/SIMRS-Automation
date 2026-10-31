@@ -25,6 +25,9 @@ import ExcelJS from 'exceljs';
 import { CHAINS, type Chain } from '../../lib/qa-data/e2e-chains';
 import { FOUND_BLOCKERS } from '../../lib/qa-data/found-blockers';
 import { blockers, prerequisites, testCaseRef, type TestCaseRef } from '../../lib/qa-data';
+import { BLOCKER_TITLE_ID } from './blocker-titles-id';
+import { statusId } from './report-language';
+import { addNotesColumn, evidenceCell, probableCause } from './run-notes';
 
 const TEMPLATE = 'reference/14-hospital-accounts.xlsx';
 const OUT_DIR = 'reports/e2e-chains';
@@ -38,6 +41,12 @@ const STATES: Record<string, { title: string; cause: string; fix: string; who: s
     title: 'The journey is marked "Needs Evaluation" in its workbook',
     cause: 'Column "Automation Candidate" of the journey reads "Needs Evaluation"; the chain does not run a journey that is not cleared for automation.',
     fix: 'Decide whether the journey can be automated and set "Automation Candidate" to Yes.',
+    who: 'QA / Product owner',
+  },
+  'NOT-AUTOMATED': {
+    title: 'The journey is not to be automated (Automation Candidate = No)',
+    cause: 'Column "Automation Candidate" of the journey reads "No": its steps are tested by hand, so the chain does not run it.',
+    fix: 'Run the step by hand, or set "Automation Candidate" to Yes and write its test.',
     who: 'QA / Product owner',
   },
   'STEP-NOT-RUN': {
@@ -101,9 +110,12 @@ interface ChainRun {
 
 function loadRuns(): Map<string, ChainRun> {
   const runs = new Map<string, ChainRun>();
-  const files = fs.existsSync(OUT_DIR) ? fs.readdirSync(OUT_DIR).filter((f) => /^results.*\.json$/.test(f)).sort() : [];
-  for (const f of files) {
-    const report = JSON.parse(fs.readFileSync(path.join(OUT_DIR, f), 'utf8')) as { suites: PwSuite[] };
+  // The chain runs (reports/e2e-chains) and plain runs of the suite (reports/e2e, playwright.config.ts), oldest first: the newest result of a chain wins.
+  const files = [OUT_DIR, 'reports/e2e']
+    .flatMap((dir) => (fs.existsSync(dir) ? fs.readdirSync(dir).filter((f) => /^results.*\.json$/.test(f)).map((f) => path.join(dir, f)) : []))
+    .map((file) => ({ file, report: JSON.parse(fs.readFileSync(file, 'utf8')) as { suites: PwSuite[]; stats?: { startTime?: string } } }))
+    .sort((a, b) => (a.report.stats?.startTime ?? '').localeCompare(b.report.stats?.startTime ?? ''));
+  for (const { report } of files) {
     for (const spec of specsOf(report.suites)) {
       const id = spec.title.match(/^(E2E-\d{3}) /)?.[1];
       const t = spec.tests[0];
@@ -161,6 +173,8 @@ const appOf = (tc: string) => {
 
 interface ChainStepResult {
   n: number;
+  /** Automation notes of the step (see the column of the same name). */
+  note: string;
   tc: string;
   role: string;
   ref: TestCaseRef;
@@ -174,7 +188,7 @@ interface ChainStepResult {
 function evaluate(chain: Chain, run: ChainRun | undefined): ChainStepResult[] {
   const stops = run?.notes('chain-stop') ?? new Map<number, string[]>();
   const stopAt = Math.min(...[...stops.keys()], Infinity);
-  const stopCause = Number.isFinite(stopAt) ? stops.get(stopAt)![0].match(/^(Blocker \d+|User U\d+|NEEDS-EVALUATION|STEP-NOT-RUN)/)![1] : '';
+  const stopCause = Number.isFinite(stopAt) ? stops.get(stopAt)![0].match(/^(Blocker \d+|User U\d+|NEEDS-EVALUATION|NOT-AUTOMATED|STEP-NOT-RUN)/)![1] : '';
   let failedAt = 0;
   return chain.steps.map((s, i) => {
     const n = i + 1;
@@ -184,26 +198,27 @@ function evaluate(chain: Chain, run: ChainRun | undefined): ChainStepResult[] {
     const date = run ? `${run.date} chain run: ` : '';
     // A source test case that records its blocker and then skips (test.skip) leaves a skipped run with a stop: that run counts.
     if (!run || (run.status === 'skipped' && !Number.isFinite(stopAt))) {
-      return { ...base, status: 'Not Run', causes: ['NOT-RUN'], actual: run ? `${date}skipped` : 'The chain has not been run yet.' };
+      return { ...base, status: 'Not Run', causes: ['NOT-RUN'], actual: run ? `${date}skipped` : 'The chain has not been run yet.', note: run ? 'The chain is skipped in its run.' : 'No result of this chain yet.' };
     }
     if (n >= stopAt) {
       const actual = n === stopAt ? `${date}the chain stops here: ${stops.get(n)!.join(' / ')}` : `${date}not reached: the chain stops at step ${stopAt} (${stopCause}).`;
-      return { ...base, status: 'Blocked', causes: [stopCause], actual };
+      return { ...base, status: 'Blocked', causes: [stopCause], actual, note: n === stopAt ? `Stopped by ${stops.get(n)!.join(' / ')}` : `Not reached: the chain stops at step ${stopAt} (${stopCause}).` };
     }
     if (failedAt) {
-      return { ...base, status: 'Blocked', causes: ['SITE-DEFECT'], actual: `${date}not reached: step ${failedAt} failed.` };
+      return { ...base, status: 'Blocked', causes: ['SITE-DEFECT'], actual: `${date}not reached: step ${failedAt} failed.`, note: `Not reached: step ${failedAt} failed.` };
     }
     const ran = run.steps.get(n);
     const err = ran ? errorOf(ran) : '';
     if (!ran || err) {
       failedAt = n;
       const seen = run.notes('note').get(n) ?? [];
-      return { ...base, status: 'Failed', causes: ['SITE-DEFECT'], actual: `${date}${err || run.error || 'the step did not run'}${seen.length ? `. Seen: ${seen.join(' / ')}` : ''}` };
+      const error = err || run.error || 'the step did not run';
+      return { ...base, status: 'Failed', causes: ['SITE-DEFECT'], actual: `${date}${error}${seen.length ? `. Seen: ${seen.join(' / ')}` : ''}`, note: [`Error: ${error}`, `Probable cause: ${probableCause(error)}`, seen.length ? `Seen: ${seen.join(' / ')}` : ''].filter(Boolean).join('. ') };
     }
     const devs = run.notes('deviation').get(n) ?? [];
     const notes = run.notes('note').get(n) ?? [];
     const actual = `${date}${source.length} source step(s) passed.${devs.length ? ` Deviation (the flow goes on): ${devs.join(' / ')}.` : ''}${notes.length ? ` Notes: ${notes.join(' / ')}` : ''}`;
-    return { ...base, status: 'Passed', causes: devs.length ? ['DEVIATION'] : [], actual };
+    return { ...base, status: 'Passed', causes: devs.length ? ['DEVIATION'] : [], actual, note: [devs.length ? `Deviation from the workbook: ${devs.join(' / ')}` : '', notes.length ? `Notes: ${notes.join(' / ')}` : ''].filter(Boolean).join('. ') };
   });
 }
 
@@ -220,9 +235,9 @@ function defineBlocker(id: string, defects: Map<string, string[]>, deviations: M
   const n = Number(id.match(/^Blocker (\d+)$/)?.[1]);
   if (n) {
     const c = blockers().blockers.find((b) => b.no === n);
-    if (c) return { id, type: `Checklist (00-blockers-checklist-linked.xlsx, row ${c.row})`, title: c.blocker, cause: c.cause, fix: c.fix, who: c.who };
+    if (c) return { id, type: `Checklist (00-blockers-checklist-linked.xlsx, baris ${c.row})`, title: BLOCKER_TITLE_ID[n] ?? c.blocker, cause: c.cause, fix: c.fix, who: c.who };
     const f = FOUND_BLOCKERS.find((b) => b.no === n);
-    if (f) return { id, type: 'Found while automating (docs/qa/blockers-found.md)', title: f.blocker, cause: f.cause, fix: f.fix, who: f.who };
+    if (f) return { id, type: 'Ditemukan saat otomasi (docs/qa/blockers-found.md)', title: BLOCKER_TITLE_ID[n] ?? f.blocker, cause: f.cause, fix: f.fix, who: f.who };
   }
   const user = id.match(/^User (U\d+)$/)?.[1];
   if (user) {
@@ -293,14 +308,22 @@ async function main(): Promise<void> {
     ws.views = [{ state: 'frozen', ySplit: 1 }];
     return { ws, lists: Object.entries((t as unknown as { dataValidations: { model: Record<string, ExcelJS.DataValidation> } }).dataValidations.model).filter(([k]) => /^[A-Z]+2$/.test(k)) };
   };
+  // The status list in Indonesian, like the statuses written (scripts/qa/report-language.ts).
+  const STATUS_LIST_EN = '"Not Run,Passed,Failed,Blocked"';
+  const STATUS_LIST_ID = `"${['Not Run', 'Passed', 'Failed', 'Blocked'].map(statusId).join(',')}"`;
   const applyLists = (x: { ws: ExcelJS.Worksheet; lists: [string, ExcelJS.DataValidation][] }) => {
-    for (const [k, v] of x.lists) for (let r = 2; r <= x.ws.rowCount; r++) x.ws.getCell(`${k.replace('2', '')}${r}`).dataValidation = v;
+    for (const [k, rule] of x.lists) {
+      const v = rule.formulae?.[0] === STATUS_LIST_EN ? { ...rule, formulae: [STATUS_LIST_ID] } : rule;
+      for (let r = 2; r <= x.ws.rowCount; r++) x.ws.getCell(`${k.replace('2', '')}${r}`).dataValidation = v;
+    }
     x.ws.eachRow((row, i) => i > 1 && (row.alignment = { wrapText: true, vertical: 'top' }));
   };
   const J = fromTemplate('Journeys');
   const S = fromTemplate('Steps');
   const journeys = J.ws;
   const steps = S.ws;
+  const notesCol = addNotesColumn(steps);
+  const workbookDir = path.posix.dirname(OUT);
 
   // ---------------------------------------------------------------- Steps
   const defects = new Map<string, string[]>();
@@ -333,12 +356,13 @@ async function main(): Promise<void> {
         `${fileOf(s.tc)} | Steps | ${rows} | ${s.tc}`,
         'Yes',
         VERIFICATION[s.status],
-        s.status,
+        statusId(s.status),
         s.actual,
         specOf.get(chain.id) ?? 'no spec yet',
-        'reports/e2e-chains/results*.json (Playwright JSON of the chain run, with trace and final screenshot)',
+        evidenceCell(`E2E-${chain.id.slice(4)}`, workbookDir, 'reports/e2e-chains/results*.json (Playwright JSON of the chain run, with trace and final screenshot)'),
         s.causes.join('; ') || null,
         'As in the source test case.',
+        s.note,
       ]);
     }
   }
@@ -347,7 +371,7 @@ async function main(): Promise<void> {
   for (const { chain, steps: cs } of evaluated) {
     const breakAt = cs.find((s) => s.status !== 'Passed');
     const causes = [...new Set(cs.flatMap((s) => s.causes))];
-    const status = !breakAt ? 'Passed' : breakAt.status === 'Not Run' ? 'Not run yet' : `${breakAt.status} at step ${breakAt.n}`;
+    const status = !breakAt ? statusId('Passed') : breakAt.status === 'Not Run' ? 'Belum dijalankan' : `${statusId(breakAt.status)} di langkah ${breakAt.n}`;
     journeys.addRow([
       chain.id,
       'E2E',
@@ -385,15 +409,15 @@ async function main(): Promise<void> {
   // ---------------------------------------------------------------- Blockers
   const sheet = wb.addWorksheet('Blockers');
   sheet.columns = [
-    { header: 'Blocker ID', width: 16 },
-    { header: 'Type', width: 34 },
+    { header: 'ID blocker', width: 16 },
+    { header: 'Jenis', width: 34 },
     { header: 'Blocker', width: 44 },
-    { header: 'Cause', width: 70 },
-    { header: 'Fix', width: 50 },
-    { header: 'Who', width: 20 },
-    { header: 'Chains', width: 22 },
-    { header: 'Stops the flow', width: 12 },
-    { header: 'Chain steps', width: 60 },
+    { header: 'Penyebab', width: 70 },
+    { header: 'Perbaikan', width: 50 },
+    { header: 'Siapa', width: 20 },
+    { header: 'Rantai', width: 22 },
+    { header: 'Menghentikan alur', width: 12 },
+    { header: 'Langkah rantai', width: 60 },
   ];
   sheet.getRow(1).font = { bold: true };
   sheet.getRow(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFD9E1F2' } };
@@ -401,24 +425,24 @@ async function main(): Promise<void> {
   for (const id of [...usedBy.keys()].sort((a, b) => order(a) - order(b) || a.localeCompare(b))) {
     const d = defineBlocker(id, defects, deviations);
     const where = [...usedBy.get(id)!];
-    sheet.addRow([d.id, d.type, d.title, d.cause, d.fix, d.who, [...new Set(where.map((w) => w.slice(0, 7)))].join(', '), NON_STOPPING.has(id) ? 'No' : 'Yes', where.join('\n')]);
+    sheet.addRow([d.id, d.type, d.title, d.cause, d.fix, d.who, [...new Set(where.map((w) => w.slice(0, 7)))].join(', '), NON_STOPPING.has(id) ? 'Tidak' : 'Ya', where.join('\n')]);
   }
   sheet.eachRow((r) => (r.alignment = { wrapText: true, vertical: 'top' }));
   sheet.views = [{ state: 'frozen', ySplit: 1 }];
 
   // ---------------------------------------------------------------- Summary
   const add = (...v: unknown[]) => summary.addRow(v);
-  add('End-to-end chains across applications: happy paths and their blockers');
+  add('Rantai end-to-end lintas aplikasi: alur utama dan blocker-nya');
   summary.getRow(1).font = { bold: true, size: 14 };
-  add('Purpose', 'End-to-end (cross-application) happy paths, composed only from test cases that already exist in the 27 module workbooks. Each chain is one automated test that hands the records of a step (patient, order, invoice, document) on to the next.');
+  add('Tujuan', 'Alur utama end-to-end (lintas aplikasi), disusun hanya dari kasus uji yang sudah ada di 27 workbook modul. Setiap rantai adalah satu test otomatis yang meneruskan record satu langkah (pasien, order, invoice, dokumen) ke langkah berikutnya. Test berjalan di situs berbahasa Indonesia (/id).');
   add('Built', `${new Date().toISOString().slice(0, 10)} by npm run qa:e2e-chains (scripts/qa/build-e2e-chains.ts) from lib/qa-data/e2e-chains.ts and the chain runs reports/e2e-chains/results*.json (tests/e2e/chains/).`);
   add('Sheets', 'Journeys: one row per chain. Steps: one row per chain step, each pointing to its source test case (file, rows). Blockers: every blocker a chain meets, with its cause and fix.');
-  add('Step status', 'Passed: the chain step ran on the record of the steps before it (a deviation from the wording is noted but does not stop the flow). Failed: the site did not do what the step needs. Blocked: the chain stops at this step or before it; Defect Reference names the cause (see sheet Blockers). Not Run: the chain has not been run.');
+  add('Status langkah', `${statusId('Passed')}: langkah rantai berjalan pada record langkah sebelumnya (deviasi dari teks dicatat tetapi tidak menghentikan alur). ${statusId('Failed')}: situs tidak melakukan yang dibutuhkan langkah. ${statusId('Blocked')}: rantai berhenti di langkah ini atau sebelumnya; Defect Reference menyebut penyebabnya (lihat sheet Blockers). ${statusId('Not Run')}: rantai belum dijalankan.`);
   add('Blocker IDs', '"Blocker N": checklist blockers 1-16 (00-blockers-checklist-linked.xlsx) and blockers found while automating (17 and up, docs/qa/blockers-found.md). "User Ux": a user of 00-prerequisites.xlsx that does not exist yet. DEVIATION, SITE-DEFECT, NEEDS-EVALUATION, NOT-RUN: see sheet Blockers.');
   add('Chain design', 'The chains follow the usual hospital-system flows: outpatient, emergency, inpatient and surgical pathways; order-to-result; closed-loop medication; vein-to-vein blood; revenue cycle and cash control; procure-to-pay with three-way match; inventory control; budget commitment control; hire-to-pay; record-to-report; asset, maintenance and support services. Column "Hospital-system practice checked" names the practice of each chain.');
   add('Tests', 'tests/e2e/chains/ (one spec per chain, fixtures/chain.ts). A chain runs up to the first step that a blocker stops; the steps from there are Blocked with that cause.');
   add();
-  const head = add('Chain', 'Name', 'Applications', 'Steps', 'Passed', 'Failed', 'Blocked', 'Not Run', 'Status', 'First stop', 'Blockers that stop the flow', 'Notes that do not stop it', 'Hospital-system practice checked');
+  const head = add('Rantai', 'Nama', 'Aplikasi', 'Langkah', statusId('Passed'), statusId('Failed'), statusId('Blocked'), statusId('Not Run'), 'Status', 'Berhenti pertama', 'Blocker yang menghentikan alur', 'Catatan yang tidak menghentikan', 'Praktik sistem rumah sakit yang dicek');
   head.font = { bold: true };
   for (const { chain, steps: cs } of evaluated) {
     const breakAt = cs.find((s) => s.status !== 'Passed');
@@ -432,10 +456,10 @@ async function main(): Promise<void> {
       n('Failed'),
       n('Blocked'),
       n('Not Run'),
-      !breakAt ? 'Passed' : breakAt.status === 'Not Run' ? 'Not Run' : `${breakAt.status} at step ${breakAt.n}`,
-      breakAt ? `Step ${breakAt.n} ${breakAt.tc} (${breakAt.status}): ${breakAt.causes.filter((c) => !NON_STOPPING.has(c)).join('; ')}` : '—',
-      [...new Set(cs.flatMap((s) => (s.status === 'Passed' ? [] : s.causes.filter((c) => !NON_STOPPING.has(c)))))].join('; ') || 'none',
-      [...new Set(cs.flatMap((s) => s.causes.filter((c) => NON_STOPPING.has(c))))].join('; ') || 'none',
+      !breakAt ? statusId('Passed') : breakAt.status === 'Not Run' ? statusId('Not Run') : `${statusId(breakAt.status)} di langkah ${breakAt.n}`,
+      breakAt ? `Langkah ${breakAt.n} ${breakAt.tc} (${statusId(breakAt.status)}): ${breakAt.causes.filter((c) => !NON_STOPPING.has(c)).join('; ')}` : '—',
+      [...new Set(cs.flatMap((s) => (s.status === 'Passed' ? [] : s.causes.filter((c) => !NON_STOPPING.has(c)))))].join('; ') || 'tidak ada',
+      [...new Set(cs.flatMap((s) => s.causes.filter((c) => NON_STOPPING.has(c))))].join('; ') || 'tidak ada',
       chain.practice ?? '',
     );
   }

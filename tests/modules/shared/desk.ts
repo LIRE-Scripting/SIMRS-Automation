@@ -1,7 +1,9 @@
+import { everyPage } from '../../../pages/paging';
 import { expect, type Locator, type Page, type Response } from '@playwright/test';
 import type { Qa } from '../../../fixtures/e2e';
 import { toastMark } from '../../../lib/assertions';
 import { toastsAfter } from '../18-settings/helpers';
+import { NotOffered } from '../../../lib/not-offered';
 
 /**
  * The "desk" screens of the later applications (Housekeeping, Linen,
@@ -26,7 +28,7 @@ export class Desk {
     this.dialog = page.getByRole('dialog');
   }
   async open(): Promise<void> {
-    await this.page.goto(`/en${this.route}`);
+    await this.page.goto(`/id${this.route}`);
     await expect(this.main.getByRole('heading', { level: 1, name: this.heading })).toBeVisible();
     await this.page.waitForLoadState('networkidle').catch(() => {});
   }
@@ -69,8 +71,11 @@ export class Desk {
       if (await go.count()) await go.click();
       await expect(this.rows().filter({ hasText: search }).first()).toBeVisible().catch(() => {});
     }
-    return this.rows().evaluateAll((rs) =>
-      rs.filter((r) => r.querySelectorAll('td').length >= 3).map((r) => Array.from(r.querySelectorAll('td')).slice(0, 3).map((c) => c.textContent?.trim() ?? '')),
+    // Every page: a row saved now is on the last page (the lists are kept lowest number first).
+    return everyPage(this.main, () =>
+      this.rows().evaluateAll((rs) =>
+        rs.filter((r) => r.querySelectorAll('td').length >= 3).map((r) => Array.from(r.querySelectorAll('td')).slice(0, 3).map((c) => c.textContent?.trim() ?? '')),
+      ),
     );
   }
   /**
@@ -92,12 +97,18 @@ export class Desk {
     const answered = (await Promise.all(answers)).find(Boolean);
     if (answered) return { toasts, id: answered };
     const id = await this.newRow(before);
-    if (!id && toasts.includes(SAVED)) throw new Error(`${this.route}: saved, but its id is neither in the answer nor in the list (blocker 40)`);
+    if (!id && toasts.includes(SAVED)) throw new NotOffered(`${this.route}: saved, but its id is neither in the answer nor in the list (found blocker 40)`);
     return { toasts, id };
   }
   /** The id of a row that is in the list now and not in before. */
   private async newRow(before: Set<string>): Promise<string> {
-    return (await this.list()).find((r) => r[2] && !before.has(r[2]))?.[2] ?? '';
+    // The new row can be drawn a moment after the toast: read the list until it is there.
+    let id = '';
+    await expect.poll(async () => {
+      id = (await this.list()).find((r) => r[2] && !before.has(r[2]))?.[2] ?? '';
+      return id;
+    }, { timeout: 10_000 }).not.toBe('').catch(() => {});
+    return id;
   }
   async status(id: string): Promise<string> {
     return (await this.list()).find((r) => r[2] === id)?.[0] ?? '';
@@ -106,6 +117,7 @@ export class Desk {
 
 /** Expects a refusal and records the toast next to the server text the workbook names. */
 export function refused(qa: Qa, step: number, toasts: string[], serverText: string): void {
-  expect(toasts).not.toContain(SAVED);
+  // A save the workbook expects refused, saved by the site: a deviation, not an error of the test.
+  if (toasts.includes(SAVED)) return qa.deviation(step, `Refused (the server text ends in "${serverText}")`, 'saved ("Saved.")');
   qa.note(step, `toast "${toasts.join(' / ').slice(0, 120)}" (the workbook: the server text ends in "${serverText}")`);
 }

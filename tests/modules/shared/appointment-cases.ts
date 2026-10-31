@@ -1,4 +1,4 @@
-import type { Page } from '@playwright/test';
+import type { Browser, Page } from '@playwright/test';
 import { expect, qaTest, test, type Qa } from '../../../fixtures/e2e';
 import {
   bookSettings,
@@ -35,7 +35,7 @@ const TYPE = bookSettings().types[0].name;
  * claims its own D-day.
  */
 
-type Body = (args: { page: Page; qa: Qa }, route: string) => Promise<void>;
+type Body = (args: { page: Page; qa: Qa; browser?: Browser }, route: string) => Promise<void>;
 
 /** Mondays claimed by the running test; their QA bookings are cancelled after it (releaseWeek). */
 const claimed: string[] = [];
@@ -586,6 +586,53 @@ export const CASES = {
     });
   },
 
+  /** TC-APP001-045 / TC-APP002-009: DR-1's daily quota of 3 used up while a second clerk (U4) still has "Book" open. */
+  quotaFull: async ({ page, qa, browser }, route) => {
+    const appts = new AppointmentsPage(page, route);
+    // Each patient with its own token, so that no name is a part of another (rows are found by text).
+    const [pa, pb, pt2, pt3] = [
+      await registerPatient(page, SHARED.pt1.name, qa.token()),
+      await registerPatient(page, SHARED.pt1.name, qa.token()),
+      await registerPatient(page, SHARED.pt2.name, qa.token()),
+      await registerPatient(page, SHARED.pt3.name, qa.token()),
+    ];
+    const dDay = await claim(page);
+    // Precondition: two bookings of DR-1 on D-day, so PT-2's is the third and last of the quota.
+    await bookDr1(appts, pa, dDay, '08:00');
+    await bookDr1(appts, pb, dDay, '08:30');
+    const second = await (await browser!.newContext({ storageState: authFileOf('U4') })).newPage();
+    try {
+      await installToastRecorder(second);
+      const appts2 = new AppointmentsPage(second, route);
+      const d2 = await openBookFor(appts2, pt3, dDay);
+      const times2 = await appts2.settledOpenTimes(d2);
+      if (times2[0] && times2[0] !== NO_TIME[0]) await appts2.openTime(d2).selectOption({ label: times2[0] });
+      await qa.step(1, () => bookDr1(appts, pt2, dDay));
+      await qa.step(2, async () => {
+        const mark = await toastMark(second);
+        await appts2.submitBook(d2).click();
+        const toasts = await toastsAfter(second, mark);
+        qa.note(2, `Clerk 2 books PT-3 with the dialog opened before: "${toasts.join(' / ') || 'no toast'}"`);
+        if (toasts.includes('Appointment booked')) qa.deviation(2, 'Toast "The daily quota is full"; nothing is booked', 'PT-3 is booked as a fourth booking of the day');
+        else if (!/quota/i.test(toasts.join(' '))) qa.deviation(2, 'Toast "The daily quota is full"', `the toast says "${toasts.join(' / ') || 'nothing'}", with no word of the quota`);
+      });
+      await qa.step(3, async () => {
+        const d = await openBookFor(appts2, pt3, dDay);
+        expect(await appts2.settledOpenTimes(d)).toEqual(NO_TIME);
+        await d.getByRole('button', { name: 'Cancel' }).click();
+      });
+      await qa.step(4, async () => {
+        const next = addDays(dDay, 1);
+        const d = await openBookFor(appts2, pt3, next);
+        const times = await appts2.settledOpenTimes(d);
+        qa.note(4, `${next}: ${times.join(', ')}`);
+        if (times.join() === NO_TIME.join()) qa.deviation(4, 'Open times are offered on D-day + 1', `${next} (the day after the Monday) offers no open time: DR-1 has open hours on Monday only (00-test-data.xlsx | Book settings)`);
+      });
+    } finally {
+      await second.context().close();
+    }
+  },
+
   sameTime: async ({ page, qa }, route) => {
     const appts = new AppointmentsPage(page, route);
     const t = qa.token();
@@ -1032,6 +1079,6 @@ export function defineAppointmentCases(route: string, ids: Partial<Record<Appoin
   });
 
   for (const [key, id] of Object.entries(ids) as [AppointmentCase, string][]) {
-    qaTest(id, ({ page, qa }) => CASES[key]({ page, qa }, route));
+    qaTest(id, ({ page, qa, browser }) => CASES[key]({ page, qa, browser }, route));
   }
 }

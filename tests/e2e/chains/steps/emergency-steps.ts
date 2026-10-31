@@ -1,6 +1,7 @@
 import { expect, type Page } from '@playwright/test';
 import type { Qa } from '../../../../fixtures/e2e';
 import { Patients, WALKED_IN, walkInName } from '../../../modules/15-emergency/helpers';
+import { asOnSite } from '../../../../lib/i18n';
 
 /** Steps of 15-emergency.xlsx used by several chains, as in tests/modules/15-emergency/patients.spec.ts. */
 
@@ -41,11 +42,16 @@ export async function triageSteps(page: Page, qa: Qa, name: string): Promise<voi
     const d = await p.openRow(name, 'Triage');
     await expect(d.getByRole('combobox', { name: 'Patient condition' }).locator('option')).toHaveText(['Patient condition', 'Conscious', 'Unconscious', 'Critical']);
     await expect(d.getByRole('combobox', { name: 'Patient status' }).locator('option')).toHaveText(['Patient status', 'Waiting', 'In treatment', 'Referred']);
-    category = (await d.getByRole('combobox', { name: 'Triage category' }).locator('option').allInnerTexts()).filter((o) => o !== 'Triage category')[0];
+    // The categories load after the dialog opens; the first one is taken as the site writes it.
+    const list = d.getByRole('combobox', { name: 'Triage category' });
+    await list.locator('option').nth(1).waitFor({ state: 'attached', timeout: 15_000 });
+    category = (await asOnSite(() => list.locator('option').nth(1).innerText())).trim();
   });
   await qa.step(2, async () => {
     const d = p.dialog;
-    await d.getByRole('combobox', { name: 'Triage category' }).selectOption({ label: category });
+    // By its value: the label read back in English is not always the one the site writes ("Kuning IGD").
+    const list = d.getByRole('combobox', { name: 'Triage category' });
+    await list.selectOption({ value: (await list.locator('option').nth(1).getAttribute('value')) ?? '' });
     await d.getByRole('combobox', { name: 'Patient condition' }).selectOption('Critical');
     await d.getByRole('combobox', { name: 'Patient status' }).selectOption('Waiting');
     expect(await p.click(d.getByRole('button', { name: 'Save' }))).toContain('Triage saved. This category is now current.');

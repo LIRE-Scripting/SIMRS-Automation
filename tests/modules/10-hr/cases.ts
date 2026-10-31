@@ -5,7 +5,8 @@ import { expect } from '../../../fixtures/e2e';
 import { STEPS, LeavePage, EmployeesPage, NotOffered } from '../../../pages/hr/HrPages';
 import { STAND_IN_STORE } from '../../../lib/inventory-data';
 import { SC_STAND_IN, HR } from '../../../lib/hr-data';
-import type { Page } from '@playwright/test';
+import type { Browser, Locator, Page } from '@playwright/test';
+import { userPage } from '../shared/access';
 import type { Qa } from '../../../fixtures/e2e';
 
 /**
@@ -281,4 +282,49 @@ export async function pending(page: import('@playwright/test').Page, qa: Qa, bas
   const r = reason(qa);
   expect(await submitLeave(page, { employee: emp.no, from, to, days: '3', reason: r })).toContain('Leave submitted');
   return { r, emp };
+}
+
+export const TC_APP010_004 = async ({ page, qa, browser }: { page: Page; qa: Qa; browser: Browser }): Promise<void> => {
+  const p = new EmployeesPage(page);
+  const emp1 = await employee(page, qa);
+  const emp2 = await employee(page, qa, HR.emp2);
+  await qa.step(1, async () => {
+    const d = await p.openEdit(emp1.no);
+    await p.fill(d, { reportingAuthority: emp2.no });
+    qa.note(1, `"Reporting authority" ${emp2.no} (EMP-2 of the test); "Account login" is left empty: no prepared account is free to be linked`);
+    expect(await saveEmployee(p, d)).toContain('Employee updated');
+  });
+  await qa.step(2, async () => {
+    const d = await p.openEdit(emp1.no);
+    await expect(p.text(d, 'Reporting authority')).toHaveValue(emp2.no);
+  });
+  await qa.step(3, async () => {
+    const u7 = await userPage(browser, 'U7');
+    try {
+      await u7.goto('/id/hr/employees');
+      await u7.waitForLoadState('networkidle').catch(() => {});
+      const own = u7.getByRole('dialog', { name: 'Edit employee' });
+      const opened = await own.isVisible({ timeout: 10_000 }).catch(() => false);
+      const notice = await u7.getByText(NOTICE).isVisible().catch(() => false);
+      qa.note(3, `U7 (qa.pegawai, linked to X-EMP-QA-PEGAWAI) stands for USR-1: ${new URL(u7.url()).pathname}; "Edit employee" ${opened ? 'opens by itself' : 'does not open'}; notice ${notice ? 'shown' : 'not shown'}`);
+      if (!opened) qa.deviation(3, 'The file of the linked employee opens by itself as "Edit employee"', 'the list opens; no file of its own');
+      if (notice) qa.deviation(3, `The notice "${NOTICE}" is not shown`, 'the notice is shown to the linked account');
+    } finally {
+      await u7.context().close();
+    }
+  });
+  await qa.step(4, async () => {
+    await p.open();
+    await expect(page.getByText(NOTICE)).toBeVisible();
+  });
+};
+
+export const NOTICE = 'Configuration is missed';
+
+/** Saves the open employee dialog (walking to the last step); returns the toasts. */
+export async function saveEmployee(p: EmployeesPage, d: Locator): Promise<string[]> {
+  if (!(await p.save(d).isVisible())) await p.walk(d);
+  const mark = await toastMark(p.page);
+  await p.save(d).click();
+  return toastsAfter(p.page, mark);
 }

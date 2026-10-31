@@ -12,15 +12,20 @@ export class AppHeader {
     return this.page.getByRole('banner');
   }
 
-  /** The user chip; reads "Not signed in" when the session was dropped. */
+  /**
+   * The user chip: the button that opens the menu holding "Sign out" (it
+   * shows the account's name, e.g. "admin2" or "X QA Admin Kedua"), or the
+   * chip reading "Not signed in" when the session was dropped.
+   */
   profileButton(): Locator {
-    return this.banner().locator('button').filter({
-      hasText: /superadmin|not signed in|belum masuk/i,
-    });
+    const withSignOut = this.banner().locator(
+      'xpath=.//*[@role="menu"][.//*[normalize-space()="Sign out" or normalize-space()="Keluar"]]/preceding-sibling::button[1]',
+    );
+    return withSignOut.or(this.banner().locator('button').filter({ hasText: /superadmin|not signed in|belum masuk/i }));
   }
 
   async isSignedIn(): Promise<boolean> {
-    return (await this.profileButton().filter({ hasText: /not signed in|belum masuk/i }).count()) === 0;
+    return (await this.banner().locator('button').filter({ hasText: /not signed in|belum masuk/i }).count()) === 0;
   }
 
   branchButton(): Locator {
@@ -41,7 +46,7 @@ export class AppHeader {
   }
 
   async signOut(): Promise<void> {
-    await this.profileButton().click();
+    await this.profileButton().first().click();
     await this.page.getByRole('menuitem', { name: /^(sign out|keluar)$/i }).click();
   }
 }

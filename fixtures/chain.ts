@@ -1,3 +1,4 @@
+import { NotOffered } from '../lib/not-offered';
 import { test as base } from '@playwright/test';
 import { authFileOf } from '../lib/config';
 import { blockers, prerequisites, testCaseRef } from '../lib/qa-data';
@@ -82,6 +83,11 @@ function checkCause(chain: Chain, k: number, cause: string): string {
     if (ref.journey.automationCandidate !== 'Needs Evaluation') throw new Error(`${tc} is not marked Needs Evaluation`);
     return `${ref.module.source} | Journeys | row ${ref.journey.row}: Automation Candidate = Needs Evaluation`;
   }
+  if (cause === 'NOT-AUTOMATED') {
+    const ref = testCaseRef(tc);
+    if (ref.journey.automationCandidate !== 'No') throw new Error(`${tc} is not marked Automation Candidate = No`);
+    return `${ref.module.source} | Journeys | row ${ref.journey.row}: Automation Candidate = No`;
+  }
   throw new Error(`Unknown chain stop cause "${cause}"`);
 }
 
@@ -132,7 +138,17 @@ const test = e2e.extend<{ chain: ChainRun; chainId: string }>({
         if (stoppedAt) return undefined as never;
         const cs = chain.steps[k - 1];
         if (!cs) throw new Error(`${chain.id} has no step ${k}`);
-        return base.step(`Chain step ${k} ${traceTag(testCaseRef(cs.tc))}: ${cs.role}`, () => body(qaOf(k)));
+        return base.step(`Chain step ${k} ${traceTag(testCaseRef(cs.tc))}: ${cs.role}`, async () => {
+          try {
+            return await body(qaOf(k));
+          } catch (e) {
+            // A record no list or picker offers (found blocker 40) stops the chain at this step, as it blocks the module test.
+            if (!(e instanceof NotOffered)) throw e;
+            stoppedAt ||= k;
+            note('chain-stop', k, `Blocker 40: ${cs.tc}, ${checkCause(chain, k, 'Blocker 40')}. ${e.message}`);
+            return undefined as never;
+          }
+        });
       },
       stop: (k, cause, detail) => {
         stoppedAt ||= k;
@@ -146,7 +162,8 @@ const test = e2e.extend<{ chain: ChainRun; chainId: string }>({
         const plan = planFor(testCaseRef(tc));
         if (plan.disposition === 'automate') throw new Error(`${tc} is planned to run; stop the chain with its blocked step instead`);
         const causes = plan.reasons.map((r) =>
-          r.match(/^Blocker \d+/)?.[0] ?? (r.match(/^Needs user (U\d+)/) ? `User ${r.match(/^Needs user (U\d+)/)![1]}` : /Needs Evaluation/.test(r) ? 'NEEDS-EVALUATION' : r),
+          r.match(/^Blocker \d+/)?.[0] ??
+            (r.match(/^Needs user (U\d+)/) ? `User ${r.match(/^Needs user (U\d+)/)![1]}` : /Needs Evaluation/.test(r) ? 'NEEDS-EVALUATION' : /Automation Candidate = No\b/.test(r) ? 'NOT-AUTOMATED' : r),
         );
         stoppedAt ||= k;
         note('chain-stop', k, `${causes[0]}: ${checkCause(chain, k, causes[0])}${causes.length > 1 ? `. Also: ${plan.reasons.slice(1).join('; ')}` : ''}`);

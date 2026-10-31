@@ -54,6 +54,8 @@ export const BLOCKER_TITLE_ID: Record<number, string> = {
   49: '"Hitung" di Order diet menjawab HTTP 500: tidak ada resep diet yang dinilai',
   50: 'Perjanjian sourcing tidak bisa disimpan: "Save" menjawab HTTP 500 untuk tender dengan pemenang',
   55: '"Simpan branding" dengan logo yang diunggah menjawab HTTP 500 ("Failed to save branding.")',
+  56: '"Bayar" saat tidak ada lagi yang ditagih, dan refund di atas limit, menjawab HTTP 500',
+  57: '"Link me" di SDM, Profil saya menjawab HTTP 500 untuk akun yang sudah ditautkan ke karyawan',
   54: 'Dialog Triase di Pasien IGD tidak menawarkan kategori triase',
   53: '"Revert latest stamp" di meja kerja laboratorium menjawab HTTP 500',
   52: '"Konfirmasi penyerahan" menjawab HTTP 500, bukan menyelesaikan penjualan (dengan freeze days, atau pasien yang namanya sama sedang dirawat)',

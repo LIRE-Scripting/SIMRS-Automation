@@ -5,7 +5,7 @@ import { installToastRecorder, toastMark } from '../../../lib/assertions';
 import { pageToRow } from '../../../pages/paging';
 import { png } from './png';
 import { createUser, fillUser, invalidFields, newPassword, pick, roles, signInAs, toastsAfter, users, type NewUser } from './helpers';
-import { TC_APP018_037, TC_APP018_039 } from './cases';
+import { block, BRANCH, cellsOf, mapLines, newUser, ROLE, TC_APP018_031, TC_APP018_037, TC_APP018_039, TC_APP018_041, userData } from './cases';
 import { NotOffered } from '../../../lib/not-offered';
 
 /**
@@ -25,106 +25,7 @@ test.beforeEach(async ({ page }) => {
   await installToastRecorder(page);
 });
 
-const BRANCH = 'Daan Mogot';
-const ROLE = 'perawat';
-
-function userData(qa: Qa, roles = [ROLE]): NewUser {
-  const login = `qa.perawat1.${qa.token().toLowerCase()}`;
-  return { login, fullName: qa.name('X Perawat Uji'), email: `${login}@example.test`, password: newPassword(), branch: BRANCH, roles };
-}
-
-async function newUser(page: Page, qa: Qa, roleNames?: string[]): Promise<NewUser> {
-  const u = userData(qa, roleNames);
-  expect(await createUser(page, u)).toContain('User added.');
-  return u;
-}
-
-/** Blocks a test account (end of a test). */
-async function block(page: Page, login: string): Promise<void> {
-  const u = users(page);
-  await u.edit(login).catch(() => {});
-  if (!(await u.dialog.isVisible())) return;
-  await u.advanced();
-  await u.dialog.getByRole('checkbox', { name: 'Blocked' }).check();
-  await u.save();
-}
-
-const cellsOf = async (row: Locator) => (await row.getByRole('cell').allInnerTexts()).map((t) => t.replace(/\s+/g, ' ').trim());
-
-/** The lines of a login on Branch map; pages on, as a new login is not on the first page. */
-async function mapLines(page: Page, login: string): Promise<Locator> {
-  const main = page.getByRole('main');
-  await page.goto('/id/identity/site-maps');
-  await expect(main.getByRole('heading', { level: 1, name: 'User Site Mapping' })).toBeVisible();
-  await expect(main.getByRole('cell').first()).toBeVisible();
-  const lines = await pageToRow(main, () => main.getByRole('row').filter({ has: page.getByRole('cell', { name: login, exact: true }) }));
-  // Each page draws only some of its logins (found blocker 40): a new login is often on no page.
-  if (!(await lines.count())) throw new NotOffered(`the login ${login} is on no page of User Site Mapping (found blocker 40)`);
-  return lines;
-}
-
-qaTest('TC-APP018-031', async ({ page, qa, browser }) => {
-  const u = users(page);
-  const v = userData(qa);
-  try {
-    await qa.step(1, async () => {
-      await page.goto('/id/settings');
-      await page.getByRole('main').getByRole('link', { name: /^Users\b/ }).click();
-      await expect(u.main.getByRole('heading', { level: 1, name: 'Users' })).toBeVisible();
-      await expect(u.main.getByText('Users of this hospital.', { exact: true })).toBeVisible();
-      await expect(u.search).toBeVisible();
-      await expect(u.status).toBeVisible();
-      await expect(u.main.getByRole('button', { name: 'Add User' })).toBeVisible();
-      await expect(u.main.getByRole('columnheader')).toHaveText(['Login', 'Full name', 'Email', 'Roles', 'Status', 'Actions']);
-    });
-    await qa.step(2, async () => {
-      await u.main.getByRole('button', { name: 'Add User' }).click();
-      await expect(u.dialog).toHaveAccessibleName('Add User');
-      await expect(u.dialog.getByText('Create or update a tenant user and assign roles.')).toBeVisible();
-      for (const f of ['Login', 'Full name', 'Email', 'Password']) await expect(u.dialog.getByRole('textbox', { name: f })).toBeVisible();
-      for (const f of ['Branch', 'Store']) await expect(u.dialog.getByRole('combobox', { name: f })).toBeVisible();
-      await expect(u.dialog.getByRole('checkbox', { name: ROLE, exact: true })).toBeVisible();
-      for (const b of ['Cancel', 'Save']) await expect(u.dialog.getByRole('button', { name: b })).toBeVisible();
-    });
-    await qa.step(3, async () => {
-      expect(await fillUser(u, v)).toContain('User added.');
-      const c = await u.cells(await u.row(v.login));
-      expect([c[0], c[1], c[2], c[4]]).toEqual([v.login, v.fullName, v.email, 'Active']);
-      if (c[3] !== ROLE) qa.deviation(3, `a row with the role "${ROLE}"`, `"Roles" reads "${c[3]}"`);
-    });
-    await qa.step(4, async () => {
-      const lines = await mapLines(page, v.login);
-      await expect(lines).toHaveCount(1);
-      expect((await cellsOf(lines)).slice(0, 3)).toEqual([v.login, v.fullName, ROLE]);
-      const branch = await lines.getByRole('combobox', { name: 'Branch' }).inputValue();
-      if (!branch.includes(BRANCH)) qa.deviation(4, `the branch that was chosen (${BRANCH})`, `the line's branch is empty ("every branch")`);
-    });
-    await qa.step(5, async () => {
-      const s = await signInAs(browser, v.login, v.password);
-      try {
-        expect(s.ok, s.message).toBe(true);
-        const apps = (await s.page.getByRole('main').getByRole('link').allInnerTexts()).map((t) => t.split('\n')[0].trim()).filter(Boolean);
-        const banner = (await s.page.getByRole('banner').first().innerText()).replace(/\s+/g, ' ');
-        qa.note(5, `apps: ${apps.join(', ')}; header: "${banner}"`);
-        if (!banner.includes(BRANCH)) qa.deviation(5, 'Only the chosen branch in the header', `the header names no branch: "${banner}"`);
-      } finally {
-        await s.context.close();
-      }
-    });
-    await qa.step(6, async () => {
-      await page.goto('/id/audit');
-      await page.getByRole('textbox', { name: 'Action' }).fill('user.create');
-      await page.getByRole('button', { name: 'Search' }).click();
-      await page.waitForLoadState('networkidle').catch(() => {});
-      const first = (await page.getByRole('table').getByRole('rowgroup').nth(1).getByRole('row').first().innerText()).replace(/\s+/g, ' ');
-      qa.note(6, `newest user.create: "${first}"`);
-      expect(first).toContain('user.create');
-      if (!first.includes(v.login)) qa.deviation(6, 'An entry user.create with the login', `the entry does not name the login: "${first}"`);
-    });
-  } finally {
-    await block(page, v.login);
-  }
-});
+qaTest('TC-APP018-031', TC_APP018_031);
 
 qaTest('TC-APP018-032', async ({ page, qa }) => {
   const u = users(page);
@@ -322,59 +223,7 @@ qaTest('TC-APP018-040', async ({ page, qa }) => {
   qa.notRun(3, 'needs two administrators saving the same role at once');
 });
 
-qaTest('TC-APP018-041', async ({ page, qa }) => {
-  const v = await newUser(page, qa);
-  const main = page.getByRole('main');
-  const setBranch = async (text: string): Promise<string[]> => {
-    const line = await mapLines(page, v.login);
-    const box = line.getByRole('combobox', { name: 'Branch' });
-    const mark = await toastMark(page);
-    if (text) await pick(box, text);
-    else {
-      await box.fill('');
-      await box.press('Enter');
-      await box.blur();
-    }
-    return toastsAfter(page, mark);
-  };
-  try {
-    await qa.step(1, async () => {
-      await page.goto('/id/settings');
-      await main.getByRole('link', { name: /^Branch map\b/ }).click();
-      await expect(main.getByRole('heading', { level: 1, name: 'User Site Mapping' })).toBeVisible();
-      await expect(main.getByText('Branch where each role applies. Empty means every branch.', { exact: true })).toBeVisible();
-      await expect(main.getByRole('columnheader')).toHaveText(['Login', 'Name', 'Role', 'Branch']);
-    });
-    await qa.step(2, async () => {
-      expect(await setBranch('Kemayoran')).toContain('Site mapping updated.');
-      await expect((await mapLines(page, v.login)).getByRole('combobox', { name: 'Branch' })).toHaveValue(/Kemayoran/);
-    });
-    await qa.step(3, async () => {
-      const toasts = await setBranch('');
-      qa.note(3, `emptied: toast "${toasts.join(' / ')}"`);
-      expect(toasts).toContain('Site mapping updated.');
-      await expect((await mapLines(page, v.login)).getByRole('combobox', { name: 'Branch' })).toHaveValue('');
-    });
-    await qa.step(4, async () => {
-      await page.goto('/id/settings');
-      await main.getByRole('link', { name: /^Sign-in log\b/ }).click();
-      await expect(main.getByRole('heading', { level: 1, name: 'User Login Log' })).toBeVisible();
-      await expect(main.getByText('Login events for users of this hospital.', { exact: true })).toBeVisible();
-      await expect(main.getByRole('columnheader')).toHaveText(['When', 'User', 'Full name', 'Entry point']);
-      const when = await main.getByRole('rowgroup').nth(1).getByRole('row').evaluateAll((rs) => rs.map((r) => r.querySelector('td')?.textContent ?? ''));
-      const key = (t: string) => t.replace(/^(\d{2})\/(\d{2})\/(\d{4}), (\d{2})\.(\d{2})\.(\d{2})$/, '$3$2$1$4$5$6');
-      expect(when.map(key)).toEqual([...when.map(key)].sort().reverse());
-    });
-    await qa.step(5, async () => {
-      const rows = await main.getByRole('rowgroup').nth(1).getByRole('row').count();
-      const filters = await main.locator('input, select').count();
-      qa.note(5, `${rows} rows, ${filters} filter input(s); no failed sign-ins and no device address are shown`);
-      expect(filters).toBe(0);
-    });
-  } finally {
-    await block(page, v.login);
-  }
-});
+qaTest('TC-APP018-041', TC_APP018_041);
 
 qaTest('TC-APP018-042', async ({ page, qa, browser }) => {
   const v = await newUser(page, qa);

@@ -154,3 +154,47 @@ export const TC_APP010_042 = async ({ page, qa }: CaseArgs): Promise<void> => {
     qa.note(6, `rows of ${no}: ${(await l.list(no)).map((r) => `${r[0]} ${r[1]}`).join(' ; ')} (TBD in the workbook: whether the days return to the balance)`);
   });
 };
+
+export const TC_APP010_040 = async ({ page, qa }: { page: Page; qa: Qa }): Promise<void> => {
+  const p = profile(page);
+  const no = qa.code('X-EMP-01');
+
+  await qa.step(1, async () => {
+    await page.goto('/id/hr');
+    await page.getByRole('complementary').getByRole('link', { name: 'Profile' }).or(page.getByRole('main').getByRole('link', { name: 'Profile' })).first().click();
+    await expect(p.main.getByRole('heading', { level: 1, name: 'My profile' })).toBeVisible();
+    await expect(p.main.getByRole('textbox', { name: 'Search' }).or(p.main.getByRole('searchbox')).first()).toBeVisible();
+    await expect(p.main.getByRole('button', { name: 'Employee', exact: true })).toBeVisible();
+  });
+
+  await qa.step(2, async () => {
+    await p.main.getByRole('button', { name: 'Employee', exact: true }).click();
+    await expect(p.dialog).toHaveAccessibleName('My profile');
+    for (const f of ['Employee no', NLK]) await expect(p.dialog.getByRole('textbox', { name: f })).toBeVisible();
+    await expect(p.dialog.getByRole('combobox', { name: 'Action' }).locator('option')).toHaveText(['Employee', 'Link me', 'My profile']);
+    for (const b of ['Close', 'Save']) await expect(p.dialog.getByRole('button', { name: b }).first()).toBeVisible();
+  });
+
+  await qa.step(3, async () => {
+    expect(await p.save({ 'Employee no': no, [NLK]: qa.name('X Karyawan Uji') }, 'Employee')).toContain(SAVED);
+    expect((await p.list(no)).some((r) => r.join(' ').includes(no))).toBe(true);
+  });
+
+  let linked = true;
+  await qa.step(4, async () => {
+    const toasts = await p.save({ 'Employee no': no }, 'Link me');
+    if (toasts.some((t) => /React error #441/.test(t))) {
+      linked = false;
+      qa.note(4, '"Link me": toast "Minified React error #441" (HTTP 500, found blocker 57); U1 was linked to an employee by an earlier run of this test');
+      return qa.blocked(4, 57);
+    }
+    expect(toasts).toContain(SAVED);
+  });
+  if (!linked) return qa.blocked(5, 57);
+
+  await qa.step(5, async () => {
+    const toasts = await p.save({}, 'My profile');
+    const shown = (await p.dialog.innerText().catch(() => '')).replace(/\s+/g, ' ');
+    qa.note(5, `"My profile": "${toasts.join(' / ') || 'no toast'}"; the dialog reads "${shown.slice(0, 160)}" (TBD in the workbook)`);
+  });
+};

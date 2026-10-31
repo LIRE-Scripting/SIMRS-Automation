@@ -1,4 +1,5 @@
 import { expect, type Locator, type Page } from '@playwright/test';
+import { pageToRow } from '../../../pages/paging';
 import { toastMark, toastsSince } from '../../../lib/assertions';
 
 /** Shared steps of 12-ris.xlsx. Every order of a test carries a study text with a token, so its row is found by it. */
@@ -27,7 +28,7 @@ export class RadOrdersPage {
   }
 
   async open(): Promise<void> {
-    await this.page.goto('/en/radiology/orders');
+    await this.page.goto('/id/radiology/orders');
     await expect(this.heading).toBeVisible();
   }
 
@@ -48,15 +49,7 @@ export class RadOrdersPage {
     await this.open();
     const match = () => this.rows().filter({ has: this.page.getByRole('cell', { name: study, exact: true }) });
     await expect(this.rows().first()).toBeVisible();
-    const next = this.main.getByRole('button', { name: 'Next page' });
-    for (let i = 0; i < 200; i++) {
-      if (await match().count()) return match();
-      if (!(await next.isVisible()) || (await next.isDisabled())) break;
-      const first = await this.rows().first().innerText();
-      await next.press('Enter');
-      await expect(this.rows().first()).not.toHaveText(first);
-    }
-    return match();
+    return pageToRow(this.main, match);
   }
 
   async openNew(): Promise<Locator> {
@@ -89,7 +82,7 @@ export class StudiesPage {
   }
 
   async open(): Promise<void> {
-    await this.page.goto('/en/radiology/studies');
+    await this.page.goto('/id/radiology/studies');
     await expect(this.main.getByRole('heading', { level: 1, name: 'Schedule and report' })).toBeVisible();
   }
 

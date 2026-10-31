@@ -14,7 +14,7 @@ Test title = `<TC ID> <Scenario Name> [<file> | Steps | rows a-b | <TC ID>]`; an
 | TC-APP002-006 | JRN-APP002-006 | Rescheduling appointments | Positive | High | rows 29-32 | 7 | `tests/modules/02-appointment/appointments.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP002-007 | JRN-APP002-007 | Cancelling appointments | Positive | High | rows 33-36 | 8 | `tests/modules/02-appointment/appointments.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP002-008 | JRN-APP002-008 | Blocking a consultant's time | Positive | High | rows 37-40 | 9 | `tests/modules/02-appointment/appointments.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
-| TC-APP002-009 | JRN-APP002-009 | Daily quota used up | Negative | High | rows 41-44 | 10 | `tests/modules/02-appointment/not-automated.spec.ts` | U1 / Podomoro | fixme | 02-appointment.xlsx \| Journeys \| row 10: Automation Candidate = Needs Evaluation |
+| TC-APP002-009 | JRN-APP002-009 | Daily quota used up | Negative | High | rows 41-44 | 10 | `tests/modules/02-appointment/appointments.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP002-010 | JRN-APP002-010 | Two bookings in the same open time | Negative | High | rows 45-47 | 11 | `tests/modules/02-appointment/appointments.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP002-011 | JRN-APP002-011 | Booking for a day that has passed | Boundary | High | rows 48-49 | 12 | `tests/modules/02-appointment/appointments.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP002-012 | JRN-APP002-012 | Booking form that is not complete | Negative | High | rows 50-53 | 13 | `tests/modules/02-appointment/appointments.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
@@ -36,15 +36,15 @@ Test title = `<TC ID> <Scenario Name> [<file> | Steps | rows a-b | <TC ID>]`; an
 | TC-APP002-028 | JRN-APP002-023 | Screen /appointment/cross-consult-types opens | Regression | Medium | row 96 | 24 | `tests/modules/02-appointment/screens.spec.ts` | U2 / All branches | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP002-029 | JRN-APP002-023 | Screen /appointment/referral-types opens | Regression | Medium | row 97 | 24 | `tests/modules/02-appointment/screens.spec.ts` | U2 / All branches | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP002-030 | JRN-APP002-023 | Screen /appointment/schedule opens | Regression | Medium | row 98 | 24 | `tests/modules/02-appointment/screens.spec.ts` | U2 / All branches | automate (saves; needs QA_ALLOW_WRITES) |  |
-| TC-APP002-031 | JRN-APP002-024 | Deep link without a session | Security | High | row 99 | 25 | `tests/modules/02-appointment/not-automated.spec.ts` | U1 / Podomoro | fixme | 02-appointment.xlsx \| Journeys \| row 25: Automation Candidate = Needs Evaluation / Needs user U10 "Second tenant, tenant without a licence, platform superadmin" (00-prerequisites.xlsx \| Users \| row 14: Deferred: needs a decision and a second tenant) |
-| TC-APP002-032 | JRN-APP002-024 | Tenant without the licence | Security | High | rows 100-101 | 25 | `tests/modules/02-appointment/not-automated.spec.ts` | U1 / Podomoro | fixme | 02-appointment.xlsx \| Journeys \| row 25: Automation Candidate = Needs Evaluation / Needs user U10 "Second tenant, tenant without a licence, platform superadmin" (00-prerequisites.xlsx \| Users \| row 14: Deferred: needs a decision and a second tenant) |
-| TC-APP002-033 | JRN-APP002-024 | Write without the write privilege | Security | High | row 102 | 25 | `tests/modules/02-appointment/not-automated.spec.ts` | U1 / Podomoro | fixme | 02-appointment.xlsx \| Journeys \| row 25: Automation Candidate = Needs Evaluation / Needs user U10 "Second tenant, tenant without a licence, platform superadmin" (00-prerequisites.xlsx \| Users \| row 14: Deferred: needs a decision and a second tenant) / TBD in step(s) 1: stated part only (Q8) |
+| TC-APP002-031 | JRN-APP002-024 | Deep link without a session | Security | High | row 99 | 25 | `tests/modules/02-appointment/not-automated.spec.ts` | U1 / Podomoro | fixme | Needs user U10 "Second tenant, tenant without a licence, platform superadmin" (00-prerequisites.xlsx \| Users \| row 14: Deferred: needs a decision and a second tenant) |
+| TC-APP002-032 | JRN-APP002-024 | Tenant without the licence | Security | High | rows 100-101 | 25 | `tests/modules/02-appointment/not-automated.spec.ts` | U1 / Podomoro | fixme | Needs user U10 "Second tenant, tenant without a licence, platform superadmin" (00-prerequisites.xlsx \| Users \| row 14: Deferred: needs a decision and a second tenant) |
+| TC-APP002-033 | JRN-APP002-024 | Write without the write privilege | Security | High | row 102 | 25 | `tests/modules/02-appointment/not-automated.spec.ts` | U1 / Podomoro | fixme | Needs user U10 "Second tenant, tenant without a licence, platform superadmin" (00-prerequisites.xlsx \| Users \| row 14: Deferred: needs a decision and a second tenant) / TBD in step(s) 1: stated part only (Q8) |
 
 ## Counts
 
 - automate (read-only): 2
-- automate (saves; needs QA_ALLOW_WRITES): 27
+- automate (saves; needs QA_ALLOW_WRITES): 28
 - automate (chain; needs a record from another app): 0
-- fixme: 4
+- fixme: 3
 - skip: 0
 - test cases with a "TBD" step (asserted partially): 1

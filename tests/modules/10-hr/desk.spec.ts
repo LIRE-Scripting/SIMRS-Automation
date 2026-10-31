@@ -1,7 +1,7 @@
 import { expect, qaTest, test } from '../../../fixtures/e2e';
 import { installToastRecorder } from '../../../lib/assertions';
 import { addDays, todayWib } from '../../../lib/dates';
-import { deskEmployee, idOf, leave, NLK, profile, SAVED, TC_APP010_042, YEAR } from './desk-cases';
+import { deskEmployee, idOf, leave, NLK, profile, SAVED, TC_APP010_040, TC_APP010_042, YEAR } from './desk-cases';
 
 /**
  * 10-hr.xlsx, the HR desk: My profile (/hr/desk) and Year balance
@@ -19,41 +19,7 @@ test.beforeEach(async ({ page }) => {
 });
 
 
-qaTest('TC-APP010-040', async ({ page, qa }) => {
-  const p = profile(page);
-  const no = qa.code('X-EMP-01');
-
-  await qa.step(1, async () => {
-    await page.goto('/id/hr');
-    await page.getByRole('complementary').getByRole('link', { name: 'Profile' }).or(page.getByRole('main').getByRole('link', { name: 'Profile' })).first().click();
-    await expect(p.main.getByRole('heading', { level: 1, name: 'My profile' })).toBeVisible();
-    await expect(p.main.getByRole('textbox', { name: 'Search' }).or(p.main.getByRole('searchbox')).first()).toBeVisible();
-    await expect(p.main.getByRole('button', { name: 'Employee', exact: true })).toBeVisible();
-  });
-
-  await qa.step(2, async () => {
-    await p.main.getByRole('button', { name: 'Employee', exact: true }).click();
-    await expect(p.dialog).toHaveAccessibleName('My profile');
-    for (const f of ['Employee no', NLK]) await expect(p.dialog.getByRole('textbox', { name: f })).toBeVisible();
-    await expect(p.dialog.getByRole('combobox', { name: 'Action' }).locator('option')).toHaveText(['Employee', 'Link me', 'My profile']);
-    for (const b of ['Close', 'Save']) await expect(p.dialog.getByRole('button', { name: b }).first()).toBeVisible();
-  });
-
-  await qa.step(3, async () => {
-    expect(await p.save({ 'Employee no': no, [NLK]: qa.name('X Karyawan Uji') }, 'Employee')).toContain(SAVED);
-    expect((await p.list(no)).some((r) => r.join(' ').includes(no))).toBe(true);
-  });
-
-  await qa.step(4, async () => {
-    expect(await p.save({ 'Employee no': no }, 'Link me')).toContain(SAVED);
-  });
-
-  await qa.step(5, async () => {
-    const toasts = await p.save({}, 'My profile');
-    const shown = (await p.dialog.innerText().catch(() => '')).replace(/\s+/g, ' ');
-    qa.note(5, `"My profile": "${toasts.join(' / ') || 'no toast'}"; the dialog reads "${shown.slice(0, 160)}" (TBD in the workbook)`);
-  });
-});
+qaTest('TC-APP010-040', TC_APP010_040);
 
 qaTest('TC-APP010-041', async ({ page, qa }) => {
   const p = profile(page);

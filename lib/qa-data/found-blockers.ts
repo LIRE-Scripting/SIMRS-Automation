@@ -193,6 +193,11 @@ export const FOUND_BLOCKERS: FoundBlocker[] = [
     who: 'Development',
     howFound: 'Seen on the site (automation of 06 Transfusion Medicine)',
     testCases: [
+      { id: 'TC-APP006-013', steps: [2, 3, 4, 5] },
+      { id: 'TC-APP006-044', steps: [1, 2, 3] },
+      { id: 'TC-APP006-021', steps: [3] },
+      { id: 'TC-APP006-053', steps: [1, 2, 3] },
+      { id: 'TC-APP006-054', steps: [1] },
       { id: 'TC-APP006-016', steps: [3, 4] },
       { id: 'TC-APP006-022', steps: [1, 2, 3, 4] },
       { id: 'TC-APP006-029', steps: [3, 4] },
@@ -259,6 +264,7 @@ export const FOUND_BLOCKERS: FoundBlocker[] = [
     who: 'Development',
     howFound: 'Seen on the site (automation of 05 Pharmacy)',
     testCases: [
+      { id: 'TC-APP004-045', steps: [3] },
       { id: 'TC-APP005-002', steps: [2, 3, 4, 5, 6, 7] },
       { id: 'TC-APP005-004', steps: [2, 3, 4] },
       { id: 'TC-APP005-025', steps: [4] },
@@ -278,6 +284,10 @@ export const FOUND_BLOCKERS: FoundBlocker[] = [
     who: 'Site administrator (Workflow)',
     howFound: 'Seen on the site (automation of 09 Procurement)',
     testCases: [
+      { id: 'TC-APP009-005', steps: [2, 3, 4] },
+      { id: 'TC-APP009-017', steps: [1, 2] },
+      { id: 'TC-APP009-018', steps: [2, 3] },
+      { id: 'TC-APP009-021', steps: [4] },
       { id: 'TC-APP009-004', steps: [3, 4] },
       { id: 'TC-APP009-006' },
       { id: 'TC-APP009-015', steps: [1] },
@@ -297,6 +307,8 @@ export const FOUND_BLOCKERS: FoundBlocker[] = [
     who: 'Development',
     howFound: 'Seen on the site (automation of 09 Procurement)',
     testCases: [
+      { id: 'TC-APP009-021', steps: [1, 2, 3] },
+      { id: 'TC-APP007-024', steps: [2, 3] },
       { id: 'TC-APP009-046', steps: [3, 4] },
       { id: 'TC-APP009-049', steps: [1, 2] },
       { id: 'TC-APP009-051', steps: [1, 2, 3] },
@@ -367,6 +379,9 @@ export const FOUND_BLOCKERS: FoundBlocker[] = [
     who: 'Development',
     howFound: 'Seen on the site (automation of 14 Hospital Accounts)',
     testCases: [
+      { id: 'TC-APP014-016', steps: [2] },
+      { id: 'TC-APP005-035', steps: [3, 4] },
+      { id: 'TC-APP005-040', steps: [1, 4, 5] },
       { id: 'TC-APP014-002', steps: [1, 2] },
       { id: 'TC-APP014-033' },
     ],
@@ -384,6 +399,7 @@ export const FOUND_BLOCKERS: FoundBlocker[] = [
     who: 'Development',
     howFound: 'Seen on the site (automation of 14 Hospital Accounts)',
     testCases: [
+      { id: 'TC-APP014-067', steps: [1] },
       { id: 'TC-APP014-061', steps: [5] },
       { id: 'TC-APP014-063', steps: [3] },
       { id: 'TC-APP014-065' },
@@ -470,6 +486,25 @@ export const FOUND_BLOCKERS: FoundBlocker[] = [
     who: 'Development',
     howFound: 'Seen on the site (full run of 2026-10-21, docs/qa/run-summary-2026-10-21.md)',
     testCases: [
+      { id: 'TC-APP005-017', steps: [1, 2, 3, 4, 5] },
+      { id: 'TC-APP007-008', steps: [3, 4] },
+      { id: 'TC-APP005-038', steps: [1, 2, 3, 4, 5] },
+      { id: 'TC-APP015-011', steps: [1, 2, 3, 4, 5] },
+      { id: 'TC-APP017-009', steps: [1, 2] },
+      { id: 'TC-APP017-017', steps: [1, 2, 3] },
+      { id: 'TC-APP017-018', steps: [1, 2, 3, 4, 5] },
+      { id: 'TC-APP017-019', steps: [1, 2, 3] },
+      { id: 'TC-APP017-027', steps: [1, 2, 3] },
+      { id: 'TC-APP013-013', steps: [1, 2, 3] },
+      { id: 'TC-APP010-021', steps: [1, 2, 3, 4] },
+      { id: 'TC-APP010-039', steps: [2, 3, 4] },
+      { id: 'TC-APP004-017', steps: [1, 2, 3, 4] },
+      { id: 'TC-APP004-022', steps: [2] },
+      { id: 'TC-APP004-023', steps: [1, 2, 3] },
+      { id: 'TC-APP004-039', steps: [1, 2, 3, 4] },
+      { id: 'TC-APP005-018', steps: [1, 2, 3, 4, 5] },
+      { id: 'TC-APP004-033', steps: [2] },
+      { id: 'TC-APP004-035', steps: [2] },
       { id: 'TC-APP001-053', steps: [2, 3] },
       { id: 'TC-APP002-017', steps: [2, 3] },
       { id: 'TC-APP004-018', steps: [3, 6] },
@@ -499,6 +534,7 @@ export const FOUND_BLOCKERS: FoundBlocker[] = [
       { id: 'TC-APP005-042', steps: [1, 2] },
       { id: 'TC-APP019-042', steps: [2, 3, 4, 5] },
       { id: 'TC-APP019-043', steps: [1, 2] },
+      { id: 'TC-APP001-023', steps: [2] },
       { id: 'TC-APP022-007', steps: [1, 2, 3, 4] },
       { id: 'TC-APP019-002', steps: [1, 2] },
       { id: 'TC-APP019-003', steps: [1, 2] },
@@ -665,6 +701,9 @@ export const FOUND_BLOCKERS: FoundBlocker[] = [
     who: 'Development',
     howFound: 'Seen on the site (TC-APP014-070, written 2026-10-28)',
     testCases: [
+      { id: 'TC-APP005-016', steps: [1, 2, 3, 4, 5, 6] },
+      { id: 'TC-APP005-036', steps: [1, 2, 3, 4] },
+      { id: 'TC-APP005-037', steps: [1, 2, 3, 4] },
       { id: 'TC-APP014-070', steps: [1, 2, 3] },
       { id: 'TC-APP014-071', steps: [2, 3] },
     ],
@@ -754,6 +793,7 @@ export const FOUND_BLOCKERS: FoundBlocker[] = [
     who: 'Development',
     howFound: 'Seen on the site (TC-APP005-033 and 028, since 2026-10-15)',
     testCases: [
+      { id: 'TC-APP007-009', steps: [3, 4] },
       { id: 'TC-APP005-028', steps: [3] },
       { id: 'TC-APP005-033', steps: [2, 3, 6] },
     ],
@@ -800,6 +840,38 @@ export const FOUND_BLOCKERS: FoundBlocker[] = [
     who: 'Development',
     howFound: 'Seen on the site (TC-APP018-043, 2026-10-29)',
     testCases: [{ id: 'TC-APP018-043', steps: [2, 3, 4] }],
+  },
+  {
+    no: 56,
+    blocker: '"Pay" with nothing more to collect, and a refund above the refund limit, answer HTTP 500',
+    category: 'Function',
+    scope: '14 Hospital Accounts\nFast Cashier, /billing/cashier: "Pay" with cash 0 on a sale whose deposits cover the bill; "Refund payment" above "Refund limit (IDR)"',
+    cause:
+      'Seen 2026-10-30 (the cashier cases passed on 2026-10-21): a walk-in sale of 150,000 (net 166,500) with deposits of 166,500, "Pay" with ' +
+      'the cash amount 0 shows the red box "Minified React error #441" (HTTP 500) and the sale stays Draft; the same after a reopened sale ' +
+      'was discounted. "Refund payment" of 150,000 on a paid sale (limit 100,000) answers HTTP 500 too, instead of holding the refund for approval.',
+    fix: '1. Fix "Pay" when nothing more is due, and the refund above the limit.\n2. Run TC-APP014-004, 009 and 010 again.',
+    who: 'Development',
+    howFound: 'Seen on the site (TC-APP014-004, 009, 010, 2026-10-30)',
+    testCases: [
+      { id: 'TC-APP014-004', steps: [2] },
+      { id: 'TC-APP014-009', steps: [1, 2, 3, 4] },
+      { id: 'TC-APP014-010', steps: [3, 4] },
+    ],
+  },
+  {
+    no: 57,
+    blocker: '"Link me" on HR, My profile answers HTTP 500 for an account that an earlier link already joined to an employee',
+    category: 'Function',
+    scope: '10 HR\nMy profile, /hr/desk, dialog "My profile" with the action "Link me"',
+    cause:
+      'Seen 2026-10-30 (chain E2E-039 step 7, TC-APP010-040 step 4): "Link me" with the number of a new employee of the test answers HTTP 500, ' +
+      'toast "Minified React error #441". The account U1 was linked to an employee of an earlier run of the same test; moving the link to a ' +
+      'new employee, or telling the user that the account is already linked, does not happen.',
+    fix: '1. Let "Link me" move the link, or refuse with a message.\n2. Run TC-APP010-040 and the chain E2E-039 again.',
+    who: 'Development',
+    howFound: 'Seen on the site (E2E-039, 2026-10-30)',
+    testCases: [{ id: 'TC-APP010-040', steps: [4, 5] }],
   },
 ];
 

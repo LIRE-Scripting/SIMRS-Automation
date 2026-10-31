@@ -55,7 +55,9 @@ export function planFor(ref: TestCaseRef): Plan {
     for (const b of foundBlockersOf(testCase.id)) {
       reasons.push(`Blocker ${b.no} (found by automation, docs/qa/blockers-found.md): ${b.blocker}`);
     }
-    if (journey.automationCandidate === 'Needs Evaluation') {
+    // "Needs Evaluation" is automated since 2026-10-29 (the user's decision, open question Q10); a blocker or a
+    // missing user still keeps the test case fixme. QA_NEEDS_EVALUATION=fixme turns it back.
+    if (journey.automationCandidate === 'Needs Evaluation' && process.env.QA_NEEDS_EVALUATION === 'fixme') {
       reasons.push(`${module.source} | Journeys | row ${journey.row}: Automation Candidate = Needs Evaluation`);
     }
     const prepared = new Map(prerequisites().users.map((u) => [u.key, u]));
