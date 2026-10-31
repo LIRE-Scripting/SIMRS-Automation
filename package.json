@@ -18,7 +18,8 @@
     "qa:prereq-evidence": "tsx scripts/qa/build-prereq-evidence.ts",
     "qa:run-summary": "tsx scripts/qa/build-run-summary.ts",
     "qa:messages": "tsx scripts/qa/fetch-messages.ts",
-    "qa:findings-md": "tsx scripts/qa/build-findings-md.ts"
+    "qa:findings-md": "tsx scripts/qa/build-findings-md.ts",
+    "qa:summary-id-missing": "tsx scripts/qa/summary-id-missing.ts"
   },
   "keywords": [],
   "author": "",

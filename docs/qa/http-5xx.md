@@ -1,6 +1,6 @@
 # HTTP 5xx dari site
 
-Dibangun 2026-10-31 16:44 UTC dari `reports/summary/run-summary.json`. Bangun ulang: `npm run qa:run-summary && npm run qa:findings-md`.
+Dibangun 2026-10-31 17:07 UTC dari `reports/summary/run-summary.json`. Bangun ulang: `npm run qa:run-summary && npm run qa:findings-md`.
 
 Setiap jawaban 5xx dicatat oleh `fixtures/e2e.ts` (fixture `serverErrors`) ke `.qa-state/**/http-5xx.jsonl`. Di sini hanya yang terjadi **dalam hasil terbaru** sebuah test: 5xx dari run lama yang test-nya sudah diulang tidak dihitung.
 
@@ -34,6 +34,6 @@ Jenis input yang memicunya:
 
 | Test | Status test | Waktu (UTC) | Jawaban | Endpoint | Digest | Jenis |
 |---|---|---|---|---|---|---|
-| E2E-033 | Blocked | 2026-10-29 00:23 | 500 POST | `/id/billing/cashier` |  | input valid (positif) |
-| TC-APP014-011 | Passed | 2026-10-30 01:48 | 500 POST | `/id/billing/cashier` |  | input valid (positif) |
-| TC-APP015-052 | Blocked | 2026-10-31 11:14 | 500 POST | `/id/emergency/patients` |  | blocker 13 |
+| E2E-033 | Terblokir | 2026-10-29 00:23 | 500 POST | `/id/billing/cashier` |  | input valid (positif) |
+| TC-APP014-011 | Lulus | 2026-10-30 01:48 | 500 POST | `/id/billing/cashier` |  | input valid (positif) |
+| TC-APP015-052 | Terblokir | 2026-10-31 11:14 | 500 POST | `/id/emergency/patients` |  | blocker 13 |

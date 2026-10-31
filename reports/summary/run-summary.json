@@ -1,7 +1,7 @@
 {
   "run": {
     "start": "2026-10-28T23:17:29.899Z",
-    "built": "2026-10-31T16:44:35.903Z",
+    "built": "2026-10-31T17:07:56.139Z",
     "site": "https://rs.showcase.atklik.xyz",
     "branch": "Podomoro",
     "serverErrors": ".qa-state/http-5xx.jsonl",
@@ -515,8 +515,8 @@
   "perBlocker": [
     {
       "no": 2,
-      "title": "Halaman donor menjawab HTTP 500",
-      "source": "00-blockers-checklist-linked.xlsx row 6",
+      "title": "Halaman Donor tidak memuat daftar donor (\"failed to list donors\"; sampai 2026-10-30 HTTP 500)",
+      "source": "00-blockers-checklist-linked.xlsx baris 6",
       "fix": "1. Find the failing donor list request in the server log and fix it.\n2. Show the screen with a message when the list fails, not the error page.\n3. Read the screen again and review the 27 journeys.",
       "who": "Development",
       "category": "Function",
@@ -533,8 +533,8 @@
     },
     {
       "no": 3,
-      "title": "Halaman baru pengeluaran steril menjawab HTTP 500",
-      "source": "00-blockers-checklist-linked.xlsx row 7",
+      "title": "Halaman baru pengeluaran steril gagal (\"cssd request failed\"; sampai 2026-10-30 HTTP 500)",
+      "source": "00-blockers-checklist-linked.xlsx baris 7",
       "fix": "1. Open the page again with one branch chosen.\n2. If it still fails: find the failing request in the server log; fix it or add a fallback.\n3. Check that issue sources and stores exist for the branch.",
       "who": "Tester, then Development",
       "category": "Data + Function",
@@ -547,8 +547,8 @@
     },
     {
       "no": 4,
-      "title": "Tenants dan Entitlements menjawab HTTP 500 untuk administrator rumah sakit",
-      "source": "00-blockers-checklist-linked.xlsx row 8",
+      "title": "Tenants dan Entitlements menolak administrator rumah sakit (\"missing required privilege\"; sampai 2026-10-30 HTTP 500)",
+      "source": "00-blockers-checklist-linked.xlsx baris 8",
       "fix": "Function: hide the links for users without the right, or show \"no access\" instead of the error page.\nData: an account with LICENSING_WRITE to test the two screens.",
       "who": "Development; Requester for the account",
       "category": "Data + Function",
@@ -562,7 +562,7 @@
     {
       "no": 5,
       "title": "28 daftar tidak termuat dengan \"Semua cabang\"",
-      "source": "00-blockers-checklist-linked.xlsx row 9",
+      "source": "00-blockers-checklist-linked.xlsx baris 9",
       "fix": "1. Decide: the screen asks for a branch, or the list loads for all branches.\n2. In both cases show a message instead of HTTP 500 and an empty table.\n3. Run the eight kept journeys again with \"All branches\".\nWorkaround now: choose one branch in the header (all 28 lists load with Podomoro).",
       "who": "Development; Tester for the workaround",
       "category": "Function",
@@ -583,7 +583,7 @@
     {
       "no": 6,
       "title": "\"Record code\" tidak bisa disimpan dengan \"Semua cabang\"",
-      "source": "00-blockers-checklist-linked.xlsx row 10",
+      "source": "00-blockers-checklist-linked.xlsx baris 10",
       "fix": "1. As blocker 5: ask for a branch or use the branch of the stay.\n2. Decide whether the code must exist in the diagnosis catalogue.\nWorkaround now: choose one branch in the header.",
       "who": "Development",
       "category": "Function",
@@ -597,7 +597,7 @@
     {
       "no": 7,
       "title": "\"Hitung jasa\" tidak pernah berhasil",
-      "source": "00-blockers-checklist-linked.xlsx row 11",
+      "source": "00-blockers-checklist-linked.xlsx baris 11",
       "fix": "Send the number from the dialog, or drop the requirement on the server. Then run JRN-APP010-045.",
       "who": "Development",
       "category": "Function",
@@ -613,7 +613,7 @@
     {
       "no": 8,
       "title": "Order diet tidak pernah sampai ke Dapur atau Layanan dan tagihan",
-      "source": "00-blockers-checklist-linked.xlsx row 12",
+      "source": "00-blockers-checklist-linked.xlsx baris 12",
       "fix": "1. Decide whether a diet order must appear in the kitchen and on the bill.\n2. If yes: add it. If no: rewrite JRN-APP013-039 for late meals only.",
       "who": "Product owner, then Development",
       "category": "Function",
@@ -629,7 +629,7 @@
     {
       "no": 9,
       "title": "Kunjungan IGD yang sudah ditutup tidak bisa diterima lagi; \"Tandai hidup\" tidak bisa dicapai",
-      "source": "00-blockers-checklist-linked.xlsx row 13",
+      "source": "00-blockers-checklist-linked.xlsx baris 13",
       "fix": "a) Decide how a known patient comes in again; allow a new encounter for the same record.\nb) Offer \"Mark as alive\" on a closed row of a patient brought dead.",
       "who": "Product owner, then Development",
       "category": "Function",
@@ -643,7 +643,7 @@
     {
       "no": 10,
       "title": "Item yang disimpan tidak tampil di daftar mana pun",
-      "source": "00-blockers-checklist-linked.xlsx row 14",
+      "source": "00-blockers-checklist-linked.xlsx baris 14",
       "fix": "Add a list for each of the five kinds of record, or show them on their screen after the save.",
       "who": "Development",
       "category": "Function",
@@ -657,7 +657,7 @@
     {
       "no": 11,
       "title": "Penerimaan layanan dan tagihan vendor tidak pernah tampil di daftar",
-      "source": "00-blockers-checklist-linked.xlsx row 15",
+      "source": "00-blockers-checklist-linked.xlsx baris 15",
       "fix": "Add a route and a list for receipts and bills, with the id of each row. Then the end-to-end journey JRN-APP022-008 can be run.",
       "who": "Development",
       "category": "Function",
@@ -673,7 +673,7 @@
     {
       "no": 12,
       "title": "Pencarian terminologi tidak menemukan kode",
-      "source": "00-blockers-checklist-linked.xlsx row 16",
+      "source": "00-blockers-checklist-linked.xlsx baris 16",
       "fix": "Import and activate a diagnosis code version on the site (API or seed; no screen does it). Then run JRN-APP003-047 again.",
       "who": "Site administrator",
       "category": "Data",
@@ -687,7 +687,7 @@
     {
       "no": 13,
       "title": "Set-up cabang belum ada",
-      "source": "00-blockers-checklist-linked.xlsx row 17",
+      "source": "00-blockers-checklist-linked.xlsx baris 17",
       "fix": "09: an item below its minimum stock in the branch.\n10: \"Link me\" on My profile for the test user.\n15 and 19: open again with one branch chosen; if still missing, add the configuration for that branch.\n20: a usable Budget posting rule in Finance for the branch, and an approver for each chain.\n21: a passed Bowie Dick test for the autoclave; KIT and KITS in Inventory.",
       "who": "Tester, with the go-ahead of blocker 15",
       "category": "Data",
@@ -713,7 +713,7 @@
     {
       "no": 14,
       "title": "34 journey butuh data yang dibuat di aplikasi lain",
-      "source": "00-blockers-checklist-linked.xlsx row 18",
+      "source": "00-blockers-checklist-linked.xlsx baris 18",
       "fix": "Run the feeding journeys first, in the same branch, and note the ids: Settings, then HR, Inventory, Procurement and Finance, then the others. The journey IDs are in the row \"Needs data or a step of another application\" of each sheet of 00-conditions-and-blockers.xlsx.",
       "who": "Tester, with the go-ahead of blocker 15",
       "category": "Data",
@@ -1413,13 +1413,7 @@
       "reason": "",
       "status": "Passed",
       "group": "01 Ambulatory Care",
-      "previous": "Failed",
-      "triage": {
-        "cause": "site",
-        "finding": "The Department picker searches only the records the page loaded first (50 departments; QA Poli Umum (DEP-1) was number 51+ after the \"QA Poli Uji\" departments of the Settings runs); a record past them is \"not found\" although it exists. Shows since the data grew past the limit.",
-        "next": "Dev: search the Department list on the server (or load all); then rerun. Found blocker 40 (pickers and lists capped).",
-        "owner": "Dev"
-      }
+      "previous": "Failed"
     },
     {
       "kind": "module",
@@ -1457,13 +1451,7 @@
       "reason": "",
       "status": "Passed",
       "group": "01 Ambulatory Care",
-      "previous": "Not run",
-      "triage": {
-        "cause": "site",
-        "finding": "The Department picker searches only the records the page loaded first (50 departments; QA Poli Umum (DEP-1) was number 51+ after the \"QA Poli Uji\" departments of the Settings runs); a record past them is \"not found\" although it exists. Shows since the data grew past the limit.",
-        "next": "Dev: search the Department list on the server (or load all); then rerun. Found blocker 40 (pickers and lists capped).",
-        "owner": "Dev"
-      }
+      "previous": "Not run"
     },
     {
       "kind": "module",
@@ -1483,13 +1471,7 @@
       "reason": "Step 2: blocker 17 (found by automation, docs/qa/blockers-found.md): Book settings: a quota or open-hours row cannot be switched to \"Unit\"; Step 3: blocker 17 (found by automation, docs/qa/blockers-found.md): Book settings: a quota or open-hours row cannot be switched to \"Unit\"; Step 4: blocker 17 (found by automation, docs/qa/blockers-found.md): Book settings: a quota or open-hours row cannot be switched to \"Unit\"",
       "status": "Blocked",
       "group": "01 Ambulatory Care",
-      "previous": "Not run",
-      "triage": {
-        "cause": "site",
-        "finding": "The Department picker searches only the records the page loaded first (50 departments; QA Poli Umum (DEP-1) was number 51+ after the \"QA Poli Uji\" departments of the Settings runs); a record past them is \"not found\" although it exists. Shows since the data grew past the limit.",
-        "next": "Dev: search the Department list on the server (or load all); then rerun. Found blocker 40 (pickers and lists capped).",
-        "owner": "Dev"
-      }
+      "previous": "Not run"
     },
     {
       "kind": "module",
@@ -1509,13 +1491,7 @@
       "reason": "Step 2: blocker 18 (found by automation, docs/qa/blockers-found.md): More than 3 bookings on one day cannot be made with the shared Book settings; Step 6: blocker 18 (found by automation, docs/qa/blockers-found.md): More than 3 bookings on one day cannot be made with the shared Book settings",
       "status": "Blocked",
       "group": "01 Ambulatory Care",
-      "previous": "Not run",
-      "triage": {
-        "cause": "site",
-        "finding": "The Department picker searches only the records the page loaded first (50 departments; QA Poli Umum (DEP-1) was number 51+ after the \"QA Poli Uji\" departments of the Settings runs); a record past them is \"not found\" although it exists. Shows since the data grew past the limit.",
-        "next": "Dev: search the Department list on the server (or load all); then rerun. Found blocker 40 (pickers and lists capped).",
-        "owner": "Dev"
-      }
+      "previous": "Not run"
     },
     {
       "kind": "module",
@@ -1535,13 +1511,7 @@
       "reason": "Step 2: blocker 18 (found by automation, docs/qa/blockers-found.md): More than 3 bookings on one day cannot be made with the shared Book settings; Step 4: blocker 18 (found by automation, docs/qa/blockers-found.md): More than 3 bookings on one day cannot be made with the shared Book settings",
       "status": "Blocked",
       "group": "01 Ambulatory Care",
-      "previous": "Not run",
-      "triage": {
-        "cause": "site",
-        "finding": "The Department picker searches only the records the page loaded first (50 departments; QA Poli Umum (DEP-1) was number 51+ after the \"QA Poli Uji\" departments of the Settings runs); a record past them is \"not found\" although it exists. Shows since the data grew past the limit.",
-        "next": "Dev: search the Department list on the server (or load all); then rerun. Found blocker 40 (pickers and lists capped).",
-        "owner": "Dev"
-      }
+      "previous": "Not run"
     },
     {
       "kind": "module",
@@ -1559,13 +1529,7 @@
       "reason": "",
       "status": "Passed",
       "group": "01 Ambulatory Care",
-      "previous": "Not run",
-      "triage": {
-        "cause": "site",
-        "finding": "The Department picker searches only the records the page loaded first (50 departments; QA Poli Umum (DEP-1) was number 51+ after the \"QA Poli Uji\" departments of the Settings runs); a record past them is \"not found\" although it exists. Shows since the data grew past the limit.",
-        "next": "Dev: search the Department list on the server (or load all); then rerun. Found blocker 40 (pickers and lists capped).",
-        "owner": "Dev"
-      }
+      "previous": "Not run"
     },
     {
       "kind": "module",
@@ -1583,13 +1547,7 @@
       "reason": "",
       "status": "Passed",
       "group": "01 Ambulatory Care",
-      "previous": "Not run",
-      "triage": {
-        "cause": "site",
-        "finding": "The Department picker searches only the records the page loaded first (50 departments; QA Poli Umum (DEP-1) was number 51+ after the \"QA Poli Uji\" departments of the Settings runs); a record past them is \"not found\" although it exists. Shows since the data grew past the limit.",
-        "next": "Dev: search the Department list on the server (or load all); then rerun. Found blocker 40 (pickers and lists capped).",
-        "owner": "Dev"
-      }
+      "previous": "Not run"
     },
     {
       "kind": "module",
@@ -1609,13 +1567,7 @@
       "reason": "Step 4: blocker 17 (found by automation, docs/qa/blockers-found.md): Book settings: a quota or open-hours row cannot be switched to \"Unit\"",
       "status": "Blocked",
       "group": "01 Ambulatory Care",
-      "previous": "Not run",
-      "triage": {
-        "cause": "site",
-        "finding": "The Department picker searches only the records the page loaded first (50 departments; QA Poli Umum (DEP-1) was number 51+ after the \"QA Poli Uji\" departments of the Settings runs); a record past them is \"not found\" although it exists. Shows since the data grew past the limit.",
-        "next": "Dev: search the Department list on the server (or load all); then rerun. Found blocker 40 (pickers and lists capped).",
-        "owner": "Dev"
-      }
+      "previous": "Not run"
     },
     {
       "kind": "module",
@@ -1635,13 +1587,7 @@
       "reason": "Step 4: Excel expects \"the button is replaced by the word \"Called\"\"; the site: the button is replaced by \"Start encounter\" (actions: Start encounter Set MLC Record document)",
       "status": "Deviation",
       "group": "01 Ambulatory Care",
-      "previous": "Failed",
-      "triage": {
-        "cause": "site",
-        "finding": "The Department picker searches only the records the page loaded first (50 departments; QA Poli Umum (DEP-1) was number 51+ after the \"QA Poli Uji\" departments of the Settings runs); a record past them is \"not found\" although it exists. Shows since the data grew past the limit.",
-        "next": "Dev: search the Department list on the server (or load all); then rerun. Found blocker 40 (pickers and lists capped).",
-        "owner": "Dev"
-      }
+      "previous": "Failed"
     },
     {
       "kind": "module",
@@ -1661,13 +1607,7 @@
       "reason": "Passed; not run: Step 4: needs the next working day: arrivals cannot be dated on the site, and one run lasts minutes",
       "status": "Passed",
       "group": "01 Ambulatory Care",
-      "previous": "Not run",
-      "triage": {
-        "cause": "site",
-        "finding": "The Department picker searches only the records the page loaded first (50 departments; QA Poli Umum (DEP-1) was number 51+ after the \"QA Poli Uji\" departments of the Settings runs); a record past them is \"not found\" although it exists. Shows since the data grew past the limit.",
-        "next": "Dev: search the Department list on the server (or load all); then rerun. Found blocker 40 (pickers and lists capped).",
-        "owner": "Dev"
-      }
+      "previous": "Not run"
     },
     {
       "kind": "module",
@@ -1685,13 +1625,7 @@
       "reason": "",
       "status": "Passed",
       "group": "01 Ambulatory Care",
-      "previous": "Not run",
-      "triage": {
-        "cause": "site",
-        "finding": "The Department picker searches only the records the page loaded first (50 departments; QA Poli Umum (DEP-1) was number 51+ after the \"QA Poli Uji\" departments of the Settings runs); a record past them is \"not found\" although it exists. Shows since the data grew past the limit.",
-        "next": "Dev: search the Department list on the server (or load all); then rerun. Found blocker 40 (pickers and lists capped).",
-        "owner": "Dev"
-      }
+      "previous": "Not run"
     },
     {
       "kind": "module",
@@ -2121,13 +2055,7 @@
       "reason": "Step 1: Excel expects \"A question to confirm, naming both patients, before anything changes\"; the site: merged at once (toast \"Patients merged\"); Step 2: Excel expects \"An undo or a merge history\"; the site: neither exists on Registered Patients; Step 3: Excel expects \"PT-DUP-B's arrival is shown under PT-DUP-A\"; the site: the arrival still shows PT-DUP-B's MRN MRN-2026-707F8C2A",
       "status": "Deviation",
       "group": "01 Ambulatory Care",
-      "previous": "Failed",
-      "triage": {
-        "cause": "site",
-        "finding": "The Department picker searches only the records the page loaded first (50 departments; QA Poli Umum (DEP-1) was number 51+ after the \"QA Poli Uji\" departments of the Settings runs); a record past them is \"not found\" although it exists. Shows since the data grew past the limit.",
-        "next": "Dev: search the Department list on the server (or load all); then rerun. Found blocker 40 (pickers and lists capped).",
-        "owner": "Dev"
-      }
+      "previous": "Failed"
     },
     {
       "kind": "module",
@@ -2170,13 +2098,7 @@
       "reason": "Step 4: blocker 17 (found by automation, docs/qa/blockers-found.md): Book settings: a quota or open-hours row cannot be switched to \"Unit\"",
       "status": "Blocked",
       "group": "01 Ambulatory Care",
-      "previous": "Not run",
-      "triage": {
-        "cause": "site",
-        "finding": "The Department picker searches only the records the page loaded first (50 departments; QA Poli Umum (DEP-1) was number 51+ after the \"QA Poli Uji\" departments of the Settings runs); a record past them is \"not found\" although it exists. Shows since the data grew past the limit.",
-        "next": "Dev: search the Department list on the server (or load all); then rerun. Found blocker 40 (pickers and lists capped).",
-        "owner": "Dev"
-      }
+      "previous": "Not run"
     },
     {
       "kind": "module",
@@ -2217,13 +2139,7 @@
       "reason": "Step 2: Excel expects \"08:00 is no longer offered\"; the site: 08:00 is still offered and chosen first; Step 3: Excel expects \"A warning that PT-1 already has this appointment\"; the site: booked a second time (toast \"Appointment booked\")",
       "status": "Deviation",
       "group": "01 Ambulatory Care",
-      "previous": "Not run",
-      "triage": {
-        "cause": "site",
-        "finding": "The Department picker searches only the records the page loaded first (50 departments; QA Poli Umum (DEP-1) was number 51+ after the \"QA Poli Uji\" departments of the Settings runs); a record past them is \"not found\" although it exists. Shows since the data grew past the limit.",
-        "next": "Dev: search the Department list on the server (or load all); then rerun. Found blocker 40 (pickers and lists capped).",
-        "owner": "Dev"
-      }
+      "previous": "Not run"
     },
     {
       "kind": "module",
@@ -2245,13 +2161,7 @@
       "reason": "Step 1: Excel expects \"The past day cannot be chosen, or no open time is offered\"; the site: 2026-10-30 can be chosen and offers 08:00, 08:30, 09:00, 09:30, 10:00, 10:30, 11:00, 11:30",
       "status": "Deviation",
       "group": "01 Ambulatory Care",
-      "previous": "Not run",
-      "triage": {
-        "cause": "site",
-        "finding": "The Department picker searches only the records the page loaded first (50 departments; QA Poli Umum (DEP-1) was number 51+ after the \"QA Poli Uji\" departments of the Settings runs); a record past them is \"not found\" although it exists. Shows since the data grew past the limit.",
-        "next": "Dev: search the Department list on the server (or load all); then rerun. Found blocker 40 (pickers and lists capped).",
-        "owner": "Dev"
-      }
+      "previous": "Not run"
     },
     {
       "kind": "module",
@@ -2272,13 +2182,7 @@
       "reason": "Step 2: Excel expects \"A message that the department is missing\"; the site: the click does nothing: no message, the dialog stays open; Step 3: Excel expects \"A message that the department is missing\"; the site: the click does nothing: no message, the dialog stays open",
       "status": "Deviation",
       "group": "01 Ambulatory Care",
-      "previous": "Not run",
-      "triage": {
-        "cause": "site",
-        "finding": "The Department picker searches only the records the page loaded first (50 departments; QA Poli Umum (DEP-1) was number 51+ after the \"QA Poli Uji\" departments of the Settings runs); a record past them is \"not found\" although it exists. Shows since the data grew past the limit.",
-        "next": "Dev: search the Department list on the server (or load all); then rerun. Found blocker 40 (pickers and lists capped).",
-        "owner": "Dev"
-      }
+      "previous": "Not run"
     },
     {
       "kind": "module",
@@ -2300,13 +2204,7 @@
       "reason": "Step 1: blocker 17 (found by automation, docs/qa/blockers-found.md): Book settings: a quota or open-hours row cannot be switched to \"Unit\"",
       "status": "Blocked",
       "group": "01 Ambulatory Care",
-      "previous": "Not run",
-      "triage": {
-        "cause": "site",
-        "finding": "The Department picker searches only the records the page loaded first (50 departments; QA Poli Umum (DEP-1) was number 51+ after the \"QA Poli Uji\" departments of the Settings runs); a record past them is \"not found\" although it exists. Shows since the data grew past the limit.",
-        "next": "Dev: search the Department list on the server (or load all); then rerun. Found blocker 40 (pickers and lists capped).",
-        "owner": "Dev"
-      }
+      "previous": "Not run"
     },
     {
       "kind": "module",
@@ -2328,13 +2226,7 @@
       "reason": "Step 1: Excel expects \"A question to confirm, with a place for the reason\"; the site: cancelled at once: no question, no reason; Step 2: Excel expects \"Present, or a note that it must be booked again\"; the site: no way to bring it back and no note; Step 3: Excel expects \"Refused\"; the site: refused with toast \"Booking failed\"",
       "status": "Deviation",
       "group": "01 Ambulatory Care",
-      "previous": "Not run",
-      "triage": {
-        "cause": "site",
-        "finding": "The Department picker searches only the records the page loaded first (50 departments; QA Poli Umum (DEP-1) was number 51+ after the \"QA Poli Uji\" departments of the Settings runs); a record past them is \"not found\" although it exists. Shows since the data grew past the limit.",
-        "next": "Dev: search the Department list on the server (or load all); then rerun. Found blocker 40 (pickers and lists capped).",
-        "owner": "Dev"
-      }
+      "previous": "Not run"
     },
     {
       "kind": "module",
@@ -2379,13 +2271,7 @@
       "reason": "Step 1: Excel expects \"Refused with a message about the times\"; the site: refused with toast \"Booking failed\"; Step 2: Excel expects \"A warning that PT-1 is booked in that time\"; the site: blocked without a warning; PT-1 stays booked; Step 3: Excel expects \"The block is listed and can be removed\"; the site: no list of blocks and no way to remove one",
       "status": "Deviation",
       "group": "01 Ambulatory Care",
-      "previous": "Not run",
-      "triage": {
-        "cause": "site",
-        "finding": "The Department picker searches only the records the page loaded first (50 departments; QA Poli Umum (DEP-1) was number 51+ after the \"QA Poli Uji\" departments of the Settings runs); a record past them is \"not found\" although it exists. Shows since the data grew past the limit.",
-        "next": "Dev: search the Department list on the server (or load all); then rerun. Found blocker 40 (pickers and lists capped).",
-        "owner": "Dev"
-      }
+      "previous": "Not run"
     },
     {
       "kind": "module",
@@ -2405,13 +2291,7 @@
       "reason": "Step 2: blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found; Step 3: blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found",
       "status": "Blocked",
       "group": "01 Ambulatory Care",
-      "previous": "Not run",
-      "triage": {
-        "cause": "automation",
-        "finding": "Rerun after the rename: typing the cashier's name in \"Consultant or unit\" shows an empty list with no \"no match\" text; the test waits for an option or that text. An empty list means \"not offered\", as the workbook expects. Steps 2-3 of this test case (pickers with more than 50 users or departments) are now runnable: Users 107, Departments 75; the site fails them (pickers capped at 50).",
-        "next": "QA automation: accept the empty list in step 1 and automate steps 2-3 (they will fail on found blocker 40 until Dev fixes the pickers).",
-        "owner": "QA automation"
-      }
+      "previous": "Not run"
     },
     {
       "kind": "module",
@@ -2431,13 +2311,7 @@
       "reason": "Step 3: Excel expects \"A message that the From date is after the To date\"; the site: no message; the list is empty (\"No appointments in this view.\")",
       "status": "Deviation",
       "group": "01 Ambulatory Care",
-      "previous": "Not run",
-      "triage": {
-        "cause": "site",
-        "finding": "The Department picker searches only the records the page loaded first (50 departments; QA Poli Umum (DEP-1) was number 51+ after the \"QA Poli Uji\" departments of the Settings runs); a record past them is \"not found\" although it exists. Shows since the data grew past the limit.",
-        "next": "Dev: search the Department list on the server (or load all); then rerun. Found blocker 40 (pickers and lists capped).",
-        "owner": "Dev"
-      }
+      "previous": "Not run"
     },
     {
       "kind": "module",
@@ -2455,13 +2329,7 @@
       "reason": "DR-1 has no open hours on 2026-10-31 (Monday to Friday only)",
       "status": "Not run",
       "group": "01 Ambulatory Care",
-      "previous": "Not run",
-      "triage": {
-        "cause": "site",
-        "finding": "The Department picker searches only the records the page loaded first (50 departments; QA Poli Umum (DEP-1) was number 51+ after the \"QA Poli Uji\" departments of the Settings runs); a record past them is \"not found\" although it exists. Shows since the data grew past the limit.",
-        "next": "Dev: search the Department list on the server (or load all); then rerun. Found blocker 40 (pickers and lists capped).",
-        "owner": "Dev"
-      }
+      "previous": "Not run"
     },
     {
       "kind": "module",
@@ -2482,13 +2350,7 @@
       "reason": "Step 1: Excel expects \"Toast \"This patient is already waiting in that department\". No new number\"; the site: toast \"Arrival failed\"; Step 3: Excel expects \"The button is disabled until a department is picked\"; the site: \"Arrive\" is enabled; the empty field already holds a department (id set)",
       "status": "Deviation",
       "group": "01 Ambulatory Care",
-      "previous": "Not run",
-      "triage": {
-        "cause": "site",
-        "finding": "The Department picker searches only the records the page loaded first (50 departments; QA Poli Umum (DEP-1) was number 51+ after the \"QA Poli Uji\" departments of the Settings runs); a record past them is \"not found\" although it exists. Shows since the data grew past the limit.",
-        "next": "Dev: search the Department list on the server (or load all); then rerun. Found blocker 40 (pickers and lists capped).",
-        "owner": "Dev"
-      }
+      "previous": "Not run"
     },
     {
       "kind": "module",
@@ -2570,13 +2432,7 @@
       "reason": "Step 1: Excel expects \"The patient's name shortened or hidden, and no MRN\"; the site: full name \"QA-AMB Pasien Satu MVWK3JL2004\" and MRN shown; Step 2: Excel expects \"A word such as \"Waiting\"\"; the site: Status \"A\"; Step 3: Excel expects \"The board does not change\"; the site: a row for the booking of 2026-11-09 appears at once, with its token, name and MRN",
       "status": "Deviation",
       "group": "01 Ambulatory Care",
-      "previous": "Not run",
-      "triage": {
-        "cause": "site",
-        "finding": "The Department picker searches only the records the page loaded first (50 departments; QA Poli Umum (DEP-1) was number 51+ after the \"QA Poli Uji\" departments of the Settings runs); a record past them is \"not found\" although it exists. Shows since the data grew past the limit.",
-        "next": "Dev: search the Department list on the server (or load all); then rerun. Found blocker 40 (pickers and lists capped).",
-        "owner": "Dev"
-      }
+      "previous": "Not run"
     },
     {
       "kind": "module",
@@ -2707,13 +2563,7 @@
       "reason": "",
       "status": "Passed",
       "group": "01 Ambulatory Care",
-      "previous": "Failed",
-      "triage": {
-        "cause": "site",
-        "finding": "The Department picker searches only the records the page loaded first (50 departments; QA Poli Umum (DEP-1) was number 51+ after the \"QA Poli Uji\" departments of the Settings runs); a record past them is \"not found\" although it exists. Shows since the data grew past the limit.",
-        "next": "Dev: search the Department list on the server (or load all); then rerun. Found blocker 40 (pickers and lists capped).",
-        "owner": "Dev"
-      }
+      "previous": "Failed"
     },
     {
       "kind": "module",
@@ -2899,13 +2749,7 @@
       "reason": "",
       "status": "Passed",
       "group": "01 Ambulatory Care",
-      "previous": "Not run",
-      "triage": {
-        "cause": "site",
-        "finding": "The Department picker searches only the records the page loaded first (50 departments; QA Poli Umum (DEP-1) was number 51+ after the \"QA Poli Uji\" departments of the Settings runs); a record past them is \"not found\" although it exists. Shows since the data grew past the limit.",
-        "next": "Dev: search the Department list on the server (or load all); then rerun. Found blocker 40 (pickers and lists capped).",
-        "owner": "Dev"
-      }
+      "previous": "Not run"
     },
     {
       "kind": "module",
@@ -2923,13 +2767,7 @@
       "reason": "",
       "status": "Passed",
       "group": "01 Ambulatory Care",
-      "previous": "Not run",
-      "triage": {
-        "cause": "site",
-        "finding": "The Department picker searches only the records the page loaded first (50 departments; QA Poli Umum (DEP-1) was number 51+ after the \"QA Poli Uji\" departments of the Settings runs); a record past them is \"not found\" although it exists. Shows since the data grew past the limit.",
-        "next": "Dev: search the Department list on the server (or load all); then rerun. Found blocker 40 (pickers and lists capped).",
-        "owner": "Dev"
-      }
+      "previous": "Not run"
     },
     {
       "kind": "module",
@@ -2947,13 +2785,7 @@
       "reason": "",
       "status": "Passed",
       "group": "01 Ambulatory Care",
-      "previous": "Not run",
-      "triage": {
-        "cause": "site",
-        "finding": "The Department picker searches only the records the page loaded first (50 departments; QA Poli Umum (DEP-1) was number 51+ after the \"QA Poli Uji\" departments of the Settings runs); a record past them is \"not found\" although it exists. Shows since the data grew past the limit.",
-        "next": "Dev: search the Department list on the server (or load all); then rerun. Found blocker 40 (pickers and lists capped).",
-        "owner": "Dev"
-      }
+      "previous": "Not run"
     },
     {
       "kind": "module",
@@ -2971,13 +2803,7 @@
       "reason": "",
       "status": "Passed",
       "group": "01 Ambulatory Care",
-      "previous": "Not run",
-      "triage": {
-        "cause": "site",
-        "finding": "The Department picker searches only the records the page loaded first (50 departments; QA Poli Umum (DEP-1) was number 51+ after the \"QA Poli Uji\" departments of the Settings runs); a record past them is \"not found\" although it exists. Shows since the data grew past the limit.",
-        "next": "Dev: search the Department list on the server (or load all); then rerun. Found blocker 40 (pickers and lists capped).",
-        "owner": "Dev"
-      }
+      "previous": "Not run"
     },
     {
       "kind": "module",
@@ -3174,13 +3000,7 @@
       "reason": "",
       "status": "Passed",
       "group": "02 Appointment",
-      "previous": "Not run",
-      "triage": {
-        "cause": "site",
-        "finding": "The Department picker searches only the records the page loaded first (50 departments; QA Poli Umum (DEP-1) was number 51+ after the \"QA Poli Uji\" departments of the Settings runs); a record past them is \"not found\" although it exists. Shows since the data grew past the limit.",
-        "next": "Dev: search the Department list on the server (or load all); then rerun. Found blocker 40 (pickers and lists capped).",
-        "owner": "Dev"
-      }
+      "previous": "Not run"
     },
     {
       "kind": "module",
@@ -3200,13 +3020,7 @@
       "reason": "Step 2: blocker 17 (found by automation, docs/qa/blockers-found.md): Book settings: a quota or open-hours row cannot be switched to \"Unit\"; Step 3: blocker 17 (found by automation, docs/qa/blockers-found.md): Book settings: a quota or open-hours row cannot be switched to \"Unit\"; Step 4: blocker 17 (found by automation, docs/qa/blockers-found.md): Book settings: a quota or open-hours row cannot be switched to \"Unit\"",
       "status": "Blocked",
       "group": "02 Appointment",
-      "previous": "Not run",
-      "triage": {
-        "cause": "site",
-        "finding": "The Department picker searches only the records the page loaded first (50 departments; QA Poli Umum (DEP-1) was number 51+ after the \"QA Poli Uji\" departments of the Settings runs); a record past them is \"not found\" although it exists. Shows since the data grew past the limit.",
-        "next": "Dev: search the Department list on the server (or load all); then rerun. Found blocker 40 (pickers and lists capped).",
-        "owner": "Dev"
-      }
+      "previous": "Not run"
     },
     {
       "kind": "module",
@@ -3226,13 +3040,7 @@
       "reason": "Step 2: blocker 18 (found by automation, docs/qa/blockers-found.md): More than 3 bookings on one day cannot be made with the shared Book settings; Step 6: blocker 18 (found by automation, docs/qa/blockers-found.md): More than 3 bookings on one day cannot be made with the shared Book settings",
       "status": "Blocked",
       "group": "02 Appointment",
-      "previous": "Not run",
-      "triage": {
-        "cause": "site",
-        "finding": "The Department picker searches only the records the page loaded first (50 departments; QA Poli Umum (DEP-1) was number 51+ after the \"QA Poli Uji\" departments of the Settings runs); a record past them is \"not found\" although it exists. Shows since the data grew past the limit.",
-        "next": "Dev: search the Department list on the server (or load all); then rerun. Found blocker 40 (pickers and lists capped).",
-        "owner": "Dev"
-      }
+      "previous": "Not run"
     },
     {
       "kind": "module",
@@ -3252,13 +3060,7 @@
       "reason": "Step 2: blocker 18 (found by automation, docs/qa/blockers-found.md): More than 3 bookings on one day cannot be made with the shared Book settings; Step 4: blocker 18 (found by automation, docs/qa/blockers-found.md): More than 3 bookings on one day cannot be made with the shared Book settings",
       "status": "Blocked",
       "group": "02 Appointment",
-      "previous": "Not run",
-      "triage": {
-        "cause": "site",
-        "finding": "The Department picker searches only the records the page loaded first (50 departments; QA Poli Umum (DEP-1) was number 51+ after the \"QA Poli Uji\" departments of the Settings runs); a record past them is \"not found\" although it exists. Shows since the data grew past the limit.",
-        "next": "Dev: search the Department list on the server (or load all); then rerun. Found blocker 40 (pickers and lists capped).",
-        "owner": "Dev"
-      }
+      "previous": "Not run"
     },
     {
       "kind": "module",
@@ -3276,13 +3078,7 @@
       "reason": "",
       "status": "Passed",
       "group": "02 Appointment",
-      "previous": "Not run",
-      "triage": {
-        "cause": "site",
-        "finding": "The Department picker searches only the records the page loaded first (50 departments; QA Poli Umum (DEP-1) was number 51+ after the \"QA Poli Uji\" departments of the Settings runs); a record past them is \"not found\" although it exists. Shows since the data grew past the limit.",
-        "next": "Dev: search the Department list on the server (or load all); then rerun. Found blocker 40 (pickers and lists capped).",
-        "owner": "Dev"
-      }
+      "previous": "Not run"
     },
     {
       "kind": "module",
@@ -3300,13 +3096,7 @@
       "reason": "",
       "status": "Passed",
       "group": "02 Appointment",
-      "previous": "Not run",
-      "triage": {
-        "cause": "site",
-        "finding": "The Department picker searches only the records the page loaded first (50 departments; QA Poli Umum (DEP-1) was number 51+ after the \"QA Poli Uji\" departments of the Settings runs); a record past them is \"not found\" although it exists. Shows since the data grew past the limit.",
-        "next": "Dev: search the Department list on the server (or load all); then rerun. Found blocker 40 (pickers and lists capped).",
-        "owner": "Dev"
-      }
+      "previous": "Not run"
     },
     {
       "kind": "module",
@@ -3326,13 +3116,7 @@
       "reason": "Step 4: blocker 17 (found by automation, docs/qa/blockers-found.md): Book settings: a quota or open-hours row cannot be switched to \"Unit\"",
       "status": "Blocked",
       "group": "02 Appointment",
-      "previous": "Not run",
-      "triage": {
-        "cause": "site",
-        "finding": "The Department picker searches only the records the page loaded first (50 departments; QA Poli Umum (DEP-1) was number 51+ after the \"QA Poli Uji\" departments of the Settings runs); a record past them is \"not found\" although it exists. Shows since the data grew past the limit.",
-        "next": "Dev: search the Department list on the server (or load all); then rerun. Found blocker 40 (pickers and lists capped).",
-        "owner": "Dev"
-      }
+      "previous": "Not run"
     },
     {
       "kind": "module",
@@ -3373,13 +3157,7 @@
       "reason": "Step 2: Excel expects \"08:00 is no longer offered\"; the site: 08:00 is still offered and chosen first; Step 3: Excel expects \"A warning that PT-1 already has this appointment\"; the site: booked a second time (toast \"Appointment booked\")",
       "status": "Deviation",
       "group": "02 Appointment",
-      "previous": "Not run",
-      "triage": {
-        "cause": "site",
-        "finding": "The Department picker searches only the records the page loaded first (50 departments; QA Poli Umum (DEP-1) was number 51+ after the \"QA Poli Uji\" departments of the Settings runs); a record past them is \"not found\" although it exists. Shows since the data grew past the limit.",
-        "next": "Dev: search the Department list on the server (or load all); then rerun. Found blocker 40 (pickers and lists capped).",
-        "owner": "Dev"
-      }
+      "previous": "Not run"
     },
     {
       "kind": "module",
@@ -3401,13 +3179,7 @@
       "reason": "Step 1: Excel expects \"The past day cannot be chosen, or no open time is offered\"; the site: 2026-10-30 can be chosen and offers 08:00, 08:30, 09:00, 09:30, 10:00, 10:30, 11:00, 11:30",
       "status": "Deviation",
       "group": "02 Appointment",
-      "previous": "Not run",
-      "triage": {
-        "cause": "site",
-        "finding": "The Department picker searches only the records the page loaded first (50 departments; QA Poli Umum (DEP-1) was number 51+ after the \"QA Poli Uji\" departments of the Settings runs); a record past them is \"not found\" although it exists. Shows since the data grew past the limit.",
-        "next": "Dev: search the Department list on the server (or load all); then rerun. Found blocker 40 (pickers and lists capped).",
-        "owner": "Dev"
-      }
+      "previous": "Not run"
     },
     {
       "kind": "module",
@@ -3428,13 +3200,7 @@
       "reason": "Step 2: Excel expects \"A message that the department is missing\"; the site: the click does nothing: no message, the dialog stays open; Step 3: Excel expects \"A message that the department is missing\"; the site: the click does nothing: no message, the dialog stays open",
       "status": "Deviation",
       "group": "02 Appointment",
-      "previous": "Not run",
-      "triage": {
-        "cause": "site",
-        "finding": "The Department picker searches only the records the page loaded first (50 departments; QA Poli Umum (DEP-1) was number 51+ after the \"QA Poli Uji\" departments of the Settings runs); a record past them is \"not found\" although it exists. Shows since the data grew past the limit.",
-        "next": "Dev: search the Department list on the server (or load all); then rerun. Found blocker 40 (pickers and lists capped).",
-        "owner": "Dev"
-      }
+      "previous": "Not run"
     },
     {
       "kind": "module",
@@ -3456,13 +3222,7 @@
       "reason": "Step 1: blocker 17 (found by automation, docs/qa/blockers-found.md): Book settings: a quota or open-hours row cannot be switched to \"Unit\"",
       "status": "Blocked",
       "group": "02 Appointment",
-      "previous": "Not run",
-      "triage": {
-        "cause": "site",
-        "finding": "The Department picker searches only the records the page loaded first (50 departments; QA Poli Umum (DEP-1) was number 51+ after the \"QA Poli Uji\" departments of the Settings runs); a record past them is \"not found\" although it exists. Shows since the data grew past the limit.",
-        "next": "Dev: search the Department list on the server (or load all); then rerun. Found blocker 40 (pickers and lists capped).",
-        "owner": "Dev"
-      }
+      "previous": "Not run"
     },
     {
       "kind": "module",
@@ -3484,13 +3244,7 @@
       "reason": "Step 1: Excel expects \"A question to confirm, with a place for the reason\"; the site: cancelled at once: no question, no reason; Step 2: Excel expects \"Present, or a note that it must be booked again\"; the site: no way to bring it back and no note; Step 3: Excel expects \"Refused\"; the site: refused with toast \"Booking failed\"",
       "status": "Deviation",
       "group": "02 Appointment",
-      "previous": "Not run",
-      "triage": {
-        "cause": "site",
-        "finding": "The Department picker searches only the records the page loaded first (50 departments; QA Poli Umum (DEP-1) was number 51+ after the \"QA Poli Uji\" departments of the Settings runs); a record past them is \"not found\" although it exists. Shows since the data grew past the limit.",
-        "next": "Dev: search the Department list on the server (or load all); then rerun. Found blocker 40 (pickers and lists capped).",
-        "owner": "Dev"
-      }
+      "previous": "Not run"
     },
     {
       "kind": "module",
@@ -3535,13 +3289,7 @@
       "reason": "Step 1: Excel expects \"Refused with a message about the times\"; the site: refused with toast \"Booking failed\"; Step 2: Excel expects \"A warning that PT-1 is booked in that time\"; the site: blocked without a warning; PT-1 stays booked; Step 3: Excel expects \"The block is listed and can be removed\"; the site: no list of blocks and no way to remove one",
       "status": "Deviation",
       "group": "02 Appointment",
-      "previous": "Not run",
-      "triage": {
-        "cause": "site",
-        "finding": "The Department picker searches only the records the page loaded first (50 departments; QA Poli Umum (DEP-1) was number 51+ after the \"QA Poli Uji\" departments of the Settings runs); a record past them is \"not found\" although it exists. Shows since the data grew past the limit.",
-        "next": "Dev: search the Department list on the server (or load all); then rerun. Found blocker 40 (pickers and lists capped).",
-        "owner": "Dev"
-      }
+      "previous": "Not run"
     },
     {
       "kind": "module",
@@ -3561,13 +3309,7 @@
       "reason": "Step 2: blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found; Step 3: blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found",
       "status": "Blocked",
       "group": "02 Appointment",
-      "previous": "Not run",
-      "triage": {
-        "cause": "automation",
-        "finding": "Rerun after the rename: typing the cashier's name in \"Consultant or unit\" shows an empty list with no \"no match\" text; the test waits for an option or that text. An empty list means \"not offered\", as the workbook expects. Steps 2-3 of this test case (pickers with more than 50 users or departments) are now runnable: Users 107, Departments 75; the site fails them (pickers capped at 50).",
-        "next": "QA automation: accept the empty list in step 1 and automate steps 2-3 (they will fail on found blocker 40 until Dev fixes the pickers).",
-        "owner": "QA automation"
-      }
+      "previous": "Not run"
     },
     {
       "kind": "module",
@@ -3587,13 +3329,7 @@
       "reason": "Step 3: Excel expects \"A message that the From date is after the To date\"; the site: no message; the list is empty (\"No appointments in this view.\")",
       "status": "Deviation",
       "group": "02 Appointment",
-      "previous": "Not run",
-      "triage": {
-        "cause": "site",
-        "finding": "The Department picker searches only the records the page loaded first (50 departments; QA Poli Umum (DEP-1) was number 51+ after the \"QA Poli Uji\" departments of the Settings runs); a record past them is \"not found\" although it exists. Shows since the data grew past the limit.",
-        "next": "Dev: search the Department list on the server (or load all); then rerun. Found blocker 40 (pickers and lists capped).",
-        "owner": "Dev"
-      }
+      "previous": "Not run"
     },
     {
       "kind": "module",
@@ -4811,13 +4547,7 @@
       "reason": "",
       "status": "Passed",
       "group": "03 Patient Care",
-      "previous": "Failed",
-      "triage": {
-        "cause": "site",
-        "finding": "The radiology order made in the consultation does not show in RIS Orders (same on 2026-10-18).",
-        "next": "Dev: check that consultation radiology orders reach RIS for the branch; then rerun.",
-        "owner": "Dev"
-      }
+      "previous": "Failed"
     },
     {
       "kind": "module",
@@ -4873,13 +4603,7 @@
       "reason": "Step 1: Excel expects \"The patient's name and MRN on the order\"; the site: the order row has no patient: \"RAD-1793461715 QA Foto toraks PA MVWKLNRE010 — — — —\"",
       "status": "Deviation",
       "group": "03 Patient Care",
-      "previous": "Failed",
-      "triage": {
-        "cause": "site",
-        "finding": "The radiology order made in the consultation does not show in RIS Orders (same on 2026-10-18).",
-        "next": "Dev: check that consultation radiology orders reach RIS for the branch; then rerun.",
-        "owner": "Dev"
-      }
+      "previous": "Failed"
     },
     {
       "kind": "module",
@@ -5764,13 +5488,7 @@
       "reason": "Step 2: blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found; Step 3: blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found",
       "status": "Blocked",
       "group": "04 Inpatient",
-      "previous": "Failed",
-      "triage": {
-        "cause": "site",
-        "finding": "The Bed picker searches only the records the page loaded first (the bed list of the ward; the new bed QA-199-… is not offered); a record past them is \"not found\" although it exists. Shows since the data grew past the limit.",
-        "next": "Dev: search the Bed list on the server (or load all); then rerun. Found blocker 40 (pickers and lists capped).",
-        "owner": "Dev"
-      }
+      "previous": "Failed"
     },
     {
       "kind": "module",
@@ -7306,13 +7024,7 @@
       "reason": "Passed; not run: Step 3: needs a branch with nothing pending; U1 works on Podomoro only, where QA orders are always pending",
       "status": "Passed",
       "group": "05 Pharmacy",
-      "previous": "Failed",
-      "triage": {
-        "cause": "automation",
-        "finding": "Step 6 searches Issue Lines for \"generik\", but no step makes a line with that remark, and step 5 leaves the list on its last page while the search covers the page on screen only.",
-        "next": "QA automation: make a sale with the remark \"generik\" first and search from page 1.",
-        "owner": "QA automation"
-      }
+      "previous": "Failed"
     },
     {
       "kind": "module",
@@ -7409,13 +7121,7 @@
       "reason": "Step 3: Excel expects \"The sale goes through for PT-2\"; the site: refused: \"advanceDispense: 400 Patient has been admitted\" (PT-3 of the same name is admitted)",
       "status": "Deviation",
       "group": "05 Pharmacy",
-      "previous": "Failed",
-      "triage": {
-        "cause": "site",
-        "finding": "Dispense confirm (walk-in sale of QA-PARA, quantity 1) answers HTTP 500 (server action error, digest in sheet HTTP 5xx). The request carries well-formed values from the workbook (see the request body in sheet HTTP 5xx).",
-        "next": "Dev: look up the digest in the server log and fix the action; then rerun the test.",
-        "owner": "Dev"
-      }
+      "previous": "Failed"
     },
     {
       "kind": "module",
@@ -7515,13 +7221,7 @@
       "reason": "Step 6: Excel expects \"Confirmed toast\"; the site: refused (\"advanceDispense: 400 pharmacy: not enough stock\ninventory: not enough stock (QA-FRZ-MVW7MXG8007)\"): with Freeze days 29 the batch expiring in 30 days is still held back",
       "status": "Deviation",
       "group": "05 Pharmacy",
-      "previous": "Failed",
-      "triage": {
-        "cause": "site",
-        "finding": "Dispense confirm (walk-in sale of QA-PARA, quantity 1) answers HTTP 500 (server action error, digest in sheet HTTP 5xx). The request carries well-formed values from the workbook (see the request body in sheet HTTP 5xx).",
-        "next": "Dev: look up the digest in the server log and fix the action; then rerun the test.",
-        "owner": "Dev"
-      }
+      "previous": "Failed"
     },
     {
       "kind": "module",
@@ -7697,13 +7397,7 @@
       "reason": "Step 1: blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found; Step 2: blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found",
       "status": "Blocked",
       "group": "05 Pharmacy",
-      "previous": "Failed",
-      "triage": {
-        "cause": "site",
-        "finding": "Issue Lines search \"Paracetamol\" lists one of the two sales of the test (same on 2026-10-18); the second sale was not confirmed (dispense confirm HTTP 500).",
-        "next": "Dev: fix dispense confirm (see TC-APP005-028); then rerun.",
-        "owner": "Dev"
-      }
+      "previous": "Failed"
     },
     {
       "kind": "module",
@@ -9997,13 +9691,7 @@
       "reason": "",
       "status": "Passed",
       "group": "07 Inventory",
-      "previous": "Failed",
-      "triage": {
-        "cause": "automation",
-        "finding": "After \"Inactive\" is chosen the table shows its empty row (no inactive item on the page on screen: the filter narrows only the 50 rows of the page, blocker 40); the test reads that row as an item with status \"\".",
-        "next": "QA automation: treat the empty row as \"no rows\"; the missing inactive item stays a note on blocker 40.",
-        "owner": "QA automation"
-      }
+      "previous": "Failed"
     },
     {
       "kind": "module",
@@ -11964,13 +11652,7 @@
       "reason": "Step 1: Excel expects \"Refused: \"incision, department type, and percentage are required\"\"; the site: \"Saved.\" with the percentage empty (policy \"QA-sama MVWJVGTP004\")",
       "status": "Deviation",
       "group": "08 Operation Theater",
-      "previous": "Failed",
-      "triage": {
-        "cause": "site",
-        "finding": "A pain policy with an empty number is saved (\"Saved\"); the workbook expects a refusal (\"incision, department type, and percentage are required\"). Same on 2026-10-18.",
-        "next": "Dev: require the number; Product: confirm the rule.",
-        "owner": "Dev"
-      }
+      "previous": "Failed"
     },
     {
       "kind": "module",
@@ -12376,13 +12058,7 @@
       "reason": "",
       "status": "Passed",
       "group": "09 Procurement",
-      "previous": "Failed",
-      "triage": {
-        "cause": "site",
-        "finding": "Orders without a date are not at the end with \"—\": the last page shows a date (same on 2026-10-18).",
-        "next": "Product: confirm the sort; Dev: sort orders without a date last.",
-        "owner": "Product"
-      }
+      "previous": "Failed"
     },
     {
       "kind": "module",
@@ -12543,13 +12219,7 @@
       "reason": "Step 1: blocker 30 (found by automation, docs/qa/blockers-found.md): The purchase order approval chain has one step, not the four of the shared data",
       "status": "Blocked",
       "group": "09 Procurement",
-      "previous": "Failed",
-      "triage": {
-        "cause": "site",
-        "finding": "Blocker 30: the approval chain has one step, so PO-DONE cannot show four \"Done\" steps.",
-        "next": "Dev/Product: blocker 30 (four-step approval chain).",
-        "owner": "Dev"
-      }
+      "previous": "Failed"
     },
     {
       "kind": "module",
@@ -13653,13 +13323,7 @@
       "reason": "Step 2: blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found; Step 3: blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found; Step 4: blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found",
       "status": "Blocked",
       "group": "10 HR",
-      "previous": "Passed",
-      "triage": {
-        "cause": "site",
-        "finding": "The Employee (leave) picker searches only the records the page loaded first (employees made by earlier runs fill it; the new QA-EMP-… and X QA Pegawai are not offered); a record past them is \"not found\" although it exists. Shows since the data grew past the limit.",
-        "next": "Dev: search the Employee (leave) list on the server (or load all); then rerun. Found blocker 40 (pickers and lists capped).",
-        "owner": "Dev"
-      }
+      "previous": "Passed"
     },
     {
       "kind": "module",
@@ -13679,13 +13343,7 @@
       "reason": "Step 1: blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found; Step 2: blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found",
       "status": "Blocked",
       "group": "10 HR",
-      "previous": "Failed",
-      "triage": {
-        "cause": "site",
-        "finding": "The Employee (leave) picker searches only the records the page loaded first (employees made by earlier runs fill it; the new QA-EMP-… and X QA Pegawai are not offered); a record past them is \"not found\" although it exists. Shows since the data grew past the limit.",
-        "next": "Dev: search the Employee (leave) list on the server (or load all); then rerun. Found blocker 40 (pickers and lists capped).",
-        "owner": "Dev"
-      }
+      "previous": "Failed"
     },
     {
       "kind": "module",
@@ -13705,13 +13363,7 @@
       "reason": "Step 1: blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found; Step 2: blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found",
       "status": "Blocked",
       "group": "10 HR",
-      "previous": "Failed",
-      "triage": {
-        "cause": "site",
-        "finding": "The Employee (leave) picker searches only the records the page loaded first (employees made by earlier runs fill it; the new QA-EMP-… and X QA Pegawai are not offered); a record past them is \"not found\" although it exists. Shows since the data grew past the limit.",
-        "next": "Dev: search the Employee (leave) list on the server (or load all); then rerun. Found blocker 40 (pickers and lists capped).",
-        "owner": "Dev"
-      }
+      "previous": "Failed"
     },
     {
       "kind": "module",
@@ -13731,13 +13383,7 @@
       "reason": "Step 1: blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found; Step 2: blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found",
       "status": "Blocked",
       "group": "10 HR",
-      "previous": "Failed",
-      "triage": {
-        "cause": "site",
-        "finding": "The Employee (leave) picker searches only the records the page loaded first (employees made by earlier runs fill it; the new QA-EMP-… and X QA Pegawai are not offered); a record past them is \"not found\" although it exists. Shows since the data grew past the limit.",
-        "next": "Dev: search the Employee (leave) list on the server (or load all); then rerun. Found blocker 40 (pickers and lists capped).",
-        "owner": "Dev"
-      }
+      "previous": "Failed"
     },
     {
       "kind": "module",
@@ -13757,13 +13403,7 @@
       "reason": "Step 1: blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found; Step 2: blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found; Step 3: blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found",
       "status": "Blocked",
       "group": "10 HR",
-      "previous": "Deviation",
-      "triage": {
-        "cause": "site",
-        "finding": "The Employee (leave) picker searches only the records the page loaded first (employees made by earlier runs fill it; the new QA-EMP-… and X QA Pegawai are not offered); a record past them is \"not found\" although it exists. Shows since the data grew past the limit.",
-        "next": "Dev: search the Employee (leave) list on the server (or load all); then rerun. Found blocker 40 (pickers and lists capped).",
-        "owner": "Dev"
-      }
+      "previous": "Deviation"
     },
     {
       "kind": "module",
@@ -13840,13 +13480,7 @@
       "reason": "Step 1: blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found; Step 2: blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found; Step 3: blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found",
       "status": "Blocked",
       "group": "10 HR",
-      "previous": "Passed",
-      "triage": {
-        "cause": "site",
-        "finding": "The Employee (leave) picker searches only the records the page loaded first (employees made by earlier runs fill it; the new QA-EMP-… and X QA Pegawai are not offered); a record past them is \"not found\" although it exists. Shows since the data grew past the limit.",
-        "next": "Dev: search the Employee (leave) list on the server (or load all); then rerun. Found blocker 40 (pickers and lists capped).",
-        "owner": "Dev"
-      }
+      "previous": "Passed"
     },
     {
       "kind": "module",
@@ -13866,13 +13500,7 @@
       "reason": "Step 1: blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found; Step 2: blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found; Step 3: blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found",
       "status": "Blocked",
       "group": "10 HR",
-      "previous": "Failed",
-      "triage": {
-        "cause": "site",
-        "finding": "The Employee (leave) picker searches only the records the page loaded first (employees made by earlier runs fill it; the new QA-EMP-… and X QA Pegawai are not offered); a record past them is \"not found\" although it exists. Shows since the data grew past the limit.",
-        "next": "Dev: search the Employee (leave) list on the server (or load all); then rerun. Found blocker 40 (pickers and lists capped).",
-        "owner": "Dev"
-      }
+      "previous": "Failed"
     },
     {
       "kind": "module",
@@ -13892,13 +13520,7 @@
       "reason": "Step 1: blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found; Step 2: blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found; Step 3: blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found",
       "status": "Blocked",
       "group": "10 HR",
-      "previous": "Failed",
-      "triage": {
-        "cause": "site",
-        "finding": "The Employee (leave) picker searches only the records the page loaded first (employees made by earlier runs fill it; the new QA-EMP-… and X QA Pegawai are not offered); a record past them is \"not found\" although it exists. Shows since the data grew past the limit.",
-        "next": "Dev: search the Employee (leave) list on the server (or load all); then rerun. Found blocker 40 (pickers and lists capped).",
-        "owner": "Dev"
-      }
+      "previous": "Failed"
     },
     {
       "kind": "module",
@@ -13920,13 +13542,7 @@
       "reason": "Step 2: blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found; Step 3: blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found; Step 4: blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found; Step 5: blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found",
       "status": "Blocked",
       "group": "10 HR",
-      "previous": "Failed",
-      "triage": {
-        "cause": "site",
-        "finding": "The Employee (leave) picker searches only the records the page loaded first (employees made by earlier runs fill it; the new QA-EMP-… and X QA Pegawai are not offered); a record past them is \"not found\" although it exists. Shows since the data grew past the limit.",
-        "next": "Dev: search the Employee (leave) list on the server (or load all); then rerun. Found blocker 40 (pickers and lists capped).",
-        "owner": "Dev"
-      }
+      "previous": "Failed"
     },
     {
       "kind": "module",
@@ -13988,13 +13604,7 @@
       "reason": "Step 2: blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found; Step 3: blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found; Step 4: blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found; Step 5: blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found",
       "status": "Blocked",
       "group": "10 HR",
-      "previous": "Deviation",
-      "triage": {
-        "cause": "site",
-        "finding": "The Employee (leave) picker searches only the records the page loaded first (employees made by earlier runs fill it; the new QA-EMP-… and X QA Pegawai are not offered); a record past them is \"not found\" although it exists. Shows since the data grew past the limit.",
-        "next": "Dev: search the Employee (leave) list on the server (or load all); then rerun. Found blocker 40 (pickers and lists capped).",
-        "owner": "Dev"
-      }
+      "previous": "Deviation"
     },
     {
       "kind": "module",
@@ -14014,13 +13624,7 @@
       "reason": "Step 2: blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found; Step 3: blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found",
       "status": "Blocked",
       "group": "10 HR",
-      "previous": "Failed",
-      "triage": {
-        "cause": "site",
-        "finding": "The Employee (leave) picker searches only the records the page loaded first (employees made by earlier runs fill it; the new QA-EMP-… and X QA Pegawai are not offered); a record past them is \"not found\" although it exists. Shows since the data grew past the limit.",
-        "next": "Dev: search the Employee (leave) list on the server (or load all); then rerun. Found blocker 40 (pickers and lists capped).",
-        "owner": "Dev"
-      }
+      "previous": "Failed"
     },
     {
       "kind": "module",
@@ -14221,13 +13825,7 @@
       "reason": "Step 1: blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found; Step 2: blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found; Step 3: blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found; Step 4: blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found; Step 5: blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found",
       "status": "Blocked",
       "group": "10 HR",
-      "previous": "Failed",
-      "triage": {
-        "cause": "site",
-        "finding": "The Employee (leave) picker searches only the records the page loaded first (employees made by earlier runs fill it; the new QA-EMP-… and X QA Pegawai are not offered); a record past them is \"not found\" although it exists. Shows since the data grew past the limit.",
-        "next": "Dev: search the Employee (leave) list on the server (or load all); then rerun. Found blocker 40 (pickers and lists capped).",
-        "owner": "Dev"
-      }
+      "previous": "Failed"
     },
     {
       "kind": "module",
@@ -15696,13 +15294,7 @@
       "reason": "Step 1: blocker 53 (found by automation, docs/qa/blockers-found.md): \"Revert latest stamp\" on the laboratory Work desk fails (\"bad_request\")",
       "status": "Blocked",
       "group": "11 Laboratory",
-      "previous": "Failed",
-      "triage": {
-        "cause": "site",
-        "finding": "\"Revert latest stamp\" of a lab order answers HTTP 500 (server action error, digest in sheet HTTP 5xx). The request carries well-formed values from the workbook (see the request body in sheet HTTP 5xx).",
-        "next": "Dev: look up the digest in the server log and fix the action; then rerun the test.",
-        "owner": "Dev"
-      }
+      "previous": "Failed"
     },
     {
       "kind": "module",
@@ -17400,13 +16992,7 @@
       "reason": "",
       "status": "Passed",
       "group": "13 Dietary",
-      "previous": "Failed",
-      "triage": {
-        "cause": "site",
-        "finding": "Diet order \"Calculate\" (assessment) answers HTTP 500 (server action error, digest in sheet HTTP 5xx). The request carries well-formed values from the workbook (see the request body in sheet HTTP 5xx).",
-        "next": "Dev: look up the digest in the server log and fix the action; then rerun the test.",
-        "owner": "Dev"
-      }
+      "previous": "Failed"
     },
     {
       "kind": "module",
@@ -17885,13 +17471,7 @@
       "reason": "Step 2: blocker 56 (found by automation, docs/qa/blockers-found.md): \"Pay\" with nothing more to collect fails with a database error; a refund above the refund limit is not held",
       "status": "Blocked",
       "group": "14 Hospital Accounts",
-      "previous": "Not run",
-      "triage": {
-        "cause": "site",
-        "finding": "Cashier \"Pay\" of a bill already covered by deposits answers HTTP 500 (server action error, digest in sheet HTTP 5xx). The request carries well-formed values from the workbook (see the request body in sheet HTTP 5xx).",
-        "next": "Dev: look up the digest in the server log and fix the action; then rerun the test.",
-        "owner": "Dev"
-      }
+      "previous": "Not run"
     },
     {
       "kind": "module",
@@ -18009,13 +17589,7 @@
       "reason": "Step 3: blocker 56 (found by automation, docs/qa/blockers-found.md): \"Pay\" with nothing more to collect fails with a database error; a refund above the refund limit is not held; Step 4: blocker 56 (found by automation, docs/qa/blockers-found.md): \"Pay\" with nothing more to collect fails with a database error; a refund above the refund limit is not held",
       "status": "Blocked",
       "group": "14 Hospital Accounts",
-      "previous": "Not run",
-      "triage": {
-        "cause": "site",
-        "finding": "Cashier \"Pay\" of a bill already covered by deposits answers HTTP 500 (server action error, digest in sheet HTTP 5xx). The request carries well-formed values from the workbook (see the request body in sheet HTTP 5xx).",
-        "next": "Dev: look up the digest in the server log and fix the action; then rerun the test.",
-        "owner": "Dev"
-      }
+      "previous": "Not run"
     },
     {
       "kind": "module",
@@ -18514,13 +18088,7 @@
       "reason": "Passed; not run: Step 2: needs a second tab opened before the close of TC-APP014-011; the tests do not keep a tab across tests; Step 3: needs a second tab opened before the close of TC-APP014-011; the tests do not keep a tab across tests; Step 4: needs a second tab opened before the close of TC-APP014-011; the tests do not keep a tab across tests",
       "status": "Passed",
       "group": "14 Hospital Accounts",
-      "previous": "Passed",
-      "triage": {
-        "cause": "environment",
-        "finding": "Needs the counter closed for the day; the day is closed only at the end of the run (TC-APP014-011, E2E-033).",
-        "next": "QA automation: run TC-APP014-036 after TC-APP014-011.",
-        "owner": "QA automation"
-      }
+      "previous": "Passed"
     },
     {
       "kind": "module",
@@ -19937,13 +19505,7 @@
       "reason": "",
       "status": "Passed",
       "group": "15 Emergency",
-      "previous": "Passed",
-      "triage": {
-        "cause": "automation",
-        "finding": "Refused with \"An active category already uses that description or colour.\": the triage category of the run of 2026-10-18 is still active with the same description/colour. The site is right.",
-        "next": "QA automation: unique description per run and retire the category at the end of the test.",
-        "owner": "QA automation"
-      }
+      "previous": "Passed"
     },
     {
       "kind": "module",
@@ -19963,13 +19525,7 @@
       "reason": "Passed; not run: Step 4: needs a category on an open encounter; the encounter part is run in TC-APP015-037",
       "status": "Passed",
       "group": "15 Emergency",
-      "previous": "Passed",
-      "triage": {
-        "cause": "automation",
-        "finding": "Refused with \"An active category already uses that description or colour.\": the triage category of the run of 2026-10-18 is still active with the same description/colour. The site is right.",
-        "next": "QA automation: unique description per run and retire the category at the end of the test.",
-        "owner": "QA automation"
-      }
+      "previous": "Passed"
     },
     {
       "kind": "module",
@@ -21794,13 +21350,7 @@
       "reason": "Step 2: blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found; Step 3: blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found; Step 4: blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found; Step 5: blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found",
       "status": "Blocked",
       "group": "17 Payroll",
-      "previous": "Passed",
-      "triage": {
-        "cause": "site",
-        "finding": "The Employee (payroll) picker searches only the records the page loaded first (the new QA-EMP-… of the run is not offered); a record past them is \"not found\" although it exists. Shows since the data grew past the limit.",
-        "next": "Dev: search the Employee (payroll) list on the server (or load all); then rerun. Found blocker 40 (pickers and lists capped).",
-        "owner": "Dev"
-      }
+      "previous": "Passed"
     },
     {
       "kind": "module",
@@ -21839,13 +21389,7 @@
       "reason": "Step 1: blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found; Step 2: blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found; Step 3: blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found; Step 4: blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found",
       "status": "Blocked",
       "group": "17 Payroll",
-      "previous": "Failed",
-      "triage": {
-        "cause": "site",
-        "finding": "The Employee (payroll) picker searches only the records the page loaded first (the new QA-EMP-… of the run is not offered); a record past them is \"not found\" although it exists. Shows since the data grew past the limit.",
-        "next": "Dev: search the Employee (payroll) list on the server (or load all); then rerun. Found blocker 40 (pickers and lists capped).",
-        "owner": "Dev"
-      }
+      "previous": "Failed"
     },
     {
       "kind": "module",
@@ -21938,13 +21482,7 @@
       "reason": "Step 1: blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found; Step 2: blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found; Step 3: blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found",
       "status": "Blocked",
       "group": "17 Payroll",
-      "previous": "Failed",
-      "triage": {
-        "cause": "site",
-        "finding": "The Employee (payroll) picker searches only the records the page loaded first (the new QA-EMP-… of the run is not offered); a record past them is \"not found\" although it exists. Shows since the data grew past the limit.",
-        "next": "Dev: search the Employee (payroll) list on the server (or load all); then rerun. Found blocker 40 (pickers and lists capped).",
-        "owner": "Dev"
-      }
+      "previous": "Failed"
     },
     {
       "kind": "module",
@@ -21984,13 +21522,7 @@
       "reason": "Step 1: blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found; Step 2: blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found; Step 3: blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found",
       "status": "Blocked",
       "group": "17 Payroll",
-      "previous": "Deviation",
-      "triage": {
-        "cause": "site",
-        "finding": "The Employee (payroll) picker searches only the records the page loaded first (the new QA-EMP-… of the run is not offered); a record past them is \"not found\" although it exists. Shows since the data grew past the limit.",
-        "next": "Dev: search the Employee (payroll) list on the server (or load all); then rerun. Found blocker 40 (pickers and lists capped).",
-        "owner": "Dev"
-      }
+      "previous": "Deviation"
     },
     {
       "kind": "module",
@@ -22029,13 +21561,7 @@
       "reason": "Step 1: blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found; Step 2: blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found; Step 3: blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found; Step 4: blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found",
       "status": "Blocked",
       "group": "17 Payroll",
-      "previous": "Deviation",
-      "triage": {
-        "cause": "site",
-        "finding": "The Employee (payroll) picker searches only the records the page loaded first (the new QA-EMP-… of the run is not offered); a record past them is \"not found\" although it exists. Shows since the data grew past the limit.",
-        "next": "Dev: search the Employee (payroll) list on the server (or load all); then rerun. Found blocker 40 (pickers and lists capped).",
-        "owner": "Dev"
-      }
+      "previous": "Deviation"
     },
     {
       "kind": "module",
@@ -22055,13 +21581,7 @@
       "reason": "Step 1: blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found; Step 2: blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found",
       "status": "Blocked",
       "group": "17 Payroll",
-      "previous": "Deviation",
-      "triage": {
-        "cause": "site",
-        "finding": "The Employee (payroll) picker searches only the records the page loaded first (the new QA-EMP-… of the run is not offered); a record past them is \"not found\" although it exists. Shows since the data grew past the limit.",
-        "next": "Dev: search the Employee (payroll) list on the server (or load all); then rerun. Found blocker 40 (pickers and lists capped).",
-        "owner": "Dev"
-      }
+      "previous": "Deviation"
     },
     {
       "kind": "module",
@@ -22083,13 +21603,7 @@
       "reason": "Step 2: blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found; Step 3: blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found; Step 4: blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found; Step 5: blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found",
       "status": "Blocked",
       "group": "17 Payroll",
-      "previous": "Deviation",
-      "triage": {
-        "cause": "site",
-        "finding": "The Employee (payroll) picker searches only the records the page loaded first (the new QA-EMP-… of the run is not offered); a record past them is \"not found\" although it exists. Shows since the data grew past the limit.",
-        "next": "Dev: search the Employee (payroll) list on the server (or load all); then rerun. Found blocker 40 (pickers and lists capped).",
-        "owner": "Dev"
-      }
+      "previous": "Deviation"
     },
     {
       "kind": "module",
@@ -22109,13 +21623,7 @@
       "reason": "Step 1: blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found; Step 2: blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found; Step 3: blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found; Step 4: blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found",
       "status": "Blocked",
       "group": "17 Payroll",
-      "previous": "Deviation",
-      "triage": {
-        "cause": "site",
-        "finding": "The Employee (payroll) picker searches only the records the page loaded first (the new QA-EMP-… of the run is not offered); a record past them is \"not found\" although it exists. Shows since the data grew past the limit.",
-        "next": "Dev: search the Employee (payroll) list on the server (or load all); then rerun. Found blocker 40 (pickers and lists capped).",
-        "owner": "Dev"
-      }
+      "previous": "Deviation"
     },
     {
       "kind": "module",
@@ -22135,13 +21643,7 @@
       "reason": "Step 1: blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found; Step 2: blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found; Step 3: blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found",
       "status": "Blocked",
       "group": "17 Payroll",
-      "previous": "Failed",
-      "triage": {
-        "cause": "site",
-        "finding": "The Employee (payroll) picker searches only the records the page loaded first (QA-EMP-NONAKTIF-… / QA-EMP-XSS-… of the run are not offered, so the check on inactive or script names cannot be made); a record past them is \"not found\" although it exists. Shows since the data grew past the limit.",
-        "next": "Dev: search the Employee (payroll) list on the server (or load all); then rerun. Found blocker 40 (pickers and lists capped).",
-        "owner": "Dev"
-      }
+      "previous": "Failed"
     },
     {
       "kind": "module",
@@ -22336,13 +21838,7 @@
       "reason": "Step 1: blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found; Step 2: blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found; Step 3: blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found",
       "status": "Blocked",
       "group": "17 Payroll",
-      "previous": "Failed",
-      "triage": {
-        "cause": "site",
-        "finding": "The Employee (payroll) picker searches only the records the page loaded first (QA-EMP-NONAKTIF-… / QA-EMP-XSS-… of the run are not offered, so the check on inactive or script names cannot be made); a record past them is \"not found\" although it exists. Shows since the data grew past the limit.",
-        "next": "Dev: search the Employee (payroll) list on the server (or load all); then rerun. Found blocker 40 (pickers and lists capped).",
-        "owner": "Dev"
-      }
+      "previous": "Failed"
     },
     {
       "kind": "module",
@@ -22816,13 +22312,7 @@
       "reason": "Step 1: blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found; Step 2: blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found; Step 3: blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found; Step 4: blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found",
       "status": "Blocked",
       "group": "17 Payroll",
-      "previous": "Deviation",
-      "triage": {
-        "cause": "site",
-        "finding": "The Employee (payroll) picker searches only the records the page loaded first (the new QA-EMP-… of the run is not offered); a record past them is \"not found\" although it exists. Shows since the data grew past the limit.",
-        "next": "Dev: search the Employee (payroll) list on the server (or load all); then rerun. Found blocker 40 (pickers and lists capped).",
-        "owner": "Dev"
-      }
+      "previous": "Deviation"
     },
     {
       "kind": "module",
@@ -23298,13 +22788,7 @@
       "reason": "",
       "status": "Passed",
       "group": "18 Settings",
-      "previous": "Passed",
-      "triage": {
-        "cause": "automation",
-        "finding": "After the edit, the row was looked up before the search had filtered the list (timing). The tax code is saved with the new rate.",
-        "next": "Fixed 2026-10-21 (Mdm.row waits for the search); rerun.",
-        "owner": "QA automation"
-      }
+      "previous": "Passed"
     },
     {
       "kind": "module",
@@ -23772,13 +23256,7 @@
       "reason": "Step 3: Excel expects \"a row with the role \"perawat\"\"; the site: \"Roles\" reads \"—\"; Step 5: Excel expects \"Only the chosen branch in the header\"; the site: the header names no branch: \"KlikMed Home Dashboard Preferences Apps Reports Analytics Notifications No notifications yet. ID Language ID EN AR Q QA-Perawat Uji MVWL9CEY002 QA-Perawat Uji MVWL9CEY002 perawat Profile Preferences Sign out\"; Step 6: Excel expects \"An entry user.create with the login\"; the site: the entry does not name the login: \"31/10/2026, 23.01.35 user.create platform/identity admin2 succeeded admin2\"",
       "status": "Deviation",
       "group": "18 Settings",
-      "previous": "Failed",
-      "triage": {
-        "cause": "site",
-        "finding": "User Site Mapping draws only 24 rows of each page of 50 (\"Showing 51–100 of 127\" lists 24 logins): rows 25–50 of every page are never shown, and the new user's line falls among them (blocker 40). The test now pages through the list (rerun 2026-10-21); before that it read page 1 only.",
-        "next": "Dev: draw every row of the page (blocker 40); then run again.",
-        "owner": "Dev"
-      }
+      "previous": "Failed"
     },
     {
       "kind": "module",
@@ -23974,13 +23452,7 @@
       "reason": "",
       "status": "Passed",
       "group": "18 Settings",
-      "previous": "Failed",
-      "triage": {
-        "cause": "site",
-        "finding": "User Site Mapping draws only 24 rows of each page of 50 (\"Showing 51–100 of 127\" lists 24 logins): rows 25–50 of every page are never shown, and the new user's line falls among them (blocker 40). The test now pages through the list (rerun 2026-10-21); before that it read page 1 only.",
-        "next": "Dev: draw every row of the page (blocker 40); then run again.",
-        "owner": "Dev"
-      }
+      "previous": "Failed"
     },
     {
       "kind": "module",
@@ -23998,13 +23470,7 @@
       "reason": "",
       "status": "Passed",
       "group": "18 Settings",
-      "previous": "Failed",
-      "triage": {
-        "cause": "site",
-        "finding": "User Site Mapping draws only 24 rows of each page of 50 (\"Showing 51–100 of 127\" lists 24 logins): rows 25–50 of every page are never shown, and the new user's line falls among them (blocker 40). The test now pages through the list (rerun 2026-10-21); before that it read page 1 only.",
-        "next": "Dev: draw every row of the page (blocker 40); then run again.",
-        "owner": "Dev"
-      }
+      "previous": "Failed"
     },
     {
       "kind": "module",
@@ -24397,13 +23863,7 @@
       "reason": "Step 1: blocker 4 (00-blockers-checklist-linked.xlsx | Checklist | row 8): Tenants and Entitlements answer HTTP 500 for the hospital administrator",
       "status": "Blocked",
       "group": "18 Settings",
-      "previous": "Failed",
-      "triage": {
-        "cause": "site",
-        "finding": "Blocker 4 still present: /entitlements and /tenants answer HTTP 500 for the hospital administrator.",
-        "next": "Dev: blocker 4 (hide the links or allow the screens); QA: the screen test stays failed until then.",
-        "owner": "Dev"
-      }
+      "previous": "Failed"
     },
     {
       "kind": "module",
@@ -24873,13 +24333,7 @@
       "reason": "Step 1: blocker 4 (00-blockers-checklist-linked.xlsx | Checklist | row 8): Tenants and Entitlements answer HTTP 500 for the hospital administrator",
       "status": "Blocked",
       "group": "18 Settings",
-      "previous": "Failed",
-      "triage": {
-        "cause": "site",
-        "finding": "Blocker 4 still present: /entitlements and /tenants answer HTTP 500 for the hospital administrator.",
-        "next": "Dev: blocker 4 (hide the links or allow the screens); QA: the screen test stays failed until then.",
-        "owner": "Dev"
-      }
+      "previous": "Failed"
     },
     {
       "kind": "module",
@@ -25455,13 +24909,7 @@
       "reason": "",
       "status": "Passed",
       "group": "19 Finance",
-      "previous": "Passed",
-      "triage": {
-        "cause": "automation",
-        "finding": "Precondition changed by the prerequisite run (S09, 2026-10-20): \"Allocation — operating\" now has its accounts, so \"Save\" without choosing saves. The site is right.",
-        "next": "QA automation: clear the debit and credit accounts before the save, or use a rule without accounts.",
-        "owner": "QA automation"
-      }
+      "previous": "Passed"
     },
     {
       "kind": "module",
@@ -25596,13 +25044,7 @@
       "reason": "Step 3: blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found",
       "status": "Blocked",
       "group": "19 Finance",
-      "previous": "Passed",
-      "triage": {
-        "cause": "site",
-        "finding": "The Account (Budget posting rules) picker searches only the records the page loaded first (the select lists the first accounts; the QA-XSS account of the run is not among them); a record past them is \"not found\" although it exists. Shows since the data grew past the limit.",
-        "next": "Dev: search the Account (Budget posting rules) list on the server (or load all); then rerun. Found blocker 40 (pickers and lists capped).",
-        "owner": "Dev"
-      }
+      "previous": "Passed"
     },
     {
       "kind": "module",
@@ -25667,13 +25109,7 @@
       "reason": "Step 1: Excel expects \"The text \"A financial year is required.\"\"; the site: the browser stops the click (Current financial year: Please select an item in the list.); Step 2: Excel expects \"The text \"At least one user must be allowed to transact.\"\"; the site: toast \"Configuration saved.\": saved with no user (\"Add user\" adds no line, TC-APP019-035); Step 3: Excel expects \"The text that imprest eligibility needs a type, an amount, an account and a department, employee or party\"; the site: the row with only a type is saved (\"Configuration saved.\")",
       "status": "Deviation",
       "group": "19 Finance",
-      "previous": "Failed",
-      "triage": {
-        "cause": "site",
-        "finding": "An imprest row with a type and no amount is saved (\"Configuration saved.\"); the workbook expects a refusal. Same on 2026-10-18.",
-        "next": "Dev: validate imprest rows (type, amount, account, holder).",
-        "owner": "Dev"
-      }
+      "previous": "Failed"
     },
     {
       "kind": "module",
@@ -29556,13 +28992,7 @@
       "reason": "Step 1: blocker 3 (00-blockers-checklist-linked.xlsx | Checklist | row 7): New sterile issue page answers HTTP 500",
       "status": "Blocked",
       "group": "21 CSSD",
-      "previous": "Failed",
-      "triage": {
-        "cause": "site",
-        "finding": "Blocker 3 still present: /cssd/issues/new answers HTTP 500.",
-        "next": "Dev: blocker 3; then rerun.",
-        "owner": "Dev"
-      }
+      "previous": "Failed"
     },
     {
       "kind": "module",
@@ -29831,13 +29261,7 @@
       "reason": "Step 3: blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found; Step 4: blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found; Step 5: blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found; Step 6: blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found",
       "status": "Blocked",
       "group": "22 Services",
-      "previous": "Failed",
-      "triage": {
-        "cause": "site",
-        "finding": "The desk list shows its first 22 rows only, with no paging and no search; the record saved now is past them, so its status or id cannot be read (checked 2026-10-21 on /housekeeping/contracts, /maintenance/work, /maintenance/amc, /fixed-assets/register, /services/categories).",
-        "next": "Dev: add paging or a search (newest first) to the desk lists; then rerun. Found blocker 40.",
-        "owner": "Dev"
-      }
+      "previous": "Failed"
     },
     {
       "kind": "module",
@@ -29875,13 +29299,7 @@
       "reason": "Step 4: blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found",
       "status": "Blocked",
       "group": "22 Services",
-      "previous": "Passed",
-      "triage": {
-        "cause": "site",
-        "finding": "The desk list shows its first 22 rows only, with no paging and no search; the record saved now is past them, so its status or id cannot be read (checked 2026-10-21 on /housekeeping/contracts, /maintenance/work, /maintenance/amc, /fixed-assets/register, /services/categories).",
-        "next": "Dev: add paging or a search (newest first) to the desk lists; then rerun. Found blocker 40.",
-        "owner": "Dev"
-      }
+      "previous": "Passed"
     },
     {
       "kind": "module",
@@ -30069,13 +29487,7 @@
       "reason": "Step 2: Excel expects \"Refused (the server text ends in \"document is missing\")\"; the site: saved (\"Saved.\")",
       "status": "Deviation",
       "group": "22 Services",
-      "previous": "Failed",
-      "triage": {
-        "cause": "site",
-        "finding": "Step 2: a service order with \"Document\" left empty (as the workbook asks) is saved (\"Saved.\"); the workbook expects a refusal (\"document is missing\"). The HTTP 500 of this test is step 1 (order for a request that is not approved), a refusal answered with 500.",
-        "next": "Dev: refuse an order without a document, and answer step 1 with a message instead of HTTP 500.",
-        "owner": "Dev"
-      }
+      "previous": "Failed"
     },
     {
       "kind": "module",
@@ -31164,13 +30576,7 @@
       "reason": "Step 5: Excel expects \"Refused (the server text ends in \"location is missing\")\"; the site: saved (\"Saved.\")",
       "status": "Deviation",
       "group": "24 Housekeeping",
-      "previous": "Failed",
-      "triage": {
-        "cause": "site",
-        "finding": "Step 5: a shift for a location code that does not exist (QA-X-TIDAK-ADA-…) is saved (\"Saved.\"); the workbook expects a refusal (\"location is missing\"). Steps 1-4 are refused, but with HTTP 500.",
-        "next": "Dev: check that the location exists; answer the refusals with messages.",
-        "owner": "Dev"
-      }
+      "previous": "Failed"
     },
     {
       "kind": "module",
@@ -31206,13 +30612,7 @@
       "reason": "",
       "status": "Passed",
       "group": "24 Housekeeping",
-      "previous": "Failed",
-      "triage": {
-        "cause": "site",
-        "finding": "The desk list shows its first 22 rows only, with no paging and no search; the record saved now is past them, so its status or id cannot be read (checked 2026-10-21 on /housekeeping/contracts, /maintenance/work, /maintenance/amc, /fixed-assets/register, /services/categories).",
-        "next": "Dev: add paging or a search (newest first) to the desk lists; then rerun. Found blocker 40.",
-        "owner": "Dev"
-      }
+      "previous": "Failed"
     },
     {
       "kind": "module",
@@ -32008,13 +31408,7 @@
       "reason": "Step 3: blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found; Step 4: blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found; Step 5: blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found; Step 6: blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found; Step 7: blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found; Step 8: blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found",
       "status": "Blocked",
       "group": "26 Maintenance",
-      "previous": "Failed",
-      "triage": {
-        "cause": "site",
-        "finding": "The desk list shows its first 22 rows only, with no paging and no search; the record saved now is past them, so its status or id cannot be read (checked 2026-10-21 on /housekeeping/contracts, /maintenance/work, /maintenance/amc, /fixed-assets/register, /services/categories).",
-        "next": "Dev: add paging or a search (newest first) to the desk lists; then rerun. Found blocker 40.",
-        "owner": "Dev"
-      }
+      "previous": "Failed"
     },
     {
       "kind": "module",
@@ -32034,13 +31428,7 @@
       "reason": "Step 2: blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found; Step 3: blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found; Step 4: blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found; Step 5: blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found; Step 6: blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found; Step 7: blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found; Step 8: blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found; Step 9: blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found; Step 10: blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found; Step 11: blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found",
       "status": "Blocked",
       "group": "26 Maintenance",
-      "previous": "Failed",
-      "triage": {
-        "cause": "site",
-        "finding": "The save of a breakdown answers \"Saved.\" with the id 00000000-0000-0000-0000-000000000000, and the new breakdown is not in the desk list (the server sends its first 40 records, blocker 40), so no work order can be made for it. Before the test fix the nil id was posted as Document and the server answered HTTP 500.",
-        "next": "Dev: answer the save of a breakdown with its id, and blocker 40. QA automation: the test now stops there instead of posting the nil id.",
-        "owner": "Dev"
-      }
+      "previous": "Failed"
     },
     {
       "kind": "module",
@@ -32082,13 +31470,7 @@
       "reason": "",
       "status": "Passed",
       "group": "26 Maintenance",
-      "previous": "Passed",
-      "triage": {
-        "cause": "site",
-        "finding": "The desk list shows its first 22 rows only, with no paging and no search; the record saved now is past them, so its status or id cannot be read (checked 2026-10-21 on /housekeeping/contracts, /maintenance/work, /maintenance/amc, /fixed-assets/register, /services/categories).",
-        "next": "Dev: add paging or a search (newest first) to the desk lists; then rerun. Found blocker 40.",
-        "owner": "Dev"
-      }
+      "previous": "Passed"
     },
     {
       "kind": "module",
@@ -32383,13 +31765,7 @@
       "reason": "Step 3: blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found; Step 4: blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found; Step 5: blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found; Step 6: blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found",
       "status": "Blocked",
       "group": "27 Fixed assets",
-      "previous": "Blocked",
-      "triage": {
-        "cause": "site",
-        "finding": "The desk list shows its first 22 rows only, with no paging and no search; the record saved now is past them, so its status or id cannot be read (checked 2026-10-21 on /housekeeping/contracts, /maintenance/work, /maintenance/amc, /fixed-assets/register, /services/categories).",
-        "next": "Dev: add paging or a search (newest first) to the desk lists; then rerun. Found blocker 40.",
-        "owner": "Dev"
-      }
+      "previous": "Blocked"
     },
     {
       "kind": "module",
@@ -32742,13 +32118,7 @@
       "reason": "Step 10: Blocker 13: blocker 13 (00-blockers-checklist-linked.xlsx | Checklist | row 17): Set-up missing on the branch",
       "status": "Blocked",
       "group": "E2E chains",
-      "previous": "Failed",
-      "triage": {
-        "cause": "site",
-        "finding": "The chain books or queues the patient in QA Poli Umum; the Department picker searches only the first 50 departments (found blocker 40).",
-        "next": "Departments renamed 2026-10-21; rerun these chains after 07:00 WIB (E2E-033 closes the U1 cashier day until then). Dev: picker search on the server.",
-        "owner": "QA automation"
-      }
+      "previous": "Failed"
     },
     {
       "kind": "chain",
@@ -32786,13 +32156,7 @@
       "reason": "Step 2: Blocker 40: TC-APP012-029 step 2, blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found",
       "status": "Blocked",
       "group": "E2E chains",
-      "previous": "Failed",
-      "triage": {
-        "cause": "site",
-        "finding": "The radiology order made in the chain is not offered in RIS \"Schedule and report\" (the order list does not reach it); same as TC-APP003-048/051.",
-        "next": "Dev: RIS order list for the branch (all open orders, newest included); then rerun.",
-        "owner": "Dev"
-      }
+      "previous": "Failed"
     },
     {
       "kind": "chain",
@@ -32895,13 +32259,7 @@
       "reason": "Step 1: Blocker 51: TC-APP007-001 step 4, blocker 51 (found by automation, docs/qa/blockers-found.md): Lists leave new records out for a while: a new item of Item Master, and a new dispense line of Pharmacy Issue Lines; Step 5: Blocker 31: blocker 31 (found by automation, docs/qa/blockers-found.md): Goods receipt, supplier invoice and returns cannot be saved: \"grn\" answers \"receive at the gate first\" after a saved gate. goods receipt (\"grn\") answers HTTP 500",
       "status": "Blocked",
       "group": "E2E chains",
-      "previous": "Failed",
-      "triage": {
-        "cause": "site",
-        "finding": "The inventory item saved in the chain (QA-INV-PARA-…) is not found in the item list afterwards: the list does not reach the new item (capped list, probably found blocker 40, to confirm).",
-        "next": "Dev: item list search/paging that reaches new items; QA: confirm by hand once.",
-        "owner": "Dev"
-      }
+      "previous": "Failed"
     },
     {
       "kind": "chain",
@@ -32921,13 +32279,7 @@
       "reason": "Step 6: Blocker 50: TC-APP023-012 step 3, blocker 50 (found by automation, docs/qa/blockers-found.md): A sourcing agreement cannot be saved: \"accept a bidder on the sheet first\" for a tender with an accepted bidder; Step 6: Blocker 50: TC-APP023-012 step 4, blocker 50 (found by automation, docs/qa/blockers-found.md): A sourcing agreement cannot be saved: \"accept a bidder on the sheet first\" for a tender with an accepted bidder; Step 6: Blocker 50: TC-APP023-012 step 5, blocker 50 (found by automation, docs/qa/blockers-found.md): A sourcing agreement cannot be saved: \"accept a bidder on the sheet first\" for a tender with an accepted bidder; Step 6: Blocker 50: TC-APP023-012 step 6, blocker 50 (found by automation, docs/qa/blockers-found.md): A sourcing agreement cannot be saved: \"accept a bidder on the sheet first\" for a tender with an accepted bidder; Step 6: Blocker 50: TC-APP023-012 step 7, blocker 50 (found by automation, docs/qa/blockers-found.md): A sourcing agreement cannot be saved: \"accept a bidder on the sheet first\" for a tender with an accepted bidder",
       "status": "Blocked",
       "group": "E2E chains",
-      "previous": "Blocked",
-      "triage": {
-        "cause": "automation",
-        "finding": "The chain still stops \"as planned\" at a test case that became runnable when users U3-U7 were made (2026-10-20): \"is planned to run; stop the chain with its blocked step instead\".",
-        "next": "QA automation: run that chain step (write the step from the workbook) instead of stopping.",
-        "owner": "QA automation"
-      }
+      "previous": "Blocked"
     },
     {
       "kind": "chain",
@@ -32948,13 +32300,7 @@
       "reason": "Step 2: Blocker 40: TC-APP010-008 step 2, blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found; Step 2: Blocker 40: TC-APP010-008 step 3, blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found; Step 2: Blocker 40: TC-APP010-008 step 4, blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found; Step 5: Blocker 37: blocker 37 (found by automation, docs/qa/blockers-found.md): The 12 salary components of the workbook are not on the site, and no screen makes them",
       "status": "Blocked",
       "group": "E2E chains",
-      "previous": "Blocked",
-      "triage": {
-        "cause": "site",
-        "finding": "The Employee picker searches only the records the page loaded first (the new QA-EMP-001 of the chain is not offered); a record past them is \"not found\" although it exists. Shows since the data grew past the limit.",
-        "next": "Dev: search the Employee list on the server (or load all); then rerun. Found blocker 40 (pickers and lists capped).",
-        "owner": "Dev"
-      }
+      "previous": "Blocked"
     },
     {
       "kind": "chain",
@@ -32974,13 +32320,7 @@
       "reason": "Step 7: STEP-NOT-RUN: TC-APP020-013 step 5 is not run: TBD in the workbook: the notice to the departments is not on a screen of this user",
       "status": "Blocked",
       "group": "E2E chains",
-      "previous": "Blocked",
-      "triage": {
-        "cause": "automation",
-        "finding": "The chain still stops \"as planned\" at a test case that became runnable when users U3-U7 were made (2026-10-20): \"is planned to run; stop the chain with its blocked step instead\".",
-        "next": "QA automation: run that chain step (write the step from the workbook) instead of stopping.",
-        "owner": "QA automation"
-      }
+      "previous": "Blocked"
     },
     {
       "kind": "chain",
@@ -33000,13 +32340,7 @@
       "reason": "Step 2: Blocker 40: TC-APP027-003 step 3, blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found; Step 2: Blocker 40: TC-APP027-003 step 4, blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found; Step 2: Blocker 40: TC-APP027-003 step 5, blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found; Step 2: Blocker 40: TC-APP027-003 step 6, blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found",
       "status": "Blocked",
       "group": "E2E chains",
-      "previous": "Blocked",
-      "triage": {
-        "cause": "site",
-        "finding": "The desk list shows its first 22 rows only, with no paging and no search; the record saved now is past them, so its status or id cannot be read (checked 2026-10-21 on /housekeeping/contracts, /maintenance/work, /maintenance/amc, /fixed-assets/register, /services/categories).",
-        "next": "Dev: add paging or a search (newest first) to the desk lists; then rerun. Found blocker 40.",
-        "owner": "Dev"
-      }
+      "previous": "Blocked"
     },
     {
       "kind": "chain",
@@ -33026,13 +32360,7 @@
       "reason": "Step 3: TC-APP024-007 step 3: Excel expects \"a row with the status \"draft\"\"; the site: the new log reads \"sent\"",
       "status": "Deviation",
       "group": "E2E chains",
-      "previous": "Failed",
-      "triage": {
-        "cause": "site",
-        "finding": "The desk list shows its first 22 rows only, with no paging and no search; the record saved now is past them, so its status or id cannot be read (checked 2026-10-21 on /housekeeping/contracts, /maintenance/work, /maintenance/amc, /fixed-assets/register, /services/categories).",
-        "next": "Dev: add paging or a search (newest first) to the desk lists; then rerun. Found blocker 40.",
-        "owner": "Dev"
-      }
+      "previous": "Failed"
     },
     {
       "kind": "chain",
@@ -33053,13 +32381,7 @@
       "reason": "Step 1: Blocker 40: TC-APP022-001 step 3, blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found; Step 1: Blocker 40: TC-APP022-001 step 4, blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found; Step 1: Blocker 40: TC-APP022-001 step 5, blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found; Step 1: Blocker 40: TC-APP022-001 step 6, blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found; Step 6: Blocker 11: blocker 11 (00-blockers-checklist-linked.xlsx | Checklist | row 15): Service receipt and Vendor bill are never listed",
       "status": "Blocked",
       "group": "E2E chains",
-      "previous": "Failed",
-      "triage": {
-        "cause": "site",
-        "finding": "The desk list shows its first 22 rows only, with no paging and no search; the record saved now is past them, so its status or id cannot be read (checked 2026-10-21 on /housekeeping/contracts, /maintenance/work, /maintenance/amc, /fixed-assets/register, /services/categories).",
-        "next": "Dev: add paging or a search (newest first) to the desk lists; then rerun. Found blocker 40.",
-        "owner": "Dev"
-      }
+      "previous": "Failed"
     },
     {
       "kind": "chain",
@@ -33137,13 +32459,7 @@
       "reason": "",
       "status": "Passed",
       "group": "E2E chains",
-      "previous": "Failed",
-      "triage": {
-        "cause": "site",
-        "finding": "The chain books or queues the patient in QA Poli Umum; the Department picker searches only the first 50 departments (found blocker 40).",
-        "next": "Departments renamed 2026-10-21; rerun these chains after 07:00 WIB (E2E-033 closes the U1 cashier day until then). Dev: picker search on the server.",
-        "owner": "QA automation"
-      }
+      "previous": "Failed"
     },
     {
       "kind": "chain",
@@ -33183,13 +32499,7 @@
       "reason": "Step 2: Blocker 24: TC-APP002-019 step 4, blocker 24 (found by automation, docs/qa/blockers-found.md): Referral types and Cross-consult types list only the first rows, with no paging or search",
       "status": "Blocked",
       "group": "E2E chains",
-      "previous": "Failed",
-      "triage": {
-        "cause": "site",
-        "finding": "Blocker 24: the referral/cross-consult type saved in the chain is not listed (the list shows the first rows only, no paging or search).",
-        "next": "Dev: blocker 24; then rerun.",
-        "owner": "Dev"
-      }
+      "previous": "Failed"
     },
     {
       "kind": "chain",
@@ -33287,13 +32597,7 @@
       "reason": "",
       "status": "Passed",
       "group": "E2E chains",
-      "previous": "Failed",
-      "triage": {
-        "cause": "site",
-        "finding": "The chain books or queues the patient in QA Poli Umum; the Department picker searches only the first 50 departments (found blocker 40).",
-        "next": "Departments renamed 2026-10-21; rerun these chains after 07:00 WIB (E2E-033 closes the U1 cashier day until then). Dev: picker search on the server.",
-        "owner": "QA automation"
-      }
+      "previous": "Failed"
     },
     {
       "kind": "chain",
@@ -33316,13 +32620,7 @@
       "reason": "Step 3: Blocker 40: TC-APP004-010 step 2, blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found; Step 3: Blocker 40: TC-APP004-010 step 3, blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found",
       "status": "Blocked",
       "group": "E2E chains",
-      "previous": "Deviation",
-      "triage": {
-        "cause": "site",
-        "finding": "The Bed picker searches only the records the page loaded first (the new bed QA-103-… of the chain is not offered); a record past them is \"not found\" although it exists. Shows since the data grew past the limit.",
-        "next": "Dev: search the Bed list on the server (or load all); then rerun. Found blocker 40 (pickers and lists capped).",
-        "owner": "Dev"
-      }
+      "previous": "Deviation"
     },
     {
       "kind": "chain",
@@ -33342,13 +32640,7 @@
       "reason": "Step 12: Blocker 40: TC-APP012-025 step 2, blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found",
       "status": "Blocked",
       "group": "E2E chains",
-      "previous": "Failed",
-      "triage": {
-        "cause": "site",
-        "finding": "The radiology order made in the chain is not offered in RIS \"Schedule and report\" (the order list does not reach it); same as TC-APP003-048/051.",
-        "next": "Dev: RIS order list for the branch (all open orders, newest included); then rerun.",
-        "owner": "Dev"
-      }
+      "previous": "Failed"
     },
     {
       "kind": "chain",
@@ -33389,13 +32681,7 @@
       "reason": "Step 4: Blocker 40: TC-APP004-010 step 2, blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found; Step 4: Blocker 40: TC-APP004-010 step 3, blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found",
       "status": "Blocked",
       "group": "E2E chains",
-      "previous": "Deviation",
-      "triage": {
-        "cause": "site",
-        "finding": "The Bed picker searches only the records the page loaded first (the new bed QA-103-… of the chain is not offered); a record past them is \"not found\" although it exists. Shows since the data grew past the limit.",
-        "next": "Dev: search the Bed list on the server (or load all); then rerun. Found blocker 40 (pickers and lists capped).",
-        "owner": "Dev"
-      }
+      "previous": "Deviation"
     },
     {
       "kind": "chain",
@@ -33457,13 +32743,7 @@
       "reason": "Step 1: Blocker 40: TC-APP014-057 step 3, blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found",
       "status": "Blocked",
       "group": "E2E chains",
-      "previous": "Failed",
-      "triage": {
-        "cause": "site",
-        "finding": "The desk list shows its first 22 rows only, with no paging and no search; the record saved now is past them, so its status or id cannot be read (checked 2026-10-21 on /housekeeping/contracts, /maintenance/work, /maintenance/amc, /fixed-assets/register, /services/categories).",
-        "next": "Dev: add paging or a search (newest first) to the desk lists; then rerun. Found blocker 40.",
-        "owner": "Dev"
-      }
+      "previous": "Failed"
     },
     {
       "kind": "chain",
@@ -33483,13 +32763,7 @@
       "reason": "Step 5: STEP-NOT-RUN: TC-APP014-011 step 4 is not run: Cashier 2 is not made (00-prerequisites.xlsx | Users, U4 \"Second user of the same role\")",
       "status": "Blocked",
       "group": "E2E chains",
-      "previous": "Failed",
-      "triage": {
-        "cause": "environment",
-        "finding": "The chain needs an open U1 cashier day; TC-APP014-011 (run just before it) had closed the day until 07:00 WIB. Run order of this run, not the site.",
-        "next": "QA automation: run E2E-033 before TC-APP014-011 (both close the day), after 07:00 WIB.",
-        "owner": "QA automation"
-      }
+      "previous": "Failed"
     },
     {
       "kind": "chain",
@@ -33530,13 +32804,7 @@
       "reason": "Step 1: Blocker 51: TC-APP007-001 step 4, blocker 51 (found by automation, docs/qa/blockers-found.md): Lists leave new records out for a while: a new item of Item Master, and a new dispense line of Pharmacy Issue Lines",
       "status": "Blocked",
       "group": "E2E chains",
-      "previous": "Failed",
-      "triage": {
-        "cause": "site",
-        "finding": "The inventory item saved in the chain (QA-INV-PARA-…) is not found in the item list afterwards: the list does not reach the new item (capped list, probably found blocker 40, to confirm).",
-        "next": "Dev: item list search/paging that reaches new items; QA: confirm by hand once.",
-        "owner": "Dev"
-      }
+      "previous": "Failed"
     },
     {
       "kind": "chain",
@@ -33641,13 +32909,7 @@
       "reason": "Step 2: Blocker 43: TC-APP010-042 step 3, blocker 43 (found by automation, docs/qa/blockers-found.md): A year balance cannot be saved on the HR desk: \"Year balance\" answers \"pending approval\"; Step 2: Blocker 43: TC-APP010-042 step 4, blocker 43 (found by automation, docs/qa/blockers-found.md): A year balance cannot be saved on the HR desk: \"Year balance\" answers \"pending approval\"; Step 2: Blocker 43: TC-APP010-042 step 5, blocker 43 (found by automation, docs/qa/blockers-found.md): A year balance cannot be saved on the HR desk: \"Year balance\" answers \"pending approval\"; Step 2: Blocker 43: TC-APP010-042 step 6, blocker 43 (found by automation, docs/qa/blockers-found.md): A year balance cannot be saved on the HR desk: \"Year balance\" answers \"pending approval\"",
       "status": "Blocked",
       "group": "E2E chains",
-      "previous": "Blocked",
-      "triage": {
-        "cause": "automation",
-        "finding": "The chain still stops \"as planned\" at a test case that became runnable when users U3-U7 were made (2026-10-20): \"is planned to run; stop the chain with its blocked step instead\".",
-        "next": "QA automation: run that chain step (write the step from the workbook) instead of stopping.",
-        "owner": "QA automation"
-      }
+      "previous": "Blocked"
     },
     {
       "kind": "chain",
@@ -33687,13 +32949,7 @@
       "reason": "Step 1: Blocker 42: TC-APP019-066 step 2, blocker 42 (found by automation, docs/qa/blockers-found.md): No imprest advance can be requested: no imprest eligibility can be set up for the branch; Step 1: Blocker 42: TC-APP019-066 step 3, blocker 42 (found by automation, docs/qa/blockers-found.md): No imprest advance can be requested: no imprest eligibility can be set up for the branch; Step 1: Blocker 42: TC-APP019-066 step 4, blocker 42 (found by automation, docs/qa/blockers-found.md): No imprest advance can be requested: no imprest eligibility can be set up for the branch; Step 1: Blocker 42: TC-APP019-066 step 5, blocker 42 (found by automation, docs/qa/blockers-found.md): No imprest advance can be requested: no imprest eligibility can be set up for the branch; Step 1: STEP-NOT-RUN: TC-APP019-066 step 6 is not run: TBD in the workbook: the settlement of the difference on Payments (\"Imprest settlement\")",
       "status": "Blocked",
       "group": "E2E chains",
-      "previous": "Blocked",
-      "triage": {
-        "cause": "automation",
-        "finding": "The chain still stops \"as planned\" at a test case that became runnable when users U3-U7 were made (2026-10-20): \"is planned to run; stop the chain with its blocked step instead\".",
-        "next": "QA automation: run that chain step (write the step from the workbook) instead of stopping.",
-        "owner": "QA automation"
-      }
+      "previous": "Blocked"
     },
     {
       "kind": "chain",
@@ -33733,13 +32989,7 @@
       "reason": "Step 3: Blocker 40: TC-APP026-004 step 3, blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found; Step 3: Blocker 40: TC-APP026-004 step 4, blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found; Step 3: Blocker 40: TC-APP026-004 step 5, blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found; Step 3: Blocker 40: TC-APP026-004 step 6, blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found; Step 3: Blocker 40: TC-APP026-004 step 7, blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found; Step 3: Blocker 40: TC-APP026-004 step 8, blocker 40 (found by automation, docs/qa/blockers-found.md): Pickers and lists reach only their first records: a record past them cannot be chosen or found",
       "status": "Blocked",
       "group": "E2E chains",
-      "previous": "Failed",
-      "triage": {
-        "cause": "site",
-        "finding": "The desk list shows its first 22 rows only, with no paging and no search; the record saved now is past them, so its status or id cannot be read (checked 2026-10-21 on /housekeeping/contracts, /maintenance/work, /maintenance/amc, /fixed-assets/register, /services/categories).",
-        "next": "Dev: add paging or a search (newest first) to the desk lists; then rerun. Found blocker 40.",
-        "owner": "Dev"
-      }
+      "previous": "Failed"
     },
     {
       "kind": "chain",
@@ -33759,13 +33009,7 @@
       "reason": "Step 4: Blocker 8: blocker 8 (00-blockers-checklist-linked.xlsx | Checklist | row 12): A diet order never reaches Kitchen or Service and bill",
       "status": "Blocked",
       "group": "E2E chains",
-      "previous": "Failed",
-      "triage": {
-        "cause": "site",
-        "finding": "Diet order \"Calculate\" (assessment) answers HTTP 500 (server action error, digest in sheet HTTP 5xx). The request carries well-formed values from the workbook (see the request body in sheet HTTP 5xx).",
-        "next": "Dev: look up the digest in the server log and fix the action; then rerun the test.",
-        "owner": "Dev"
-      }
+      "previous": "Failed"
     },
     {
       "kind": "chain",
@@ -33823,13 +33067,7 @@
       "reason": "Step 4: TC-APP005-060 step 2: Excel expects \"The block lists item names with the issued quantity\"; the site: nothing is listed for the name or the MRN",
       "status": "Deviation",
       "group": "E2E chains",
-      "previous": "Failed",
-      "triage": {
-        "cause": "site",
-        "finding": "The chain books or queues the patient in QA Poli Umum; the Department picker searches only the first 50 departments (found blocker 40).",
-        "next": "Departments renamed 2026-10-21; rerun these chains after 07:00 WIB (E2E-033 closes the U1 cashier day until then). Dev: picker search on the server.",
-        "owner": "QA automation"
-      }
+      "previous": "Failed"
     },
     {
       "kind": "chain",
@@ -33865,13 +33103,7 @@
       "reason": "Step 1: STEP-NOT-RUN: TC-APP018-054 step 5 is not run: TBD in the workbook: the purchase order of 09 Procurement against the two-step chain is chain E2E-050 (steps 2 and 3)",
       "status": "Blocked",
       "group": "E2E chains",
-      "previous": "Blocked",
-      "triage": {
-        "cause": "automation",
-        "finding": "The chain still stops \"as planned\" at a test case that became runnable when users U3-U7 were made (2026-10-20): \"is planned to run; stop the chain with its blocked step instead\".",
-        "next": "QA automation: run that chain step (write the step from the workbook) instead of stopping.",
-        "owner": "QA automation"
-      }
+      "previous": "Blocked"
     }
   ],
   "errors": [

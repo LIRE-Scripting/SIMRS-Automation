@@ -5,9 +5,9 @@
  */
 export const BLOCKER_TITLE_ID: Record<number, string> = {
   1: 'Login tetap di halaman login',
-  2: 'Halaman donor menjawab HTTP 500',
-  3: 'Halaman baru pengeluaran steril menjawab HTTP 500',
-  4: 'Tenants dan Entitlements menjawab HTTP 500 untuk administrator rumah sakit',
+  2: 'Halaman Donor tidak memuat daftar donor ("failed to list donors"; sampai 2026-10-30 HTTP 500)',
+  3: 'Halaman baru pengeluaran steril gagal ("cssd request failed"; sampai 2026-10-30 HTTP 500)',
+  4: 'Tenants dan Entitlements menolak administrator rumah sakit ("missing required privilege"; sampai 2026-10-30 HTTP 500)',
   5: '28 daftar tidak termuat dengan "Semua cabang"',
   6: '"Record code" tidak bisa disimpan dengan "Semua cabang"',
   7: '"Hitung jasa" tidak pernah berhasil',

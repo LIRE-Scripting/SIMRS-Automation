@@ -11,6 +11,9 @@
  *   npm run qa:findings-md
  */
 import fs from 'node:fs';
+import { CHAIN_NAME_ID } from './chain-names-id';
+import { statusId } from './report-language';
+import { partId, reasonId, titleId, wordId } from './summary-id';
 
 interface Outcome {
   kind: 'module' | 'chain';
@@ -46,14 +49,15 @@ const SUMMARY = 'reports/summary/run-summary.json';
 const s = JSON.parse(fs.readFileSync(SUMMARY, 'utf8')) as Summary;
 const built = s.run.built.slice(0, 16).replace('T', ' ') + ' UTC';
 const cell = (t: string) => t.replace(/\|/g, '\\|').replace(/\s+/g, ' ').trim();
-const groupOf = (o: Outcome) => (o.kind === 'chain' ? 'Rantai E2E' : o.group ?? '');
+const groupOf = (o: Outcome) => (o.kind === 'chain' ? 'Rantai E2E' : wordId(o.group ?? ''));
+const titleOf = (o: Outcome) => (o.kind === 'chain' ? (CHAIN_NAME_ID[o.id] ?? titleId(o.title)) : titleId(o.title));
 const order = (a: string, b: string) => (a === 'Rantai E2E' ? 1 : b === 'Rantai E2E' ? -1 : a.localeCompare(b));
 
 /** "Step 5: [TC-APP001-019 step 4: ]Excel expects "X"; the site: Y" → its parts. */
 function parseDeviation(text: string): { step: string; source: string; expected: string; site: string } {
   const m = text.match(/^Step (\d+): (?:(TC-APP\d{3}-\d{3} step \d+): )?Excel expects "([\s\S]*?)"; the site: ([\s\S]*)$/);
-  if (!m) return { step: text.match(/^Step (\d+)/)?.[1] ?? '', source: '', expected: '', site: text };
-  return { step: m[1], source: m[2] ?? '', expected: m[3], site: m[4] };
+  if (!m) return { step: text.match(/^Step (\d+)/)?.[1] ?? '', source: '', expected: '', site: reasonId(text.replace(/^Step \d+: /, '')) };
+  return { step: m[1], source: (m[2] ?? '').replace(' step ', ' langkah '), expected: partId(m[3]), site: partId(m[4]) };
 }
 
 function deviationsMd(): string {
@@ -82,7 +86,7 @@ function deviationsMd(): string {
       for (const d of o.deviations) {
         const p = parseDeviation(d);
         const step = p.source ? `${p.step} (${p.source})` : p.step;
-        out.push(`| ${o.id} | ${cell(o.title)} | ${step} | ${cell(p.expected)} | ${cell(p.site)} |`);
+        out.push(`| ${o.id} | ${cell(titleOf(o))} | ${step} | ${cell(p.expected)} | ${cell(p.site)} |`);
       }
     }
     out.push('');
@@ -135,7 +139,7 @@ function http5xxMd(): string {
   }
   out.push('', '## Per test', '', '| Test | Status test | Waktu (UTC) | Jawaban | Endpoint | Digest | Jenis |', '|---|---|---|---|---|---|---|');
   for (const e of [...errs].sort((a, b) => a.id.localeCompare(b.id) || a.at.localeCompare(b.at))) {
-    out.push(`| ${e.id} | ${e.testStatus} | ${e.at.slice(0, 16).replace('T', ' ')} | ${e.status} ${e.method} | \`${path(e)}\` | ${e.digest ?? ''} | ${cell(kindShort(e.kind))} |`);
+    out.push(`| ${e.id} | ${statusId(e.testStatus)} | ${e.at.slice(0, 16).replace('T', ' ')} | ${e.status} ${e.method} | \`${path(e)}\` | ${e.digest ?? ''} | ${cell(kindShort(e.kind))} |`);
   }
   out.push('');
   return out.join('\n');
