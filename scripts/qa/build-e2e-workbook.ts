@@ -26,6 +26,10 @@ import path from 'node:path';
 import ExcelJS from 'exceljs';
 import { modules } from '../../lib/qa-data';
 import { sentenceId, statusId } from './report-language';
+import { reasonId, saveMissing } from './summary-id';
+
+/** The reasons and notes the tests record (English), in Indonesian (scripts/qa/summary-id.ts). */
+const idList = (xs: string[]): string => xs.map((x) => sentenceId(reasonId(x))).join('; ');
 import { addNotesColumn, evidenceCell, probableCause } from './run-notes';
 
 const OUT = 'reports/e2e';
@@ -106,8 +110,8 @@ function outcomes(spec: PwSpec, stepNumbers: number[]): Map<number, StepOutcome>
     const blocker = reasons.find((r) => /^Blocker \d+/.test(r));
     for (const n of stepNumbers) {
       out.set(n, blocker
-        ? { status: 'Blocked', actual: `${runDate} E2E: tidak dijalankan. ${blocker}`, defect: blocker.match(/^Blocker \d+/)![0], note: `Test dilewati: ${reasons.join('; ')}` }
-        : { status: 'Not Run', actual: `${runDate} E2E: tidak dijalankan. ${reasons.join('; ') || 'dilewati'}`, note: reasons.join('; ') || 'dilewati' });
+        ? { status: 'Blocked', actual: `${runDate} E2E: tidak dijalankan. ${idList([blocker])}`, defect: blocker.match(/^Blocker \d+/)![0], note: `Test dilewati: ${idList(reasons)}` }
+        : { status: 'Not Run', actual: `${runDate} E2E: tidak dijalankan. ${idList(reasons) || 'dilewati'}`, note: idList(reasons) || 'dilewati' });
     }
     return out;
   }
@@ -131,21 +135,22 @@ function outcomes(spec: PwSpec, stepNumbers: number[]): Map<number, StepOutcome>
     ?? (result.status !== 'passed' ? stepNumbers.find((n) => !ran.has(n) && !blocked.has(n) && !notRun.has(n)) : undefined);
 
   for (const n of stepNumbers) {
-    const note = testNotes.get(n)?.join('; ');
+    const note = testNotes.has(n) ? idList(testNotes.get(n)!) : undefined;
     const extra = note ? ` Catatan: ${note}.` : '';
     const ownNote = note ? `Catatan: ${note}` : undefined;
     if (blocked.has(n)) {
       const text = blocked.get(n)!.join('; ');
-      out.set(n, { status: 'Blocked', actual: `${runDate} E2E: ${text}.${extra}`, defect: text.match(/blocker (\d+)/)?.[0].replace('blocker', 'Blocker'), note: [`Dihentikan oleh ${text}`, ownNote].filter(Boolean).join('. ') });
+      const shown = idList(blocked.get(n)!);
+      out.set(n, { status: 'Blocked', actual: `${runDate} E2E: ${shown}.${extra}`, defect: text.match(/blocker (\d+)/)?.[0].replace('blocker', 'Blocker'), note: [`Dihentikan oleh ${shown}`, ownNote].filter(Boolean).join('. ') });
     } else if (failedAt === n) {
       const error = firstLine(ran.get(n)?.error?.message) || testError;
       out.set(n, { status: 'Failed', actual: `${runDate} E2E gagal: ${error}.${extra}`, note: [`Error: ${error}`, `Kemungkinan penyebab: ${sentenceId(probableCause(error))}`, ownNote].filter(Boolean).join('. ') });
     } else if (deviations.has(n) && (failedAt === undefined || n < failedAt)) {
       // A deviation was seen on the screen, even on a step partly "not run".
-      const dev = deviations.get(n)!.join('; ');
+      const dev = idList(deviations.get(n)!);
       out.set(n, { status: 'Failed', actual: `${runDate} E2E: Expected Result tidak terpenuhi. ${dev}.${extra}`, note: [`Deviasi dari workbook: ${dev}`, ownNote].filter(Boolean).join('. ') });
     } else if (notRun.has(n)) {
-      out.set(n, { status: 'Not Run', actual: `${runDate} E2E: tidak dijalankan. ${notRun.get(n)!.join('; ')}.${extra}`, note: notRun.get(n)!.join('; ') });
+      out.set(n, { status: 'Not Run', actual: `${runDate} E2E: tidak dijalankan. ${idList(notRun.get(n)!)}.${extra}`, note: idList(notRun.get(n)!) });
     } else if (!ran.has(n) || (failedAt !== undefined && n > failedAt)) {
       const why = result.status === 'passed' ? 'langkah tidak dicapai oleh test' : `test berhenti lebih awal (${testError})`;
       out.set(n, { status: 'Not Run', actual: `${runDate} E2E: tidak dijalankan; ${why}.${extra}`, note: [`Tidak dicapai: ${why}`, ownNote].filter(Boolean).join('. ') });
@@ -280,6 +285,11 @@ async function main(): Promise<void> {
     await wb.xlsx.writeFile(file);
     console.log(`${file}: ${tcs.length} test cases;`, count);
   }
+  const untranslated = saveMissing(MISSING);
+  if (untranslated) console.log(`${MISSING}: ${untranslated} texts without Indonesian (add them to scripts/qa/id/texts.json)`);
 }
+
+/** Texts of the result workbooks without a translation yet. */
+const MISSING = '.qa-state/workbook-id-missing.json';
 
 void main();

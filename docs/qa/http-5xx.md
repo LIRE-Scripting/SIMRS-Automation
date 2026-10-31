@@ -1,6 +1,6 @@
 # HTTP 5xx dari site
 
-Dibangun 2026-10-31 17:07 UTC dari `reports/summary/run-summary.json`. Bangun ulang: `npm run qa:run-summary && npm run qa:findings-md`.
+Dibangun 2026-10-31 17:35 UTC dari `reports/summary/run-summary.json`. Bangun ulang: `npm run qa:run-summary && npm run qa:findings-md`.
 
 Setiap jawaban 5xx dicatat oleh `fixtures/e2e.ts` (fixture `serverErrors`) ke `.qa-state/**/http-5xx.jsonl`. Di sini hanya yang terjadi **dalam hasil terbaru** sebuah test: 5xx dari run lama yang test-nya sudah diulang tidak dihitung.
 

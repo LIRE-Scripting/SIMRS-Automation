@@ -1,6 +1,6 @@
 # Deviasi: langkah yang berjalan tetapi hasilnya berbeda dari workbook
 
-Dibangun 2026-10-31 17:07 UTC dari `reports/summary/run-summary.json` (hasil terbaru tiap test case dan rantai). Bangun ulang: `npm run qa:run-summary && npm run qa:findings-md`.
+Dibangun 2026-10-31 17:35 UTC dari `reports/summary/run-summary.json` (hasil terbaru tiap test case dan rantai). Bangun ulang: `npm run qa:run-summary && npm run qa:findings-md`.
 
 Deviasi = langkah **bisa dijalankan**, tetapi yang tampil di site tidak sama dengan *Expected Result* workbook. Di workbook hasil, langkahnya berstatus **Failed** dengan perilaku site di *Actual Result*. Blocker (langkah tidak bisa dijalankan sama sekali) ada di `docs/qa/blockers-found.md`.
 
@@ -64,22 +64,22 @@ Deviasi = langkah **bisa dijalankan**, tetapi yang tampil di site tidak sama den
 | TC-APP001-036 | Batch bencana yang belum lengkap | 2 | Pesan bahwa batch bencana butuh minimal dua pasien | toast "Registration failed" (HTTP 500) |
 | TC-APP001-036 | Batch bencana yang belum lengkap | 3 | Toast "A patient already matches the duplicate fields" | toast "Registration failed" (HTTP 500) |
 | TC-APP001-037 | Jenis kunjungan yang dinonaktifkan | 1 | Tidak ada yang berubah: "New Registration" masih menawarkan "Newborn" | "Newborn" tidak lagi ditawarkan padahal pengaturannya dibatalkan |
-| TC-APP001-039 | Mengoreksi pasien terdaftar | 1 | Details with a way to edit | no edit function (buttons: Consent, Renew, Close) |
-| TC-APP001-039 | Mengoreksi pasien terdaftar | 3 | Present, with a reason | no way to record a death or remove a record |
+| TC-APP001-039 | Mengoreksi pasien terdaftar | 1 | Detail dengan cara untuk mengedit | tidak ada fungsi edit (tombol: Consent, Renew, Close) |
+| TC-APP001-039 | Mengoreksi pasien terdaftar | 3 | Ada, dengan alasan | tidak ada cara mencatat kematian atau menghapus record |
 | TC-APP001-040 | Data identitas yang tidak ditanyakan formulir | 1 | Kolom-kolomnya ada | jenis kelamin, NIK, alamat, telepon, penjamin, dan nomor asuransi tidak ada di formulir |
 | TC-APP001-040 | Data identitas yang tidak ditanyakan formulir | 2 | Ditampilkan di detail dan di daftar | tidak ditampilkan (data seperti itu tidak disimpan) |
 | TC-APP001-042 | Penggabungan yang salah dibuat | 1 | Pertanyaan konfirmasi yang menyebut kedua pasien, sebelum ada yang berubah | langsung digabung (toast "Patients merged") |
 | TC-APP001-042 | Penggabungan yang salah dibuat | 2 | Pembatalan atau riwayat penggabungan | keduanya tidak ada di Registered Patients |
 | TC-APP001-042 | Penggabungan yang salah dibuat | 3 | Kedatangan PT-DUP-B tampil di bawah PT-DUP-A | kedatangan masih menampilkan MRN PT-DUP-B MRN-2026-707F8C2A |
-| TC-APP001-043 | Pasien terdaftar di cabang lain | 1 | PT-1 is found | searching PT-1's MRN and name on Kemayoran finds nothing |
-| TC-APP001-043 | Pasien terdaftar di cabang lain | 2 | PT-1 is offered | PT-1 is not offered in Book and Arrive on Kemayoran |
+| TC-APP001-043 | Pasien terdaftar di cabang lain | 1 | PT-1 ditemukan | mencari MRN dan nama PT-1 di Kemayoran tidak menemukan apa pun |
+| TC-APP001-043 | Pasien terdaftar di cabang lain | 2 | PT-1 ditawarkan | PT-1 tidak ditawarkan di Book dan Arrive di Kemayoran |
 | TC-APP001-045 | Kuota harian habis | 2 | Toast "The daily quota is full" | toast bertuliskan "Booking failed", tanpa menyebut kuota |
 | TC-APP001-046 | Dua booking di jam buka yang sama | 2 | 08:00 tidak lagi ditawarkan | 08:00 masih ditawarkan dan dipilih pertama |
 | TC-APP001-046 | Dua booking di jam buka yang sama | 3 | Peringatan bahwa PT-1 sudah punya janji temu ini | dibooking untuk kedua kalinya (toast "Appointment booked") |
 | TC-APP001-047 | Booking untuk hari yang sudah lewat | 1 | Hari yang sudah lewat tidak bisa dipilih, atau tidak ada jam buka yang ditawarkan | 2026-10-30 bisa dipilih dan menawarkan 08:00, 08:30, 09:00, 09:30, 10:00, 10:30, 11:00, 11:30 |
 | TC-APP001-048 | Formulir booking yang belum lengkap | 2 | Pesan bahwa departemen belum diisi | klik tidak berbuat apa-apa: tanpa pesan, dialog tetap terbuka |
 | TC-APP001-048 | Formulir booking yang belum lengkap | 3 | Pesan bahwa departemen belum diisi | klik tidak berbuat apa-apa: tanpa pesan, dialog tetap terbuka |
-| TC-APP001-049 | Penjadwalan ulang yang harus ditolak | 3 | Refused: a cancelled appointment cannot be moved | ditolak dengan toast "Booking failed" |
+| TC-APP001-049 | Penjadwalan ulang yang harus ditolak | 3 | Ditolak: janji temu yang dibatalkan tidak bisa dipindah | ditolak dengan toast "Booking failed" |
 | TC-APP001-050 | Membatalkan tanpa konfirmasi atau alasan | 1 | Pertanyaan konfirmasi, dengan tempat untuk alasan | langsung dibatalkan: tanpa konfirmasi, tanpa alasan |
 | TC-APP001-050 | Membatalkan tanpa konfirmasi atau alasan | 2 | Ada, atau catatan bahwa harus dibooking ulang | tidak ada cara mengembalikannya dan tidak ada catatan |
 | TC-APP001-050 | Membatalkan tanpa konfirmasi atau alasan | 3 | Ditolak | ditolak dengan toast "Booking failed" |
@@ -116,7 +116,7 @@ Deviasi = langkah **bisa dijalankan**, tetapi yang tampil di site tidak sama den
 | TC-APP002-011 | Booking untuk hari yang sudah lewat | 1 | Hari yang sudah lewat tidak bisa dipilih, atau tidak ada jam buka yang ditawarkan | 2026-10-30 bisa dipilih dan menawarkan 08:00, 08:30, 09:00, 09:30, 10:00, 10:30, 11:00, 11:30 |
 | TC-APP002-012 | Formulir booking yang belum lengkap | 2 | Pesan bahwa departemen belum diisi | klik tidak berbuat apa-apa: tanpa pesan, dialog tetap terbuka |
 | TC-APP002-012 | Formulir booking yang belum lengkap | 3 | Pesan bahwa departemen belum diisi | klik tidak berbuat apa-apa: tanpa pesan, dialog tetap terbuka |
-| TC-APP002-013 | Penjadwalan ulang yang harus ditolak | 3 | Refused: a cancelled appointment cannot be moved | ditolak dengan toast "Booking failed" |
+| TC-APP002-013 | Penjadwalan ulang yang harus ditolak | 3 | Ditolak: janji temu yang dibatalkan tidak bisa dipindah | ditolak dengan toast "Booking failed" |
 | TC-APP002-014 | Membatalkan tanpa konfirmasi atau alasan | 1 | Pertanyaan konfirmasi, dengan tempat untuk alasan | langsung dibatalkan: tanpa konfirmasi, tanpa alasan |
 | TC-APP002-014 | Membatalkan tanpa konfirmasi atau alasan | 2 | Ada, atau catatan bahwa harus dibooking ulang | tidak ada cara mengembalikannya dan tidak ada catatan |
 | TC-APP002-014 | Membatalkan tanpa konfirmasi atau alasan | 3 | Ditolak | ditolak dengan toast "Booking failed" |
@@ -155,7 +155,7 @@ Deviasi = langkah **bisa dijalankan**, tetapi yang tampil di site tidak sama den
 | TC-APP003-028 | Nama obat salah eja | 1 | Saran dari daftar obat | tidak ada daftar obat yang cocok |
 | TC-APP003-028 | Nama obat salah eja | 2 | Salah eja ditolak atau dikoreksi | order dibuat dengan "Paracetmol 500 mg tab" |
 | TC-APP003-030 | Resep hanya terkirim sebagian | 1 | Kedua baris ditolak bersama, dengan alasannya | 1 baris terkirim, 1 tersisa di daftar; toast "placeOrder: 400 clinical: invalid order: strength is too long" |
-| TC-APP003-031 | Membatalkan atau mengoreksi order yang salah | 1 | The order with a Cancel or Edit control | the order is listed under "Drug orders" with no Cancel or Edit |
+| TC-APP003-031 | Membatalkan atau mengoreksi order yang salah | 1 | Order dengan kontrol Cancel atau Edit | order tercantum di "Drug orders" tanpa Cancel atau Edit |
 | TC-APP003-032 | Order pasien sebelumnya | 1 | Daftar order pasien dengan tanggal, obat, jumlah, dan status | daftar menampilkan "Paracetamol 500mg Tablet" |
 | TC-APP003-033 | Order yang sama dikirim dua kali | 2 | Peringatan bahwa obat yang sama baru saja diorder untuk pasien ini | diorder lagi tanpa peringatan |
 | TC-APP003-033 | Order yang sama dikirim dua kali | 3 | Satu baris | 2 baris |
@@ -227,7 +227,7 @@ Deviasi = langkah **bisa dijalankan**, tetapi yang tampil di site tidak sama den
 | TC-APP005-030 | Pasien dengan alergi obat yang sudah tercatat | 2 | Peringatan alergi untuk Paracetamol | "Drug order alerts" bertuliskan: Tinjau blok keras dan peringatan lunak sebelum konfirmasi.sandbox No drug interactions detected for this order. |
 | TC-APP005-030 | Pasien dengan alergi obat yang sudah tercatat | 3 | Confirm diblokir atau butuh pengakuan | "Confirm dispense" aktif |
 | TC-APP005-033 | Stok kedaluwarsa dan hampir kedaluwarsa | 6 | Toast konfirmasi | ditolak ("advanceDispense: 400 pharmacy: not enough stock inventory: not enough stock (QA-FRZ-MVW7MXG8007)"): dengan Freeze days 29, batch yang kedaluwarsa dalam 30 hari masih ditahan |
-| TC-APP005-034 | Memilih gudang | 3 | Toast "Choose a store this visit may dispense from." | "Confirm dispense" is disabled while Store is empty |
+| TC-APP005-034 | Memilih gudang | 3 | Toast "Choose a store this visit may dispense from." | "Confirm dispense" nonaktif selama Store kosong |
 | TC-APP005-045 | User tanpa peran farmasi melihat order dan issue lines | 1 | Tidak ada kartu "Pharmacy", atau kartunya membuka halaman "no access" | kartu ditampilkan ke U3 (tanpa hak) dan membuka /id/pharmacy |
 | TC-APP005-045 | User tanpa peran farmasi melihat order dan issue lines | 2 | Akses ditolak | U3 (tanpa hak) membaca /pharmacy/orders ("Orders", 25 baris) |
 | TC-APP005-045 | User tanpa peran farmasi melihat order dan issue lines | 3 | Akses ditolak | U3 (tanpa hak) membaca /pharmacy/issue-lines ("Issue Lines", 25 baris) |
@@ -244,8 +244,8 @@ Deviasi = langkah **bisa dijalankan**, tetapi yang tampil di site tidak sama den
 | Test case | Judul | Langkah | Workbook mengharapkan | Di site |
 |---|---|---:|---|---|
 | TC-APP006-020 | Permintaan darah yang ditulis dokter | 4 | Formulir menampilkan nomor permintaan dan status "Approved" | statusnya "Pending" (butuh persetujuan lewat "Approve") |
-| TC-APP006-032 | Hub, navigasi, dan bahasa Indonesia | 1 | A button "New request" | "New request" is a link |
-| TC-APP006-047 | Tes infeksi mana yang melepas unit | 2 | A message that the test list must be set up first | no such message; the dialog shows no test line |
+| TC-APP006-032 | Hub, navigasi, dan bahasa Indonesia | 1 | Tombol "New request" | "New request" adalah tautan |
+| TC-APP006-047 | Tes infeksi mana yang melepas unit | 2 | Pesan bahwa daftar tes harus disiapkan dulu | tidak ada pesan seperti itu; dialog tidak menampilkan baris tes |
 | TC-APP006-049 | Kantong masuk stok lewat penerimaan biasa | 2 | Status "Unscreened", dengan "Group" dan "Serology" belum dikerjakan | Status "Available" (tombol: Group, Serology, Separate, Discard, Convert, Send out) |
 | TC-APP006-052 | Permintaan yang harus ditolak | 2 | Ditolak: "department is required" | "bloodbank: invalid input: component is required" |
 | TC-APP006-052 | Permintaan yang harus ditolak | 6 | Ditolak: "component has no service mapping" | "bloodbank: invalid input: required-by date is in the past" |
@@ -341,8 +341,8 @@ Deviasi = langkah **bisa dijalankan**, tetapi yang tampil di site tidak sama den
 | Test case | Judul | Langkah | Workbook mengharapkan | Di site |
 |---|---|---:|---|---|
 | TC-APP009-001 | Membuat order pembelian | 4 | "Persetujuan Purchase Order (4 steps)"; empat langkah, yang pertama "Current", yang lain "Pending" | "PURCHASE ORDER (1 LANGKAH)": Approval Step 1 Current (blocker temuan 30) |
-| TC-APP009-004 | Memajukan satu langkah persetujuan | 1 | Step 1 "Pengajuan Departemen" marked "Current" | step 1 "Approval Step 1 Current" (found blocker 30) |
-| TC-APP009-005 | Order pembelian disetujui melewati keempat langkah | 1 | Row Approval "Step 2" | the chain has 1 step: the order is fully approved (found blocker 30) |
+| TC-APP009-004 | Memajukan satu langkah persetujuan | 1 | Langkah 1 "Pengajuan Departemen" ditandai "Current" | langkah 1 "Approval Step 1 Current" (blocker temuan 30) |
+| TC-APP009-005 | Order pembelian disetujui melewati keempat langkah | 1 | Baris Approval "Step 2" | rantai punya 1 langkah: order sudah disetujui penuh (blocker temuan 30) |
 | TC-APP009-012 | Order pembelian tanpa item, jumlah, atau total | 1 | Baris item dengan item, jumlah, satuan, dan harga | tidak ada baris item; formulir berisi nomor, tanggal, vendor, departemen, mata uang, jumlah uang muka, dan jumlah dibayar |
 | TC-APP009-012 | Order pembelian tanpa item, jumlah, atau total | 2 | Total yang dihitung dari baris-barisnya | tidak ada total |
 | TC-APP009-012 | Order pembelian tanpa item, jumlah, atau total | 3 | Tanggal kirim, alamat kirim, dan syarat pembayaran | tidak ada satu pun kolom ini |
@@ -353,9 +353,9 @@ Deviasi = langkah **bisa dijalankan**, tetapi yang tampil di site tidak sama den
 | TC-APP009-014 | Vendor dan departemen diketik sebagai teks bebas | 3 | Ditolak: departemen tidak ada | tersimpan |
 | TC-APP009-014 | Vendor dan departemen diketik sebagai teks bebas | 4 | Ditolak: vendor belum diisi | tersimpan tanpa vendor |
 | TC-APP009-015 | Order pembelian yang disetujui tampak seperti yang masih menunggu | 1 | PO-DONE shows a status such as "Approved" | Approval "Step 1" |
-| TC-APP009-015 | Order pembelian yang disetujui tampak seperti yang masih menunggu | 2 | All steps "Done" | the approved order shows Approval Step 1 Current (its one-step chain, found blocker 30) |
-| TC-APP009-015 | Order pembelian yang disetujui tampak seperti yang masih menunggu | 3 | No approval button on an approved order | the order still offers its approval button |
-| TC-APP009-018 | Satu orang membuat dan menyetujui, atau menyetujui beberapa langkah | 1 | Refused: the creator cannot approve their own order | the creator approves the order |
+| TC-APP009-015 | Order pembelian yang disetujui tampak seperti yang masih menunggu | 2 | Semua langkah "Done" | order yang disetujui menampilkan Approval Step 1 Current (rantai satu langkahnya, blocker temuan 30) |
+| TC-APP009-015 | Order pembelian yang disetujui tampak seperti yang masih menunggu | 3 | Tidak ada tombol persetujuan pada order yang sudah disetujui | order masih menawarkan tombol persetujuannya |
+| TC-APP009-018 | Satu orang membuat dan menyetujui, atau menyetujui beberapa langkah | 1 | Ditolak: pembuat tidak bisa menyetujui ordernya sendiri | pembuat menyetujui ordernya |
 | TC-APP009-018 | Satu orang membuat dan menyetujui, atau menyetujui beberapa langkah | 2 | Refused: the creator cannot approve (and one person not consecutive steps) | U4 approves its own order |
 | TC-APP009-019 | Menolak order pembelian atau mengembalikannya | 1 | Tombol untuk menolak, dengan alasan | tidak ada tolak (tombol: Close, Advance approval) |
 | TC-APP009-019 | Menolak order pembelian atau mengembalikannya | 2 | Tombol untuk mengembalikannya agar dikoreksi | tidak ada cara mengembalikan order (tombol: Close, Advance approval) |
@@ -390,8 +390,8 @@ Deviasi = langkah **bisa dijalankan**, tetapi yang tampil di site tidak sama den
 | TC-APP010-004 | Atasan pelapor dan akun user yang ditautkan | 3 | Berkas karyawan yang ditautkan terbuka sendiri sebagai "Edit employee" | daftar terbuka; tidak ada berkas sendiri |
 | TC-APP010-004 | Atasan pelapor dan akun user yang ditautkan | 3 | Pemberitahuan "Configuration is missed" tidak ditampilkan | pemberitahuan ditampilkan ke akun yang ditautkan |
 | TC-APP010-015 | Hub, navigasi, dan bahasa Indonesia | 2 | "Duty roster" mengarah ke modul Duty Roster | tautan (/id/roster) tetap di hub HR |
-| TC-APP010-019 | Jumlah hari yang tidak cocok dengan tanggal | 1 | "Days" changes to 5 | "Days" stays 1 |
-| TC-APP010-020 | Menyetujui cuti sendiri, dan cuti yang tidak perlu persetujuan | 3 | The approver is shown | no column names who decided (columns: Type, From, To, Days, Slot, Status, Reason, Actions) |
+| TC-APP010-019 | Jumlah hari yang tidak cocok dengan tanggal | 1 | "Days" berubah menjadi 5 | "Days" tetap 1 |
+| TC-APP010-020 | Menyetujui cuti sendiri, dan cuti yang tidak perlu persetujuan | 3 | Penyetuju ditampilkan | tidak ada kolom yang menyebut siapa yang memutuskan (kolom: Type, From, To, Days, Slot, Status, Reason, Actions) |
 | TC-APP010-024 | Cuti yang disetujui di Jadwal Dinas dan Penggajian | 1 | Peringatan atau penolakan saat EMP-1 diberi shift di hari cutinya | tidak ada shift yang bisa ditetapkan: "Duty roster" membuka /id/roster dan site tidak menyimpan jadwal dinas |
 | TC-APP010-025 | Karyawan yang sudah keluar: "Relieved" dan akun user | 2 | "Relieved", dengan tanggal keluar | berkas bertuliskan nonaktif (Tidak aktif): "Relieved" tidak disimpan |
 | TC-APP010-025 | Karyawan yang sudah keluar: "Relieved" dan akun user | 2 | "Relieved", dengan tanggal keluar | tidak ada kolom untuk tanggal keluar |
@@ -423,7 +423,7 @@ Deviasi = langkah **bisa dijalankan**, tetapi yang tampil di site tidak sama den
 | TC-APP010-034 | User tanpa peran SDM membaca semua berkas karyawan | 4 | Tidak mungkin | "Download" memberi U3 file employees.csv |
 | TC-APP010-034 | User tanpa peran SDM membaca semua berkas karyawan | 5 | Akses ditolak | U3 (tanpa hak) membaca /hr/leave-applications ("Leave applications", 10 baris) |
 | TC-APP010-038 | Teks skrip di file dan formula di daftar yang diunduh | 3 | Nama kedua ditampilkan sebagai teks, tidak dijalankan sebagai formula | sel diawali "=" seperti yang diketik |
-| TC-APP010-039 | Klik ganda, dua admin sekaligus, dan muat ulang | 1 | One employee. The button is disabled while it reads "Saving…" | 0 employees |
+| TC-APP010-039 | Klik ganda, dua admin sekaligus, dan muat ulang | 1 | Satu karyawan. Tombol nonaktif selama bertuliskan "Saving…" | 0 karyawan |
 | TC-APP010-040 | Meja SDM, My profile: menambah karyawan, menautkan akun saya, membaca profil saya | 4 | Toast "Saved." | ditolak: "hr: invalid input: duplicate": U1 tertaut ke karyawan dari run sebelumnya test ini, dan tautannya tidak dipindah ke QA-EMP-01-MVW7XW2T001 |
 | TC-APP010-045 | Meja SDM, Year balance: comp-off untuk hari libur yang dipakai kerja | 1 | Toast "Saved."; baris comp-off dengan id | "Saved.", tetapi daftar tidak menampilkan baris QA-EMP-01-MVWKC4JR001 |
 
@@ -553,7 +553,7 @@ Deviasi = langkah **bisa dijalankan**, tetapi yang tampil di site tidak sama den
 | TC-APP014-007 | Diskon di atas batas: ditahan, disetujui, lalu dibayar | 1 | Badge status "Waiting for approval" | diskon 60.000 di atas batas 50.000 tidak ditahan: status "Draft", "Apply discount" nonaktif, tidak ada yang menunggu persetujuan |
 | TC-APP014-016 | Pengaturan harga item dan estimasi | 3 | Memilih QA-PARA, jumlah 10 | kartu tidak punya kolom jumlah: setiap baris adalah satu unit |
 | TC-APP014-016 | Pengaturan harga item dan estimasi | 4 | Pasien neto Rp 12.500, pajak Rp 1.375, total Rp 13.875 | estimasi bertuliskan "t. Nothing is saved to stock or to a charge. Patient Item code Add line QA-PARA · Paracetamol 500mg Tablet 1 Estimating…" |
-| TC-APP014-017 | Klaim asuransi dari kelayakan sampai rekonsiliasi | 2 | Panel line "This charge uses that split: Rp 1.000.000 / Rp 4.000.000" | no split line |
+| TC-APP014-017 | Klaim asuransi dari kelayakan sampai rekonsiliasi | 2 | Baris panel "This charge uses that split: Rp 1.000.000 / Rp 4.000.000" | tidak ada baris pembagian |
 | TC-APP014-019 | Penjualan hanya dengan keyboard | 2 | Kursor pindah ke jumlah tunai | kursor ada di "" |
 | TC-APP014-023 | Membayar lebih dari jumlah tagihan | 1 | Kasir diberi tahu ada kembalian 33.500, atau kelebihannya ditolak | diterima: Deposits Rp 200.000, tidak ada kembalian yang ditampilkan |
 | TC-APP014-024 | Jumlah yang diketik dengan titik sebagai pemisah ribuan | 1 | Penjualan Rp 150.000 sebelum pajak | penjualan Rp 150: titik dibaca sebagai titik desimal |
@@ -568,7 +568,7 @@ Deviasi = langkah **bisa dijalankan**, tetapi yang tampil di site tidak sama den
 | TC-APP014-048 | User tanpa peran keuangan melihat tagihan dan laci kas | 1 | Tidak ada kartu "Hospital Accounts", atau kartunya membuka halaman "no access" | kartu ditampilkan ke U3 (tanpa hak) dan membuka /id/billing |
 | TC-APP014-048 | User tanpa peran keuangan melihat tagihan dan laci kas | 2 | Akses ditolak | U3 (tanpa hak) membaca /billing/cashier ("Fast Cashier", 0 baris; invoice INV-1793459614-9ba2a260 ditemukan beserta jumlahnya) |
 | TC-APP014-052 | Penjualan hilang di layar: Esc, sesi habis, klik ganda | 1 | Layar mempertahankan penjualan, atau bertanya sebelum mengosongkan | Esc langsung mengosongkan seluruh layar, tanpa konfirmasi |
-| TC-APP014-061 | Buku besar pasien: menagih layanan rawat inap dari tarif | 4 | A row with the state "open" and "QA-RI-0001-MVWJK9A000D deposit 0" | the list without a search does not show the new invoice (it lists some invoices only) |
+| TC-APP014-061 | Buku besar pasien: menagih layanan rawat inap dari tarif | 4 | Baris dengan status "open" dan "QA-RI-0001-MVWJK9A000D deposit 0" | daftar tanpa pencarian tidak menampilkan invoice baru (hanya mencantumkan sebagian invoice) |
 
 ## 15 IGD
 
@@ -606,8 +606,8 @@ Deviasi = langkah **bisa dijalankan**, tetapi yang tampil di site tidak sama den
 | TC-APP015-023 | Klik ganda, dua perawat sekaligus, dan muat ulang | 2 | Perawat 2 diberi tahu bahwa triase sudah dicatat | triase dicatat untuk kedua kalinya |
 | TC-APP015-023 | Klik ganda, dua perawat sekaligus, dan muat ulang | 3 | Perawat 2 diberi tahu bahwa kunjungan sudah punya bay | kunjungan dipindah ke QA-IGD-02-MVWJTWUP00C |
 | TC-APP015-023 | Klik ganda, dua perawat sekaligus, dan muat ulang | 4 | Teks disimpan, atau perawat diberi peringatan | id yang setengah diketik hilang tanpa peringatan |
-| TC-APP015-032 | Penerimaan yang ditolak | 1 | Toast "That registration is not valid for emergency." | "(no patient offered)" |
-| TC-APP015-032 | Penerimaan yang ditolak | 2 | Toast "This visit is already received." | "(no patient offered)" |
+| TC-APP015-032 | Penerimaan yang ditolak | 1 | Toast "That registration is not valid for emergency." | "(tidak ada pasien yang ditawarkan)" |
+| TC-APP015-032 | Penerimaan yang ditolak | 2 | Toast "This visit is already received." | "(tidak ada pasien yang ditawarkan)" |
 | TC-APP015-036 | Walk-in yang ditolak atau ganda | 4 | Peringatan tentang duplikat | pasien kedua dan encounter terbuka kedua tersimpan tanpa peringatan |
 | TC-APP015-058 | Layar Visits lama di samping layar baru | 4 | Pasien kedua diterima di Emergency Patients | "tidak ada toast" dan pasien tidak tercantum |
 
@@ -668,7 +668,7 @@ Deviasi = langkah **bisa dijalankan**, tetapi yang tampil di site tidak sama den
 
 | Test case | Judul | Langkah | Workbook mengharapkan | Di site |
 |---|---|---:|---|---|
-| TC-APP017-014 | Periode diketik sebagai teks bebas | 1 | A month can be chosen | a text field (type "null", hint "YYYY-MM") |
+| TC-APP017-014 | Periode diketik sebagai teks bebas | 1 | Bulan bisa dipilih | kolom teks (type "null", petunjuk "YYYY-MM") |
 | TC-APP017-020 | Komponen gaji tidak bisa dilihat atau dikelola | 1 | Daftar dengan nama, jenis, tarif atau jumlah, dan apakah penghasilan atau potongan | tidak ada layar seperti itu (hub: Batches) |
 | TC-APP017-020 | Komponen gaji tidak bisa dilihat atau dikelola | 2 | Komponen bisa diedit | tidak ada layar untuk mengedit komponen (menu Payroll: Batches, Year, Payroll record, Tax, Calculate, Payslip, Reimburse) |
 | TC-APP017-020 | Komponen gaji tidak bisa dilihat atau dikelola | 3 | Komponen bisa ditetapkan | tidak ada layar untuk menetapkan komponen (menu Payroll: Batches, Year, Payroll record, Tax, Calculate, Payslip, Reimburse) |
@@ -681,8 +681,8 @@ Deviasi = langkah **bisa dijalankan**, tetapi yang tampil di site tidak sama den
 
 | Test case | Judul | Langkah | Workbook mengharapkan | Di site |
 |---|---|---:|---|---|
-| TC-APP018-001 | Direktori Settings: grup, pencarian, dan tautan | 1 | six groups: Organization, Reference, Access, Appearance, Workflow, Trail | 7 groups: Organization, Reference, Access, Appearance, Workflow, Licensing, Trail |
-| TC-APP018-001 | Direktori Settings: grup, pencarian, dan tautan | 2 | "Settings", "Jump to a group" and Organization 3 Reference 3 Access 6 Appearance 7 Workflow 1 Trail 1 | "Settings Jump to a group Organization 4 Reference 3 Access 6 Appearance 7 Workflow 1 Licensing 2 Trail 1" |
+| TC-APP018-001 | Direktori Settings: grup, pencarian, dan tautan | 1 | enam grup: Organization, Reference, Access, Appearance, Workflow, Trail | 7 grup: Organization, Reference, Access, Appearance, Workflow, Licensing, Trail |
+| TC-APP018-001 | Direktori Settings: grup, pencarian, dan tautan | 2 | "Settings", "Jump to a group", dan Organization 3 Reference 3 Access 6 Appearance 7 Workflow 1 Trail 1 | "Settings Jump to a group Organization 4 Reference 3 Access 6 Appearance 7 Workflow 1 Licensing 2 Trail 1" |
 | TC-APP018-012 | Dua hub, navigasi, dan bahasa Indonesia | 2 | Direktori Settings dari langkah 1 | halaman kedua "Settings" dengan "Master Data — org hierarchy and reference packs" dan ubin Add Site, Sites, Facility time, Departments, Service Centers, Countries, Cities, Units of Measure, Tax Codes |
 | TC-APP018-012 | Dua hub, navigasi, dan bahasa Indonesia | 4 | "Tambah Departemen", "Kode departemen", "Departemen ditambahkan." | "Tambah Departemen", Kode departemen, Nama departemen, toast "Department added." |
 | TC-APP018-013 | User tanpa hak data master mengubah departemen dan pusat layanan | 1 | Ditolak | Menambah departemen diterima untuk U3 (tanpa hak): toast "Department added." |
@@ -751,8 +751,8 @@ Deviasi = langkah **bisa dijalankan**, tetapi yang tampil di site tidak sama den
 | TC-APP019-018 | Formulir voucher di batasnya | 1 | Ditolak: voucher butuh nilai | voucher "IDR 0,00" tersimpan |
 | TC-APP019-018 | Formulir voucher di batasnya | 4 | Ditolak: bukan mata uang | tersimpan; detail bertuliskan "VCH-1793445763 Journal Close Doc date 2026-10-31 Voucher value XYZ 1.000,00 Party QA PT Uji MVWBA89G" |
 | TC-APP019-020 | Tahun buku yang tidak mungkin benar | 5 | Ditolak, atau peringatan | tahun QA-FY-MVWLRTBS00K tersimpan; tanggal finalisasi tidak dibandingkan dengan tahunnya |
-| TC-APP019-021 | Mengubah, menghapus, atau menutup tahun buku per periode | 1 | The year can be edited while nothing is booked in it | the row offers Periods, Lock |
-| TC-APP019-021 | Mengubah, menghapus, atau menutup tahun buku per periode | 2 | A delete, offered while the year is empty | the row offers Periods, Lock |
+| TC-APP019-021 | Mengubah, menghapus, atau menutup tahun buku per periode | 1 | Tahun bisa diedit selama belum ada yang dibukukan di dalamnya | baris menawarkan Periods, Lock |
+| TC-APP019-021 | Mengubah, menghapus, atau menutup tahun buku per periode | 2 | Hapus, ditawarkan selama tahunnya kosong | baris menawarkan Periods, Lock |
 | TC-APP019-023 | Menonaktifkan akun yang dipakai aturan posting | 1 | Peringatan bahwa akun dipakai aturan posting | langsung dinonaktifkan: toast "Account updated." dan tanpa peringatan |
 | TC-APP019-024 | Buku besar, saldo akun, dan laporan | 1 | Entri yang dibukukan ke akun dan saldonya | baris tidak bisa dibuka; yang ditawarkan Edit |
 | TC-APP019-024 | Buku besar, saldo akun, dan laporan | 2 | Ada ubin atau laporan | hub berisi Financial years, Chart of accounts, Branch configuration, Currency, Cost centres, Account maps, Budget posting rules, Vouchers, Journals, ERP staging; "Trial balance" hanya ada di menu |
@@ -771,12 +771,12 @@ Deviasi = langkah **bisa dijalankan**, tetapi yang tampil di site tidak sama den
 | TC-APP019-036 | Konfigurasi yang ditolak | 2 | Teks "At least one user must be allowed to transact." | toast "Configuration saved.": tersimpan tanpa user ("Add user" tidak menambah baris, TC-APP019-035) |
 | TC-APP019-036 | Konfigurasi yang ditolak | 3 | Teks bahwa kelayakan imprest butuh jenis, jumlah, akun, dan departemen, karyawan, atau pihak | baris yang hanya berisi jenis tersimpan ("Configuration saved.") |
 | TC-APP019-041 | Pusat biaya yang ditolak | 1 | Teks "The shares must total 100%." | toast "Shares must total 100%." |
-| TC-APP019-045 | Jurnal yang ditolak dialog | 2 | The text "A journal needs at least two lines." | "lan MVTAC7N060D QA-RJ-MVTGO7QK40F · QA-Rawat Jalan MVTGO7QK40I QA-RJ-MVWLRTBS019 · QA-Rawat Jalan MVWLRTBS01C QA-RJ-MVWLRTBS01H · QA-Rawat Jalan MVWLRTBS01K Debit 1000000.00 · Kredit 0.00 Tutup Simpan" |
-| TC-APP019-045 | Jurnal yang ditolak dialog | 3 | The text "Narration is required." | "TAC7N060D QA-RJ-MVTGO7QK40F · QA-Rawat Jalan MVTGO7QK40I QA-RJ-MVWLRTBS019 · QA-Rawat Jalan MVWLRTBS01C QA-RJ-MVWLRTBS01H · QA-Rawat Jalan MVWLRTBS01K Debit 1000000.00 · Kredit 1000000.00 Tutup Simpan" |
-| TC-APP019-045 | Jurnal yang ditolak dialog | 4 | The text "A reversible journal needs a reverse date." | "TAC7N060D QA-RJ-MVTGO7QK40F · QA-Rawat Jalan MVTGO7QK40I QA-RJ-MVWLRTBS019 · QA-Rawat Jalan MVWLRTBS01C QA-RJ-MVWLRTBS01H · QA-Rawat Jalan MVWLRTBS01K Debit 1000000.00 · Kredit 1000000.00 Tutup Simpan" |
-| TC-APP019-051 | Dokumen yang ditolak dialog | 1 | The text "Instrument number, type, date, and validity are required." | "uaran Uji MV9H0RI460P QA-2110-MVDE6HKD580I · QA PPN Keluaran Uji MVDE6HKD580J QA-2110-MVDE6HKD580O · QA PPN Keluaran Uji MVDE6HKD580P QA-2110-MVDHF9E5710I · QA PPN Keluaran Uji MVDHF9E5710J Close Save" |
-| TC-APP019-051 | Dokumen yang ditolak dialog | 2 | The text "A cash receipt needs a beneficiary." | "uaran Uji MV9H0RI460P QA-2110-MVDE6HKD580I · QA PPN Keluaran Uji MVDE6HKD580J QA-2110-MVDE6HKD580O · QA PPN Keluaran Uji MVDE6HKD580P QA-2110-MVDHF9E5710I · QA PPN Keluaran Uji MVDHF9E5710J Close Save" |
-| TC-APP019-051 | Dokumen yang ditolak dialog | 3 | The text "This voucher needs a party and a reference number." | "uaran Uji MV9H0RI460P QA-2110-MVDE6HKD580I · QA PPN Keluaran Uji MVDE6HKD580J QA-2110-MVDE6HKD580O · QA PPN Keluaran Uji MVDE6HKD580P QA-2110-MVDHF9E5710I · QA PPN Keluaran Uji MVDHF9E5710J Close Save" |
+| TC-APP019-045 | Jurnal yang ditolak dialog | 2 | Teks "A journal needs at least two lines." | "lan MVTAC7N060D QA-RJ-MVTGO7QK40F · QA-Rawat Jalan MVTGO7QK40I QA-RJ-MVWLRTBS019 · QA-Rawat Jalan MVWLRTBS01C QA-RJ-MVWLRTBS01H · QA-Rawat Jalan MVWLRTBS01K Debit 1000000.00 · Kredit 0.00 Tutup Simpan" |
+| TC-APP019-045 | Jurnal yang ditolak dialog | 3 | Teks "Narration is required." | "TAC7N060D QA-RJ-MVTGO7QK40F · QA-Rawat Jalan MVTGO7QK40I QA-RJ-MVWLRTBS019 · QA-Rawat Jalan MVWLRTBS01C QA-RJ-MVWLRTBS01H · QA-Rawat Jalan MVWLRTBS01K Debit 1000000.00 · Kredit 1000000.00 Tutup Simpan" |
+| TC-APP019-045 | Jurnal yang ditolak dialog | 4 | Teks "A reversible journal needs a reverse date." | "TAC7N060D QA-RJ-MVTGO7QK40F · QA-Rawat Jalan MVTGO7QK40I QA-RJ-MVWLRTBS019 · QA-Rawat Jalan MVWLRTBS01C QA-RJ-MVWLRTBS01H · QA-Rawat Jalan MVWLRTBS01K Debit 1000000.00 · Kredit 1000000.00 Tutup Simpan" |
+| TC-APP019-051 | Dokumen yang ditolak dialog | 1 | Teks "Instrument number, type, date, and validity are required." | "uaran Uji MV9H0RI460P QA-2110-MVDE6HKD580I · QA PPN Keluaran Uji MVDE6HKD580J QA-2110-MVDE6HKD580O · QA PPN Keluaran Uji MVDE6HKD580P QA-2110-MVDHF9E5710I · QA PPN Keluaran Uji MVDHF9E5710J Close Save" |
+| TC-APP019-051 | Dokumen yang ditolak dialog | 2 | Teks "A cash receipt needs a beneficiary." | "uaran Uji MV9H0RI460P QA-2110-MVDE6HKD580I · QA PPN Keluaran Uji MVDE6HKD580J QA-2110-MVDE6HKD580O · QA PPN Keluaran Uji MVDE6HKD580P QA-2110-MVDHF9E5710I · QA PPN Keluaran Uji MVDHF9E5710J Close Save" |
+| TC-APP019-051 | Dokumen yang ditolak dialog | 3 | Teks "This voucher needs a party and a reference number." | "uaran Uji MV9H0RI460P QA-2110-MVDE6HKD580I · QA PPN Keluaran Uji MVDE6HKD580J QA-2110-MVDE6HKD580O · QA PPN Keluaran Uji MVDE6HKD580P QA-2110-MVDHF9E5710I · QA PPN Keluaran Uji MVDHF9E5710J Close Save" |
 | TC-APP019-055 | Pembayaran yang ditolak | 2 | Teks "A bank instrument is required." | "tidak ada toast" |
 | TC-APP019-069 | Permintaan yang ditolak | 3 | Teks "An approved legal agreement is required." | "tidak ada toast" |
 | TC-APP019-075 | Langkah yang ditolak | 1 | Teks "This letter of credit step is not allowed yet." | "tidak ada toast" |
@@ -793,7 +793,7 @@ Deviasi = langkah **bisa dijalankan**, tetapi yang tampil di site tidak sama den
 | TC-APP020-016 | Anggaran internal yang ditolak | 7 | Teks "Add at least one head" | "Internal budget BIB000023 saved as draft. / " |
 | TC-APP020-017 | Jumlah | 2 | Teks "Enter an amount above zero with at most two decimals." dan tidak ada anggaran internal yang tersimpan | anggaran internal BIB000024 tersimpan dengan jumlah "150,5" |
 | TC-APP020-020 | Konsolidasi yang ditolak | 5 | Anggaran internal dari permintaan yang ditolak tercantum lagi | BIB000026 tidak ditawarkan setelah ditolak |
-| TC-APP020-038 | Posisi di batasnya | 1 | The text "No budget lines yet. A line is created when an allocation is approved." | "r alokasi Allocated Transferred in Transferred out Reserved Utilised Balance History OBAT · 2026 B14-OPS · Belanja obat Pharmacy · DIPA-2026 DIPA 1.000.000 0 0 0 0 1.000.000 History Showing 1–1 of 1 1" |
+| TC-APP020-038 | Posisi di batasnya | 1 | Teks "No budget lines yet. A line is created when an allocation is approved." | "r alokasi Allocated Transferred in Transferred out Reserved Utilised Balance History OBAT · 2026 B14-OPS · Belanja obat Pharmacy · DIPA-2026 DIPA 1.000.000 0 0 0 0 1.000.000 History Showing 1–1 of 1 1" |
 
 ## 21 CSSD
 

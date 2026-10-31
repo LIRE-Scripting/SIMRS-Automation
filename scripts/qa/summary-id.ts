@@ -12,8 +12,13 @@
  *   <English title>" becomes "blocker 40 – <BLOCKER_TITLE_ID[40]>".
  *
  * A text without a translation stays English and is remembered in `missing`;
- * `npm run qa:summary-id-missing` lists them (.qa-state/summary-id-missing.json)
- * so they can be added to the two files.
+ * `npm run qa:summary-id-missing` lists those of the summary
+ * (.qa-state/summary-id-missing.json) and `npm run qa:e2e-workbook` those of the
+ * result workbooks (Actual Result and Catatan otomasi of sheet Steps,
+ * .qa-state/workbook-id-missing.json), so they can be added to the two files.
+ * The notes of the tests carry values of the run (tokens, ids, numbers): they
+ * are kept as templates with {0}, {1}, … (templateOf). The columns copied from
+ * the reference workbooks (Action, Expected Result, …) stay as written there.
  */
 import fs from 'node:fs';
 import { blockers } from '../../lib/qa-data';
@@ -44,14 +49,41 @@ export function titleId(en: string): string {
   return en;
 }
 
-/** A word-carrying part looked up in texts.json; English when it has none. */
+/**
+ * The values that change from run to run, replaced by {0}, {1}, … in a template: a UUID, a QA token
+ * (letters and digits, 8 or more, e.g. MVWK3JL2004) and any number. A text of the notes recorded by the
+ * tests ("2 patient(s) named QA-AMB Calon Dua MVWK3JL2004") is kept in texts.json as its template
+ * ("{0} patient(s) named QA-AMB Calon Dua {1}"), so its translation holds for every run.
+ */
+const VALUE = /\b[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\b|\b(?=[A-Z0-9]*\d)(?=[A-Z0-9]*[A-Z])[A-Z0-9]{8,}\b|\d+(?:[.,]\d+)*/g;
+export function templateOf(text: string): { key: string; values: string[] } {
+  const values: string[] = [];
+  const key = text.replace(VALUE, (v) => `{${values.push(v) - 1}}`);
+  return { key, values };
+}
+const fill = (template: string, values: string[]) => template.replace(/\{(\d+)\}/g, (m, i: string) => values[Number(i)] ?? m);
+
+/** A word-carrying part looked up in texts.json (as it is, else as its template); English when it has none. */
 export function partId(en: string): string {
   const t = norm(en);
   if (!t) return en;
   const hit = TEXTS.get(t);
   if (hit !== undefined) return hit;
-  if (/[a-z]{3}/i.test(t)) missing.texts.add(t);
+  const { key, values } = templateOf(t);
+  const tpl = TEXTS.get(key);
+  if (tpl !== undefined) return fill(tpl, values);
+  if (/[a-z]{3}/i.test(t)) missing.texts.add(values.length ? key : t);
   return en;
+}
+
+/** Writes the texts met without a translation (titles and texts) to `file`, as { en: "" } for filling in. */
+export function saveMissing(file: string): number {
+  const out = {
+    titles: Object.fromEntries([...missing.titles].sort().map((t) => [t, ''])),
+    texts: Object.fromEntries([...missing.texts].sort().map((t) => [t, ''])),
+  };
+  fs.writeFileSync(file, `${JSON.stringify(out, null, 1)}\n`);
+  return missing.titles.size + missing.texts.size;
 }
 
 /** "Excel expects "A"; the site: B" → its parts, else null. */
