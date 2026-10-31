@@ -53,3 +53,14 @@ export async function toastsSince(page: Page, mark: number): Promise<string[]> {
   const url = page.url();
   return texts.map((t) => toastInEnglish(t, url));
 }
+
+/**
+ * A save the server could not do. Until 2026-10-30 it answered HTTP 500, shown as the toast or red box
+ * "Minified React error #441"; since 2026-10-31 most of those answer with the server's own failure text
+ * instead: a database error ("ERROR: … (SQLSTATE 23514)"), "failed to …", or the action's name with the
+ * status ("saveKitComponents: 500 stock update failed").
+ */
+export const SERVER_FAILURE = /React error #441|SQLSTATE|^\s*ERROR:|^\s*failed to\b|^\s*\w+: 5\d\d\b/i;
+
+/** True when one of the texts (toasts, red boxes) is a server failure (SERVER_FAILURE). */
+export const isServerFailure = (texts: string[]): boolean => texts.some((t) => SERVER_FAILURE.test(t));

@@ -177,7 +177,7 @@ export const FOUND_BLOCKERS: FoundBlocker[] = [
   },
   {
     no: 25,
-    blocker: 'Saving an external bag or a quality-control record, and approving a blood request, answer HTTP 500',
+    blocker: 'Saving an external bag or a quality-control record fails ("failed to receive external unit", "failed to save quality control")',
     category: 'Function',
     scope:
       '06 Transfusion Medicine\nStock, dialog "Receive an external bag" (Save); Quality control, dialog "Record" (Save); ' +
@@ -186,30 +186,26 @@ export const FOUND_BLOCKERS: FoundBlocker[] = [
       'With valid values these requests answer HTTP 500 and the screen shows "Minified React error #441" (seen 2026-10-15). ' +
       'Saving the participant settings, the QC limits and a request works; the bag and the QC document are not saved, and a request stays ' +
       '"Pending", so no request reaches the queue as "approved" (also when its author approves it: whether the author may approve is ' +
-      'TC-APP006-053, but the answer is a server error, not a refusal).',
+      'TC-APP006-053, but the answer is a server error, not a refusal). Seen again on 2026-10-31 after the fixes of 2026-10-30: no HTTP 500 is recorded any more; the bag and the QC record still fail, now with the toasts "failed to receive external unit" and "failed to save quality control". A request is approved by a second user ("Request approved"; the author is refused with "a different user must approve", TC-APP006-021 and 053), and the blood group chart saves (its columns and an O Positive row are on the branch): those parts are resolved.',
     fix:
       '1. Find the failing requests in the server log (digests 1431275565 and 2743853802 of 2026-10-15) and fix them.\n' +
       '2. Run TC-APP006-016, 022, 029, 055, 057 and 062 again.',
     who: 'Development',
     howFound: 'Seen on the site (automation of 06 Transfusion Medicine)',
     testCases: [
-      { id: 'TC-APP006-013', steps: [2, 3, 4, 5] },
-      { id: 'TC-APP006-044', steps: [1, 2, 3] },
-      { id: 'TC-APP006-021', steps: [3] },
-      { id: 'TC-APP006-053', steps: [1, 2, 3] },
-      { id: 'TC-APP006-054', steps: [1] },
       { id: 'TC-APP006-016', steps: [3, 4] },
-      { id: 'TC-APP006-022', steps: [1, 2, 3, 4] },
       { id: 'TC-APP006-029', steps: [3, 4] },
+      { id: 'TC-APP006-062', steps: [1, 2] },
+      { id: 'TC-APP006-022', steps: [1, 2, 3, 4] },
+      { id: 'TC-APP006-054', steps: [1] },
       { id: 'TC-APP006-055', steps: [1, 2] },
       { id: 'TC-APP006-057', steps: [1, 2] },
-      { id: 'TC-APP006-062', steps: [1, 2] },
       { id: 'TC-APP006-072', steps: [3] },
     ],
   },
   {
     no: 26,
-    blocker: 'No store can be made, and "Branch and stores" cannot save',
+    blocker: 'No store can be made on the site (Stores has no "Add")',
     category: 'Data + Function',
     scope:
       '07 Inventory\nStores, /inventory/stores (no "Add"); Branch and stores, /inventory/setup (Save answers HTTP 500)\n' +
@@ -219,31 +215,23 @@ export const FOUND_BLOCKERS: FoundBlocker[] = [
       '"Branch and stores" (category, store, lane) answer HTTP 500 ("Minified React error #441", seen 2026-10-15). The QA stores of the ' +
       'catalogue, an inactive store and the stores "X-ST1"/"X-ST2" of the setup journeys cannot be made. On Store documents an ' +
       'opening stock is saved, but an indent, a departmental or an inter-branch request between two stores answers HTTP 500 too ' +
-      '(no lane can be saved between them; whether a lane is required is TBD in the workbook).',
-    fix: '1. Name the screen that makes a store, or add one; fix the saves of "Branch and stores".\n2. Make the catalogue stores and run the 07 journeys again.',
+      '(no lane can be saved between them; whether a lane is required is TBD in the workbook). Seen again on 2026-10-31 after the fixes of 2026-10-30: no HTTP 500 is recorded any more; "Branch and stores" saves a category, a store and a lane for stores that exist ("Saved."; a store that does not exist is refused with "store is missing"), and with the lanes FI01-00-00 ↔ FI01-01-01 indents, issues, receipts and returns between the two seed stores save (TC-APP007-039 … 050). Still no store can be made, so the inactive store ST-OFF and the inpatient store ST-IP do not exist.',
+    fix: '1. Name the screen that makes a store, or add one.\n2. Make the catalogue stores and run TC-APP007-020 and TC-APP005-034 again.',
     who: 'Development; Site administrator for the stores',
     howFound: 'Seen on the site (automation of 07 Inventory)',
     testCases: [
       { id: 'TC-APP007-020', steps: [4] },
-      { id: 'TC-APP007-039', steps: [2, 3, 4] },
-      { id: 'TC-APP007-040', steps: [1, 2] },
-      { id: 'TC-APP007-041', steps: [1] },
-      { id: 'TC-APP007-045', steps: [1, 2, 3, 4] },
-      { id: 'TC-APP007-046', steps: [1, 2] },
-      { id: 'TC-APP007-047', steps: [1, 2] },
-      { id: 'TC-APP007-048', steps: [1, 2] },
-      { id: 'TC-APP007-050', steps: [1] },
       { id: 'TC-APP005-034', steps: [2] },
     ],
   },
   {
     no: 27,
-    blocker: 'Saving a kit answers HTTP 500',
+    blocker: 'Saving a kit fails ("saveKitComponents: 500 stock update failed")',
     category: 'Function',
     scope: '07 Inventory\nItem Master, dialog "Edit Item", section "Kit components" (Save kit)',
     cause:
       'With two components picked from the list and quantities 1 and 2, "Save kit" answers HTTP 500 ("Minified React error #441", seen ' +
-      '2026-10-15). No item can be made a kit, so IT-KIT (07) and QA-KIT (05) cannot exist.',
+      '2026-10-15). No item can be made a kit, so IT-KIT (07) and QA-KIT (05) cannot exist. Seen again on 2026-10-31 after the fixes of 2026-10-30: no HTTP 500 is recorded any more; "Save kit" now shows the toast "saveKitComponents: 500 stock update failed"; the kit is still not saved.',
     fix: '1. Fix the kit save.\n2. Run TC-APP007-007 and TC-APP005-010 again.',
     who: 'Development',
     howFound: 'Seen on the site (automation of 07 Inventory)',
@@ -296,13 +284,13 @@ export const FOUND_BLOCKERS: FoundBlocker[] = [
   },
   {
     no: 31,
-    blocker: 'Goods receipt, supplier invoice and returns answer HTTP 500',
+    blocker: 'Goods receipt, supplier invoice and returns cannot be saved: "grn" answers "receive at the gate first" after a saved gate',
     category: 'Function',
     scope: '09 Procurement\nReceipts and returns, /procurement/receipts, buttons "grn", "invoice", "vendor_return", "expiry_return"',
     cause:
       'For an order made, sent and approved on /procurement/requests, "gate" saves ("Saved."), but "grn" answers HTTP 500 ("Minified React ' +
       'error #441") with the store typed as its code, its id, its name or the default "127-CART"; "invoice", "vendor_return" and ' +
-      '"expiry_return" answer HTTP 500 too (seen 2026-10-15). No goods can be received, billed or returned.',
+      '"expiry_return" answer HTTP 500 too (seen 2026-10-15). No goods can be received, billed or returned. Seen again on 2026-10-31 after the fixes of 2026-10-30: no HTTP 500 is recorded any more; "gate" answers "Saved." but nothing is listed on Receipts and returns, and "grn" for the same order answers "procurement: invalid input: receive at the gate first"; "invoice" and "vendor_return" answer "receive the goods first". No goods can be received, billed or returned.',
     fix: '1. Fix the four actions (or name the store value "Store" expects).\n2. Run TC-APP009-046, 049 and 051 again.',
     who: 'Development',
     howFound: 'Seen on the site (automation of 09 Procurement)',
@@ -316,16 +304,16 @@ export const FOUND_BLOCKERS: FoundBlocker[] = [
   },
   {
     no: 32,
-    blocker: 'Shifting an operating theatre slot by one hour answers HTTP 500',
+    blocker: 'Shifting an operating theatre slot by one hour answered HTTP 500 (resolved 2026-10-31)',
     category: 'Function',
     scope: '08 Operation Theater\nCalendar, /ot/calendar, drop zone "Shift one hour"',
     cause:
       'A slot placed on the calendar through "Place on calendar" (room, start and end tomorrow) is dragged onto "Shift one hour"; the ' +
-      'answer is HTTP 500 ("Minified React error #441", seen 2026-10-15) and the slot keeps its time.',
+      'answer is HTTP 500 ("Minified React error #441", seen 2026-10-15) and the slot keeps its time. Resolved on 2026-10-31: for a validated request the drag onto "Shift one hour" answers "Saved" and the slot moves to 09:00 (TC-APP008-039 passes); a request that is not validated is refused with "ot: invalid input: drag reschedules a validated request".',
     fix: '1. Fix the shift.\n2. Run TC-APP008-039 again.',
     who: 'Development',
     howFound: 'Seen on the site (automation of 08 Operation Theater)',
-    testCases: [{ id: 'TC-APP008-039', steps: [3] }],
+    testCases: [],
   },
   {
     no: 33,
@@ -350,23 +338,23 @@ export const FOUND_BLOCKERS: FoundBlocker[] = [
   },
   {
     no: 34,
-    blocker: 'A discount above the cashier cap answers HTTP 500 instead of waiting for approval',
-    category: 'Data + Function',
+    blocker: 'A discount above the cashier cap cannot wait for approval: no billing discount chain is set up',
+    category: 'Data',
     scope:
       '14 Hospital Accounts\nFast Cashier, /billing/cashier, "Apply discount" above "Discount cap (IDR)"\n' +
       '00-test-data.xlsx | Catalogue, 14 row "Approval chain" (billing discount chain with one step, approver Head cashier)',
     cause:
       'With the counter settings of the catalogue (cap 50,000), a discount of 60,000 answers HTTP 500 ("Minified React error #441", seen ' +
       '2026-10-15); the sale stays Draft and no approval starts. No billing discount chain is set up, and none can be checked from the ' +
-      'cashier screens. A sale cannot be brought to "Waiting for approval".',
-    fix: '1. Set up the billing discount chain (or fix the request that starts it).\n2. Run TC-APP014-029 again.',
-    who: 'Site administrator (Workflow), then Development',
+      'cashier screens. A sale cannot be brought to "Waiting for approval". Seen again on 2026-10-31: a dispense above the maximum line discount answers "workflow: chain not found: \\"billingdiscount\\"" (found blocker 47), so the billing discount chain of the catalogue is still missing; a refund above the refund limit shows the red box "this amount waits for the billing discount approval chain" and is neither made nor held (TC-APP014-009). The chain cannot be made on the site (checked 2026-10-31 with the go-ahead of the tester): Workflow, Process definitions lists 11 processes and no billing discount process, has no button to add one, and its "Edit chain" dialog keeps the process key read-only ("Available process keys: discharge and purchase order").',
+    fix: '1. Add the process "billingdiscount" to Workflow (Development: the screen offers only discharge and purchase_order), then give it one step, approver Head cashier.\n2. Run TC-APP014-007, 028 and 029 again.',
+    who: 'Development (the process), then Site administrator (its step)',
     howFound: 'Seen on the site (automation of 14 Hospital Accounts)',
-    testCases: [{ id: 'TC-APP014-029' }],
+    testCases: [{ id: 'TC-APP014-029' }, { id: 'TC-APP014-009', steps: [1, 2, 3, 4] }],
   },
   {
     no: 35,
-    blocker: 'The item price of a branch (margin and tax) cannot be saved',
+    blocker: 'The item price of a branch (margin and tax) could not be saved (resolved 2026-10-31)',
     category: 'Function',
     scope:
       '14 Hospital Accounts\nFast Cashier, /billing/cashier, section "Item price" (Save price)\n' +
@@ -374,17 +362,11 @@ export const FOUND_BLOCKERS: FoundBlocker[] = [
     cause:
       '"Save price" with Visit Outpatient, Method "Cost plus margin", Site margin 25 and Tax 11 answers HTTP 500 ("Minified React error ' +
       '#441", seen 2026-10-15); the fields go back to 0 and 0. Pharmacy sales are priced at the last cost with no tax (QA-PARA x 10 is ' +
-      'Rp 10.000 instead of the reference 13,875.00).',
+      'Rp 10.000 instead of the reference 13,875.00). Resolved on 2026-10-31: no HTTP 500 any more, and "Save price" keeps the values once "Site margin" is typed as a fraction (0.25 for 25 %; a margin of 25 is not saved, without a message, while "Tax (%)" takes 11). QA-PARA × 10 is priced Rp 12.500 + tax Rp 1.375 = Rp 13.875, as the workbook says. The tests type the margin as a fraction (tests/modules/14-hospital-accounts/helpers.ts, marginOnSite).',
     fix: '1. Fix the item price save.\n2. Run TC-APP014-002 and 033 again.',
     who: 'Development',
     howFound: 'Seen on the site (automation of 14 Hospital Accounts)',
-    testCases: [
-      { id: 'TC-APP014-016', steps: [2] },
-      { id: 'TC-APP005-035', steps: [3, 4] },
-      { id: 'TC-APP005-040', steps: [1, 4, 5] },
-      { id: 'TC-APP014-002', steps: [1, 2] },
-      { id: 'TC-APP014-033' },
-    ],
+    testCases: [],
   },
   {
     no: 36,
@@ -429,7 +411,7 @@ export const FOUND_BLOCKERS: FoundBlocker[] = [
   },
   {
     no: 38,
-    blocker: 'Saving the rights of a role answers HTTP 500 ("Failed to save rights.")',
+    blocker: 'Saving the rights of a role fails ("Failed to save rights.")',
     category: 'Function',
     scope: '18 Settings\nUser Rights, /identity/rights, "Save rights"; 00-prerequisites.xlsx | Role accounts (U8 of 04 Inpatient, 18 Settings, 22 Services, 23 Sourcing)',
     cause:
@@ -441,7 +423,7 @@ export const FOUND_BLOCKERS: FoundBlocker[] = [
       'qa.services and qa.sourcing were not made (their roles exist with 0 rights); 22 of the 26 U8 accounts and U3–U7 were made and sign in ' +
       '(docs/qa/prereq-users-and-blockers.md). The journeys of those four applications run as U1 (admin): the flows are proven, the limits ' +
       'of a role are not. Steps that need a user with only some rights of an application (a writer-only or an approver-only user, a ' +
-      'pharmacist without the cashier role) are not run for the same reason.',
+      'pharmacist without the cashier role) are not run for the same reason. Seen again on 2026-10-31 after the fixes of 2026-10-30: no HTTP 500 is recorded any more; "Save rights" still shows "Failed to save rights." and the role keeps 0 rights.',
     fix: '1. Fix the save of role privileges (server log, digest 2696407390, 2026-10-15 and 2026-10-20).\n2. PREREQ_RETRY=blocked npm run test:prereq, then npm run qa:prereq-evidence: the four roles get their rights and the four accounts are made.\n3. Run TC-APP018-039 again (and steps 4 and 5 with the 13 Dietary flow), and the journeys of 04, 18, 22 and 23 with their role accounts.',
     who: 'Development',
     howFound: 'Seen on the site (automation of 18 Settings, 2026-10-15; prerequisites run, 2026-10-20)',
@@ -569,14 +551,14 @@ export const FOUND_BLOCKERS: FoundBlocker[] = [
   },
   {
     no: 41,
-    blocker: 'No patient can be registered in Kemayoran (BR-B): "Register" answers HTTP 500',
+    blocker: 'No patient can be registered in Kemayoran (BR-B): "Register" answers "Registration failed"',
     category: 'Function',
     scope: '01 Ambulatory Care\nRegistered Patients, /registration/patients, "New Registration" on branch Kemayoran',
     cause:
       'A complete registration (visit type Outpatient, names, with or without a date of birth) on Kemayoran posts and gets HTTP 500 ' +
       '(digest 2980747901), toast "Registration failed": for U6 qa.kemayoran (admin of Kemayoran) and for U2 choosing Branch ' +
       '"Kemayoran". The same form on Podomoro saves ("Patient registered"). Kemayoran holds only its 40 seed patients ' +
-      '(seen 2026-10-21). PT-B ("QA-AMB Pasien Cabang", BR-B) cannot be made; the tests use a seed patient of Kemayoran instead where they can.',
+      '(seen 2026-10-21). PT-B ("QA-AMB Pasien Cabang", BR-B) cannot be made; the tests use a seed patient of Kemayoran instead where they can. Seen again on 2026-10-31 after the fixes of 2026-10-30: no HTTP 500 is recorded any more; the registration on Kemayoran still ends with the toast "Registration failed".',
     fix: '1. Fix the registration of a patient on Kemayoran (probably a set-up of the branch the action needs, e.g. its MRN numbering).\n2. Run TC-APP001-024 and TC-APP001-043 again.',
     who: 'Development',
     howFound: 'Seen on the site (TC-APP001-024 and 063, written 2026-10-21)',
@@ -604,13 +586,13 @@ export const FOUND_BLOCKERS: FoundBlocker[] = [
   },
   {
     no: 43,
-    blocker: 'A year balance cannot be saved on the HR desk: "Year balance" answers HTTP 500',
+    blocker: 'A year balance cannot be saved on the HR desk: "Year balance" answers "pending approval"',
     category: 'Function',
     scope: '10 HR\nHR desk, /hr/desk/leave, dialog "Year balance", action "Year balance" (Save)',
     cause:
       'Saving a year balance 2027 (2027-01-01 to 2027-12-31, 12 days) for an employee of the test answers HTTP 500 (digest 3646853607), ' +
       'toast "Minified React error #441", with the typed leave type and with the code of a leave type made just before (seen 2026-10-28; ' +
-      'the same answer on every run since 2026-10-18, TC-APP010-047 and 048). No balance, so no application against it, no approval and no cancellation.',
+      'the same answer on every run since 2026-10-18, TC-APP010-047 and 048). No balance, so no application against it, no approval and no cancellation. Seen again on 2026-10-31 after the fixes of 2026-10-30: no HTTP 500 is recorded any more; the year balance of a new employee of the test, with no application of any kind, is refused with "hr: invalid input: pending approval" (the text the workbook gives for a second balance while an application waits, TC-APP010-043 step 4).',
     fix: '1. Fix the save of a year balance on the HR desk.\n2. Run TC-APP010-042, TC-APP010-043 and E2E-040 again.',
     who: 'Development',
     howFound: 'Seen on the site (TC-APP010-042, written 2026-10-22, run 2026-10-28)',
@@ -621,20 +603,17 @@ export const FOUND_BLOCKERS: FoundBlocker[] = [
   },
   {
     no: 44,
-    blocker: 'No purchase order can be made on Purchase requests (/procurement/requests): "order" answers HTTP 500',
+    blocker: 'A purchase order on Purchase requests needs an existing supplier ("supplier is missing"; was HTTP 500, resolved 2026-10-31)',
     category: 'Function',
     scope: '09 Procurement\nPurchase requests (titled "Purchase orders"), /procurement/requests, button "order"',
     cause:
       'An order of supplier, item (X-ITM1 of Inventory), quantity 50, rate 1000, tax PPN and terms "30 hari" answers HTTP 500 (digest 1569332509), ' +
       'toast "Minified React error #441": as in the workbook, with the id of an approved purchase request of the test in "Document", and with ' +
-      'the existing vendor "QA PT Medika Uji" (seen 2026-10-28). No order, so no send, approval, amendment or follow-up can be tried.',
+      'the existing vendor "QA PT Medika Uji" (seen 2026-10-28). No order, so no send, approval, amendment or follow-up can be tried. Resolved on 2026-10-31: the order is refused with "procurement: invalid input: supplier is missing" for the made-up supplier of the workbook and for "QA PT Medika Uji", and saves with the seed supplier "PT Enseval" (as on Receipts, TC-APP009-046); the tests order with the seed supplier.',
     fix: '1. Fix the save of an order on /procurement/requests (or name what it needs).\n2. Run TC-APP009-043 and TC-APP009-045 again.',
     who: 'Development',
     howFound: 'Seen on the site (TC-APP009-043, written 2026-10-22, run 2026-10-28)',
-    testCases: [
-      { id: 'TC-APP009-043', steps: [2, 3, 4, 5] },
-      { id: 'TC-APP009-045', steps: [1, 2] },
-    ],
+    testCases: [],
   },
   {
     no: 45,
@@ -690,14 +669,14 @@ export const FOUND_BLOCKERS: FoundBlocker[] = [
   },
   {
     no: 47,
-    blocker: 'A dispense with a line discount above the maximum answers HTTP 500: no discount waits for the cashier',
-    category: 'Function',
+    blocker: 'A dispense with a line discount above the maximum cannot wait for the cashier: "chain not found: billingdiscount"',
+    category: 'Data + Function',
     scope: '05 Pharmacy\nDispense, /pharmacy/dispense, "Confirm dispense" with a line discount above "Maximum line discount (%)"; 14 Hospital Accounts, Fast Cashier, "Dispense discounts"',
     cause:
       'With "Maximum line discount (%)" 10 (05 catalogue), a counter sale of QA-PARA x 2 with a line discount of 20 answers HTTP 500 ' +
       '(digest 2492312887), toast "Minified React error #441" (seen 2026-10-28). The panel "Dispense discounts" of Fast Cashier stays empty, ' +
-      'so no discount can be approved or rejected.',
-    fix: '1. Fix the dispense of a line above the maximum discount (it should wait for approval).\n2. Run TC-APP014-070 and TC-APP014-071 again.',
+      'so no discount can be approved or rejected. Seen again on 2026-10-31: no HTTP 500 any more; the dispense is refused with "advanceDispense: 400 pharmacy: this discount needs the approval chain: workflow: chain not found: \\"billingdiscount\\"". The discount approval chain is not set up (as for found blocker 34), so still no discount waits. The chain cannot be made on the site (checked 2026-10-31 with the go-ahead of the tester): Workflow, Process definitions lists 11 processes and no billing discount process, has no button to add one, and its "Edit chain" dialog keeps the process key read-only ("Available process keys: discharge and purchase order").',
+    fix: '1. Add the process "billingdiscount" to Workflow (Development: the screen offers only discharge and purchase_order), give it its step, then check that a line above the maximum waits in "Dispense discounts".\n2. Run TC-APP005-016, 036, 037 and TC-APP014-070, 071 again.',
     who: 'Development',
     howFound: 'Seen on the site (TC-APP014-070, written 2026-10-28)',
     testCases: [
@@ -710,7 +689,7 @@ export const FOUND_BLOCKERS: FoundBlocker[] = [
   },
   {
     no: 48,
-    blocker: 'A saved unsterile receipt does not open: its page never loads and nginx answers "504 Gateway Time-out"',
+    blocker: 'A saved unsterile receipt does not open: its page never loads and times out (nginx 504 until 2026-10-30, "The operation was aborted due to timeout" since)',
     category: 'Function',
     scope: '21 CSSD\nUnsterile Receipt, /cssd/receipts/<id> ("Open" on a row of the list)',
     cause:
@@ -718,7 +697,7 @@ export const FOUND_BLOCKERS: FoundBlocker[] = [
       'shows the document: GET /id/cssd/receipts/<id> answers 504 after a minute, and while it hangs other pages of the site ' +
       '(/api/notifications, /id/cssd) answer 504 too. Seen in every run of 2026-10-28 and 2026-10-29, and in a read-only check on an idle ' +
       'site on 2026-10-29 (UR-0014 did not open within 120 s, while the list opened in 0.7 s). A saved receipt cannot be sent, approved or ' +
-      'cancelled, so no set reaches the CSSD store unsterile and no cycle can load it.',
+      'cancelled, so no set reaches the CSSD store unsterile and no cycle can load it. Seen again on 2026-10-31: no 504 any more, but the page of a saved receipt reads "The operation was aborted due to timeout" and shows no action (TC-APP021-012, 014, 017, 019, 029).',
     fix: '1. Fix the page of a saved unsterile receipt (it should open with "Send for Approval").\n2. Run TC-APP021-012, 014, 017, 019 and 029 again.',
     who: 'Development',
     howFound: 'Seen on the site (TC-APP021-012, 2026-10-29)',
@@ -732,28 +711,28 @@ export const FOUND_BLOCKERS: FoundBlocker[] = [
   },
   {
     no: 49,
-    blocker: '"Calculate" on Diet orders answers HTTP 500: no prescription is assessed',
+    blocker: '"Calculate" on Diet orders answered HTTP 500 (resolved 2026-10-31)',
     category: 'Function',
     scope: '13 Dietary\nDiet orders, /diet/orders, button "Calculate"',
     cause:
       '"Calculate" posts the assessment of the first prescription of the list (female, 60 kg, 160 cm, as the workbook says) and gets HTTP 500 ' +
       '(digest 3479685728), toast "Minified React error #441"; seen on every run since 2026-10-21 (E2E-045 and TC-APP013-040, on /en and on /id). ' +
-      'The first line stays "pending", so no BMI is shown and the order of step 4 is not tied to an assessed prescription.',
+      'The first line stays "pending", so no BMI is shown and the order of step 4 is not tied to an assessed prescription. Resolved on 2026-10-31: "Calculate" answers; it acts on the first prescription of the list (sorted by patient name), and an assessed or ordered first line is refused with "diet: invalid input: prescription is not pending". TC-APP013-040 names its patient so that its prescription is the first.',
     fix: '1. Fix the assessment of "Calculate" on Diet orders.\n2. Run TC-APP013-040 and E2E-045 again.',
     who: 'Development',
     howFound: 'Seen on the site (E2E-045, 2026-10-21; TC-APP013-040, 2026-10-29)',
-    testCases: [{ id: 'TC-APP013-040', steps: [3] }],
+    testCases: [],
   },
   {
     no: 50,
-    blocker: 'A sourcing agreement cannot be saved: "Save" answers HTTP 500 for a tender with an accepted bidder',
+    blocker: 'A sourcing agreement cannot be saved: "accept a bidder on the sheet first" for a tender with an accepted bidder',
     category: 'Function',
     scope: '23 Sourcing\nAgreements, /sourcing/agreements, dialog "Agreements", action "Agreement" (Document = id of the tender)',
     cause:
       'For a published tender (closed the day before) whose bid of the test is submitted, opened, evaluated (grade A), rated "accepted" on the ' +
       'sheet and accepted, the agreement with number, vendor, item, price 1450000 and the tender id answers HTTP 500 (digest 3681885900), toast ' +
       '"Minified React error #441"; the same with a budget head of the test and an amount on the second step (seen 2026-10-29, TC-APP023-012, ' +
-      '013, 014, 020 and E2E-009). With no agreement there is no approval, sanction (budget reservation) or amendment.',
+      '013, 014, 020 and E2E-009). With no agreement there is no approval, sanction (budget reservation) or amendment. Seen again on 2026-10-31 after the fixes of 2026-10-30: no HTTP 500 is recorded any more; the agreement is refused with "sourcing: invalid input: accept a bidder on the sheet first", although the bid of the test is accepted ("Saved.") and its bidder rated "accepted" on the sheet; the same with the bidder\'s name or code as vendor (checked 2026-10-31).',
     fix: '1. Fix the save of an agreement from a tender (or name what it still needs).\n2. Run TC-APP023-012, 013, 014, 020 and E2E-009 again.',
     who: 'Development',
     howFound: 'Seen on the site (TC-APP023-012, written 2026-10-29)',
@@ -766,47 +745,46 @@ export const FOUND_BLOCKERS: FoundBlocker[] = [
   },
   {
     no: 51,
-    blocker: 'Item Master: a new item shows "Item added." but is not listed for a long time',
+    blocker: 'Lists leave new records out for a while: a new item of Item Master, and a new dispense line of Pharmacy Issue Lines',
     category: 'Function',
-    scope: '07 Inventory\nItem Master, /inventory/items, dialog "Add Item" (Minimum stock 20, Maximum stock 500), the list paged to the end',
+    scope: '07 Inventory\nItem Master, /inventory/items, dialog "Add Item" (Minimum stock 20, Maximum stock 500), the list paged to the end; 05 Pharmacy, Issue Lines, /pharmacy/issue-lines (Return)',
     cause:
       'Saving item IT-1 of the catalogue (code QA-INV-PARA-…, minimum 20, maximum 500) posts and gets HTTP 200 and the toast "Item added.", ' +
       'but the code is on none of the pages of the list right after, nor an hour later (seen 2026-10-29 06:20–08:00 in TC-APP007-001, ' +
       'E2E-008 and E2E-035, 324 items paged to the end). At 12:40 the same items are listed (page 5), and an item saved at 12:30 was listed ' +
-      'at once. The item is stored; the list leaves new items out for a while, so the step that reads, edits or stocks it cannot go on.',
+      'at once. The item is stored; the list leaves new items out for a while, so the step that reads, edits or stocks it cannot go on. On 2026-10-31 a new item was listed at once at 16:15 but not at 16:45, also two minutes later (TC-APP007-001). The same holds for Pharmacy Issue Lines: at 16:50 its 263 lines (paged to the end) held none of the sales of the hour before, so a line sold by TC-APP005-040 could not be returned; at 16:15 the same return worked.',
     fix: '1. Find why the list leaves out new items for a while (a cache of the item list?) and fix it.\n2. Run TC-APP007-001, E2E-008 and E2E-035 again.',
     who: 'Development',
     howFound: 'Seen on the site (E2E-008, 2026-10-29)',
-    testCases: [{ id: 'TC-APP007-001', steps: [4] }],
+    testCases: [
+      { id: 'TC-APP007-001', steps: [4] },
+      { id: 'TC-APP005-040', steps: [2, 5] },
+    ],
   },
   {
     no: 52,
-    blocker: '"Confirm dispense" answers HTTP 500 instead of the sale, with Freeze days set or for a patient whose namesake is admitted',
+    blocker: '"Confirm dispense" answered HTTP 500 with Freeze days set or for a namesake (resolved 2026-10-31: now refusals)',
     category: 'Function',
     scope: '05 Pharmacy\nDispense, /pharmacy/dispense, step "Confirm" (counter sale)',
     cause:
       'Two cases, each on every run since 2026-10-15 (2026-10-21 on /en, 2026-10-29 on /id): (1) with "Freeze days" 30 for Podomoro, a sale ' +
       'of QA-FRZ × 5 from a batch that expires in 400 days answers HTTP 500 (digest 1783668951), toast "Minified React error #441", and so ' +
       'does the sale after Freeze days is set to 29; (2) a sale to PT-2 while PT-3 of the same name is admitted answers HTTP 500 too. ' +
-      'The workbook expects the sale to be confirmed; a refusal would be a message, not a server error.',
+      'The workbook expects the sale to be confirmed; a refusal would be a message, not a server error. Resolved on 2026-10-31 as a blocker: the sale with Freeze days 30 is confirmed from the right batch (TC-APP007-009, TC-APP005-033 steps 2 and 3); after Freeze days 29 the batch expiring in 30 days is refused ("not enough stock"), and the sale to PT-2 is refused with "Patient has been admitted": both recorded as deviations.',
     fix: '1. Fix "Confirm" of a counter sale with Freeze days set, and for a patient whose namesake is admitted.\n2. Run TC-APP005-028 and TC-APP005-033 again.',
     who: 'Development',
     howFound: 'Seen on the site (TC-APP005-033 and 028, since 2026-10-15)',
-    testCases: [
-      { id: 'TC-APP007-009', steps: [3, 4] },
-      { id: 'TC-APP005-028', steps: [3] },
-      { id: 'TC-APP005-033', steps: [2, 3, 6] },
-    ],
+    testCases: [],
   },
   {
     no: 53,
-    blocker: '"Revert latest stamp" on the laboratory Work desk answers HTTP 500',
+    blocker: '"Revert latest stamp" on the laboratory Work desk fails ("bad_request")',
     category: 'Function',
     scope: '11 Laboratory\nWork, /laboratory/work, action "Revert latest stamp" on an order',
     cause:
       'For an order of the test whose last step ("Review") was made a moment before, "Revert latest stamp" posts the order id to ' +
       '/id/laboratory/work and gets HTTP 500 (digest 3196244996), toast "Minified React error #441"; the same on 2026-10-21 (/en) and ' +
-      '2026-10-29 (/id). The latest step of an order cannot be undone.',
+      '2026-10-29 (/id). The latest step of an order cannot be undone. Seen again on 2026-10-31 after the fixes of 2026-10-30: no HTTP 500 is recorded any more; "Revert latest stamp" now answers the toast "bad_request" and the step is not undone.',
     fix: '1. Fix "Revert latest stamp" on the laboratory Work desk.\n2. Run TC-APP011-041 again.',
     who: 'Development',
     howFound: 'Seen on the site (TC-APP011-041, 2026-10-21 and 2026-10-29)',
@@ -829,13 +807,13 @@ export const FOUND_BLOCKERS: FoundBlocker[] = [
   },
   {
     no: 55,
-    blocker: '"Save branding" with an uploaded logo answers HTTP 500 ("Failed to save branding.")',
+    blocker: '"Save branding" with an uploaded logo fails ("Failed to save branding.")',
     category: 'Function',
     scope: '18 Settings\nTenant Branding, /identity/branding, "Upload logo" then "Save branding"',
     cause:
       'With the product name of the test, a PNG logo of 320 × 80 px uploaded ("This file is 320 × 80 px.") and the locale en, "Save branding" ' +
       'posts the logo as a data URL and gets HTTP 500, toast "Failed to save branding." (seen 2026-10-29; the screen now also has a radio ' +
-      'group "Tampilan" Text/Logo). The new branding cannot be saved, so the header and sign-in page cannot show it.',
+      'group "Tampilan" Text/Logo). The new branding cannot be saved, so the header and sign-in page cannot show it. Seen again on 2026-10-31 after the fixes of 2026-10-30: no HTTP 500 is recorded any more; "Save branding" with the logo still shows "Failed to save branding.".',
     fix: '1. Fix the save of the branding with an uploaded logo.\n2. Run TC-APP018-043 again.',
     who: 'Development',
     howFound: 'Seen on the site (TC-APP018-043, 2026-10-29)',
@@ -843,35 +821,34 @@ export const FOUND_BLOCKERS: FoundBlocker[] = [
   },
   {
     no: 56,
-    blocker: '"Pay" with nothing more to collect, and a refund above the refund limit, answer HTTP 500',
+    blocker: '"Pay" with nothing more to collect fails with a database error',
     category: 'Function',
     scope: '14 Hospital Accounts\nFast Cashier, /billing/cashier: "Pay" with cash 0 on a sale whose deposits cover the bill; "Refund payment" above "Refund limit (IDR)"',
     cause:
       'Seen 2026-10-30 (the cashier cases passed on 2026-10-21): a walk-in sale of 150,000 (net 166,500) with deposits of 166,500, "Pay" with ' +
       'the cash amount 0 shows the red box "Minified React error #441" (HTTP 500) and the sale stays Draft; the same after a reopened sale ' +
-      'was discounted. "Refund payment" of 150,000 on a paid sale (limit 100,000) answers HTTP 500 too, instead of holding the refund for approval.',
+      'was discounted. "Refund payment" of 150,000 on a paid sale (limit 100,000) answers HTTP 500 too, instead of holding the refund for approval. Seen again on 2026-10-31: no HTTP 500; "Pay" with cash 0 shows the red box "ERROR: new row for relation \\"tender_receipts\\" violates check constraint \\"tender_receipts_amount_pos\\" (SQLSTATE 23514)" and the sale stays Draft (TC-APP014-004, 010). The refund above the limit (TC-APP014-009) no longer fails with a server error: it waits for the missing billing discount chain (found blocker 34).',
     fix: '1. Fix "Pay" when nothing more is due, and the refund above the limit.\n2. Run TC-APP014-004, 009 and 010 again.',
     who: 'Development',
     howFound: 'Seen on the site (TC-APP014-004, 009, 010, 2026-10-30)',
     testCases: [
       { id: 'TC-APP014-004', steps: [2] },
-      { id: 'TC-APP014-009', steps: [1, 2, 3, 4] },
       { id: 'TC-APP014-010', steps: [3, 4] },
     ],
   },
   {
     no: 57,
-    blocker: '"Link me" on HR, My profile answers HTTP 500 for an account that an earlier link already joined to an employee',
+    blocker: '"Link me" on HR, My profile answered HTTP 500 for an account already linked (resolved 2026-10-31: refused "duplicate")',
     category: 'Function',
     scope: '10 HR\nMy profile, /hr/desk, dialog "My profile" with the action "Link me"',
     cause:
       'Seen 2026-10-30 (chain E2E-039 step 7, TC-APP010-040 step 4): "Link me" with the number of a new employee of the test answers HTTP 500, ' +
       'toast "Minified React error #441". The account U1 was linked to an employee of an earlier run of the same test; moving the link to a ' +
-      'new employee, or telling the user that the account is already linked, does not happen.',
+      'new employee, or telling the user that the account is already linked, does not happen. Resolved on 2026-10-31: the account is refused with "hr: invalid input: duplicate" (fix option 2, a refusal); the link is not moved, recorded as a deviation of TC-APP010-040 step 4.',
     fix: '1. Let "Link me" move the link, or refuse with a message.\n2. Run TC-APP010-040 and the chain E2E-039 again.',
     who: 'Development',
     howFound: 'Seen on the site (E2E-039, 2026-10-30)',
-    testCases: [{ id: 'TC-APP010-040', steps: [4, 5] }],
+    testCases: [],
   },
 ];
 

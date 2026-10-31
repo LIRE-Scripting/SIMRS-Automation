@@ -1,6 +1,6 @@
 import { asOnSite } from '../../../lib/i18n';
 import { expect, qaTest, test } from '../../../fixtures/e2e';
-import { installToastRecorder } from '../../../lib/assertions';
+import { installToastRecorder, SERVER_FAILURE } from '../../../lib/assertions';
 import { SampleWorkflowPage, WorklistPage } from '../../../pages/lab/LabPages';
 import { backToIndonesian, switchLanguage } from '../shared/language';
 import { screenOpens } from '../shared/screen-opens';
@@ -280,10 +280,10 @@ qaTest('TC-APP011-041', async ({ page, qa }) => {
   let failed = false;
   await qa.step(1, async () => {
     const r = await work(page, label, 'Revert latest stamp');
-    if (r.toasts.some((t) => /React error #441/.test(t))) {
-      // "Revert latest stamp" answers HTTP 500 (found blocker 53).
+    // HTTP 500 until 2026-10-30, the bare refusal "bad_request" since 2026-10-31 (found blocker 53).
+    if (r.toasts.some((t) => SERVER_FAILURE.test(t) || /^bad_request$/.test(t.trim()))) {
       failed = true;
-      return qa.note(1, `"Revert latest stamp": "${r.toasts.join(' / ').slice(0, 60)}" (HTTP 500); line "${r.line}"`);
+      return qa.note(1, `"Revert latest stamp": "${r.toasts.join(' / ').slice(0, 60)}"; line "${r.line}"`);
     }
     expect(r.toasts).toContain('Saved');
     qa.note(1, `line after the revert: "${r.line}"; worklist Result status "${(await cellsOf(page, type))[5]}"`);

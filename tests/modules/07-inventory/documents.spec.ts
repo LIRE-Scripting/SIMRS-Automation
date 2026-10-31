@@ -10,8 +10,9 @@ import { click, indentOrBlock, isServerError, lastId, newItem, opening, TC_APP00
  * 07-inventory.xlsx, features "Branch and stores (/inventory/setup)", "Store
  * documents (/inventory/documents)", "Stock desk (/inventory/stock-desk)" and
  * "Stock book (/inventory/ledger)". The workbook's stores "X-ST1"/"X-ST2"
- * would be made on Branch and stores, which answers HTTP 500 (found blocker
- * 26): two seed stores of BR-A stand in (Q22). Item "X-ITM1" is made per run
+ * would be made on Branch and stores, which answered HTTP 500 (found blocker
+ * 26) and since 2026-10-31 refuses a store that does not exist: two seed
+ * stores of BR-A stand in (Q22). Item "X-ITM1" is made per run
  * as "QA-ITM1-<token>" on Item Master.
  */
 
@@ -41,12 +42,21 @@ qaTest('TC-APP007-039', async ({ page, qa }) => {
     const toasts = await toastsAfter(page, mark);
     if (isServerError(toasts)) return qa.blocked(step, 26);
     await qa.step(step, async () => {
+      qa.note(step, `"Save": "${toasts.join(' / ') || 'no toast'}"`);
+      // The stand-in stores are the same on every run: their lane, saved by an earlier run, is refused as a duplicate.
+      if (step === 4 && toasts.some((t) => /duplicate/i.test(t))) {
+        await f.open('setup', 'Branch and stores');
+        return expect(f.main).toContainText(`${STAND_IN_STORE.code} → ${STAND_IN_STORE_2.code}`);
+      }
       expect(toasts).toContain('Saved.');
     });
   };
   await saveForm(2, { Code: qa.code('X-CAT1'), Name: qa.name('X Obat uji') }, 0);
-  await saveForm(3, { Store: qa.code('X-ST1') }, 1);
-  await saveForm(4, { 'From store': qa.code('X-ST1'), 'To store': qa.code('X-ST2') }, 2);
+  // X-ST1/X-ST2 cannot be made (Stores has no "Add", found blocker 26): since 2026-10-31 the forms refuse a store
+  // that does not exist ("store is missing"), so the two seed stores stand in (Q22). The lane FI01-00-00 → FI01-01-01
+  // is the one the store documents of TC-APP007-045 to 050 need (an indent without it is refused: "lane is missing").
+  await saveForm(3, { Store: STAND_IN_STORE.code }, 1);
+  await saveForm(4, { 'From store': STAND_IN_STORE.code, 'To store': STAND_IN_STORE_2.code }, 2);
 });
 
 qaTest('TC-APP007-040', async ({ page, qa }) => {

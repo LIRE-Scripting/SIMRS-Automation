@@ -1,6 +1,6 @@
 import type { Page } from '@playwright/test';
 import { expect, qaTest, test } from '../../../fixtures/e2e';
-import { installToastRecorder, toastMark } from '../../../lib/assertions';
+import { installToastRecorder, toastMark, SERVER_FAILURE } from '../../../lib/assertions';
 import { addDays, todayWib } from '../../../lib/dates';
 import { PROCUREMENT } from '../../../lib/procurement-data';
 import { PurchaseOrdersPage } from '../../../pages/procurement/ProcurementPages';
@@ -17,7 +17,7 @@ test.beforeEach(async ({ page }) => {
   await installToastRecorder(page);
 });
 
-const SERVER_ERROR = /React error #441/;
+const SERVER_ERROR = SERVER_FAILURE;
 
 async function cellsOf(page: Page, doc: string): Promise<string[]> {
   const p = new PurchaseOrdersPage(page);

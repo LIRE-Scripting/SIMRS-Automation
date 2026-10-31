@@ -34,11 +34,11 @@ Test title = `<TC ID> <Scenario Name> [<file> | Steps | rows a-b | <TC ID>]`; an
 | TC-APP014-026 | JRN-APP014-026 | Cash rules: missing identity document and the cash limit | Boundary | High | rows 93-96 | 27 | `tests/modules/14-hospital-accounts/evaluation-cashier.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP014-027 | JRN-APP014-027 | Discount larger than the charge | Boundary | High | rows 97-98 | 28 | `tests/modules/14-hospital-accounts/cashier.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP014-028 | JRN-APP014-028 | The wrong person tries to approve | Boundary | Critical | rows 99-101 | 29 | `tests/modules/14-hospital-accounts/evaluation-cashier.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
-| TC-APP014-029 | JRN-APP014-029 | A sale is locked while it waits for approval | Negative | Critical | rows 102-105 | 30 | `tests/modules/14-hospital-accounts/not-automated.spec.ts` | U1 / Podomoro | fixme | Blocker 34 (found by automation, docs/qa/blockers-found.md): A discount above the cashier cap answers HTTP 500 instead of waiting for approval |
+| TC-APP014-029 | JRN-APP014-029 | A sale is locked while it waits for approval | Negative | Critical | rows 102-105 | 30 | `tests/modules/14-hospital-accounts/not-automated.spec.ts` | U1 / Podomoro | fixme | Blocker 34 (found by automation, docs/qa/blockers-found.md): A discount above the cashier cap cannot wait for approval: no billing discount chain is set up |
 | TC-APP014-030 | JRN-APP014-030 | Refund of more than was paid | Boundary | Critical | rows 106-107 | 31 | `tests/modules/14-hospital-accounts/cashier.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP014-031 | JRN-APP014-031 | Refund of a card payment and the drawer total | Negative | High | rows 108-109 | 32 | `tests/modules/14-hospital-accounts/cashier.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP014-032 | JRN-APP014-032 | Full refund of a paid sale | Negative | High | rows 110-111 | 33 | `tests/modules/14-hospital-accounts/evaluation-cashier.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
-| TC-APP014-033 | JRN-APP014-033 | Pharmacy bill discounted at the cashier | Negative | Critical | row 112 | 34 | `tests/modules/14-hospital-accounts/cashier.spec.ts` | U1 / Podomoro | fixme | Blocker 35 (found by automation, docs/qa/blockers-found.md): The item price of a branch (margin and tax) cannot be saved |
+| TC-APP014-033 | JRN-APP014-033 | Pharmacy bill discounted at the cashier | Negative | Critical | row 112 | 34 | `tests/modules/14-hospital-accounts/cashier.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP014-034 | JRN-APP014-034 | A bill with cents | Negative | High | rows 113-114 | 35 | `tests/modules/14-hospital-accounts/cashier.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP014-035 | JRN-APP014-035 | Finding a patient's bill by name or MRN | Negative | Critical | rows 115-116 | 36 | `tests/modules/14-hospital-accounts/cashier.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP014-036 | JRN-APP014-036 | Working after the counter is closed | Negative | Critical | rows 117-120 | 37 | `tests/modules/14-hospital-accounts/zz-close-day.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
@@ -95,8 +95,8 @@ Test title = `<TC ID> <Scenario Name> [<file> | Steps | rows a-b | <TC ID>]`; an
 ## Counts
 
 - automate (read-only): 0
-- automate (saves; needs QA_ALLOW_WRITES): 66
+- automate (saves; needs QA_ALLOW_WRITES): 67
 - automate (chain; needs a record from another app): 2
-- fixme: 17
+- fixme: 16
 - skip: 0
 - test cases with a "TBD" step (asserted partially): 25

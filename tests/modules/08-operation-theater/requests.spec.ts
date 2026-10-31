@@ -1,5 +1,5 @@
 import { expect, qaTest, test } from '../../../fixtures/e2e';
-import { installToastRecorder, toastMark } from '../../../lib/assertions';
+import { installToastRecorder, toastMark, SERVER_FAILURE } from '../../../lib/assertions';
 import { OT } from '../../../lib/ot-data';
 import { OtRequestsPage } from '../../../pages/ot/OtPages';
 import { act, cellsOf, create, procedure, request, toastsAfter } from './helpers';
@@ -17,7 +17,7 @@ test.beforeEach(async ({ page }) => {
   await installToastRecorder(page);
 });
 
-const SERVER_ERROR = /React error #441/;
+const SERVER_ERROR = SERVER_FAILURE;
 
 qaTest('TC-APP008-001', async ({ page, qa }) => {
   const ot = new OtRequestsPage(page);

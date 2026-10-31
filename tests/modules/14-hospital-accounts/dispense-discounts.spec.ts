@@ -5,6 +5,7 @@ import { BILLING } from '../../../lib/billing-data';
 import { PHARMACY } from '../../../lib/pharmacy-data';
 import { CashierPage } from '../../../pages/billing/CashierPage';
 import { patient, sell, stock } from '../05-pharmacy/helpers';
+import { discountNotHeld } from '../05-pharmacy/evaluation-cashier-cases';
 import { userPage } from '../shared/access';
 import { clickFor } from '../19-finance/helpers';
 import { counterClosed, ensureSettings, holds } from './helpers';
@@ -43,8 +44,8 @@ qaTest('TC-APP014-070', async ({ page, qa }) => {
   const made = await twoHeld(page, qa);
   qa.note(1, `two dispenses with a discount of ${OVER}% (maximum ${BILLING.counter['Maximum line discount (%)']}%): "${made.toasts.map((t) => t.join(' / ')).join('" and "')}"; ${made.before} row(s) waited before`);
   let h = await holds(page);
-  if (made.toasts.every((t) => t.some((x) => /React error #441/.test(x)))) {
-    // Both dispenses answer HTTP 500 (found blocker 47): no discount waits.
+  if (made.toasts.every(discountNotHeld)) {
+    // Neither dispense is held (found blocker 47): no discount waits.
     for (const st of [1, 2, 3]) qa.blocked(st, 47);
     qa.notRun(4, 'needs the decisions of steps 2 and 3 (found blocker 47)');
     return;
@@ -75,9 +76,9 @@ qaTest('TC-APP014-070', async ({ page, qa }) => {
 qaTest('TC-APP014-071', async ({ page, qa, browser }) => {
   const made = await twoHeld(page, qa);
   qa.note(1, `${made.before} row(s) waited before the two discounts of the test; dispenses: "${made.toasts.map((t) => t.join(' / ').slice(0, 60)).join('" and "')}"`);
-  if (made.toasts.every((t) => t.some((x) => /React error #441/.test(x)))) {
+  if (made.toasts.every(discountNotHeld)) {
     qa.notRun(1, 'the pharmacist who asked is U1, who is also the cashier: a pharmacist without the cashier role is not prepared (blocker 38)');
-    // Both dispenses answer HTTP 500 (found blocker 47): no discount waits.
+    // Neither dispense is held (found blocker 47): no discount waits.
     qa.blocked(2, 47);
     qa.blocked(3, 47);
     return;

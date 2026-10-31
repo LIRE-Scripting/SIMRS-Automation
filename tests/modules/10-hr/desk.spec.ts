@@ -51,7 +51,7 @@ qaTest('TC-APP010-043', async ({ page, qa }) => {
   await qa.step(3, async () => refusedNote(3, 'days 0', await l.save({ ...YEAR, 'Employee no': no, 'Leave / shift': type, Days: '0' }, 'Year balance'), 'employee, type and days are required'));
   const opened = await l.save({ ...YEAR, 'Employee no': no, 'Leave / shift': type }, 'Year balance');
   if (!opened.includes(SAVED)) {
-    // The year balance answers HTTP 500 (found blocker 43): no balance for the second-balance refusal.
+    // The year balance cannot be saved (found blocker 43): no balance for the second-balance refusal.
     qa.note(4, `the balance of the test: "${opened.join(' / ').slice(0, 80)}"`);
     qa.blocked(4, 43);
     return;

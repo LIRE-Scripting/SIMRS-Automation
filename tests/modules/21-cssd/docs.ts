@@ -1,6 +1,7 @@
 import type { Locator, Page } from '@playwright/test';
 import { expect, type Qa } from '../../../fixtures/e2e';
 import { toastMark } from '../../../lib/assertions';
+import { asOnSite } from '../../../lib/i18n';
 import { closeDialog } from '../../../lib/pharmacy-data';
 import { ItemMasterPage } from '../../../pages/inventory/InventoryE2EPages';
 import { toastsAfter } from '../18-settings/helpers';
@@ -229,7 +230,10 @@ export async function openSaved(f: CssdForm, text: string): Promise<boolean> {
     await actions.waitFor({ timeout: 30_000 }).catch(() => {});
   }
   if (await actions.isVisible().catch(() => false)) return true;
-  const gateway = (await f.page.getByRole('heading', { name: /^50[234] / }).count()) > 0;
+  // nginx "504 Gateway Time-out" until 2026-10-30; since 2026-10-31 the page itself reads "The operation was aborted due to timeout".
+  const gateway =
+    (await f.page.getByRole('heading', { name: /^50[234] / }).count()) > 0 ||
+    (await asOnSite(() => f.main.getByText(/aborted due to timeout/i).count())) > 0;
   const onDocument = new RegExp(`/cssd/${f.route}/[0-9a-f-]{36}`).test(f.page.url());
   if (gateway || !onDocument) {
     await recovered(f.page);

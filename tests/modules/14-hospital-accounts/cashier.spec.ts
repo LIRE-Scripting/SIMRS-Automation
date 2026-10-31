@@ -1,7 +1,7 @@
 import { asOnSite } from '../../../lib/i18n';
 import type { Page } from '@playwright/test';
 import { expect, qaTest, test, type Qa } from '../../../fixtures/e2e';
-import { installToastRecorder } from '../../../lib/assertions';
+import { installToastRecorder, SERVER_FAILURE } from '../../../lib/assertions';
 import { BILLING } from '../../../lib/billing-data';
 import { PHARMACY } from '../../../lib/pharmacy-data';
 import { CashierPage, rupiah } from '../../../pages/billing/CashierPage';
@@ -32,9 +32,9 @@ test.afterEach(async ({ page }) => {
   await backToIndonesian(page);
 });
 
-/** True when the red box of the screen holds the server error (HTTP 500). */
-async function serverError(c: CashierPage): Promise<boolean> {
-  return (await c.error().allInnerTexts().catch(() => [])).some((t) => /React error #441/.test(t));
+/** The red box of the screen when it holds a server failure (HTTP 500 until 2026-10-30, a database error since), else ''. */
+async function serverError(c: CashierPage): Promise<string> {
+  return (await c.error().allInnerTexts().catch(() => [])).find((t) => SERVER_FAILURE.test(t)) ?? '';
 }
 
 /** A refusal: the expected message, or the server-error toast recorded as a deviation. */
@@ -120,9 +120,16 @@ qaTest('TC-APP014-002', async ({ page, qa }) => {
   qa.note(1, `RX invoice of a pharmacy sale of this test: ${rx}`);
   let c = await select(page, rx);
   const due = await c.barValue('Amount due');
-  qa.note(1, `found at once, Draft, Amount due ${due}, lines ${JSON.stringify(await c.lines())}: priced at cost with no tax, because the item price cannot be saved (found blocker 35)`);
-  qa.blocked(1, 35);
-  qa.blocked(2, 35);
+  // Priced with the outpatient item price of the catalogue (margin 25 %, tax 11 %), saved since 2026-10-31 (was found blocker 35).
+  await qa.step(1, async () => {
+    expect((await c.barState()).status).toBe('Draft');
+    expect(due).toBe('Rp 13.875');
+  });
+  await qa.step(2, async () => {
+    const lines = await c.lines();
+    qa.note(2, `lines ${JSON.stringify(lines)}`);
+    expect([lines.Gross, lines.Tax, lines['Patient net']]).toEqual(['Rp 12.500', 'Rp 1.375', 'Rp 13.875']);
+  });
 
   await qa.step(3, async () => {
     await pay(page);
@@ -155,9 +162,10 @@ qaTest('TC-APP014-004', async ({ page, qa }) => {
   let paid = true;
   await qa.step(2, async () => {
     await pay(page);
-    if (await serverError(c)) {
+    const failure = await serverError(c);
+    if (failure) {
       paid = false;
-      qa.note(2, '"Pay" with cash 0: red box "Minified React error #441" (HTTP 500, found blocker 56); the sale stays Draft');
+      qa.note(2, `"Pay" with cash 0: red box "${failure}" (found blocker 56); the sale stays Draft`);
       return qa.blocked(2, 56);
     }
     expect((await c.barState()).status).toBe('Paid');
@@ -191,9 +199,10 @@ qaTest('TC-APP014-010', async ({ page, qa }) => {
   let paid = true;
   await qa.step(3, async () => {
     await pay(page, '0');
-    if (await serverError(c)) {
+    const failure = await serverError(c);
+    if (failure) {
       paid = false;
-      qa.note(3, '"Pay" with cash 0: red box "Minified React error #441" (HTTP 500, found blocker 56); the sale stays Draft');
+      qa.note(3, `"Pay" with cash 0: red box "${failure}" (found blocker 56); the sale stays Draft`);
       return qa.blocked(3, 56);
     }
     expect((await c.barState()).status).toBe('Paid');
@@ -414,9 +423,22 @@ qaTest('TC-APP014-031', async ({ page, qa }) => {
   });
 });
 
-qaTest('TC-APP014-033', async ({ qa }) => {
-  // The RX invoice must be priced with Item price tax 11%: the item price cannot be saved (found blocker 35).
-  qa.blocked(1, 35);
+qaTest('TC-APP014-033', async ({ page, qa }) => {
+  // The RX invoice is priced with the item price of the catalogue (tax 11 %), saved since 2026-10-31 (was found blocker 35).
+  const rx = await rxInvoice(page, qa, { requested: '10', issued: '10' });
+  qa.note(1, `RX invoice of a pharmacy sale of 10: ${rx}`);
+  const c = await select(page, rx);
+  qa.note(1, `before the discount: ${JSON.stringify(await c.lines())}`);
+  await qa.step(1, async () => {
+    await c.field('Discount (IDR)').fill('500');
+    await c.button('Apply discount').click();
+    await expect.poll(async () => (await c.lines()).Discount).toBe('Rp 500');
+    const lines = await c.lines();
+    qa.note(1, `after a discount of 500: ${JSON.stringify(lines)}`);
+    if (lines.Tax !== 'Rp 1.320' || lines['Patient net'] !== 'Rp 13.320') {
+      qa.deviation(1, 'Discount Rp 500, Tax Rp 1.320 (11% of 12,000), Patient net Rp 13.320', `Tax ${lines.Tax}, Patient net ${lines['Patient net']}`);
+    }
+  });
 });
 
 qaTest('TC-APP014-034', async ({ page, qa }) => {

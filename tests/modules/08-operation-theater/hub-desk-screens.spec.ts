@@ -1,6 +1,6 @@
 import { asOnSite } from '../../../lib/i18n';
 import { expect, qaTest, test } from '../../../fixtures/e2e';
-import { installToastRecorder, toastMark } from '../../../lib/assertions';
+import { installToastRecorder, isServerFailure, SERVER_FAILURE, toastMark } from '../../../lib/assertions';
 import { todayWib } from '../../../lib/dates';
 import { OtDeskPage, OtRequestsPage } from '../../../pages/ot/OtPages';
 import { backToIndonesian, switchLanguage } from '../shared/language';
@@ -175,6 +175,8 @@ qaTest('TC-APP008-039', async ({ page, qa }) => {
   const room = qa.code('X-OK1');
   const p = procedure(qa, qa.prefix('X Apendektomi'));
   await request(page, { procedure: p, room, start: `${day}T08:00`, end: `${day}T09:00` });
+  // Since 2026-10-31 a slot is shifted only for a validated request ("drag reschedules a validated request").
+  expect((await act(page, p, 'Validate')).some((t) => SERVER_FAILURE.test(t))).toBe(false);
   expect(await act(page, p, 'Place on calendar')).toContain('Scheduled');
   const slot = desk.main.getByRole('button').filter({ hasText: room });
 
@@ -190,6 +192,7 @@ qaTest('TC-APP008-039', async ({ page, qa }) => {
     await expect(slot).toContainText(`${day}T08:00`);
   });
 
+  let shifted = true;
   await qa.step(3, async () => {
     // "Shift one hour" is a drop zone: the slot is dragged onto it.
     const shift = desk.main.getByRole('button', { name: 'Shift one hour' });
@@ -198,10 +201,14 @@ qaTest('TC-APP008-039', async ({ page, qa }) => {
     qa.note(3, '"Shift one hour" is a drop zone under the slots; the slot is dragged onto it');
     const toasts = await toastsAfter(page, mark);
     qa.note(3, `toast "${toasts.join(' / ')}"`);
-    expect(toasts).not.toContain('Saved');
-    await expect(slot).toContainText(`${day}T08:00`);
+    if (isServerFailure(toasts)) {
+      shifted = false;
+      return;
+    }
+    expect(toasts).toContain('Saved');
+    await expect(slot).toContainText(`${day}T09:00`);
   });
-  qa.blocked(3, 32);
+  if (!shifted) qa.blocked(3, 32);
 });
 
 qaTest('TC-APP008-040', async ({ page, qa }) => {

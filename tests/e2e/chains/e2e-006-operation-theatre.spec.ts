@@ -1,5 +1,5 @@
 import { chainTest, expect } from '../../../fixtures/chain';
-import { installToastRecorder, toastMark } from '../../../lib/assertions';
+import { installToastRecorder, toastMark, SERVER_FAILURE } from '../../../lib/assertions';
 import { OT } from '../../../lib/ot-data';
 import { OtDeskPage, OtRequestsPage } from '../../../pages/ot/OtPages';
 import { act, cellsOf, dossier, full, toastsAfter } from '../../modules/08-operation-theater/helpers';
@@ -9,7 +9,7 @@ import { act, cellsOf, dossier, full, toastsAfter } from '../../modules/08-opera
  * surgeon and the blocked amount of RQ-PREP) goes from the calendar through the
  * surgical case, its dossier and consumption; the billing policy is set last.
  */
-const SERVER_ERROR = /React error #441/;
+const SERVER_ERROR = SERVER_FAILURE;
 
 chainTest('E2E-006', async ({ page, chain }) => {
   await installToastRecorder(page);

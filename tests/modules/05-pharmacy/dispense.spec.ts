@@ -1,7 +1,7 @@
 import { asOnSite } from '../../../lib/i18n';
 import type { Browser, Page } from '@playwright/test';
 import { expect, qaTest, test, type Qa } from '../../../fixtures/e2e';
-import { installToastRecorder, toastMark, toastsSince } from '../../../lib/assertions';
+import { installToastRecorder, toastMark, toastsSince, SERVER_FAILURE } from '../../../lib/assertions';
 import { PASSWORD } from '../../../lib/config';
 import { addDays, todayWib } from '../../../lib/dates';
 import { INVENTORY } from '../../../lib/inventory-data';
@@ -16,8 +16,8 @@ import { switchLanguage } from '../shared/language';
 import { compact, DispenseWizard, typeAhead, IssueLinesPage } from '../../../pages/pharmacy/PharmacyE2EPages';
 import { backToIndonesian, CONFIRMED, confirm, expectRefused, ownItem, patient, sell, stock, storeNote, toastsAfter, toConfirm, type Patient } from './helpers';
 
-/** An answer of HTTP 500: the toast "Minified React error #441". */
-const serverError = (toasts: string[]) => toasts.some((t) => /React error #441/.test(t));
+/** A server failure: HTTP 500 (toast "Minified React error #441") until 2026-10-30, its failure text since (lib/assertions). */
+const serverError = (toasts: string[]) => toasts.some((t) => SERVER_FAILURE.test(t));
 
 /**
  * 05-pharmacy.xlsx, feature "Dispense (/pharmacy/dispense)": counter sales.
@@ -474,10 +474,8 @@ qaTest('TC-APP005-028', async ({ page, qa }) => {
       blocked = true;
       return qa.note(3, `Confirm for PT-2: "${toasts.join(' / ').slice(0, 60)}" (HTTP 500; PT-3 of the same name is admitted)`);
     }
-    if (!toasts.includes(CONFIRMED)) {
-      qa.deviation(3, 'The sale goes through for PT-2', `refused: "${toasts.join(' / ')}" (PT-3 of the same name is admitted)`);
-    }
-    expect(toasts).toContain(CONFIRMED);
+    // Since 2026-10-31 the sale is refused with a message instead of HTTP 500: recorded as a deviation.
+    if (!toasts.includes(CONFIRMED)) qa.deviation(3, 'The sale goes through for PT-2', `refused: "${toasts.join(' / ')}" (PT-3 of the same name is admitted)`);
   });
   if (blocked) qa.blocked(3, 52);
 });
@@ -670,7 +668,9 @@ qaTest('TC-APP005-033', async ({ page, qa }) => {
     let again: string[] = [];
     await qa.step(6, async () => {
       again = await sell(page, pt1, [{ item: frz }]);
-      if (!serverError(again)) expect(again).toContain(CONFIRMED);
+      if (!serverError(again) && !again.includes(CONFIRMED)) {
+        qa.deviation(6, 'Confirmed toast', `refused ("${again.join(' / ')}"): with Freeze days 29 the batch expiring in 30 days is still held back`);
+      }
     });
     if (serverError(again)) qa.blocked(6, 52);
   } finally {

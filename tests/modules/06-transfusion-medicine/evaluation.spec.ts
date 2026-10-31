@@ -1,12 +1,12 @@
 import type { Locator, Page } from '@playwright/test';
 import { expect, qaTest, test, type Qa } from '../../../fixtures/e2e';
-import { installToastRecorder } from '../../../lib/assertions';
+import { installToastRecorder, isServerFailure } from '../../../lib/assertions';
 import { ensureBloodbankDepartment } from '../../../lib/bloodbank-data';
 import { authFileOf } from '../../../lib/config';
 import { addDays, todayWib } from '../../../lib/dates';
 import { RequestsPage, StockPage } from '../../../pages/bloodbank/BloodBankPages';
 import { userPage } from '../shared/access';
-import { NO_UNIT, save, savedRequest } from './cases';
+import { NO_UNIT, openRequest, save, savedRequest } from './cases';
 
 /**
  * 06-transfusion-medicine.xlsx, the journeys marked "Needs Evaluation"
@@ -67,9 +67,9 @@ qaTest('TC-APP006-013', async ({ page, qa }) => {
     await expect(d.getByText('Cell and serum reactions take the group from the active chart.')).toBeVisible();
     const fields = await d.getByRole('textbox').evaluateAll((es) => es.map((e) => (e as HTMLInputElement).labels?.[0]?.innerText ?? e.getAttribute('aria-label') ?? '').filter((l) => !/^(DU|Disc) |^Reason$/.test(l)));
     qa.note(1, `reaction fields: ${fields.join(', ') || 'none'}`);
-    if (!fields.length) qa.deviation(1, 'A field per column of the branch', 'no reaction field: the chart has no saved column (found blocker 25)');
+    if (!fields.length) qa.deviation(1, 'A field per column of the branch', 'no reaction field on the intake bag, although the chart of the branch has its columns (anti_a … cell_o) and an O Positive row since 2026-10-31');
   });
-  blockedAll(qa, [2, 3, 4, 5], 25, 'no reaction can be typed: the blood group chart of the branch cannot be saved (found blocker 25); DN-1 is made on Donors (blocker 2)');
+  blockedAll(qa, [2, 3, 4, 5], 2, 'no reaction can be typed on an intake bag: a collected bag of DN-1 is made on Donors (HTTP 500, checklist blocker 2)');
 });
 
 qaTest('TC-APP006-014', async ({ page, qa }) => {
@@ -94,25 +94,11 @@ qaTest('TC-APP006-015', async ({ page, qa }) => {
   blockedAll(qa, [2, 3, 4], 2, 'needs the collected whole-blood bag QAWB-00001 with a donation date (Donors answers HTTP 500, checklist blocker 2)');
 });
 
-/** Opens a request of the List tab by its number; returns the form. */
-async function openRequest(page: Page, number: string): Promise<Locator> {
-  const req = new RequestsPage(page);
-  await req.open();
-  await req.tab('List');
-  const row = req.main.getByRole('row').filter({ hasText: number }).first();
-  await row.waitFor({ timeout: 10_000 });
-  const open = row.getByRole('button').first();
-  await ((await open.count()) ? open : row).click();
-  const d = page.getByRole('dialog').last();
-  await expect(d).toBeVisible();
-  return d;
-}
-
-/** Clicks a button of the request form; HTTP 500 ("Minified React error #441") blocks the step by 25. Returns the toasts, or null when blocked. */
+/** Clicks a button of the request form; a server failure (isServerFailure) blocks the step by 25. Returns the toasts, or null when blocked. */
 async function act(page: Page, qa: Qa, step: number, d: Locator, button: string): Promise<string[] | null> {
   const toasts = await save(page, d, button);
   qa.note(step, `${button}: "${toasts.join(' / ') || 'no toast'}"`);
-  if (toasts.some((t) => /React error #441/.test(t))) {
+  if (isServerFailure(toasts)) {
     qa.blocked(step, 25);
     return null;
   }
@@ -150,7 +136,7 @@ qaTest('TC-APP006-026', async ({ qa }) => {
 });
 
 qaTest('TC-APP006-044', async ({ qa }) => {
-  blockedAll(qa, [1, 2, 3], 25, 'no reaction can be typed: the blood group chart of the branch cannot be saved (found blocker 25)');
+  blockedAll(qa, [1, 2, 3], 2, 'no reaction can be typed on an intake bag: a collected bag with open grouping is made on Donors (HTTP 500, checklist blocker 2)');
   blockedAll(qa, [4, 5], 2, "needs the donor's earlier donation (A Positive) made on Donors (HTTP 500, checklist blocker 2)");
 });
 
@@ -221,9 +207,26 @@ qaTest('TC-APP006-053', async ({ page, qa, browser }) => {
   }
 });
 
-qaTest('TC-APP006-054', async ({ qa }) => {
-  qa.blocked(1, 25);
-  qa.note(1, 'needs an approved line: approving a request answers HTTP 500 (found blocker 25)');
+qaTest('TC-APP006-054', async ({ page, qa }) => {
+  // An approved line: since 2026-10-31 a second user's approval saves (was found blocker 25).
+  const { patient, approved } = await savedRequest(page, qa);
+  if (!approved) {
+    qa.blocked(1, 25);
+    qa.note(1, 'needs an approved line: the request is not approved (found blocker 25)');
+  } else {
+    await qa.step(1, async () => {
+      const req = new RequestsPage(page);
+      await req.open();
+      await req.tab('Queue');
+      await req.main.getByRole('button', { name: 'Search' }).click();
+      await req.queueTable().getByRole('row').filter({ hasText: patient.fullName }).getByRole('button').first().click();
+      const d = page.getByRole('dialog', { name: 'Cross-match and issue' });
+      await expect(d.getByRole('button', { name: 'Accept', exact: true })).toBeVisible();
+      qa.note(1, `the line before "Accept": "${(await d.innerText()).replace(/\s+/g, ' ').slice(0, 200)}"`);
+      const crossMatch = d.getByRole('button', { name: 'Cross-match', exact: true });
+      if (await crossMatch.isVisible()) qa.deviation(1, 'The cross-match fields are not shown before the line is accepted', '"Cross-match" is offered before "Accept"');
+    });
+  }
   blockedAll(qa, [2, 3, 4, 5], 2, `needs UNIT-1 (O Positive) and UNIT-A (A Positive); ${NO_UNIT}`);
 });
 

@@ -1,6 +1,6 @@
 import type { Browser, Page } from '@playwright/test';
 import { expect, qaTest, test, type Qa } from '../../../fixtures/e2e';
-import { installToastRecorder } from '../../../lib/assertions';
+import { installToastRecorder, SERVER_FAILURE } from '../../../lib/assertions';
 import { BILLING } from '../../../lib/billing-data';
 import { PHARMACY, stockOf, total } from '../../../lib/pharmacy-data';
 import { CashierPage } from '../../../pages/billing/CashierPage';
@@ -151,17 +151,24 @@ qaTest('TC-APP014-009', async ({ page, qa, browser }) => {
   const before = { available: await c.barValue('Available'), due: await c.barValue('Amount due') };
   let refused = false;
   let notHeld = false;
+  let noChain = false;
   await qa.step(1, async () => {
     await c.field('Refund (IDR)').fill('150000');
     await c.button('Refund payment').click();
     await page.waitForLoadState('networkidle').catch(() => {});
     const st = (await c.barState()).status;
     const text = (await page.locator('body').innerText()).replace(/\s+/g, ' ');
-    qa.note(1, `status "${st}"; Available ${await c.barValue('Available')}, Amount due ${await c.barValue('Amount due')}`);
-    if (/React error #441/.test(text)) {
+    const box = (await c.error().allInnerTexts().catch(() => [])).join(' / ');
+    qa.note(1, `status "${st}"; Available ${await c.barValue('Available')}, Amount due ${await c.barValue('Amount due')}${box ? `; red box "${box}"` : ''}`);
+    if (SERVER_FAILURE.test(box) || SERVER_FAILURE.test(text)) {
       refused = true;
-      qa.note(1, '"Refund payment" of 150,000 (limit 100,000): red box "Minified React error #441" (HTTP 500, found blocker 56)');
+      qa.note(1, `"Refund payment" of 150,000 (limit 100,000): red box "${box || 'Minified React error #441'}" (found blocker 56)`);
       return qa.blocked(1, 56);
+    }
+    // Since 2026-10-31: "this amount waits for the billing discount approval chain", and the chain is not set up (found blocker 34).
+    if (st !== WAITING && /approval chain/i.test(box)) {
+      noChain = true;
+      return;
     }
     if (st !== WAITING) {
       notHeld = true;
@@ -172,6 +179,10 @@ qaTest('TC-APP014-009', async ({ page, qa, browser }) => {
   });
   if (refused) {
     for (const st of [2, 3, 4]) qa.blocked(st, 56);
+    return;
+  }
+  if (noChain) {
+    for (const st of [1, 2, 3, 4]) qa.blocked(st, 34);
     return;
   }
   if (notHeld) {

@@ -4,8 +4,9 @@ import { test, expect } from '../../../fixtures/e2e';
 import { registerPatient } from '../../../lib/ambulatory-data';
 import { RequestsPage } from '../../../pages/bloodbank/BloodBankPages';
 import { BLOODBANK } from '../../../lib/bloodbank-data';
-import type { Page } from '@playwright/test';
+import type { Locator, Page } from '@playwright/test';
 import type { Qa } from '../../../fixtures/e2e';
+import { userPage } from '../shared/access';
 
 /**
  * Test cases of 06-transfusion-medicine that end-to-end chains run too (tests/e2e/chains/):
@@ -72,7 +73,7 @@ export const TC_APP006_022 = async ({ page, qa }: CaseArgs): Promise<void> => {
   if (!approved) {
     for (const s of [1, 2, 3, 4]) qa.blocked(s, 25);
     for (const s of [5, 6]) qa.blocked(s, 2);
-    test.skip(true, 'Blocker 25 (found by automation, docs/qa/blockers-found.md): a request cannot be approved (HTTP 500)');
+    test.skip(true, 'Blocker 25 (found by automation, docs/qa/blockers-found.md): a request cannot be approved');
   }
   await req.open();
   const d = page.getByRole('dialog', { name: 'Cross-match and issue' });
@@ -92,7 +93,7 @@ export const TC_APP006_022 = async ({ page, qa }: CaseArgs): Promise<void> => {
   });
 
   await qa.step(3, async () => {
-    await d.getByRole('textbox', { name: /Remarks/ }).fill('OK');
+    await d.getByRole('textbox', { name: 'Remarks', exact: true }).fill('OK');
     expect(await save(page, d, 'Accept')).toContain('Request accepted');
   });
 
@@ -134,16 +135,37 @@ export async function savedRequest(page: Page, qa: Qa, component = 'PRC', approv
   // After the save the dialog stays open without its title and shows the number and the status.
   const saved = req.savedRequestDialog();
   const number = (await saved.getByText(/^RQ\d+$/).first().innerText()).trim();
-  // Preconditions "an approved request": approved here by its author; today the site answers HTTP 500 (found blocker 25).
+  // Preconditions "an approved request". Since 2026-10-31 the author is refused ("a different user must approve", TC-APP006-053)
+  // and another user's approval saves (TC-APP006-021): U4 approves. Before, every approval answered HTTP 500 (found blocker 25).
   let approved = (await saved.getByText('Approved', { exact: true }).count()) > 0;
-  if (approve && !approved && (await saved.getByRole('button', { name: 'Approve' }).isVisible())) {
-    const mark = await toastMark(page);
-    await saved.getByRole('button', { name: 'Approve' }).click();
-    const toasts = await toastsAfter(page, mark);
-    approved = !toasts.some((t) => /React error #441/.test(t)) && (await saved.getByText('Approved', { exact: true }).count()) > 0;
-  }
   await saved.getByRole('button', { name: 'Close' }).click();
+  const browser = page.context().browser();
+  if (approve && !approved && browser) {
+    const other = await userPage(browser, 'U4');
+    try {
+      const d = await openRequest(other, number);
+      const toasts = await save(other, d, 'Approve');
+      approved = toasts.includes('Request approved');
+      qa.note(1, `request ${number} approved by U4: "${toasts.join(' / ') || 'no toast'}"`);
+    } finally {
+      await other.context().close();
+    }
+  }
   return { patient: p, number, approved };
+}
+
+/** Opens a request of the List tab by its number; returns the form. */
+export async function openRequest(page: Page, number: string): Promise<Locator> {
+  const req = new RequestsPage(page);
+  await req.open();
+  await req.tab('List');
+  const row = req.main.getByRole('row').filter({ hasText: number }).first();
+  await row.waitFor({ timeout: 10_000 });
+  const open = row.getByRole('button').first();
+  await ((await open.count()) ? open : row).click();
+  const d = page.getByRole('dialog').last();
+  await expect(d).toBeVisible();
+  return d;
 }
 
 export async function toastsAfter(page: Page, mark: number): Promise<string[]> {

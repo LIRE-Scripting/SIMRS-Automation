@@ -1,4 +1,4 @@
-import { toastsSince, toastMark, toastLocator } from '../../../lib/assertions';
+import { isServerFailure, toastsSince, toastMark, toastLocator } from '../../../lib/assertions';
 import { test, expect } from '../../../fixtures/e2e';
 import { STAND_IN_STORE_2, STAND_IN_STORE, INVENTORY } from '../../../lib/inventory-data';
 import { todayWib, addDays } from '../../../lib/dates';
@@ -179,13 +179,15 @@ export async function newItem(page: Page, qa: Qa): Promise<string> {
   return code;
 }
 
-/** Saves an indent between the two stand-in stores; on HTTP 500 the given steps are blocked (blocker 26) and the test is skipped. */
+/** Saves an indent between the two stand-in stores; on a server failure the given steps are blocked (blocker 26) and the test is skipped. */
 export async function indentOrBlock(f: StoreFormsPage, qa: Qa, item: string, steps: number[]): Promise<string> {
-  await f.fill({ Store: STAND_IN_STORE_2.code, 'To store': STAND_IN_STORE.code, Item: item, Quantity: '10', Document: '' });
+  // "Store" is the store that supplies (its stock is issued, seen 2026-10-31: the other way round the issue is refused
+  // "not enough stock"), "To store" the one that asks: X-ST1 (the opening stock) and X-ST2 of the workbook.
+  await f.fill({ Store: STAND_IN_STORE.code, 'To store': STAND_IN_STORE_2.code, Item: item, Quantity: '10', Document: '' });
   const toasts = await click(f, 'indent');
   if (isServerError(toasts)) {
     for (const s of steps) qa.blocked(s, 26);
-    test.skip(true, 'Blocker 26 (found by automation, docs/qa/blockers-found.md): an indent between two stores answers HTTP 500');
+    test.skip(true, 'Blocker 26 (found by automation, docs/qa/blockers-found.md): an indent between two stores cannot be saved');
   }
   expect(toasts).toContain('Saved.');
   return lastId(f, 'indent', item);
@@ -204,12 +206,14 @@ export async function opening(page: Page, qa: Qa) {
   return { f, item, batch, toasts };
 }
 
-/** The id shown on the newest line of a kind ("indent open <item> <id>"). */
+/** The id shown on the newest line of a kind ("indent open <item> <id>"); the list may show a new line a few seconds after "Saved.". */
 export async function lastId(f: StoreFormsPage, kind: string, item: string): Promise<string> {
-  const text = await f.main.innerText();
-  const m = [...text.matchAll(new RegExp(`${kind}\\s+\\w+\\s+${item}\\s+([0-9a-f-]{36})`, 'g'))].pop();
-  if (!m) throw new Error(`No "${kind}" line for ${item}`);
-  return m[1];
+  const line = new RegExp(`${kind}\\s+\\w+\\s+${item}\\s+([0-9a-f-]{36})`, 'g');
+  let id = '';
+  await expect
+    .poll(async () => (id = [...(await f.main.innerText()).matchAll(line)].pop()?.[1] ?? ''), { timeout: 15_000, message: `No "${kind}" line for ${item}` })
+    .not.toBe('');
+  return id;
 }
 
 /** An item of the catalogue made unique for this test. */
@@ -227,4 +231,4 @@ export async function toastsAfter(page: Page, mark: number): Promise<string[]> {
   return toastsSince(page, mark);
 }
 
-export const isServerError = (toasts: string[]) => toasts.some((t) => /React error #441/.test(t));
+export const isServerError = isServerFailure;

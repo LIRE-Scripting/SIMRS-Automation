@@ -3,6 +3,7 @@ import { todayWib, addDays } from '../../../lib/dates';
 import { expect } from '../../../fixtures/e2e';
 import type { Page } from '@playwright/test';
 import type { Qa } from '../../../fixtures/e2e';
+import { SERVER_FAILURE } from '../../../lib/assertions';
 
 /**
  * Test cases of 13-dietary that end-to-end chains run too (tests/e2e/chains/):
@@ -48,7 +49,11 @@ export const TC_APP013_034 = async ({ page, qa }: CaseArgs): Promise<void> => {
 
 export const TC_APP013_040 = async ({ page, qa }: CaseArgs): Promise<void> => {
   const o = orders(page);
-  const name = qa.name('X Pasien Diet');
+  // "Calculate" and "Diet orders" act on the first prescription of the list, sorted by patient name (TBD of the
+  // workbook). Since 2026-10-31 an assessed or ordered first line is refused ("prescription is not pending"), so the
+  // name of the workbook gets a countdown that sorts this run's prescription before every earlier one.
+  const name = `QA-Pasien 0${String(1e13 - Date.now()).padStart(13, '0')} Diet ${qa.token()}`;
+  qa.note(2, `patient name "${name}" for "X Pasien Diet": the first line of the list is the one assessed and ordered`);
 
   await qa.step(1, async () => {
     await page.goto('/id/diet');
@@ -66,8 +71,8 @@ export const TC_APP013_040 = async ({ page, qa }: CaseArgs): Promise<void> => {
   let calculated = true;
   await qa.step(3, async () => {
     const toasts = await click(page, o.calculate);
-    if (toasts.some((t) => /React error #441/.test(t))) {
-      // "Calculate" answers HTTP 500 (found blocker 49): no prescription is assessed.
+    if (toasts.some((t) => SERVER_FAILURE.test(t))) {
+      // "Calculate" fails on the server (found blocker 49): no prescription is assessed.
       calculated = false;
       return qa.note(3, `"Calculate": "${toasts.join(' / ').slice(0, 80)}"; the first line reads "${(await o.lines().first().innerText()).trim()}"`);
     }
@@ -75,6 +80,7 @@ export const TC_APP013_040 = async ({ page, qa }: CaseArgs): Promise<void> => {
     await o.open();
     const first = (await o.lines().first().innerText()).trim();
     qa.note(3, `first line after Calculate: "${first}"; this test's line: "${(await o.line(name).innerText()).trim()}"`);
+    await expect(o.line(name)).toContainText('assessed');
   });
   if (!calculated) qa.blocked(3, 49);
   await qa.step(4, async () => {

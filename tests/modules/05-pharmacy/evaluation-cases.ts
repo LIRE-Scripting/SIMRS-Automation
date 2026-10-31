@@ -11,6 +11,8 @@ import { ConsultationPage } from '../../../pages/clinical/ConsultationPage';
 import { LoginPage } from '../../../pages/LoginPage';
 import { DispenseWizard, IssueLinesPage, OrdersPage } from '../../../pages/pharmacy/PharmacyE2EPages';
 import { WardSupply } from '../04-inpatient/helpers';
+import { marginOnSite, saveItemPrice } from '../14-hospital-accounts/helpers';
+import { BILLING } from '../../../lib/billing-data';
 import { authorise, placeRestricted, remark } from '../03-patient-care/cases';
 import { signedOutJourney, userPage } from '../shared/access';
 import { CONFIRMED, expectRefused, ownItem, patient, sell, stock, storeNote, toConfirm, toastsAfter } from './helpers';
@@ -318,9 +320,21 @@ export const TC_APP005_035 = async ({ page, qa }: { page: Page; qa: Qa }): Promi
     expect(await row().count()).toBe(0);
     expect(total(after)).toBe(total(before));
   });
-  qa.blocked(3, 35);
-  qa.blocked(4, 35);
-  qa.note(3, 'a sales price for an item cannot be saved on the branch (found blocker 35), so the price below cost cannot be set up');
+  // The item price of the branch saves since 2026-10-31 (was found blocker 35). The sales price of 900 is set for an
+  // item of this test with the last cost of QA-PARA (1,000), so that the shared QA-PARA keeps its price.
+  const below = await ownItem(page, qa, para.code, para.name, [{ quantity: '5', expiry: addDays(todayWib(), 300) }]);
+  qa.note(3, `an item of this test (${below.code}, last cost ${below.lastCost}) stands in for QA-PARA`);
+  await qa.step(3, async () => {
+    const saved = await saveItemPrice(page, { salesPrices: [{ item: below.code, price: '900' }] });
+    qa.note(3, `after "Save price": sales prices ${saved.salesPrices.join(', ') || 'none'}`);
+    expect(saved.salesPrices).toContain(below.code);
+  });
+  await qa.step(4, async () => {
+    const toasts = await sell(page, pt, [{ item: below, requested: '1', issued: '1' }]);
+    qa.note(4, `sale: "${toasts.join(' / ')}"`);
+    if (toasts.includes(CONFIRMED)) qa.deviation(4, 'Refusal containing "dispensing item with lesser rate than cost is not allowed"', 'the sale is confirmed');
+    else expectRefused(qa, 4, toasts, 'lesser rate than cost');
+  });
 };
 
 export const TC_APP005_038 = async ({ page, qa }: { page: Page; qa: Qa }): Promise<void> => {
@@ -414,21 +428,58 @@ export const TC_APP005_039 = async ({ page, qa }: { page: Page; qa: Qa }): Promi
 };
 
 export const TC_APP005_040 = async ({ page, qa }: { page: Page; qa: Qa }): Promise<void> => {
-  qa.blocked(1, 35);
-  qa.note(1, 'the outpatient price (site margin) of the branch cannot be saved (found blocker 35): the sale is priced at cost and the margin cannot be changed');
+  // The item price of the branch saves since 2026-10-31 (was found blocker 35); it is set back to the catalogue's
+  // price (cost plus margin 25 %, tax 11 %) at the end. Items of this test stand in for QA-PARA and QA-IBU.
   const it = await ownItem(page, qa, para.code, para.name, [{ quantity: '10', expiry: addDays(todayWib(), 400) }]);
+  const ibu = await ownItem(page, qa, PHARMACY.ibu.code, PHARMACY.ibu.name, [{ quantity: '5', expiry: addDays(todayWib(), 400) }]);
   const pt = await patient(page, qa);
   expect(await sell(page, pt, [{ item: it, requested: '10', issued: '10' }])).toContain(CONFIRMED);
-  await qa.step(2, async () => {
-    const { row } = await issueRows(page, it.name);
-    await row().getByRole('spinbutton').first().fill('10');
+  expect(await sell(page, pt, [{ item: ibu, requested: '1', issued: '1' }])).toContain(CONFIRMED);
+  /** Returns a line; null when Issue Lines does not list it (it leaves new lines out for a while, found blocker 51). */
+  const giveBack = async (name: string, quantity: string): Promise<string[] | null> => {
+    const { row } = await issueRows(page, name);
+    if (!(await row().count())) return null;
+    await row().getByRole('spinbutton').first().fill(quantity);
     const mark = await toastMark(page);
     await row().getByRole('button', { name: 'Return' }).click();
-    expect(await toastsAfter(page, mark)).toContain('Returned.');
-  });
-  qa.blocked(3, 13);
-  qa.blocked(4, 35);
-  qa.blocked(5, 35);
+    return toastsAfter(page, mark);
+  };
+  try {
+    await qa.step(1, async () => {
+      const saved = await saveItemPrice(page, { margin: '50' });
+      qa.note(1, `Site margin after "Save price": ${saved.margin} (50 % is typed ${marginOnSite('50')})`);
+      expect(saved.margin).toBe(marginOnSite('50'));
+    });
+    let listed = true;
+    await qa.step(2, async () => {
+      const toasts = await giveBack(it.name, '10');
+      if (!toasts) {
+        listed = false;
+        return qa.note(2, `Issue Lines does not list the sale of ${it.code} (found blocker 51)`);
+      }
+      expect(toasts).toContain('Returned.');
+    });
+    if (!listed) qa.blocked(2, 51);
+    let ibuListed = true;
+    qa.blocked(3, 13);
+    await qa.step(4, async () => {
+      const saved = await saveItemPrice(page, { method: 'Sales price list' });
+      qa.note(4, `method after "Save price": ${saved.method}; no sales price for ${ibu.code}`);
+      expect(saved.method).toBe('list');
+    });
+    await qa.step(5, async () => {
+      const toasts = await giveBack(ibu.name, '1');
+      if (!toasts) {
+        ibuListed = false;
+        return qa.note(5, `Issue Lines does not list the sale of ${ibu.code} (found blocker 51)`);
+      }
+      qa.note(5, `return of 1 ${ibu.code}: "${toasts.join(' / ')}"`);
+      if (!toasts.includes('That quantity cannot be returned.')) qa.deviation(5, 'Current behaviour: toast "That quantity cannot be returned."', `toast "${toasts.join(' / ')}"`);
+    });
+    if (!ibuListed) qa.blocked(5, 51);
+  } finally {
+    await saveItemPrice(page, { method: 'Cost plus margin', margin: BILLING.itemPrice.margin, tax: BILLING.itemPrice.tax });
+  }
 };
 
 export const TC_APP005_043 = ({ qa, browser }: { qa: Qa; browser: Browser }) => signedOutJourney(browser, qa, '/pharmacy/orders', /\/(id|en)\/pharmacy\/orders/);

@@ -1,5 +1,5 @@
 import { chainTest, expect } from '../../../fixtures/chain';
-import { installToastRecorder, toastMark } from '../../../lib/assertions';
+import { installToastRecorder, toastMark, SERVER_FAILURE } from '../../../lib/assertions';
 import { OtDeskPage, OtRequestsPage } from '../../../pages/ot/OtPages';
 import { act, cellsOf, full, procedure, toastsAfter } from '../../modules/08-operation-theater/helpers';
 import { Patients } from '../../modules/15-emergency/helpers';
@@ -96,7 +96,7 @@ chainTest('E2E-023', async ({ page, chain }) => {
     });
     await qa.step(2, async () => {
       const toasts = await act(page, r.procedure, 'Pre-anesthesia');
-      expect(toasts.some((t) => /React error #441/.test(t))).toBe(false);
+      expect(toasts.some((t) => SERVER_FAILURE.test(t))).toBe(false);
     });
     await qa.step(3, async () => {
       await act(page, r.procedure, 'Start');

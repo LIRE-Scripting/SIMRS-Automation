@@ -8,6 +8,7 @@ import { PurchaseOrdersPage, ProcurementDeskPage } from '../../../pages/procurem
 import { backToIndonesian, switchLanguage } from '../shared/language';
 import { screenOpens } from '../shared/screen-opens';
 import { sourceOnSite } from '../../../lib/i18n';
+import { SEED_SUPPLIER } from './cases';
 
 /**
  * 09-procurement.xlsx: hub and language (011, 013), Suppliers and requests
@@ -144,7 +145,7 @@ async function approvedOrder(page: Page, qa: Qa): Promise<string> {
   const desk = new ProcurementDeskPage(page);
   const no = qa.code('X-PO');
   await desk.open('requests', 'Purchase orders');
-  await desk.input('Supplier').fill('PT Enseval');
+  await desk.input('Supplier').fill(SEED_SUPPLIER);
   await desk.input('Number').fill(no);
   await desk.input('Item').fill('QA-PARA');
   expect(await press(desk, 'order')).toContain('Saved.');

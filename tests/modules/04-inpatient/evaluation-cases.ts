@@ -1,7 +1,7 @@
 import type { Browser, BrowserContext, Locator, Page } from '@playwright/test';
 import { expect, test, type Qa } from '../../../fixtures/e2e';
 import { registerPatient, registerTwins } from '../../../lib/ambulatory-data';
-import { installToastRecorder, toastMark, toastsSince } from '../../../lib/assertions';
+import { installToastRecorder, toastMark, toastsSince, SERVER_FAILURE } from '../../../lib/assertions';
 import { CLINICAL } from '../../../lib/clinical-data';
 import { PASSWORD } from '../../../lib/config';
 import { userLogin } from '../../../lib/qa-data';
@@ -318,7 +318,7 @@ export const TC_APP004_026 = async ({ page, qa, browser }: { page: Page; qa: Qa;
       const toasts = await clicked(page, admitButton(adm));
       qa.note(2, `admit into ${bed}, occupied a moment ago: "${toasts.join(' / ') || 'no toast'}"`);
       if (toasts.includes('Patient admitted')) qa.deviation(2, 'A clear message that the bed is occupied. Nothing is saved', 'admitted into the occupied bed');
-      else if (toasts.some((x) => /React error #441/.test(x))) qa.deviation(2, 'A clear message that the bed is occupied', 'a server error toast ("Minified React error #441", HTTP 500)');
+      else if (toasts.some((x) => SERVER_FAILURE.test(x))) qa.deviation(2, 'A clear message that the bed is occupied', 'a server error toast ("Minified React error #441", HTTP 500)');
     });
     await qa.step(3, async () => {
       if (await adm.wizard.isVisible()) await adm.wizard.getByRole('button', { name: /Close|Cancel/ }).first().click().catch(() => {});
@@ -507,7 +507,7 @@ export const TC_APP004_040 = async ({ page, qa, browser }: { page: Page; qa: Qa;
       const red = await d.locator('[role="alert"], .text-red-600, .text-destructive').count();
       qa.note(2, `the second discharge of the same stay: "${toasts.join(' / ') || 'no toast'}"; ${red} red box(es)`);
       if (toasts.some((x) => /Discharge recorded/i.test(x))) qa.deviation(2, 'Refused with a red box; nothing changes', 'the discharge is recorded a second time');
-      else if (!red && toasts.some((x) => /React error #441/.test(x))) qa.deviation(2, 'Refused with a red box; nothing changes', 'a server error toast ("Minified React error #441", HTTP 500) and no red box');
+      else if (!red && toasts.some((x) => SERVER_FAILURE.test(x))) qa.deviation(2, 'Refused with a red box; nothing changes', 'a server error toast ("Minified React error #441", HTTP 500) and no red box');
     });
     await qa.step(3, async () => {
       const b = nurse2.getByRole('dialog').last().getByRole('button', { name: /Chain started/ });

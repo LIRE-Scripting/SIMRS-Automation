@@ -3,9 +3,10 @@ import { toastsSince, toastMark } from '../../../lib/assertions';
 import { registerPatient } from '../../../lib/ambulatory-data';
 import { RegisteredPatientsPage } from '../../../pages/ambulatory/RegisteredPatientsPage';
 import { todayWib } from '../../../lib/dates';
+import { BILLING } from '../../../lib/billing-data';
 import { PHARMACY, stockOf, total } from '../../../lib/pharmacy-data';
 import { test, expect } from '../../../fixtures/e2e';
-import { select, sale, pay, paidSale, ensureSettings, counterClosed } from './helpers';
+import { select, sale, pay, paidSale, ensureSettings, counterClosed, marginOnSite, saveItemPrice } from './helpers';
 import { rupiah, CashierPage } from '../../../pages/billing/CashierPage';
 import type { Qa } from '../../../fixtures/e2e';
 
@@ -409,7 +410,7 @@ export class DeskScreen {
   }
 }
 
-/** TC-APP014-016: Item price of Fast Cashier and an estimate (the price cannot be saved, found blocker 35). */
+/** TC-APP014-016: Item price of Fast Cashier and an estimate. */
 export const TC_APP014_016 = async ({ page, qa }: CaseArgs): Promise<void> => {
   const c = new CashierPage(page);
   await c.open();
@@ -419,8 +420,12 @@ export const TC_APP014_016 = async ({ page, qa }: CaseArgs): Promise<void> => {
     await expect(page.getByRole('combobox', { name: 'Method' })).toBeVisible();
     await expect(page.getByRole('checkbox', { name: 'Block a price below cost' })).toBeVisible();
   });
-  qa.blocked(2, 35);
-  qa.note(2, '"Save price" answers HTTP 500 (found blocker 35): the price stays at cost with no tax');
+  await qa.step(2, async () => {
+    // "Site margin" takes a fraction (marginOnSite): the workbook's 25 is typed 0.25.
+    const saved = await saveItemPrice(page, { method: 'Cost plus margin', margin: BILLING.itemPrice.margin, tax: BILLING.itemPrice.tax });
+    qa.note(2, `after "Save price" and a reload: method ${saved.method}, Site margin ${saved.margin}, Tax ${saved.tax}; a margin of 25 typed as the workbook says is not saved (no message), 0.25 is`);
+    expect([saved.method, saved.margin, saved.tax]).toEqual(['cost_plus', marginOnSite(BILLING.itemPrice.margin), BILLING.itemPrice.tax]);
+  });
   const before = total(await stockOf(page, PHARMACY.para.code));
   await c.open();
   // The card of "Estimate": its heading sits in the card's header.
@@ -447,7 +452,7 @@ export const TC_APP014_016 = async ({ page, qa }: CaseArgs): Promise<void> => {
     await page.waitForLoadState('networkidle').catch(() => {});
     const text = (await estimate.innerText()).replace(/\s+/g, ' ');
     qa.note(4, `estimate: "${text.slice(-160)}"`);
-    if (!text.includes('Rp 13.875')) qa.deviation(4, 'Patient net Rp 12.500, Tax Rp 1.375, Total Rp 13.875', 'priced at cost with no tax (found blocker 35)');
+    if (!text.includes('Rp 13.875')) qa.deviation(4, 'Patient net Rp 12.500, Tax Rp 1.375, Total Rp 13.875', `the estimate reads "${text.slice(-120)}"`);
   });
   await qa.step(5, async () => {
     expect(total(await stockOf(page, PHARMACY.para.code))).toBe(before);

@@ -1,6 +1,6 @@
 import { expect, qaTest, test, type Qa } from '../../../fixtures/e2e';
 import { registerPatient } from '../../../lib/ambulatory-data';
-import { installToastRecorder, toastMark } from '../../../lib/assertions';
+import { installToastRecorder, isServerFailure, toastMark } from '../../../lib/assertions';
 import { BLOODBANK, ensureBloodbankDepartment } from '../../../lib/bloodbank-data';
 import { authFileOf } from '../../../lib/config';
 import { addDays, todayWib } from '../../../lib/dates';
@@ -86,7 +86,7 @@ qaTest('TC-APP006-016', async ({ page, qa }) => {
       Source: 'PMI Kota QA',
     });
     const toasts = await save(page, d);
-    if (toasts.some((t) => /React error #441/.test(t))) return;
+    if (isServerFailure(toasts)) return qa.note(3, `"Save": "${toasts.join(' / ')}" (found blocker 25)`);
     expect(toasts).toContain('External bag received');
     saved = true;
   });
@@ -384,14 +384,14 @@ qaTest('TC-APP006-055', async ({ page, qa }) => {
     qa.blocked(1, 25);
     qa.blocked(2, 25);
     qa.notRun(3, 'needs an approved and accepted line (found blocker 25)');
-    test.skip(true, 'Blocker 25 (found by automation, docs/qa/blockers-found.md): a request cannot be approved (HTTP 500)');
+    test.skip(true, 'Blocker 25 (found by automation, docs/qa/blockers-found.md): a request cannot be approved');
   }
   await req.open();
   await req.tab('Queue');
   await req.main.getByRole('button', { name: 'Search' }).click();
   await req.queueTable().getByRole('row').filter({ hasText: patient.fullName }).getByRole('button').first().click();
   const d = page.getByRole('dialog', { name: 'Cross-match and issue' });
-  await d.getByRole('textbox', { name: /Remarks/ }).fill('OK');
+  await d.getByRole('textbox', { name: 'Remarks', exact: true }).fill('OK');
   expect(await save(page, d, 'Accept')).toContain('Request accepted');
 
   await qa.step(1, async () => {
@@ -421,26 +421,26 @@ qaTest('TC-APP006-057', async ({ page, qa }) => {
     qa.blocked(2, 25);
     qa.blocked(3, 2);
     qa.blocked(4, 2);
-    test.skip(true, 'Blocker 25 (found by automation, docs/qa/blockers-found.md): a request cannot be approved (HTTP 500)');
+    test.skip(true, 'Blocker 25 (found by automation, docs/qa/blockers-found.md): a request cannot be approved');
   }
   await req.open();
   await req.tab('Queue');
   await req.main.getByRole('button', { name: 'Search' }).click();
   await req.queueTable().getByRole('row').filter({ hasText: patient.fullName }).getByRole('button').first().click();
   const d = page.getByRole('dialog', { name: 'Cross-match and issue' });
-  await d.getByRole('textbox', { name: /Remarks/ }).fill('OK');
+  await d.getByRole('textbox', { name: 'Remarks', exact: true }).fill('OK');
   expect(await save(page, d, 'Accept')).toContain('Request accepted');
   qa.note(1, 'line A is an accepted line without a cross-matched unit (no screened unit can be made, blocker 2)');
 
   await qa.step(1, async () => {
-    await d.getByRole('textbox', { name: /Remarks/ }).fill('');
+    await d.getByRole('textbox', { name: 'Stop remarks' }).fill('');
     const toasts = await save(page, d, 'Cancel line');
     expect(toasts).not.toContain('Line cancelled');
     if (!toasts.some((t) => /remarks/i.test(t))) qa.deviation(1, 'Refused: "remarks are required"', `"${toasts.join(' / ')}"`);
   });
 
   await qa.step(2, async () => {
-    await d.getByRole('textbox', { name: /Remarks/ }).fill('Pasien pulang');
+    await d.getByRole('textbox', { name: 'Stop remarks' }).fill('Pasien pulang');
     expect(await save(page, d, 'Cancel line')).toContain('Line cancelled');
   });
 
@@ -487,7 +487,8 @@ qaTest('TC-APP006-029', async ({ page, qa }) => {
     const d = await qc.openDialog('Record');
     await qc.fill(d, { Technician: qa.name('QA Teknisi'), Date: todayWib(), 'Unit no.': unit, Collected: todayWib(), Volume: '280', HCT: '60' });
     const toasts = await save(page, d);
-    if (toasts.some((t) => /React error #441/.test(t))) {
+    if (isServerFailure(toasts)) {
+      qa.note(3, `"Save": "${toasts.join(' / ')}" (found blocker 25)`);
       await d.getByRole('button', { name: 'Close' }).click();
       return;
     }
@@ -519,8 +520,8 @@ qaTest('TC-APP006-062', async ({ page, qa }) => {
   const d = await qc.openDialog('Record');
   await qc.fill(d, { Technician: qa.name('QA Teknisi'), Date: todayWib(), 'Unit no.': qa.code('QA-QC-1'), Collected: todayWib(), Volume: '180' });
   const toasts = await save(page, d);
-  if (toasts.some((t) => /React error #441/.test(t))) {
-    // Every QC save answers HTTP 500 today (found blocker 25), so the out-of-limit case cannot be told apart.
+  if (isServerFailure(toasts)) {
+    // Every QC save fails today (found blocker 25), so the out-of-limit case cannot be told apart.
     qa.blocked(1, 25);
     qa.blocked(2, 25);
     test.skip(true, 'Blocker 25 (found by automation, docs/qa/blockers-found.md): Saving an external bag or a quality-control record answers HTTP 500');
@@ -563,7 +564,9 @@ qaTest('TC-APP006-072', async ({ page, qa }) => {
     // The catalogue gives only the resulting group; the reaction strengths (0 / 4) are assumed (Q21).
     await stock.fill(d, { anti_a: '0', anti_b: '0', anti_ab: '0', anti_d: '4', cell_a: '4', cell_b: '4', cell_o: '0', ABO: 'O', Rh: 'Positive', Group: 'O Positive' });
     const toasts = await save(page, d, 'Save chart');
-    if (toasts.some((t) => /React error #441/.test(t))) return qa.blocked(3, 25);
+    if (isServerFailure(toasts)) return qa.blocked(3, 25);
+    // The row of the catalogue is saved once per branch (since 2026-10-31); a later run is refused as a duplicate.
+    if (toasts.some((t) => /chart already exists/i.test(t))) return qa.note(3, `the O Positive row is already on the chart of the branch: "${toasts.join(' / ')}"`);
     expect(toasts).toContain('Chart saved');
   });
 

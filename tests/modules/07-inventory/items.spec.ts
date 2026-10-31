@@ -1,6 +1,6 @@
 import type { Page } from '@playwright/test';
 import { expect, qaTest, test, type Qa } from '../../../fixtures/e2e';
-import { installToastRecorder, toastLocator, toastMark, toastsSince } from '../../../lib/assertions';
+import { installToastRecorder, toastLocator, toastMark, toastsSince, SERVER_FAILURE } from '../../../lib/assertions';
 import { addDays, todayWib } from '../../../lib/dates';
 import { INVENTORY, STAND_IN_STORE } from '../../../lib/inventory-data';
 import { ItemMasterPage, type Item } from '../../../pages/inventory/InventoryE2EPages';
@@ -240,9 +240,9 @@ qaTest('TC-APP007-007', async ({ page, qa }) => {
     const mark = await toastMark(page);
     await d.getByRole('button', { name: 'Save kit' }).click();
     saved = await toastsAfter(page, mark);
-    if (!saved.some((t) => /React error #441/.test(t))) expect(saved).toContain('Kit saved.');
+    if (!saved.some((t) => SERVER_FAILURE.test(t))) expect(saved).toContain('Kit saved.');
   });
-  if (saved.some((t) => /React error #441/.test(t))) {
+  if (saved.some((t) => SERVER_FAILURE.test(t))) {
     qa.blocked(3, 27);
     qa.blocked(4, 27);
     return;

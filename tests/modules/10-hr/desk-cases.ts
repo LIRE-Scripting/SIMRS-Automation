@@ -2,6 +2,7 @@ import type { Locator, Page } from '@playwright/test';
 import { expect, type Qa } from '../../../fixtures/e2e';
 import { LeavePage } from '../../../pages/hr/HrPages';
 import { toastsOf } from '../shared/access';
+import { SERVER_FAILURE } from '../../../lib/assertions';
 
 /**
  * The HR desk of 10-hr.xlsx (My profile, Year balance) shared by desk.spec.ts
@@ -127,13 +128,14 @@ export const TC_APP010_042 = async ({ page, qa }: CaseArgs): Promise<void> => {
   await qa.step(3, async () => {
     const toasts = await l.save({ ...YEAR, 'Employee no': no, 'Leave / shift': type }, 'Year balance');
     qa.note(3, `Year balance of ${no}, type "${type}": "${toasts.join(' / ').slice(0, 80)}"`);
-    if (!toasts.includes(SAVED) && toasts.some((t) => /React error #441/.test(t))) return;
+    // HTTP 500 until 2026-10-30; since 2026-10-31 "pending approval" for a new employee with no application (found blocker 43).
+    if (!toasts.includes(SAVED) && toasts.some((t) => SERVER_FAILURE.test(t) || /pending approval/i.test(t))) return;
     expect(toasts).toContain(SAVED);
     expect((await l.list(no)).some((r) => r.join(' ').includes(no))).toBe(true);
     balance = true;
   });
   if (!balance) {
-    // The year balance answers HTTP 500 (found blocker 43): nothing to apply, approve or cancel.
+    // The year balance cannot be saved (found blocker 43): nothing to apply, approve or cancel.
     for (const st of [3, 4, 5, 6]) qa.blocked(st, 43);
     return;
   }
@@ -183,10 +185,14 @@ export const TC_APP010_040 = async ({ page, qa }: { page: Page; qa: Qa }): Promi
   let linked = true;
   await qa.step(4, async () => {
     const toasts = await p.save({ 'Employee no': no }, 'Link me');
-    if (toasts.some((t) => /React error #441/.test(t))) {
+    if (toasts.some((t) => SERVER_FAILURE.test(t))) {
       linked = false;
-      qa.note(4, '"Link me": toast "Minified React error #441" (HTTP 500, found blocker 57); U1 was linked to an employee by an earlier run of this test');
+      qa.note(4, `"Link me": "${toasts.join(' / ')}" (found blocker 57); U1 was linked to an employee by an earlier run of this test`);
       return qa.blocked(4, 57);
+    }
+    // Since 2026-10-31 the account that an earlier run linked is refused with a message instead of HTTP 500 (was found blocker 57).
+    if (toasts.some((t) => /duplicate/i.test(t))) {
+      return qa.deviation(4, 'Toast "Saved."', `refused: "${toasts.join(' / ')}": U1 is linked to the employee of an earlier run of this test, and the link is not moved to ${no}`);
     }
     expect(toasts).toContain(SAVED);
   });

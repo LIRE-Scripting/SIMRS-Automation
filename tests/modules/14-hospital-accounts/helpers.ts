@@ -27,15 +27,9 @@ export async function ensureSettings(page: Page): Promise<void> {
     await c.button('Save settings').click();
     await expect(page.getByRole('textbox', { name: 'Tax rate (%)' })).toHaveValue(BILLING.counter['Tax rate (%)']);
   }
-  await page.getByRole('combobox', { name: 'Visit' }).selectOption('Outpatient');
-  const margin = page.getByRole('textbox', { name: 'Site margin' });
-  const tax = page.getByRole('textbox', { name: 'Tax (%)' });
-  if ((await margin.inputValue()) !== BILLING.itemPrice.margin || (await tax.inputValue()) !== BILLING.itemPrice.tax) {
-    await page.getByRole('combobox', { name: 'Method' }).selectOption({ label: 'Cost plus margin' });
-    await margin.fill(BILLING.itemPrice.margin);
-    await tax.fill(BILLING.itemPrice.tax);
-    // "Save price" answers HTTP 500 (found blocker 35); the price stays at cost with no tax.
-    await c.button('Save price').click();
+  const now = await readItemPrice(page);
+  if (now.method !== 'cost_plus' || now.margin !== marginOnSite(BILLING.itemPrice.margin) || now.tax !== BILLING.itemPrice.tax) {
+    await saveItemPrice(page, { method: 'Cost plus margin', margin: BILLING.itemPrice.margin, tax: BILLING.itemPrice.tax });
   }
   await c.open();
   await expect(page.getByRole('textbox', { name: 'Discount cap (IDR)' })).toHaveValue(BILLING.counter['Discount cap (IDR)']);
@@ -122,3 +116,67 @@ export async function holds(page: Page): Promise<{ panel: Locator; rows: Locator
   const rows = panel.locator('xpath=.//*[.//button[normalize-space()="Approve" or normalize-space()="Setujui"] and .//button[normalize-space()="Reject" or normalize-space()="Tolak"]][not(.//*[.//button[normalize-space()="Approve" or normalize-space()="Setujui"] and .//button[normalize-space()="Reject" or normalize-space()="Tolak"]])]');
   return { panel, rows };
 }
+
+/**
+ * "Site margin" of Item price takes a fraction (0.25 for 25 %) while "Tax (%)" takes a percentage: a margin of 25
+ * is not saved, without a message (seen 2026-10-31; until 2026-10-30 every "Save price" answered HTTP 500, found
+ * blocker 35). The workbook's percentages are typed as fractions.
+ */
+export const marginOnSite = (percent: string): string => String(Number(percent) / 100);
+
+/** The card "Item price" of Fast Cashier. */
+export const itemPriceCard = (page: Page): Locator => page.getByRole('heading', { name: 'Item price' }).locator('xpath=../..');
+
+export interface ItemPrice {
+  method?: 'Cost plus margin' | 'Sales price list';
+  /** Site margin in percent, as the workbook gives it. */
+  margin?: string;
+  tax?: string;
+  salesPrices?: { item: string; price: string }[];
+}
+
+export interface SavedItemPrice {
+  method: string;
+  margin: string;
+  tax: string;
+  /** Item codes of the sales prices. */
+  salesPrices: string[];
+}
+
+/** The outpatient item price of the branch as saved: method value ("cost_plus" or "list"), margin as on the site, tax in percent. */
+export async function readItemPrice(page: Page): Promise<SavedItemPrice> {
+  await new CashierPage(page).open();
+  await page.getByRole('combobox', { name: 'Visit' }).selectOption('Outpatient');
+  const margin = page.getByRole('textbox', { name: 'Site margin' });
+  // The values of the visit load after the choice.
+  await page.waitForLoadState('networkidle').catch(() => {});
+  return {
+    method: await page.getByRole('combobox', { name: 'Method' }).inputValue(),
+    margin: await margin.inputValue(),
+    tax: await page.getByRole('textbox', { name: 'Tax (%)' }).inputValue(),
+    salesPrices: (await itemPriceCard(page).getByRole('combobox', { name: 'Item code' }).evaluateAll((es) => es.map((e) => (e as HTMLInputElement).value))).map((v) => v.split(' · ')[0].trim()),
+  };
+}
+
+/** Sets the outpatient item price of the branch, clicks "Save price" and returns the values read back after reopening. */
+export async function saveItemPrice(page: Page, v: ItemPrice): Promise<SavedItemPrice> {
+  await readItemPrice(page);
+  const card = itemPriceCard(page);
+  if (v.method) await page.getByRole('combobox', { name: 'Method' }).selectOption({ label: v.method });
+  if (v.margin !== undefined) await page.getByRole('textbox', { name: 'Site margin' }).fill(marginOnSite(v.margin));
+  if (v.tax !== undefined) await page.getByRole('textbox', { name: 'Tax (%)' }).fill(v.tax);
+  for (const sp of v.salesPrices ?? []) {
+    await card.getByRole('button', { name: 'Add sales price' }).click();
+    const code = card.getByRole('combobox', { name: 'Item code' }).last();
+    const list = page.locator(`#${await code.getAttribute('aria-controls')}`);
+    await code.fill(sp.item);
+    // Options read "<code> · <name>"; a longer code may start with the same text.
+    await list.getByRole('option').filter({ hasText: `${sp.item} · ` }).first().getByRole('button').click();
+    await card.getByRole('textbox', { name: 'Unit price' }).last().fill(sp.price);
+  }
+  await new CashierPage(page).button('Save price').click();
+  await page.waitForLoadState('networkidle').catch(() => {});
+  await page.waitForTimeout(1_000);
+  return readItemPrice(page);
+}
+

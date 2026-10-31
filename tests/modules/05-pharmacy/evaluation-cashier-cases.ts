@@ -1,6 +1,6 @@
 import type { Browser, BrowserContext, Locator, Page } from '@playwright/test';
 import { expect, test, type Qa } from '../../../fixtures/e2e';
-import { installToastRecorder, toastMark } from '../../../lib/assertions';
+import { installToastRecorder, toastMark, SERVER_FAILURE } from '../../../lib/assertions';
 import { BILLING } from '../../../lib/billing-data';
 import { addDays, todayWib } from '../../../lib/dates';
 import { PHARMACY, PHARMACY_STORE, stockOf, total } from '../../../lib/pharmacy-data';
@@ -53,9 +53,16 @@ export async function lines(page: Page, name: string): Promise<number> {
   return row().count();
 }
 
-/** Blocks the steps when the held sale answered HTTP 500 (found blocker 47); returns true then. */
+/**
+ * A dispense with a discount above the maximum that could not be held: HTTP 500 until 2026-10-30; since 2026-10-31
+ * the refusal "this discount needs the approval chain: workflow: chain not found: "billingdiscount"" (found blocker 47).
+ */
+export const discountNotHeld = (toasts: string[]): boolean =>
+  !toasts.includes(HELD) && toasts.some((t) => SERVER_FAILURE.test(t) || /Failed|error|chain not found/i.test(t));
+
+/** Blocks the steps when the held sale could not be held (found blocker 47); returns true then. */
 export function held500(qa: Qa, toasts: string[], steps: number[]): boolean {
-  if (!toasts.some((t) => /React error #441|Failed|error/i.test(t)) || toasts.includes(HELD)) return false;
+  if (!discountNotHeld(toasts)) return false;
   for (const st of steps) qa.blocked(st, 47);
   qa.note(steps[0], `"Confirm dispense" with a discount above ${MAX}%: "${toasts.join(' / ')}" (found blocker 47)`);
   return true;

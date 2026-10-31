@@ -1,7 +1,7 @@
 import { NotOffered } from '../../../lib/not-offered';
 import type { Browser, BrowserContext, Locator, Page } from '@playwright/test';
 import { expect, test, type Qa } from '../../../fixtures/e2e';
-import { installToastRecorder, toastMark } from '../../../lib/assertions';
+import { installToastRecorder, isServerFailure, toastMark } from '../../../lib/assertions';
 import { ensureBloodbankDepartment } from '../../../lib/bloodbank-data';
 import { authFileOf } from '../../../lib/config';
 import { addDays, todayWib } from '../../../lib/dates';
@@ -61,7 +61,7 @@ export async function freeze(page: Page, days?: string): Promise<{ value: string
   return { value, toasts: await toastsAfter(page, mark) };
 }
 
-export const serverError = (toasts: string[]) => toasts.some((t) => /React error #441/.test(t));
+export const serverError = isServerFailure;
 
 export const TC_APP007_008 = async ({ page, qa }: { page: Page; qa: Qa }): Promise<void> => {
   const it = await ownIt1(page, qa, [{ quantity: '100', expiry: inDays(400) }]);

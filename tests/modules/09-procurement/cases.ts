@@ -148,12 +148,16 @@ export async function fillOrder(desk: ProcurementDeskPage, qa: Qa, no: string, i
   for (const [k, val] of Object.entries(v)) await desk.input(k).or(desk.main.getByRole('spinbutton', { name: k, exact: true })).fill(val);
 }
 
+/** A supplier of the seed data: the order form takes the name of an existing supplier. */
+export const SEED_SUPPLIER = 'PT Enseval';
+
 /**
  * "order" as the workbook says (no document). When the server refuses it
- * (HTTP 500, "React error #441"), the order is made again with the id of an
- * approved purchase request of this test in "Document" (TBD in the workbook:
- * "whether an order must come from an approved request"). Returns the toasts
- * of the order that counts and what it needed.
+ * (HTTP 500 until 2026-10-30, "supplier is missing" since), the order is made
+ * again with the seed supplier, then with the id of an approved purchase
+ * request of this test in "Document" (TBD in the workbook: "whether an order
+ * must come from an approved request"). Returns the toasts of the order that
+ * counts and what it needed.
  */
 export async function placeOrder(desk: ProcurementDeskPage, qa: Qa, no: string, item: string): Promise<{ toasts: string[]; note: string }> {
   /** The order counts when its number is listed afterwards (a save may show no toast). */
@@ -170,7 +174,10 @@ export async function placeOrder(desk: ProcurementDeskPage, qa: Qa, no: string, 
     seen.push(`${t.what}: "${toasts.join(' / ').slice(0, 70) || 'no toast'}"`);
     if (toasts.includes(SAVED) || (await listed())) return { toasts: toasts.includes(SAVED) ? toasts : [...toasts, SAVED], note: seen.join('; ') };
     if (i === 0) {
-      // TBD in the workbook: "whether an order must come from an approved request"; Preconditions: "A supplier exists".
+      // Since 2026-10-31 an unknown supplier name is refused ("supplier is missing"): Preconditions "A supplier exists",
+      // the seed supplier stands in (TC-APP009-046 orders with it).
+      tries.push({ extra: { Supplier: SEED_SUPPLIER }, what: `with the seed supplier "${SEED_SUPPLIER}"` });
+      // TBD in the workbook: "whether an order must come from an approved request".
       const request = await raise(desk, item);
       expect(await act(desk, 'suppliers', request, 'send_request')).toContain(SAVED);
       expect(await act(desk, 'suppliers', request, 'approve_request')).toContain(SAVED);
