@@ -232,8 +232,9 @@ export function qaTest(id: string, body: Body): void {
 /**
  * A picker that does not offer a record of the test (NotOffered: it filters
  * only the first 50 records it loaded) stops the step it happened in and
- * the steps after it: they are blocked by found blocker 40 when its list
- * names them for the test case, else the error stands.
+ * the steps after it: they are blocked by found blocker 40 (or the blocker
+ * the NotOffered names) when its list names them for the test case, else
+ * the error stands.
  */
 function notOfferedIsBlocked(id: string, body: Body): Body {
   const wrapped = async (args: Parameters<Body>[0], testInfo: Parameters<Body>[1]) => {
@@ -244,11 +245,11 @@ function notOfferedIsBlocked(id: string, body: Body): Body {
       // Inside a step that step; between steps (a precondition of the next ones) the next step.
       const at = testInfo as { qaStep?: number; qaInStep?: boolean; qaFailed?: number };
       const from = at.qaFailed ?? (at.qaInStep ? (at.qaStep ?? 1) : (at.qaStep ?? 0) + 1);
-      const listed = foundBlocker(40).testCases.find((t) => t.id === id)?.steps?.filter((st) => st >= from) ?? [];
+      const listed = foundBlocker(e.blocker).testCases.find((t) => t.id === id)?.steps?.filter((st) => st >= from) ?? [];
       if (!listed.includes(from)) throw e;
       const qa = (args as { qa: Qa }).qa;
       qa.note(from, e.message);
-      for (const st of listed) qa.blocked(st, 40);
+      for (const st of listed) qa.blocked(st, e.blocker);
     }
   };
   // Playwright reads the fixtures a test asks for from the text of its function: the wrapper asks for the body's.

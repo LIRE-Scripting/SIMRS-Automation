@@ -11,7 +11,7 @@ import { ConsultationPage } from '../../../../pages/clinical/ConsultationPage';
 import { compact, DispenseWizard, OrdersPage } from '../../../../pages/pharmacy/PharmacyE2EPages';
 import { CONFIRMED, stock, storeNote, toastsAfter } from '../../../modules/05-pharmacy/helpers';
 import { newRxInvoice, pay, rxInvoices, select } from '../../../modules/14-hospital-accounts/helpers';
-import { Vouchers } from '../../../modules/19-finance/helpers';
+import { Vouchers, voucherRowsOnPages } from '../../../modules/19-finance/helpers';
 import type { Patient } from './outpatient-steps';
 
 /**
@@ -145,7 +145,7 @@ export async function saleSteps(page: Page, qa: Qa, sale: { before: Set<string>;
   await qa.step(3, async () => {
     const v = new Vouchers(page);
     await v.open();
-    const sv = v.rows().filter({ hasText: /^SV-/ });
+    const sv = await voucherRowsOnPages(page, /^SV-/);
     await expect(sv.first()).toBeVisible();
     await sv.first().getByRole('button', { name: 'Open' }).click();
     const detail = (await v.detail.innerText()).replace(/\s+/g, ' ');
@@ -160,7 +160,7 @@ export async function saleSteps(page: Page, qa: Qa, sale: { before: Set<string>;
     await page.waitForTimeout(60_000);
     const v = new Vouchers(page);
     await v.open();
-    const sv = v.rows().filter({ hasText: /^SV-/ });
+    const sv = await voucherRowsOnPages(page, /^SV-/);
     let n = 0;
     for (const r of (await sv.all()).slice(0, 10)) {
       await r.getByRole('button', { name: 'Open' }).press('Enter');

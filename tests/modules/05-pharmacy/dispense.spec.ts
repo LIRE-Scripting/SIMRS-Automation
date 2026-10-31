@@ -1,3 +1,4 @@
+import { registerNamesake } from '../../../lib/ambulatory-data';
 import { asOnSite } from '../../../lib/i18n';
 import type { Browser, Page } from '@playwright/test';
 import { expect, qaTest, test, type Qa } from '../../../fixtures/e2e';
@@ -57,8 +58,7 @@ async function twins(page: Page, qa: Qa): Promise<[Patient, Patient]> {
     await reg.open();
     const d = await reg.openRegister();
     await reg.fillRegister({ visitType: 'Outpatient', firstName: words.join(' '), lastName: last }, d);
-    await reg.registerButton(d).click();
-    await expect(page.getByText('Patient registered', { exact: true }).first()).toBeVisible();
+    await registerNamesake(page, reg.registerButton(d), `${words.join(' ')} ${last}`);
     await expect(d).toBeHidden();
   }
   await reg.search(last);

@@ -262,6 +262,23 @@ export async function ensureFyNext(page: Page): Promise<void> {
 export const plain = (t: string) => t.replace(/[  ]/g, ' ').replace(/\s+/g, ' ').trim();
 
 /** Vouchers (/finance/vouchers): no <main>; "Create voucher" and the voucher detail are panels, not dialogs. */
+/**
+ * The rows of a kind (e.g. /^SV-/) on the first page of Vouchers that holds any: the list shows 10 rows a page,
+ * the newest date first, and a busy day's journals (VCH-) and deposits (TD-) fill the first pages (seen 2026-10-31).
+ */
+export async function voucherRowsOnPages(page: Page, kind: RegExp): Promise<Locator> {
+  const rows = new Vouchers(page).rows().filter({ hasText: kind });
+  // The pager of Vouchers sits outside <main>.
+  const next = page.getByRole('button', { name: 'Next page' });
+  for (let i = 0; i < 40; i++) {
+    if (await rows.first().waitFor({ timeout: 2_500 }).then(() => true, () => false)) break;
+    if (!(await next.isVisible()) || (await next.isDisabled())) break;
+    await next.press('Enter');
+    await page.waitForLoadState('networkidle').catch(() => {});
+  }
+  return rows;
+}
+
 export class Vouchers {
   constructor(readonly page: Page) {}
   async open(): Promise<void> {

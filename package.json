@@ -17,7 +17,8 @@
     "test:prereq": "playwright test --project=prereq",
     "qa:prereq-evidence": "tsx scripts/qa/build-prereq-evidence.ts",
     "qa:run-summary": "tsx scripts/qa/build-run-summary.ts",
-    "qa:messages": "tsx scripts/qa/fetch-messages.ts"
+    "qa:messages": "tsx scripts/qa/fetch-messages.ts",
+    "qa:findings-md": "tsx scripts/qa/build-findings-md.ts"
   },
   "keywords": [],
   "author": "",

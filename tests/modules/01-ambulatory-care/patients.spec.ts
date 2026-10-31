@@ -1,6 +1,6 @@
 import { expect, qaTest, test, type Qa } from '../../../fixtures/e2e';
 import { installToastRecorder, toastLocator, toastMark, toastsSince } from '../../../lib/assertions';
-import { bookSettings, claimDDay, ensureMasterData, releaseWeek, SHARED } from '../../../lib/ambulatory-data';
+import { bookSettings, claimDDay, ensureMasterData, registerNamesake, releaseWeek, SHARED } from '../../../lib/ambulatory-data';
 import { hourWib } from '../../../lib/dates';
 import { AppointmentsPage, whenText } from '../../../pages/ambulatory/AppointmentsPage';
 import { ArrivalPage, QueueBoardPage } from '../../../pages/ambulatory/ArrivalPage';
@@ -515,8 +515,7 @@ qaTest('TC-APP001-010', async ({ page, qa }) => {
   await reg.search('');
   const bReg = await reg.openRegister();
   await reg.fillRegister({ firstName: 'QA-AMB Pasien', lastName: `Ganda ${token}`, dateOfBirth: '1985-03-02' }, bReg);
-  await reg.registerButton(bReg).click();
-  await expect(toastLocator(page, /^Patient registered$/)).toBeVisible();
+  await registerNamesake(page, reg.registerButton(bReg), `QA-AMB Pasien Ganda ${token}`);
   await reg.search(`Ganda ${token}`);
   await expect(reg.rows()).toHaveCount(2);
   const mrns = await Promise.all((await reg.rows().all()).map(async (r) => (await (await reg.cell(r, 'MRN')).innerText()).trim()));

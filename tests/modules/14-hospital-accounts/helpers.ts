@@ -86,26 +86,49 @@ export async function paidSale(page: Page, amount = '150000'): Promise<string> {
  * list is full is split into its 16 longer prefixes.
  */
 /**
- * The newest RX- invoices: the cashier search for "RX-" lists the 20 newest
- * first (seen 2026-10-30). Read before and after a sale, the one new number
- * is the sale's invoice. (Walking every prefix of the numbers took thousands
- * of searches once the site held a few thousand RX- invoices.)
+ * The newest RX- invoices. The cashier search lists 20 invoices, the newest day first (seen 2026-10-30); once a day
+ * holds more than 20 RX- invoices the 20 shown stay the same after a sale (seen 2026-10-31), so the search is then
+ * made for each first character of the number ("RX-0" … "RX-f"): a day's invoices of one character are fewer than 20.
+ * Read before and after a sale, the one new number is the sale's invoice. (Walking every prefix of the numbers took
+ * thousands of searches once the site held a few thousand RX- invoices; one character is 16 searches.)
  */
 export async function rxInvoices(page: Page): Promise<Set<string>> {
   const c = new CashierPage(page);
   await c.open();
-  await c.search.fill('RX-');
-  await c.button('Search').click();
   const hits = page.getByRole('listbox').getByRole('button');
-  await hits.first().waitFor({ timeout: 10_000 }).catch(() => {});
-  await page.waitForLoadState('networkidle').catch(() => {});
-  return new Set((await hits.allInnerTexts()).map((t) => t.match(/RX-[0-9a-f]{8}/)?.[0]).filter((x): x is string => !!x));
+  const numbers = async () => (await hits.allInnerTexts()).map((t) => t.match(/RX-[0-9a-f]{8}/)?.[0]).filter((x): x is string => !!x);
+  const search = async (term: string): Promise<string[]> => {
+    await c.search.fill(term);
+    await c.button('Search').click();
+    // The list of the search before stays on screen until the answer comes: wait until every number fits the term.
+    await expect
+      .poll(async () => {
+        const n = await numbers();
+        return n.length > 0 && n.every((x) => x.startsWith(term));
+      }, { timeout: 10_000 })
+      .toBe(true)
+      .catch(() => {});
+    return (await numbers()).filter((x) => x.startsWith(term));
+  };
+  const all = await search('RX-');
+  if (all.length < 20) return new Set(all);
+  const found = new Set<string>();
+  for (const h of '0123456789abcdef') for (const x of await search(`RX-${h}`)) found.add(x);
+  return found;
 }
 
-/** The one RX- invoice the cashier search offers now and did not offer `before` (a sale made in between). */
+/**
+ * The one RX- invoice the cashier search offers now and did not offer `before` (a sale made in between). The site
+ * lists a new record late now and then (found blocker 51), so the search is repeated for a minute.
+ */
 export async function newRxInvoice(page: Page, before: Set<string>): Promise<string> {
-  const added = [...(await rxInvoices(page))].filter((x) => !before.has(x));
-  expect(added, 'one new RX- invoice in the cashier search').toHaveLength(1);
+  let added: string[] = [];
+  for (const end = Date.now() + 60_000; ; ) {
+    added = [...(await rxInvoices(page))].filter((x) => !before.has(x));
+    if (added.length || Date.now() > end) break;
+    await page.waitForTimeout(15_000);
+  }
+  expect(added, 'one new RX- invoice in the cashier search (also a minute later)').toHaveLength(1);
   return added[0];
 }
 

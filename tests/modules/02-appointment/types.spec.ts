@@ -156,7 +156,13 @@ const empty = (kind: TypeKind) => async ({ page, qa }: Args) => {
     const mark = await toastMark(page);
     await list.saveButton().click();
     await expect.poll(async () => (await toastsSince(page, mark)).length, { timeout: 15_000 }).toBeGreaterThan(0);
-    expect(await toastsSince(page, mark)).toContain('Save failed');
+    const toasts = await toastsSince(page, mark);
+    // Until 2026-10-30 the save answered HTTP 500 ("Save failed"); since 2026-10-31 a code and a name of spaces are saved.
+    if (toasts.includes('Saved')) {
+      await page.reload();
+      return qa.deviation(2, 'Toast "Save failed"; no row is added', `toast "Saved": a type whose code and name are only spaces is stored (${await list.rows().count()} rows, ${before} before)`);
+    }
+    expect(toasts).toContain('Save failed');
     await page.reload();
     await expect(list.rows()).toHaveCount(before);
   });

@@ -63,9 +63,12 @@ qaTest('TC-APP006-074', async ({ page, qa }) => {
   // /bloodbank/donors answers HTTP 500: checklist blocker 2 (the journey of this screen check is not linked to it).
   const response = await page.goto('/id/bloodbank/donors');
   qa.note(1, `HTTP ${response?.status()}`);
-  if (response?.status() === 500) {
+  // HTTP 500 until 2026-10-30; since 2026-10-31 HTTP 200 with the text "failed to list donors" instead of the list.
+  const failed = await asOnSite(() => page.getByRole('main').getByText(/failed to list donors/i).count());
+  if (response?.status() === 500 || failed) {
+    if (failed) qa.note(1, 'the page reads "failed to list donors" (checklist blocker 2)');
     qa.blocked(1, 2);
-    test.skip(true, 'Blocker 2: Donor screen answers HTTP 500 (00-blockers-checklist-linked.xlsx | Checklist | row 6)');
+    test.skip(true, 'Blocker 2: the Donor screen does not load its list (00-blockers-checklist-linked.xlsx | Checklist | row 6)');
   }
   await qa.step(1, () => screenOpens(page, '/bloodbank/donors', 'Donors'));
 });

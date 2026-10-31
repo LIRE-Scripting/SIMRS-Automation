@@ -59,5 +59,6 @@ export const BLOCKER_TITLE_ID: Record<number, string> = {
   54: 'Dialog Triase di Pasien IGD tidak menawarkan kategori triase',
   53: '"Revert latest stamp" di meja kerja laboratorium gagal ("bad_request")',
   52: '"Konfirmasi penyerahan" menjawab HTTP 500 dengan freeze days atau untuk pasien bernama sama (selesai 2026-10-31: kini penolakan)',
+  58: 'Kadang pasien kedua dengan nama lengkap yang sama tidak bisa didaftarkan: "Register" menjawab "Registration failed"',
   51: 'Daftar lama menampilkan data baru: item baru di Master Item, dan baris penyerahan baru di Issue Lines farmasi',
 };

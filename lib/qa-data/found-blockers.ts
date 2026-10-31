@@ -468,6 +468,7 @@ export const FOUND_BLOCKERS: FoundBlocker[] = [
     who: 'Development',
     howFound: 'Seen on the site (full run of 2026-10-21, docs/qa/run-summary-2026-10-21.md)',
     testCases: [
+      { id: 'TC-APP022-006', steps: [3] },
       { id: 'TC-APP005-017', steps: [1, 2, 3, 4, 5] },
       { id: 'TC-APP007-008', steps: [3, 4] },
       { id: 'TC-APP005-038', steps: [1, 2, 3, 4, 5] },
@@ -849,6 +850,29 @@ export const FOUND_BLOCKERS: FoundBlocker[] = [
     who: 'Development',
     howFound: 'Seen on the site (E2E-039, 2026-10-30)',
     testCases: [],
+  },
+  {
+    no: 58,
+    blocker: 'Now and then a second patient of the same full name cannot be registered: "Register" answers "Registration failed"',
+    category: 'Data + Function',
+    scope: '01 Ambulatory Care\nRegistered Patients, /registration/patients, "New Registration" of a name already registered on the branch',
+    cause:
+      'Seen 2026-10-31 in the evening (at 16:50 the same registration of two namesakes still saved, TC-APP005-028): a second ' +
+      'registration with the full name of a patient already on Podomoro answers the toast "Registration failed" and the dialog stays ' +
+      'open, with the same or another date of birth, without one, or with a middle name; a patient of another name saves. No reason is ' +
+      'given. The duplicates and namesakes the workbooks prepare (PT-DUP-A/B "QA-AMB Pasien Ganda"; PT-2/PT-3 and PT-K1/PT-K2 of the ' +
+      'same name) cannot be made, so merging a duplicate and telling namesakes apart cannot be checked. Intermittent: five tries between 19:20 and 19:35 WIB were refused, and at 19:50 the same tests registered their duplicates and namesakes again (TC-APP001-010, 003-027, 004-023, 005-028 and E2E-048 ran). The tests block their steps by 58 only when the refusal is seen.',
+    fix:
+      '1. Tell the clerk why a namesake is refused (a duplicate check should name the existing record), or let a namesake be saved; ' +
+      'or load the duplicates and namesakes of the workbooks as data.\n2. Run TC-APP001-010, TC-APP003-027, TC-APP004-023, TC-APP005-028 and E2E-048 again.',
+    who: 'Development (or Site administrator for the data)',
+    howFound: 'Seen on the site (E2E-048 and TC-APP005-028, 2026-10-31)',
+    testCases: [
+      { id: 'TC-APP001-010', steps: [1, 2, 3, 4, 5, 6] },
+      { id: 'TC-APP003-027', steps: [1, 2] },
+      { id: 'TC-APP004-023', steps: [1, 2, 3] },
+      { id: 'TC-APP005-028', steps: [1, 2, 3] },
+    ],
   },
 ];
 

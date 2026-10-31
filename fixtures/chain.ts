@@ -142,10 +142,10 @@ const test = e2e.extend<{ chain: ChainRun; chainId: string }>({
           try {
             return await body(qaOf(k));
           } catch (e) {
-            // A record no list or picker offers (found blocker 40) stops the chain at this step, as it blocks the module test.
+            // A record no list or picker offers (found blocker 40, or the one the NotOffered names) stops the chain here, as it blocks the module test.
             if (!(e instanceof NotOffered)) throw e;
             stoppedAt ||= k;
-            note('chain-stop', k, `Blocker 40: ${cs.tc}, ${checkCause(chain, k, 'Blocker 40')}. ${e.message}`);
+            note('chain-stop', k, `Blocker ${e.blocker}: ${cs.tc}, ${checkCause(chain, k, `Blocker ${e.blocker}`)}. ${e.message}`);
             return undefined as never;
           }
         });

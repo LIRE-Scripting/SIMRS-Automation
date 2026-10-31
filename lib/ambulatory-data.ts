@@ -8,6 +8,7 @@ import { toastMark, toastsSince } from './assertions';
 import { PASSWORD } from './config';
 import { addDays, nextWeekday, todayWib } from './dates';
 import { catalogueOf } from './qa-data';
+import { NotOffered } from './not-offered';
 
 /**
  * Shared data of 01 Ambulatory Care (00-test-data.xlsx | Catalogue, rows of
@@ -188,6 +189,20 @@ export async function registerPatient(
   return reg.register({ visitType: 'Outpatient', firstName: words.join(' '), lastName: `${last} ${token}`, dateOfBirth });
 }
 
+/**
+ * Clicks "Register" for a patient whose full name may already be registered. Now and then (2026-10-31 evening) the
+ * site refuses a second patient of the same full name with the toast "Registration failed" (found blocker 58): the
+ * steps that need a namesake or a duplicate are then blocked (NotOffered with blocker 58).
+ */
+export async function registerNamesake(page: Page, register: Locator, fullName: string): Promise<void> {
+  const mark = await toastMark(page);
+  await register.click();
+  await expect.poll(async () => (await toastsSince(page, mark)).find((t) => /^(Patient registered|Registration failed)$/.test(t)) ?? '', { timeout: 15_000 }).not.toBe('');
+  if ((await toastsSince(page, mark)).includes('Registration failed')) {
+    throw new NotOffered(`a second patient named "${fullName}" is refused: toast "Registration failed" (found blocker 58)`, 58);
+  }
+}
+
 /** Two registered patients with the same full name (the workbook name + token); returns both with their MRNs. */
 export async function registerTwins(page: Page, excelName: string, token: string): Promise<[{ mrn: string; fullName: string }, { mrn: string; fullName: string }]> {
   const reg = new RegisteredPatientsPage(page);
@@ -197,8 +212,7 @@ export async function registerTwins(page: Page, excelName: string, token: string
     await reg.open();
     const d = await reg.openRegister();
     await reg.fillRegister({ visitType: 'Outpatient', firstName: words.join(' '), lastName: last }, d);
-    await reg.registerButton(d).click();
-    await expect(page.getByText('Patient registered', { exact: true }).first()).toBeVisible();
+    await registerNamesake(page, reg.registerButton(d), `${words.join(' ')} ${last}`);
     await expect(d).toBeHidden();
   }
   await reg.search(last);
