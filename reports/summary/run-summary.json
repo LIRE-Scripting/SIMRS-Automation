@@ -1,7 +1,7 @@
 {
   "run": {
     "start": "2026-10-30T00:15:07.935Z",
-    "built": "2026-11-01T07:34:02.761Z",
+    "built": "2026-11-01T07:42:49.341Z",
     "site": "https://rs.showcase.atklik.xyz",
     "branch": "Podomoro",
     "serverErrors": ".qa-state/http-5xx.jsonl",
@@ -9,15 +9,15 @@
   },
   "totals": {
     "modules": {
-      "Passed": 803,
-      "Deviation": 349,
+      "Passed": 846,
+      "Deviation": 306,
       "Failed": 0,
       "Blocked": 446,
       "Not run": 6
     },
     "chains": {
-      "Passed": 4,
-      "Deviation": 8,
+      "Passed": 5,
+      "Deviation": 7,
       "Failed": 0,
       "Blocked": 38,
       "Not run": 0
@@ -32,8 +32,8 @@
     {
       "module": "01 Ambulatory Care",
       "total": 89,
-      "Passed": 39,
-      "Deviation": 32,
+      "Passed": 43,
+      "Deviation": 28,
       "Failed": 0,
       "Blocked": 15,
       "Not run": 3,
@@ -54,8 +54,8 @@
     {
       "module": "02 Appointment",
       "total": 33,
-      "Passed": 8,
-      "Deviation": 11,
+      "Passed": 9,
+      "Deviation": 10,
       "Failed": 0,
       "Blocked": 14,
       "Not run": 0,
@@ -74,8 +74,8 @@
     {
       "module": "03 Patient Care",
       "total": 63,
-      "Passed": 31,
-      "Deviation": 21,
+      "Passed": 35,
+      "Deviation": 17,
       "Failed": 0,
       "Blocked": 11,
       "Not run": 0,
@@ -93,8 +93,8 @@
     {
       "module": "04 Inpatient",
       "total": 90,
-      "Passed": 41,
-      "Deviation": 27,
+      "Passed": 47,
+      "Deviation": 21,
       "Failed": 0,
       "Blocked": 22,
       "Not run": 0,
@@ -111,8 +111,8 @@
     {
       "module": "05 Pharmacy",
       "total": 78,
-      "Passed": 42,
-      "Deviation": 19,
+      "Passed": 44,
+      "Deviation": 17,
       "Failed": 0,
       "Blocked": 17,
       "Not run": 0,
@@ -134,8 +134,8 @@
     {
       "module": "06 Transfusion Medicine",
       "total": 81,
-      "Passed": 10,
-      "Deviation": 8,
+      "Passed": 11,
+      "Deviation": 7,
       "Failed": 0,
       "Blocked": 63,
       "Not run": 0,
@@ -153,8 +153,8 @@
     {
       "module": "07 Inventory",
       "total": 67,
-      "Passed": 36,
-      "Deviation": 21,
+      "Passed": 39,
+      "Deviation": 18,
       "Failed": 0,
       "Blocked": 10,
       "Not run": 0,
@@ -175,8 +175,8 @@
     {
       "module": "08 Operation Theater",
       "total": 53,
-      "Passed": 33,
-      "Deviation": 18,
+      "Passed": 36,
+      "Deviation": 15,
       "Failed": 0,
       "Blocked": 2,
       "Not run": 0,
@@ -210,8 +210,8 @@
     {
       "module": "10 HR",
       "total": 68,
-      "Passed": 23,
-      "Deviation": 15,
+      "Passed": 24,
+      "Deviation": 14,
       "Failed": 0,
       "Blocked": 30,
       "Not run": 0,
@@ -230,8 +230,8 @@
     {
       "module": "11 Laboratory",
       "total": 54,
-      "Passed": 37,
-      "Deviation": 14,
+      "Passed": 38,
+      "Deviation": 13,
       "Failed": 0,
       "Blocked": 3,
       "Not run": 0,
@@ -247,8 +247,8 @@
     {
       "module": "12 RIS",
       "total": 35,
-      "Passed": 19,
-      "Deviation": 13,
+      "Passed": 21,
+      "Deviation": 11,
       "Failed": 0,
       "Blocked": 3,
       "Not run": 0,
@@ -264,8 +264,8 @@
     {
       "module": "13 Dietary",
       "total": 62,
-      "Passed": 33,
-      "Deviation": 19,
+      "Passed": 34,
+      "Deviation": 18,
       "Failed": 0,
       "Blocked": 10,
       "Not run": 0,
@@ -323,8 +323,8 @@
     {
       "module": "16 MRD",
       "total": 49,
-      "Passed": 24,
-      "Deviation": 19,
+      "Passed": 27,
+      "Deviation": 16,
       "Failed": 0,
       "Blocked": 6,
       "Not run": 0,
@@ -340,8 +340,8 @@
     {
       "module": "17 Payroll",
       "total": 69,
-      "Passed": 24,
-      "Deviation": 4,
+      "Passed": 25,
+      "Deviation": 3,
       "Failed": 0,
       "Blocked": 41,
       "Not run": 0,
@@ -360,8 +360,8 @@
     {
       "module": "18 Settings",
       "total": 92,
-      "Passed": 63,
-      "Deviation": 22,
+      "Passed": 66,
+      "Deviation": 19,
       "Failed": 0,
       "Blocked": 7,
       "Not run": 0,
@@ -378,8 +378,8 @@
     {
       "module": "19 Finance",
       "total": 128,
-      "Passed": 71,
-      "Deviation": 23,
+      "Passed": 75,
+      "Deviation": 19,
       "Failed": 0,
       "Blocked": 34,
       "Not run": 0,
@@ -416,8 +416,8 @@
     {
       "module": "21 CSSD",
       "total": 57,
-      "Passed": 33,
-      "Deviation": 4,
+      "Passed": 35,
+      "Deviation": 2,
       "Failed": 0,
       "Blocked": 20,
       "Not run": 0,
@@ -454,8 +454,8 @@
     {
       "module": "23 Sourcing",
       "total": 34,
-      "Passed": 24,
-      "Deviation": 1,
+      "Passed": 25,
+      "Deviation": 0,
       "Failed": 0,
       "Blocked": 9,
       "Not run": 0,
@@ -1638,9 +1638,10 @@
       "error": "",
       "cause": "",
       "reason": "Step 4: Excel expects \"the button is replaced by the word \"Called\"\"; the site: the button is replaced by \"Start encounter\" (actions: Start encounter Set MLC Record document)",
-      "status": "Deviation",
+      "status": "Passed",
       "group": "01 Ambulatory Care",
-      "previous": "Failed"
+      "previous": "Failed",
+      "passedWithNotes": true
     },
     {
       "kind": "module",
@@ -1783,9 +1784,10 @@
       "error": "",
       "cause": "",
       "reason": "Step 1: Excel expects \"a button \"New Registration\"\"; the site: \"New Registration\" is a link",
-      "status": "Deviation",
+      "status": "Passed",
       "group": "01 Ambulatory Care",
-      "previous": "Deviation"
+      "previous": "Deviation",
+      "passedWithNotes": true
     },
     {
       "kind": "module",
@@ -2337,9 +2339,10 @@
       "error": "",
       "cause": "",
       "reason": "Step 1: Excel expects \"Refused with a message about the repeated name\"; the site: refused with toast \"Booking failed\"; Step 2: Excel expects \"A remove button on each row\"; the site: no remove button; the row is taken out by emptying its name; Step 3: Excel expects \"Refused with a message for each row\"; the site: the browser stops the save at the field \"Max per day\" (minimum 1); the hours row gets no message; Step 4: Excel expects \"Refused: one quota per consultant\"; the site: refused with toast \"\"",
-      "status": "Deviation",
+      "status": "Passed",
       "group": "01 Ambulatory Care",
-      "previous": "Not run"
+      "previous": "Not run",
+      "passedWithNotes": true
     },
     {
       "kind": "module",
@@ -2443,9 +2446,10 @@
       "error": "",
       "cause": "",
       "reason": "Step 1: Excel expects \"Toast \"This patient is already waiting in that department\". No new number\"; the site: toast \"Arrival failed\"; Step 3: Excel expects \"The button is disabled until a department is picked\"; the site: \"Arrive\" is enabled; the empty field already holds a department (id set)",
-      "status": "Deviation",
+      "status": "Passed",
       "group": "01 Ambulatory Care",
-      "previous": "Not run"
+      "previous": "Not run",
+      "passedWithNotes": true
     },
     {
       "kind": "module",
@@ -3417,9 +3421,10 @@
       "error": "",
       "cause": "",
       "reason": "Step 1: Excel expects \"Refused with a message about the repeated name\"; the site: refused with toast \"Booking failed\"; Step 2: Excel expects \"A remove button on each row\"; the site: no remove button; the row is taken out by emptying its name; Step 3: Excel expects \"Refused with a message for each row\"; the site: the browser stops the save at the field \"Max per day\" (minimum 1); the hours row gets no message; Step 4: Excel expects \"Refused: one quota per consultant\"; the site: refused with toast \"\"",
-      "status": "Deviation",
+      "status": "Passed",
       "group": "02 Appointment",
-      "previous": "Not run"
+      "previous": "Not run",
+      "passedWithNotes": true
     },
     {
       "kind": "module",
@@ -3837,9 +3842,10 @@
       "error": "",
       "cause": "",
       "reason": "Step 4: Excel expects \"Remaining 10\"; the site: Remaining reads \"10 / 10\"",
-      "status": "Deviation",
+      "status": "Passed",
       "group": "03 Patient Care",
-      "previous": "Not run"
+      "previous": "Not run",
+      "passedWithNotes": true
     },
     {
       "kind": "module",
@@ -4072,9 +4078,10 @@
       "error": "",
       "cause": "",
       "reason": "Step 1: Excel expects \"Button \"Open Consultation\"\"; the site: \"Open Consultation\" is a link",
-      "status": "Deviation",
+      "status": "Passed",
       "group": "03 Patient Care",
-      "previous": "Deviation"
+      "previous": "Deviation",
+      "passedWithNotes": true
     },
     {
       "kind": "module",
@@ -4114,9 +4121,10 @@
       "error": "",
       "cause": "",
       "reason": "Step 3: Excel expects \"The empty field is marked\"; the site: no field is marked and no message is shown; \"Submit order\" is only disabled",
-      "status": "Deviation",
+      "status": "Passed",
       "group": "03 Patient Care",
-      "previous": "Deviation"
+      "previous": "Deviation",
+      "passedWithNotes": true
     },
     {
       "kind": "module",
@@ -4880,9 +4888,10 @@
       "error": "",
       "cause": "",
       "reason": "Step 1: Excel expects \"The browser asks for the note (required field); nothing is sent\"; the site: \"Save\" stays disabled while Note is empty; nothing can be sent",
-      "status": "Deviation",
+      "status": "Passed",
       "group": "03 Patient Care",
-      "previous": "Deviation"
+      "previous": "Deviation",
+      "passedWithNotes": true
     },
     {
       "kind": "module",
@@ -5133,9 +5142,10 @@
       "error": "",
       "cause": "",
       "reason": "Step 3: Excel expects \"only beds whose number or description contains \"qa-10\"\"; the site: also 1 bed(s) without \"qa-10\" (the words \"qa\" and \"10…\" are enough)",
-      "status": "Deviation",
+      "status": "Passed",
       "group": "04 Inpatient",
-      "previous": "Passed"
+      "previous": "Passed",
+      "passedWithNotes": true
     },
     {
       "kind": "module",
@@ -5154,9 +5164,10 @@
       "error": "",
       "cause": "",
       "reason": "Step 2: Excel expects \"Hint \"Bed no or description…\"\"; the site: hint \"No. atau deskripsi…\"",
-      "status": "Deviation",
+      "status": "Passed",
       "group": "04 Inpatient",
-      "previous": "Passed"
+      "previous": "Passed",
+      "passedWithNotes": true
     },
     {
       "kind": "module",
@@ -5477,9 +5488,10 @@
       "error": "",
       "cause": "",
       "reason": "Step 1: Excel expects \"A button \"Open admissions\"\"; the site: \"Open admissions\" is a link",
-      "status": "Deviation",
+      "status": "Passed",
       "group": "04 Inpatient",
-      "previous": "Deviation"
+      "previous": "Deviation",
+      "passedWithNotes": true
     },
     {
       "kind": "module",
@@ -5585,9 +5597,10 @@
       "error": "",
       "cause": "",
       "reason": "Step 3: Excel expects \"Refused with a message that names the length limit\"; the site: refused with \"failed to admit\"",
-      "status": "Deviation",
+      "status": "Passed",
       "group": "04 Inpatient",
-      "previous": "Deviation"
+      "previous": "Deviation",
+      "passedWithNotes": true
     },
     {
       "kind": "module",
@@ -6282,9 +6295,10 @@
       "error": "",
       "cause": "",
       "reason": "Step 1: Excel expects \"A field \"Branch\"\"; the site: no Branch field (U1 works on one branch)",
-      "status": "Deviation",
+      "status": "Passed",
       "group": "04 Inpatient",
-      "previous": "Deviation"
+      "previous": "Deviation",
+      "passedWithNotes": true
     },
     {
       "kind": "module",
@@ -6676,9 +6690,10 @@
       "error": "",
       "cause": "",
       "reason": "Step 2: Excel expects \"\"Branch\", \"Patient\", \"Order\", \"Status\" and \"Reason\"\"; the site: no \"Branch\" field (U1 works on one branch)",
-      "status": "Deviation",
+      "status": "Passed",
       "group": "04 Inpatient",
-      "previous": "Deviation"
+      "previous": "Deviation",
+      "passedWithNotes": true
     },
     {
       "kind": "module",
@@ -7429,9 +7444,10 @@
       "error": "",
       "cause": "",
       "reason": "Step 1: Excel expects \"A Dispense button\"; the site: \"Dispense\" is a link; Step 2: Excel expects \"The sidebar shows 3 items\"; the site: 9 items: Orders, Catalogue, Alerts, Estimate, Patient issues, Price & TPN, Dose record, Dispense, Issue Lines",
-      "status": "Deviation",
+      "status": "Passed",
       "group": "05 Pharmacy",
-      "previous": "Deviation"
+      "previous": "Deviation",
+      "passedWithNotes": true
     },
     {
       "kind": "module",
@@ -8224,9 +8240,10 @@
       "error": "",
       "cause": "",
       "reason": "Step 2: Excel expects \"Fields \"Branch\", \"Patient\", \"Order\", \"Status\" and \"Reason\"\"; the site: no \"Branch\" field",
-      "status": "Deviation",
+      "status": "Passed",
       "group": "05 Pharmacy",
-      "previous": "Deviation"
+      "previous": "Deviation",
+      "passedWithNotes": true
     },
     {
       "kind": "module",
@@ -9606,9 +9623,10 @@
       "error": "",
       "cause": "",
       "reason": "Step 2: Excel expects \"Refused: \"department is required\"\"; the site: \"bloodbank: invalid input: component is required\"; Step 6: Excel expects \"Refused: \"component has no service mapping\"\"; the site: \"bloodbank: invalid input: required-by date is in the past\"",
-      "status": "Deviation",
+      "status": "Passed",
       "group": "06 Transfusion Medicine",
-      "previous": "Deviation"
+      "previous": "Deviation",
+      "passedWithNotes": true
     },
     {
       "kind": "module",
@@ -10467,9 +10485,10 @@
       "error": "",
       "cause": "",
       "reason": "Step 4: Excel expects \"Toast \"Choose a branch before creating a stock request.\"\"; the site: \"Please select an item in the list.\"",
-      "status": "Deviation",
+      "status": "Passed",
       "group": "07 Inventory",
-      "previous": "Not run"
+      "previous": "Not run",
+      "passedWithNotes": true
     },
     {
       "kind": "module",
@@ -10509,9 +10528,10 @@
       "error": "",
       "cause": "",
       "reason": "Step 1: Excel expects \"A button \"Item Master\"\"; the site: \"Item Master\" is a link",
-      "status": "Deviation",
+      "status": "Passed",
       "group": "07 Inventory",
-      "previous": "Deviation"
+      "previous": "Deviation",
+      "passedWithNotes": true
     },
     {
       "kind": "module",
@@ -10532,9 +10552,10 @@
       "error": "",
       "cause": "",
       "reason": "Step 2: Excel expects \"Refused: the code is already in use\"; the site: toast \"Failed to save item.\"; Step 3: Excel expects \"Refused: the minimum is above the maximum\"; the site: toast \"Failed to save item.\"; Step 4: Excel expects \"Refused: the value cannot be negative\"; the site: toast \"Failed to save item.\"",
-      "status": "Deviation",
+      "status": "Passed",
       "group": "07 Inventory",
-      "previous": "Deviation"
+      "previous": "Deviation",
+      "passedWithNotes": true
     },
     {
       "kind": "module",
@@ -11674,9 +11695,10 @@
       "error": "",
       "cause": "",
       "reason": "Step 1: Excel expects \"Columns Request no, Procedures, Blocked, List prepared, Actions\"; the site: columns Request no, Procedures, Status, Blocked, List prepared, Actions",
-      "status": "Deviation",
+      "status": "Passed",
       "group": "08 Operation Theater",
-      "previous": "Deviation"
+      "previous": "Deviation",
+      "passedWithNotes": true
     },
     {
       "kind": "module",
@@ -12099,9 +12121,10 @@
       "error": "",
       "cause": "",
       "reason": "Step 1: Excel expects \"A dialog with \"Branch\", …\"; the site: no \"Branch\" field (the request takes the branch of the session)",
-      "status": "Deviation",
+      "status": "Passed",
       "group": "08 Operation Theater",
-      "previous": "Deviation"
+      "previous": "Deviation",
+      "passedWithNotes": true
     },
     {
       "kind": "module",
@@ -12329,9 +12352,10 @@
       "error": "",
       "cause": "",
       "reason": "Step 2: Excel expects \"A dialog with \"Branch\", …\"; the site: no \"Branch\" field",
-      "status": "Deviation",
+      "status": "Passed",
       "group": "08 Operation Theater",
-      "previous": "Deviation"
+      "previous": "Deviation",
+      "passedWithNotes": true
     },
     {
       "kind": "module",
@@ -14826,9 +14850,10 @@
       "error": "",
       "cause": "",
       "reason": "Step 4: Excel expects \"Toast \"Saved.\"\"; the site: refused: \"hr: invalid input: duplicate\": U1 is linked to the employee of an earlier run of this test, and the link is not moved to QA-EMP-01-MVW7XW2T001",
-      "status": "Deviation",
+      "status": "Passed",
       "group": "10 HR",
-      "previous": "Not run"
+      "previous": "Not run",
+      "passedWithNotes": true
     },
     {
       "kind": "module",
@@ -15583,9 +15608,10 @@
       "error": "",
       "cause": "",
       "reason": "Step 1: Excel expects \"A button \"Open worklist\"\"; the site: \"Open worklist\" is a link",
-      "status": "Deviation",
+      "status": "Passed",
       "group": "11 Laboratory",
-      "previous": "Deviation"
+      "previous": "Deviation",
+      "passedWithNotes": true
     },
     {
       "kind": "module",
@@ -16583,9 +16609,10 @@
       "error": "",
       "cause": "",
       "reason": "Step 1: Excel expects \"A button \"Open orders\"\"; the site: \"Open orders\" is a link",
-      "status": "Deviation",
+      "status": "Passed",
       "group": "12 RIS",
-      "previous": "Failed"
+      "previous": "Failed",
+      "passedWithNotes": true
     },
     {
       "kind": "module",
@@ -16698,9 +16725,10 @@
       "error": "",
       "cause": "",
       "reason": "Step 4: Excel expects \"Refused with a message that names the limit of 255, or the field stops at 255\"; the site: toast \"failed to create radiology order\"; Step 5: Excel expects \"Refused with a message that names the limit of 500\"; the site: toast \"failed to create radiology order\"",
-      "status": "Deviation",
+      "status": "Passed",
       "group": "12 RIS",
-      "previous": "Deviation"
+      "previous": "Deviation",
+      "passedWithNotes": true
     },
     {
       "kind": "module",
@@ -17396,9 +17424,10 @@
       "error": "",
       "cause": "",
       "reason": "Step 1: Excel expects \"A button \"Open requests\"\"; the site: \"Open requests\" is a link",
-      "status": "Deviation",
+      "status": "Passed",
       "group": "13 Dietary",
-      "previous": "Deviation"
+      "previous": "Deviation",
+      "passedWithNotes": true
     },
     {
       "kind": "module",
@@ -22102,9 +22131,10 @@
       "error": "",
       "cause": "",
       "reason": "Step 1: Excel expects \"Refused with a message that the user may not do this\"; the site: toast \"Failed to create request\"",
-      "status": "Deviation",
+      "status": "Passed",
       "group": "16 MRD",
-      "previous": "Not run"
+      "previous": "Not run",
+      "passedWithNotes": true
     },
     {
       "kind": "module",
@@ -22269,9 +22299,10 @@
       "error": "",
       "cause": "",
       "reason": "Step 1: Excel expects \"Toast \"That code already exists\"\"; the site: toast \"Failed to create request\"; Step 3: Excel expects \"Toast \"Choose an active request type. Purpose stays.\"\"; the site: the browser stops the click (\"Please select an item in the list.\"); that text is the first line of the list",
-      "status": "Deviation",
+      "status": "Passed",
       "group": "16 MRD",
-      "previous": "Deviation"
+      "previous": "Deviation",
+      "passedWithNotes": true
     },
     {
       "kind": "module",
@@ -22368,9 +22399,10 @@
       "error": "",
       "cause": "",
       "reason": "Step 2: Excel expects \"Toast \"That review step is not available\"\"; the site: toast \"Failed to issue record\"",
-      "status": "Deviation",
+      "status": "Passed",
       "group": "16 MRD",
-      "previous": "Not run"
+      "previous": "Not run",
+      "passedWithNotes": true
     },
     {
       "kind": "module",
@@ -23621,9 +23653,10 @@
       "error": "",
       "cause": "",
       "reason": "Step 1: Excel expects \"TBD: no row; the search looks at the employee number, the period and the amounts only\"; the site: 1 row(s)",
-      "status": "Deviation",
+      "status": "Passed",
       "group": "17 Payroll",
-      "previous": "Passed"
+      "previous": "Passed",
+      "passedWithNotes": true
     },
     {
       "kind": "module",
@@ -24344,9 +24377,10 @@
       "error": "",
       "cause": "",
       "reason": "Step 1: Excel expects \"Refused with a message that the user may not do this\"; the site: toast \"Failed to save site.\"",
-      "status": "Deviation",
+      "status": "Passed",
       "group": "18 Settings",
-      "previous": "Not run"
+      "previous": "Not run",
+      "passedWithNotes": true
     },
     {
       "kind": "module",
@@ -24367,9 +24401,10 @@
       "error": "",
       "cause": "",
       "reason": "Step 1: Excel expects \"A message that the code already exists. No row is added\"; the site: toast \"Failed to save site.\"; Step 2: Excel expects \"A message that the code already exists\"; the site: toast \"Failed to save department.\"; Step 3: Excel expects \"A message that the code already exists\"; the site: toast \"Failed to save country.\"",
-      "status": "Deviation",
+      "status": "Passed",
       "group": "18 Settings",
-      "previous": "Deviation"
+      "previous": "Deviation",
+      "passedWithNotes": true
     },
     {
       "kind": "module",
@@ -24736,9 +24771,10 @@
       "error": "",
       "cause": "",
       "reason": "Step 2: Excel expects \"Toast \"Failed to save user.\"\"; the site: the browser stops the click (Password: Please fill out this field.)",
-      "status": "Deviation",
+      "status": "Passed",
       "group": "18 Settings",
-      "previous": "Deviation"
+      "previous": "Deviation",
+      "passedWithNotes": true
     },
     {
       "kind": "module",
@@ -25968,9 +26004,10 @@
       "error": "",
       "cause": "",
       "reason": "Step 2: Excel expects \"Each line has … \"Open\"\"; the site: a line shows no status; an open period offers \"Lock\" and \"Mark adjustment\"",
-      "status": "Deviation",
+      "status": "Passed",
       "group": "19 Finance",
-      "previous": "Deviation"
+      "previous": "Deviation",
+      "passedWithNotes": true
     },
     {
       "kind": "module",
@@ -26008,9 +26045,10 @@
       "error": "",
       "cause": "",
       "reason": "Step 2: Excel expects \"\"Branch restriction\" (\"All branches\")\"; the site: a list \"Branches allowed to use this account\" (none chosen: \"Global account\") and a list \"Users allowed to use this account\"",
-      "status": "Deviation",
+      "status": "Passed",
       "group": "19 Finance",
-      "previous": "Deviation"
+      "previous": "Deviation",
+      "passedWithNotes": true
     },
     {
       "kind": "module",
@@ -26204,9 +26242,10 @@
       "error": "",
       "cause": "",
       "reason": "Step 1: Excel expects \"five tiles: Financial years, Chart of accounts, Budget posting rules, Vouchers, ERP staging\"; the site: 10 tiles under MASTER, BUKU BESAR: Financial years, Chart of accounts, Branch configuration, Currency, Cost centres, Account maps, Budget posting rules, Vouchers, Journals, ERP staging",
-      "status": "Deviation",
+      "status": "Passed",
       "group": "19 Finance",
-      "previous": "Deviation"
+      "previous": "Deviation",
+      "passedWithNotes": true
     },
     {
       "kind": "module",
@@ -26780,9 +26819,10 @@
       "error": "",
       "cause": "",
       "reason": "Step 1: Excel expects \"The text \"The shares must total 100%.\"\"; the site: toast \"Shares must total 100%.\"",
-      "status": "Deviation",
+      "status": "Passed",
       "group": "19 Finance",
-      "previous": "Passed"
+      "previous": "Passed",
+      "passedWithNotes": true
     },
     {
       "kind": "module",
@@ -29963,9 +30003,10 @@
       "error": "",
       "cause": "",
       "reason": "Step 1: Excel expects \"The text \"Choose an indicator type.\"\"; the site: the browser stops the click (Indicator Type: Please select an item in the list.); Step 2: Excel expects \"The text \"Choose a test name.\"\"; the site: the browser stops the click (Test Name: Please select an item in the list.)",
-      "status": "Deviation",
+      "status": "Passed",
       "group": "21 CSSD",
-      "previous": "Deviation"
+      "previous": "Deviation",
+      "passedWithNotes": true
     },
     {
       "kind": "module",
@@ -30268,9 +30309,10 @@
       "error": "",
       "cause": "",
       "reason": "Step 1: Excel expects \"The text \"End is before start.\"\"; the site: \"cssd: invalid input\"; Step 2: Excel expects \"The text \"Expiry must be after the sterilization date.\"\"; the site: \"cssd: invalid input\"; Step 3: Excel expects \"The text \"Add at least one set or item.\"\"; the site: \"cssd: invalid input\"; Step 4: Excel expects \"The text \"That packing number is not an unsterile set.\"\"; the site: \"cssd: invalid input\"",
-      "status": "Deviation",
+      "status": "Passed",
       "group": "21 CSSD",
-      "previous": "Not run"
+      "previous": "Not run",
+      "passedWithNotes": true
     },
     {
       "kind": "module",
@@ -32185,9 +32227,10 @@
       "error": "",
       "cause": "",
       "reason": "Step 3: Excel expects \"Refused; the bid stays \"opened\"\"; the site: \"missing required privilege\", the bid reads \"\"",
-      "status": "Deviation",
+      "status": "Passed",
       "group": "23 Sourcing",
-      "previous": "Not run"
+      "previous": "Not run",
+      "passedWithNotes": true
     },
     {
       "kind": "module",
@@ -34230,9 +34273,10 @@
       "error": "",
       "cause": "",
       "reason": "Step 1: TC-APP008-025 step 1: Excel expects \"A dialog with \"Branch\", …\"; the site: no \"Branch\" field (the request takes the branch of the session)",
-      "status": "Deviation",
+      "status": "Passed",
       "group": "E2E chains",
-      "previous": "Deviation"
+      "previous": "Deviation",
+      "passedWithNotes": true
     },
     {
       "kind": "chain",

@@ -1,6 +1,6 @@
 # Deviasi: langkah yang berjalan tetapi hasilnya berbeda dari workbook
 
-Dibangun 2026-11-01 07:34 UTC dari `reports/summary/run-summary.json` (hasil terbaru tiap test case dan rantai). Bangun ulang: `npm run qa:run-summary && npm run qa:findings-md`.
+Dibangun 2026-11-01 07:41 UTC dari `reports/summary/run-summary.json` (hasil terbaru tiap test case dan rantai). Bangun ulang: `npm run qa:run-summary && npm run qa:findings-md`.
 
 Deviasi = langkah **bisa dijalankan**, tetapi yang tampil di site tidak sama dengan *Expected Result* workbook. Di workbook hasil, langkahnya berstatus **Failed** dengan perilaku site di *Actual Result*. Blocker (langkah tidak bisa dijalankan sama sekali) ada di `docs/qa/blockers-found.md`.
 

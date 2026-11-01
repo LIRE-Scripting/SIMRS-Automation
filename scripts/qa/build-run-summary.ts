@@ -114,6 +114,8 @@ export interface TestOutcome {
   screenshot?: string;
   /** The screenshot is the starting screen of the journey (scripts/qa/blocked-screenshots.ts): the test case did not run. */
   screenshotStart?: boolean;
+  /** Passed with notes: every deviation counts as passed (scripts/qa/deviation-review.ts). */
+  passedWithNotes?: boolean;
 }
 
 /** A hint from the error text of a failed test; the reviewed cause is in scripts/qa/run-triage.ts. */
@@ -297,6 +299,12 @@ function main(): void {
   // The reviewed causes (run-triage.ts, 2026-10-21) describe failures: a test that no longer fails keeps none.
   for (const o of outcomes) if (o.status !== 'Failed') delete o.triage;
 
+  // A deviation whose every difference counts as passed (scripts/qa/deviation-review.ts, the user's decision of
+  // 2026-11-01) is counted as Passed, "Lulus (dengan catatan)"; its deviations stay listed with their notes.
+  for (const o of outcomes) {
+    if (o.status === 'Deviation' && reviewCase(o.id, o.deviations) === 'Bisa dianggap lulus') Object.assign(o, { status: 'Passed', passedWithNotes: true });
+  }
+
   const mods = outcomes.filter((o) => o.kind === 'module');
   const chains = outcomes.filter((o) => o.kind === 'chain');
   const groups = [...new Set(mods.map((o) => o.group))];
@@ -394,7 +402,8 @@ async function checkResultWorkbooks(mods: TestOutcome[], dirs: string[]): Promis
     });
     for (const [id, st] of steps) {
       const has = (x: string) => st.some((s) => s.status === x);
-      const status = byId.get(id)?.status;
+      // A test case passed with notes keeps its deviations (Failed steps) in its result workbook.
+      const status = byId.get(id)?.passedWithNotes ? 'Deviation' : byId.get(id)?.status;
       const agrees = {
         Passed: has('Passed') && !has('Failed') && !has('Blocked'),
         Deviation: has('Failed') && !st.some((s) => /E2E (failed|gagal)/.test(s.actual)),
@@ -419,7 +428,9 @@ type Summary = {
 
 const FILL_EN: Record<string, string> = { Passed: 'FFD9EAD3', Deviation: 'FFFFF2CC', Failed: 'FFF4CCCC', Blocked: 'FFFCE5CD', 'Not run': 'FFEFEFEF' };
 /** The fill of a status cell, by its Indonesian (or English) status. */
-const FILL: Record<string, string> = { ...FILL_EN, ...Object.fromEntries(Object.entries(FILL_EN).map(([k, v]) => [statusId(k), v])) };
+/** The status shown for a test case passed with notes (its deviations all count as passed). */
+const WITH_NOTES = 'Lulus (dengan catatan)';
+const FILL: Record<string, string> = { ...FILL_EN, ...Object.fromEntries(Object.entries(FILL_EN).map(([k, v]) => [statusId(k), v])), [WITH_NOTES]: 'FFE2F0D9' };
 
 /** Indonesian texts of the workbook (scripts/qa/summary-id.ts): titles, reasons and the builder's own sentences. */
 const idText = (t: string): string => sentenceId(textId(t));
@@ -469,6 +480,7 @@ function smallThumbnail(png: string): { file: string; width: number; height: num
 /** One plain sentence on a test case: what happened, in Indonesian. */
 function simpleLine(o: TestOutcome): string {
   const cut = (t: string, n = 280) => (t.length > n ? `${t.slice(0, n - 1)}…` : t);
+  if (o.passedWithNotes) return `Lulus dengan catatan (${o.deviations.length} perbedaan dari referensi yang bisa diterima). ${cut(idText(o.deviations[0] ?? ''))}`;
   if (o.status === 'Passed') return o.notRun.length ? `Lulus; ${o.notRun.length} langkah tidak dijalankan: ${cut(idText(o.notRun[0]), 200)}` : 'Lulus: semua langkah sesuai harapan.';
   if (o.status === 'Deviation') return `${o.deviations.length} deviasi. ${cut(idText(o.deviations[0] ?? ''))}`;
   if (o.status === 'Failed') return `Gagal${o.failedStep ? ` di ${o.failedStep.replace(/^Step (\d+).*$/, 'langkah $1')}` : ''}: ${cut(o.error, 220)}`;
@@ -512,7 +524,7 @@ function moduleSheets(wb: ExcelJS.Workbook, s: Summary): void {
       no: i + 1,
       id: o.id,
       title: idTitle(o),
-      status: statusId(o.status),
+      status: o.passedWithNotes ? WITH_NOTES : statusId(o.status),
       line: simpleLine(o),
       shot: o.screenshot ? { text: o.screenshotStart ? 'layar awal (tidak dijalankan) – buka' : 'buka gambar penuh', hyperlink: path.relative(OUT_DIR, keptShot(o)) } : 'tidak ada',
     })), 'status');
@@ -559,6 +571,7 @@ function chainPicture(o: TestOutcome): string | undefined {
 
 /** One line on how far a chain got: every step, the step and blocker it stopped at, its deviations, or its error. */
 function chainLine(o: TestOutcome): string {
+  if (o.passedWithNotes) return `Lulus dengan catatan: ${o.deviations.length} perbedaan dari referensi yang bisa diterima, mis. ${idText(o.deviations[0] ?? '').slice(0, 160)}`;
   if (o.status === 'Passed') return 'Semua langkah lulus';
   if (o.status === 'Failed') return `Gagal${o.failedStep ? ` di ${o.failedStep.replace(/^Chain step (\d+).*$/, 'langkah $1')}` : ''}: ${o.error.slice(0, 160)}`;
   const stop = o.reason.match(/Step (\d+): (?:Blocker (\d+)|User (U\d+)|([A-Z-]+))(?::\s*([^;]*))?/);
@@ -624,9 +637,10 @@ function overview(wb: ExcelJS.Workbook, s: Summary): void {
   ws.addRow(['Tingkat lulus (lulus / semua kasus uji)', { formula: `${sum('Passed')}/${sum('total')}`, result: m.Passed / s.totals.testCases }]).getCell(2).numFmt = '0%';
   ws.addRow(['Cakupan (dijalankan / semua kasus uji)', { formula: `(${sum('Passed')}+${sum('Deviation')}+${sum('Failed')})/${sum('total')}`, result: (m.Passed + m.Deviation + m.Failed) / s.totals.testCases }]).getCell(2).numFmt = '0%';
   ws.addRow(['Jawaban HTTP 5xx dari situs', s.totals.http5xx]);
-  const dev = s.outcomes.filter((o) => o.kind === 'module' && o.status === 'Deviation');
+  const dev = s.outcomes.filter((o) => o.kind === 'module' && (o.status === 'Deviation' || o.passedWithNotes));
   const verdicts = (['Bisa dianggap lulus', 'Perlu keputusan', 'Deviasi nyata'] as const).map((v) => `${dev.filter((o) => reviewCase(o.id, o.deviations) === v).length} ${v.toLowerCase()}`);
-  ws.addRow(['Tinjauan kasus uji berstatus Deviasi', `${verdicts.join(' · ')} (kolom "Tinjauan deviasi" di sheet modul)`]);
+  ws.addRow(['Tinjauan kasus uji dengan deviasi', `${verdicts.join(' · ')} (kolom "Tinjauan deviasi" di sheet modul)`]);
+  ws.addRow(['Lulus dengan catatan', `${dev.filter((o) => o.passedWithNotes).length} kasus uji yang semua deviasinya bisa diterima dihitung Lulus, berstatus "${WITH_NOTES}" di sheet modulnya`]);
   for (let r = 8; r <= ws.rowCount; r++) ws.getRow(r).getCell(2).alignment = { horizontal: 'left' };
   ws.addRow([]);
 
@@ -640,7 +654,7 @@ function overview(wb: ExcelJS.Workbook, s: Summary): void {
   header(ws.addRow(['Rantai', 'Skenario', 'Status', 'Sampai mana', 'Tangkapan layar']));
   const chains = s.outcomes.filter((o) => o.kind === 'chain').sort((x, y) => x.id.localeCompare(y.id));
   for (const o of chains) {
-    const row = ws.addRow([o.id, CHAIN_NAME_ID[o.id] ?? o.title, statusId(o.status), chainLine(o), '']);
+    const row = ws.addRow([o.id, CHAIN_NAME_ID[o.id] ?? o.title, o.passedWithNotes ? WITH_NOTES : statusId(o.status), chainLine(o), '']);
     row.alignment = { vertical: 'top', wrapText: true };
     fillStatus(row.getCell(3));
     const pic = chainPicture(o);
@@ -682,6 +696,7 @@ function overview(wb: ExcelJS.Workbook, s: Summary): void {
   ] as [Status, string][]) {
     fillStatus(ws.addRow([statusId(x), text]).getCell(1));
   }
+  fillStatus(ws.addRow([WITH_NOTES, 'dihitung Lulus: semua perbedaannya dari referensi bisa diterima (hanya bentuk atau teks yang beda); catatannya di kolom "Tinjauan deviasi"']).getCell(1));
 }
 
 /** The blocker watch (tests/modules/00-access/blocker-watch.spec.ts): the newest look at each watched blocker. */
@@ -729,7 +744,7 @@ async function writeWorkbook(s: Summary): Promise<void> {
     { header: 'Status', key: 'status', width: 12 },
     { header: 'Sampai mana', key: 'line', width: 70 },
     { header: 'Tangkapan layar', key: 'shot', width: 44 },
-  ], chainRows.map((o) => ({ id: o.id, title: idTitle(o), status: statusId(o.status), line: chainLine(o), shot: chainPicture(o) ? '' : 'tidak ada' })), 'status');
+  ], chainRows.map((o) => ({ id: o.id, title: idTitle(o), status: o.passedWithNotes ? WITH_NOTES : statusId(o.status), line: chainLine(o), shot: chainPicture(o) ? '' : 'tidak ada' })), 'status');
   chainRows.forEach((o, i) => {
     const pic = chainPicture(o);
     if (!pic) return;
