@@ -20,7 +20,9 @@ test.beforeEach(async ({ page }) => {
   await installToastRecorder(page);
 });
 
-qaTest('TC-APP014-011', TC_APP014_011);
+// Closes the U1 day: only in the morning run (QA_MORNING=1), last of all, so that the other cashier tests of the day can take
+// money and a later run does not record "already closed" over its result.
+if (process.env.QA_MORNING === '1') qaTest('TC-APP014-011', TC_APP014_011);
 
 /**
  * A second and a third cashier for the closes that U1 cannot make twice: U6 (qa.kemayoran) and U4 (qa.admin3) have a
@@ -96,7 +98,31 @@ qaTest('TC-APP014-037', async ({ qa, browser }) => {
   }
 });
 
-qaTest('TC-APP014-038', async ({ qa }) => {
-  qa.notRun(1, 'needs the screen opened at 06:30 and 07:30 WIB the next morning (time-dependent, Q16)');
-  qa.notRun(2, 'see step 1');
-});
+/** Milliseconds until hh:mm WIB today (negative when past). */
+function untilWib(hhmm: string): number {
+  const [h, m] = hhmm.split(':').map(Number);
+  const wib = new Date(Date.now() + 7 * 3600_000);
+  return Date.UTC(wib.getUTCFullYear(), wib.getUTCMonth(), wib.getUTCDate(), h - 7, m) - Date.now();
+}
+const clockWib = () => new Date(Date.now() + 7 * 3600_000).toISOString().slice(11, 16);
+
+if (process.env.QA_MORNING === '1') {
+  // At 06:30 and 07:30 WIB (open question Q16): only the morning run declares it (.qa-state/morning-run.sh), so that a run
+  // at another hour does not hide the morning's result. The U1 counter was closed the day before (TC-APP014-011 or E2E-033).
+  qaTest('TC-APP014-038', async ({ page, qa }) => {
+    test.setTimeout(80 * 60_000);
+    if (untilWib('06:30') < -10 * 60_000) throw new Error(`TC-APP014-038 runs at 06:30 and 07:30 WIB; it is ${clockWib()}`);
+    const c = new CashierPage(page);
+    qa.note(1, 'precondition: the U1 counter was closed the day before (the morning run closes it last, after E2E-033 or TC-APP014-011)');
+    for (const [step, at] of [[1, '06:30'], [2, '07:30']] as const) {
+      await page.waitForTimeout(Math.max(0, untilWib(at)));
+      await qa.step(step, async () => {
+        await c.open();
+        await page.waitForLoadState('networkidle').catch(() => {});
+        const closed = await c.closedBanner().isVisible();
+        qa.note(step, `Fast Cashier at ${clockWib()} WIB: ${closed ? `the banner "${(await c.closedBanner().innerText()).trim()}"` : 'no closed banner'}`);
+        if (closed) qa.deviation(step, step === 1 ? 'A new day: no closed banner' : 'Still the same new day: no closed banner', `at ${clockWib()} WIB the counter still shows the close of the day before${step === 1 ? ' (the day of the counter turns at 07:00 WIB, midnight UTC)' : ''}`);
+      });
+    }
+  });
+}

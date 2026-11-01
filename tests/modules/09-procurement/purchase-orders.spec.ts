@@ -362,9 +362,10 @@ qaTest('TC-APP009-027', async ({ page, qa }) => {
   await p.open();
   const seeded = (await p.rows().evaluateAll((rs) => rs.map((r) => (r.querySelector('td')?.textContent ?? '').trim()))).filter((d) => /^QA-PO-\d+$/.test(d));
   qa.note(1, `seeded orders numbered QA-PO- and digits on the first page: ${seeded.length} (the workbook expects 25)`);
-  // Advancing a seeded order would change the shared seed data; only the precondition is checked.
-  qa.notRun(1, 'the 25 seeded QA-PO- orders are not on the site (the list holds three seed orders: PO-001-A, PO-001, PO-USG)');
-  qa.notRun(2, 'see step 1');
+  // Seeded orders at "Step 1" to "Step 4" need the four-step chain; the chain of the site has one step (found blocker 30).
+  qa.note(1, 'the 25 seeded QA-PO- orders are not on the site (the list holds three seed orders: PO-001-A, PO-001, PO-USG); orders of the test cannot stand in, as none can wait at "Step 2" to "Step 4"');
+  qa.blocked(1, 30);
+  qa.blocked(2, 30);
 });
 
 qaTest('TC-APP009-035', async ({ page, qa }) => {

@@ -3,6 +3,7 @@ import type { Qa } from '../../../../fixtures/e2e';
 import { toastLocator } from '../../../../lib/assertions';
 import { AdmissionsPage, BedsPage, DischargesPage } from '../../../../pages/inpatient/InpatientPages';
 import { NotOffered } from '../../../../lib/not-offered';
+import { asOnSite } from '../../../../lib/i18n';
 
 /**
  * Steps of 04-inpatient.xlsx used by several chains, written as in
@@ -91,7 +92,9 @@ export async function transferSteps(page: Page, qa: Qa, name: string, from: stri
   const adm = new AdmissionsPage(page);
   const beds = new BedsPage(page);
   await adm.open();
-  const admitted = await (await adm.cell(await adm.stay(name), 'Admitted')).innerText();
+  // The admission time as the site writes it ("01 Nov 2026, 07.31"), compared untranslated after the transfer.
+  const admittedCell = await adm.cell(await adm.stay(name), 'Admitted');
+  const admitted = await asOnSite(() => admittedCell.innerText());
   const d = page.getByRole('dialog', { name: 'Transfer bed' });
   await qa.step(1, async () => {
     await (await adm.stay(name)).getByRole('button', { name: 'Transfer' }).click();
@@ -119,7 +122,8 @@ export async function transferSteps(page: Page, qa: Qa, name: string, from: stri
     await expect(toastLocator(page, /^Transferred$/)).toBeVisible();
     const row = await adm.stay(name);
     await expect(await adm.cell(row, 'Bed')).toHaveText(to);
-    await expect(await adm.cell(row, 'Admitted')).toHaveText(admitted);
+    const cell = await adm.cell(row, 'Admitted');
+    await asOnSite(() => expect(cell).toHaveText(admitted));
   });
   await qa.step(4, async () => {
     await adm.open();

@@ -33,17 +33,45 @@ export interface Plan {
  */
 const NON_BLOCKING = new Set([1, 14, 15, 16]);
 
+/**
+ * The users a test case needs when its own steps need fewer than its journey
+ * names (00-prerequisites.xlsx | Journeys lists the users of every case of the
+ * journey). Seen on the site 2026-11-01: a deep link is opened signed out;
+ * a write without the write privilege is tried by U3 (qa.staff, no
+ * privilege); the Audit Log (/id/audit) and the approval chains of Workflow
+ * (Process Definitions) are open to the administrator U1, so the audit and
+ * chain cases need no platform superadmin (U10).
+ */
+function usersOfCase(ref: TestCaseRef): string[] | null {
+  const s = ref.testCase.scenario;
+  if (s === 'Deep link without a session') return ['Not signed in'];
+  if (s === 'Write without the write privilege') return ['U1', 'U3'];
+  if (/^Audit trail of /.test(s) || s === "History of a patient's beds") return ['U1'];
+  // The "Superadmin" of these journeys switches or edits an approval chain in Workflow: U1 does it (Process Definitions, "Ubah rantai").
+  if (['Discharge when the approval chain is missing or switched off', 'Approval chain switched off or missing', 'Approval chain changed while purchase orders wait'].includes(s)) return ['U1'];
+  return null;
+}
+
+/**
+ * Journeys marked "Automation Candidate = No" that are run by simulation
+ * (the user's decision of 2026-11-01, "bisa di simulasi"): the print preview
+ * is the page under the print media type, and "Scans the printed barcode" is
+ * the barcode read from its bars (lib/barcode.ts); the camp journey needs no
+ * device at all.
+ */
+const SIMULATED = new Set(['TC-APP001-004', 'TC-APP004-009', 'TC-APP006-011', 'TC-APP011-002']);
+
 export function planFor(ref: TestCaseRef): Plan {
   const { module, testCase, journey, needs } = ref;
-  const users = needs.usersNeeded.split(',').map((u) => u.trim());
-  const signedOut = /not signed in/i.test(needs.usersNeeded) && !users.some((u) => /^U\d+$/.test(u));
+  const users = usersOfCase(ref) ?? needs.usersNeeded.split(',').map((u) => u.trim());
+  const signedOut = users.some((u) => /not signed in/i.test(u)) && !users.some((u) => /^U\d+$/.test(u));
   const user: Plan['user'] = signedOut ? null : users.includes('U2') || needs.branch === 'All branches' ? 'U2' : 'U1';
   const readOnly = /No data was changed/.test(testCase.finalState ?? '');
   const partialSteps = testCase.steps.filter((s) => s.expected.includes('TBD')).map((s) => s.step);
 
   const reasons: string[] = [];
   let disposition: Disposition = 'automate';
-  if (journey.automationCandidate === 'No') {
+  if (journey.automationCandidate === 'No' && !SIMULATED.has(testCase.id)) {
     disposition = 'skip';
     reasons.push(`${module.source} | Journeys | row ${journey.row}: Automation Candidate = No`);
   } else {

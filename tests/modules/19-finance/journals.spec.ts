@@ -214,9 +214,10 @@ qaTest('TC-APP019-046', async ({ page, qa }) => {
 });
 
 qaTest('TC-APP019-047', async ({ qa }) => {
-  qa.notRun(1, 'needs a user with a transaction limit of 50000000 in the branch configuration (an account of 00-prerequisites.xlsx that is not prepared, blocker 38)');
-  qa.notRun(2, 'needs a user with the finance write right who is not in "Users allowed to transact" (blocker 38)');
-  qa.notRun(3, '"Refuse a negative cash or bank balance" is a setting of the branch configuration for every user');
+  // Each step saves a journal (or approves a payment) dated today: none can be saved, the year 2026 has no periods (found blocker 45).
+  // The limit of step 1 cannot be typed either: "Add user" of Finance configuration adds no line with a limit (TC-APP019-035 step 4).
+  qa.note(1, 'the transaction limit 50000000 cannot be set: "Add user" of Finance configuration adds no line with a limit (TC-APP019-035 step 4)');
+  for (const st of [1, 2, 3]) qa.blocked(st, 45);
 });
 
 qaTest('TC-APP019-048', async ({ page, qa }) => {

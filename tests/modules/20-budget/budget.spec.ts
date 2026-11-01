@@ -316,7 +316,9 @@ qaTest('TC-APP020-006', async ({ page, qa }) => {
 });
 
 qaTest('TC-APP020-042', async ({ qa }) => {
-  for (const s of [1, 2, 3, 4, 5]) qa.notRun(s, 'TBD with the product owner; needs a budget line with a balance (allocation needs U5)');
+  // A budget line gets its balance from an approved allocation, which the set-up of Podomoro does not allow (checklist blocker 13).
+  qa.note(1, 'no budget line has a balance: a line is made by an approved allocation, which the branch set-up does not allow (blocker 13); what the steps expect is TBD in the workbook');
+  for (const s of [1, 2, 3, 4, 5]) qa.blocked(s, 13);
 });
 
 const SCREENS: [string, string, string][] = [

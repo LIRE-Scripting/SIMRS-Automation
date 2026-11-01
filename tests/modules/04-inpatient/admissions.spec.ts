@@ -3,6 +3,7 @@ import { expect, qaTest, test, type Qa } from '../../../fixtures/e2e';
 import { installToastRecorder, toastLocator, toastMark, toastsSince } from '../../../lib/assertions';
 import { AdmissionsPage, BedsPage, DischargesPage } from '../../../pages/inpatient/InpatientPages';
 import { NotOffered } from '../../../lib/not-offered';
+import { asOnSite } from '../../../lib/i18n';
 
 /**
  * 04-inpatient.xlsx, features "Bed management (/adt/beds)", "Admissions
@@ -149,7 +150,9 @@ qaTest('TC-APP004-003', async ({ page, qa }) => {
     await beds.search('qa-10');
     const nos = await beds.rows().evaluateAll((rs) => rs.map((r) => r.querySelector('td')?.textContent?.trim() ?? ''));
     expect(nos.length).toBeGreaterThan(0);
-    for (const x of nos) expect(x.toLowerCase()).toContain('qa-10');
+    // The search takes "qa-10" as the words "qa" and "10…": a bed QA-0…-1012N is found though it holds no "qa-10".
+    const others = (await beds.rows().evaluateAll((rs) => rs.map((r) => [r.querySelector('td')?.textContent?.trim() ?? '', r.textContent ?? '']))).filter(([, t]) => !t.toLowerCase().includes('qa-10')).map(([no]) => no);
+    if (others.length) qa.deviation(3, 'only beds whose number or description contains "qa-10"', `also ${others.length} bed(s) without "qa-10" (the words "qa" and "10…" are enough)`);
   });
 
   await qa.step(4, async () => {
@@ -579,7 +582,9 @@ qaTest('TC-APP004-010', async ({ page, qa }) => {
   const name = qa.name('QA-INP Pasien Satu');
   await adm.open();
   await adm.admit(name, bed1);
-  const admitted = await (await adm.cell(await adm.stay(name), 'Admitted')).innerText();
+  // The admission time as the site writes it ("01 Nov 2026, 07.31"), compared untranslated after the transfer.
+  const admittedCell = await adm.cell(await adm.stay(name), 'Admitted');
+  const admitted = await asOnSite(() => admittedCell.innerText());
   const before = await adm.census();
   const d = page.getByRole('dialog', { name: 'Transfer bed' });
 
@@ -615,7 +620,8 @@ qaTest('TC-APP004-010', async ({ page, qa }) => {
     await expect(toastLocator(page, /^Transferred$/)).toBeVisible();
     const row = await adm.stay(name);
     await expect(await adm.cell(row, 'Bed')).toHaveText(bed3);
-    await expect(await adm.cell(row, 'Admitted')).toHaveText(admitted);
+    const cell = await adm.cell(row, 'Admitted');
+    await asOnSite(() => expect(cell).toHaveText(admitted));
   });
 
   await qa.step(4, async () => {

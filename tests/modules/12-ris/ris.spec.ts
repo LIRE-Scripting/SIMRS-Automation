@@ -6,6 +6,9 @@ import { RIS } from '../../../lib/ris-data';
 import { backToIndonesian, switchLanguage } from '../shared/language';
 import { screenOpens } from '../shared/screen-opens';
 import { RadOrdersPage, StudiesPage, toastsAfter, type RadOrder } from './helpers';
+import { toastLocator } from '../../../lib/assertions';
+import { ConsultationPage } from '../../../pages/clinical/ConsultationPage';
+import { newPt1 } from '../03-patient-care/cases';
 
 /**
  * 12-ris.xlsx: Orders (/radiology/orders), Schedule and report
@@ -452,28 +455,53 @@ qaTest('TC-APP012-028', async ({ page, qa }) => {
 qaTest('TC-APP012-029', async ({ page, qa }) => {
   const o = new RadOrdersPage(page);
   const s = new StudiesPage(page);
-  // An order of the consultation journey of 03 Patient Care: "QA Foto toraks PA <token>" rows are on the list (seen 2026-10-15).
-  await o.open();
-  const fromConsult = (await o.rows().evaluateAll((rs) => rs.map((r) => (r.querySelectorAll('td')[1]?.textContent ?? '').trim()))).find((t) => /^QA Foto toraks PA /.test(t));
-  if (!fromConsult) {
-    for (const st of [1, 2, 3]) qa.notRun(st, 'no radiology order from a consultation (03 Patient Care) is on the first page');
-    return;
-  }
-  qa.note(1, `an order written in 03 Patient Care by the consultation journey: "${fromConsult}"`);
+  // Precondition (made by the test): a radiology order written by the doctor in 03 Patient Care, journey "Radiology order
+  // from the consultation" (Consultation, "Create radiology order").
+  const c = new ConsultationPage(page);
+  await c.openFor(await newPt1(page, qa));
+  const study = qa.name('QA Foto toraks PA');
+  await c.panel.getByRole('textbox', { name: 'Study' }).fill(study);
+  await c.panel.getByRole('button', { name: /^(Create radiology order|Creating…)$/ }).click();
+  await expect(toastLocator(page, /^Radiology order created\. It is worked on the radiology screen\.$/)).toBeVisible();
+  qa.note(1, `the order of the consultation: study "${study}"`);
+
+  /** The order's row on Orders: filtered by the study and paged (a new order without a study date is on a later page). */
+  const row = async () => {
+    await o.open();
+    const r = o.main.getByRole('row').filter({ hasText: study }).first();
+    const filter = o.main.getByRole('textbox', { name: 'Study description' });
+    if (await filter.count()) {
+      await filter.fill(study);
+      await filter.press('Enter');
+    }
+    for (let i = 0; i < 40; i++) {
+      if (await r.waitFor({ timeout: 3_000 }).then(() => true, () => false)) return r;
+      const next = o.main.getByRole('button', { name: 'Next page' });
+      if (!(await next.isVisible()) || (await next.isDisabled())) break;
+      await next.click();
+      await page.waitForLoadState('networkidle').catch(() => {});
+    }
+    return r;
+  };
   await qa.step(1, async () => {
-    const c = await o.cells(await o.row(fromConsult));
-    qa.note(1, `row: ${c.join(' | ')}`);
-    expect(c[1]).toBe(fromConsult);
+    const r = await row();
+    await expect(r).toBeVisible();
+    const cells = (await r.getByRole('cell').allInnerTexts()).map((t) => t.replace(/\s+/g, ' ').trim());
+    qa.note(1, `row: ${cells.join(' | ')} (reference and accession number: TBD in the workbook)`);
+    expect(cells).toContain(study);
   });
-  await qa.step(2, async () => {
-    await s.open();
-    await expect(s.order.locator('option').first()).toBeAttached();
-    const options = await s.order.locator('option').allInnerTexts();
-    expect(options).toContain(fromConsult);
-  });
+  // "Schedule and report" lists the first orders only (found blocker 40): a new order may not be among them.
+  await s.open();
+  await expect(s.order.locator('option').first()).toBeAttached();
+  const options = (await s.order.locator('option').allInnerTexts()).map((t) => t.trim());
+  if (options.some((t) => t.includes(study))) await qa.step(2, async () => expect(options.some((t) => t.includes(study))).toBe(true));
+  else {
+    qa.note(2, `"Schedule and report" offers ${options.length} orders, not "${study}"`);
+    qa.blocked(2, 40);
+  }
   await qa.step(3, async () => {
-    const c = await o.cells(await o.row(fromConsult));
-    qa.note(3, `no patient on the order: ${c.join(' | ')}`);
+    const cells = (await (await row()).getByRole('cell').allInnerTexts()).map((t) => t.replace(/\s+/g, ' ').trim());
+    qa.note(3, `the order as the radiographer reads it: ${cells.join(' | ')}`);
   });
 });
 

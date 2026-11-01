@@ -226,10 +226,6 @@ qaTest('TC-APP015-038', async ({ page, qa }) => {
   });
 });
 
-qaTest('TC-APP015-039', async ({ qa }) => {
-  qa.notRun(1, 'needs a reception at 10:00 and a second triage at 10:04 (time-dependent, Q16)');
-});
-
 qaTest('TC-APP015-040', async ({ page, qa }) => {
   const p = new Patients(page);
   const name = await encounter(p, qa);

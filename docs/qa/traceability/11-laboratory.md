@@ -7,14 +7,14 @@ Test title = `<TC ID> <Scenario Name> [<file> | Steps | rows a-b | <TC ID>]`; an
 | TC ID | Journey ID | Scenario | Type | Prio | Steps rows | Journeys row | Spec | User / branch | Disposition | Reason |
 |---|---|---|---|---|---|---|---|---|---|---|
 | TC-APP011-001 | JRN-APP011-001 | Creating a lab order | Positive | Critical | rows 2-5 | 2 | `tests/modules/11-laboratory/worklist.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
-| TC-APP011-002 | JRN-APP011-002 | Generating the sample and printing its label | Positive | Critical | rows 6-10 | 3 | `tests/modules/11-laboratory/not-automated.spec.ts` | U1 / Podomoro | skip | 11-laboratory.xlsx \| Journeys \| row 3: Automation Candidate = No |
+| TC-APP011-002 | JRN-APP011-002 | Generating the sample and printing its label | Positive | Critical | rows 6-10 | 3 | `tests/modules/11-laboratory/sample-label.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP011-003 | JRN-APP011-003 | Sending and accepting the sample | Positive | Critical | rows 11-12 | 4 | `tests/modules/11-laboratory/worklist.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP011-004 | JRN-APP011-004 | Capturing a result | Positive | Critical | rows 13-15 | 5 | `tests/modules/11-laboratory/worklist.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP011-005 | JRN-APP011-005 | Correcting a result and its note | Positive | High | rows 16-18 | 6 | `tests/modules/11-laboratory/worklist.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP011-006 | JRN-APP011-006 | Worklist: search, status filter, scan and paging | Positive | High | rows 19-23 | 7 | `tests/modules/11-laboratory/worklist.spec.ts` | U1 / Podomoro | automate (read-only) |  |
 | TC-APP011-007 | JRN-APP011-007 | Lab order made in a consultation arrives on the worklist | Positive | High | rows 24-26 | 8 | `tests/modules/11-laboratory/evaluation.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP011-008 | JRN-APP011-008 | Analyst working on "All branches" | Positive | High | rows 27-31 | 9 | `tests/modules/11-laboratory/access.spec.ts` | U2 / All branches | automate (saves; needs QA_ALLOW_WRITES) |  |
-| TC-APP011-009 | JRN-APP011-009 | Audit trail of lab orders | Positive | High | rows 32-34 | 10 | `tests/modules/11-laboratory/not-automated.spec.ts` | U1 / Podomoro | fixme | Needs user U10 "Second tenant, tenant without a licence, platform superadmin" (00-prerequisites.xlsx \| Users \| row 14: Deferred: needs a decision and a second tenant) |
+| TC-APP011-009 | JRN-APP011-009 | Audit trail of lab orders | Positive | High | rows 32-34 | 10 | `tests/modules/11-laboratory/not-automated.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP011-010 | JRN-APP011-010 | Hub, navigation and Indonesian | Positive | Medium | rows 35-37 | 11 | `tests/modules/11-laboratory/work-catalogue-screens.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP011-011 | JRN-APP011-011 | Lab order without a patient | Negative | Critical | rows 38-41 | 12 | `tests/modules/11-laboratory/evaluation.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP011-012 | JRN-APP011-012 | Result does not come back to the doctor | Negative | Critical | rows 42-44 | 13 | `tests/modules/11-laboratory/evaluation.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
@@ -32,7 +32,7 @@ Test title = `<TC ID> <Scenario Name> [<file> | Steps | rows a-b | <TC ID>]`; an
 | TC-APP011-024 | JRN-APP011-024 | User without the laboratory right | Security | Critical | rows 79-81 | 25 | `tests/modules/11-laboratory/access.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP011-025 | JRN-APP011-025 | User with no laboratory role reads the worklist | Negative | High | rows 82-83 | 26 | `tests/modules/11-laboratory/access.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP011-026 | JRN-APP011-026 | Orders of another branch | Security | Critical | rows 84-86 | 27 | `tests/modules/11-laboratory/access.spec.ts` | U1 / Two branches | automate (saves; needs QA_ALLOW_WRITES) |  |
-| TC-APP011-027 | JRN-APP011-027 | Tenant without the Laboratory licence | Security | High | rows 87-88 | 28 | `tests/modules/11-laboratory/not-automated.spec.ts` | U1 / Podomoro | fixme | Needs user U10 "Second tenant, tenant without a licence, platform superadmin" (00-prerequisites.xlsx \| Users \| row 14: Deferred: needs a decision and a second tenant) |
+| TC-APP011-027 | JRN-APP011-027 | Tenant without the Laboratory licence | Security | High | rows 87-88 | 28 | `tests/modules/11-laboratory/not-automated.spec.ts` | U1 / Podomoro | fixme | Blocker 59 (found by automation, docs/qa/blockers-found.md): No tenant without a licence can be reached: the showcase has one tenant, and Tenants and Entitlements refuse the administrator / Needs user U10 "Second tenant, tenant without a licence, platform superadmin" (00-prerequisites.xlsx \| Users \| row 14: Deferred: needs a decision and a second tenant) |
 | TC-APP011-028 | JRN-APP011-028 | Opening the worklist without being signed in | Negative | Critical | rows 89-91 | 29 | `tests/modules/11-laboratory/evaluation.spec.ts` | signed out / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP011-029 | JRN-APP011-029 | Script text and special characters | Negative | Medium | rows 92-94 | 30 | `tests/modules/11-laboratory/worklist.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP011-030 | JRN-APP011-030 | Specimens and tests: specimen, container, test and a reference range | Positive | High | rows 95-98 | 31 | `tests/modules/11-laboratory/work-catalogue-screens.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) | TBD in step(s) 4: stated part only (Q8) |
@@ -57,15 +57,15 @@ Test title = `<TC ID> <Scenario Name> [<file> | Steps | rows a-b | <TC ID>]`; an
 | TC-APP011-049 | JRN-APP011-039 | Screen /laboratory/catalogue opens | Regression | Medium | row 134 | 40 | `tests/modules/11-laboratory/work-catalogue-screens.spec.ts` | U2 / All branches | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP011-050 | JRN-APP011-039 | Screen /laboratory/orders opens | Regression | Medium | row 135 | 40 | `tests/modules/11-laboratory/work-catalogue-screens.spec.ts` | U2 / All branches | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP011-051 | JRN-APP011-039 | Screen /laboratory/work opens | Regression | Medium | row 136 | 40 | `tests/modules/11-laboratory/work-catalogue-screens.spec.ts` | U2 / All branches | automate (saves; needs QA_ALLOW_WRITES) |  |
-| TC-APP011-052 | JRN-APP011-040 | Deep link without a session | Security | High | row 137 | 41 | `tests/modules/11-laboratory/not-automated.spec.ts` | U1 / Podomoro | fixme | Needs user U10 "Second tenant, tenant without a licence, platform superadmin" (00-prerequisites.xlsx \| Users \| row 14: Deferred: needs a decision and a second tenant) |
-| TC-APP011-053 | JRN-APP011-040 | Tenant without the licence | Security | High | rows 138-139 | 41 | `tests/modules/11-laboratory/not-automated.spec.ts` | U1 / Podomoro | fixme | Needs user U10 "Second tenant, tenant without a licence, platform superadmin" (00-prerequisites.xlsx \| Users \| row 14: Deferred: needs a decision and a second tenant) |
-| TC-APP011-054 | JRN-APP011-040 | Write without the write privilege | Security | High | row 140 | 41 | `tests/modules/11-laboratory/not-automated.spec.ts` | U1 / Podomoro | fixme | Needs user U10 "Second tenant, tenant without a licence, platform superadmin" (00-prerequisites.xlsx \| Users \| row 14: Deferred: needs a decision and a second tenant) / TBD in step(s) 1: stated part only (Q8) |
+| TC-APP011-052 | JRN-APP011-040 | Deep link without a session | Security | High | row 137 | 41 | `tests/modules/11-laboratory/not-automated.spec.ts` | signed out / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
+| TC-APP011-053 | JRN-APP011-040 | Tenant without the licence | Security | High | rows 138-139 | 41 | `tests/modules/11-laboratory/not-automated.spec.ts` | U1 / Podomoro | fixme | Blocker 59 (found by automation, docs/qa/blockers-found.md): No tenant without a licence can be reached: the showcase has one tenant, and Tenants and Entitlements refuse the administrator / Needs user U10 "Second tenant, tenant without a licence, platform superadmin" (00-prerequisites.xlsx \| Users \| row 14: Deferred: needs a decision and a second tenant) |
+| TC-APP011-054 | JRN-APP011-040 | Write without the write privilege | Security | High | row 140 | 41 | `tests/modules/11-laboratory/not-automated.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) | TBD in step(s) 1: stated part only (Q8) |
 
 ## Counts
 
 - automate (read-only): 1
-- automate (saves; needs QA_ALLOW_WRITES): 47
+- automate (saves; needs QA_ALLOW_WRITES): 51
 - automate (chain; needs a record from another app): 0
-- fixme: 5
-- skip: 1
+- fixme: 2
+- skip: 0
 - test cases with a "TBD" step (asserted partially): 11

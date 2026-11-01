@@ -23,15 +23,15 @@ Test title = `<TC ID> <Scenario Name> [<file> | Steps | rows a-b | <TC ID>]`; an
 | TC-APP027-015 | JRN-APP027-007 | Screen /fixed-assets/masters opens | Regression | Medium | row 77 | 8 | `tests/modules/27-fixed-assets/fixed-assets.spec.ts` | U2 / All branches | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP027-016 | JRN-APP027-007 | Screen /fixed-assets/moves opens | Regression | Medium | row 78 | 8 | `tests/modules/27-fixed-assets/fixed-assets.spec.ts` | U2 / All branches | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP027-017 | JRN-APP027-007 | Screen /fixed-assets/register opens | Regression | Medium | row 79 | 8 | `tests/modules/27-fixed-assets/fixed-assets.spec.ts` | U2 / All branches | automate (saves; needs QA_ALLOW_WRITES) |  |
-| TC-APP027-018 | JRN-APP027-008 | Deep link without a session | Security | High | row 80 | 9 | `tests/modules/27-fixed-assets/not-automated.spec.ts` | U1 / Podomoro | fixme | Needs user U10 "Second tenant, tenant without a licence, platform superadmin" (00-prerequisites.xlsx \| Users \| row 14: Deferred: needs a decision and a second tenant) |
-| TC-APP027-019 | JRN-APP027-008 | Tenant without the licence | Security | High | rows 81-82 | 9 | `tests/modules/27-fixed-assets/not-automated.spec.ts` | U1 / Podomoro | fixme | Needs user U10 "Second tenant, tenant without a licence, platform superadmin" (00-prerequisites.xlsx \| Users \| row 14: Deferred: needs a decision and a second tenant) |
-| TC-APP027-020 | JRN-APP027-008 | Write without the write privilege | Security | High | row 83 | 9 | `tests/modules/27-fixed-assets/not-automated.spec.ts` | U1 / Podomoro | fixme | Needs user U10 "Second tenant, tenant without a licence, platform superadmin" (00-prerequisites.xlsx \| Users \| row 14: Deferred: needs a decision and a second tenant) / TBD in step(s) 1: stated part only (Q8) |
+| TC-APP027-018 | JRN-APP027-008 | Deep link without a session | Security | High | row 80 | 9 | `tests/modules/27-fixed-assets/not-automated.spec.ts` | signed out / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
+| TC-APP027-019 | JRN-APP027-008 | Tenant without the licence | Security | High | rows 81-82 | 9 | `tests/modules/27-fixed-assets/not-automated.spec.ts` | U1 / Podomoro | fixme | Blocker 59 (found by automation, docs/qa/blockers-found.md): No tenant without a licence can be reached: the showcase has one tenant, and Tenants and Entitlements refuse the administrator / Needs user U10 "Second tenant, tenant without a licence, platform superadmin" (00-prerequisites.xlsx \| Users \| row 14: Deferred: needs a decision and a second tenant) |
+| TC-APP027-020 | JRN-APP027-008 | Write without the write privilege | Security | High | row 83 | 9 | `tests/modules/27-fixed-assets/not-automated.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) | TBD in step(s) 1: stated part only (Q8) |
 
 ## Counts
 
 - automate (read-only): 0
-- automate (saves; needs QA_ALLOW_WRITES): 11
+- automate (saves; needs QA_ALLOW_WRITES): 13
 - automate (chain; needs a record from another app): 6
-- fixme: 3
+- fixme: 1
 - skip: 0
 - test cases with a "TBD" step (asserted partially): 13

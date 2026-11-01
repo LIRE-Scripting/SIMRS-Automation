@@ -440,9 +440,8 @@ qaTest('TC-APP019-036', async ({ page, qa }) => {
 });
 
 qaTest('TC-APP019-037', async ({ qa }) => {
-  qa.notRun(1, 'needs a payment approved on Daan Mogot (Payments need U5); U1 works on Podomoro only');
-  qa.notRun(2, 'needs a journal saved on Daan Mogot; U1 works on Podomoro only and Journals need U5');
-  qa.notRun(3, 'see step 2');
+  // Each step saves a payment or a journal dated today (step 2: yesterday): none can be saved, the year 2026 has no periods (found blocker 45).
+  for (const st of [1, 2, 3]) qa.blocked(st, 45);
 });
 
 qaTest('TC-APP019-038', TC_APP019_038);

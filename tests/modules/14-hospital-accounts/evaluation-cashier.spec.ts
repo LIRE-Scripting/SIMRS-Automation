@@ -322,7 +322,8 @@ qaTest('TC-APP014-028', async ({ page, qa, browser }) => {
   const st0 = (await c.barState()).status;
   if (st0 !== WAITING) {
     qa.note(1, `the discount of 60,000 above the cap is not held: status "${st0}" (TC-APP014-007)`);
-    for (const st of [1, 2, 3]) qa.notRun(st, 'needs a sale waiting for approval of a 60,000 discount: a discount above the cap is not held (TC-APP014-007 step 1)');
+    // No sale waits for approval: no billing discount chain is set up (found blocker 34).
+    for (const st of [1, 2, 3]) qa.blocked(st, 34);
     return;
   }
   const tryApprove = async (p: Page, step: number, who: string) => {

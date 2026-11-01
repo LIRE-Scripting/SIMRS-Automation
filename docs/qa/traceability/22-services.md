@@ -36,9 +36,9 @@ Test title = `<TC ID> <Scenario Name> [<file> | Steps | rows a-b | <TC ID>]`; an
 | TC-APP022-028 | JRN-APP022-010 | Screen /services/purchase-requests opens | Regression | Medium | row 103 | 11 | `tests/modules/22-services/services.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP022-029 | JRN-APP022-010 | Screen /services/receipts opens | Regression | Medium | row 104 | 11 | `tests/modules/22-services/services.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP022-030 | JRN-APP022-010 | Screen /services/requests opens | Regression | Medium | row 105 | 11 | `tests/modules/22-services/services.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
-| TC-APP022-031 | JRN-APP022-011 | Deep link without a session | Security | High | row 106 | 12 | `tests/modules/22-services/not-automated.spec.ts` | U1 / Podomoro | fixme | Needs user U10 "Second tenant, tenant without a licence, platform superadmin" (00-prerequisites.xlsx \| Users \| row 14: Deferred: needs a decision and a second tenant) |
-| TC-APP022-032 | JRN-APP022-011 | Tenant without the licence | Security | High | rows 107-108 | 12 | `tests/modules/22-services/not-automated.spec.ts` | U1 / Podomoro | fixme | Needs user U10 "Second tenant, tenant without a licence, platform superadmin" (00-prerequisites.xlsx \| Users \| row 14: Deferred: needs a decision and a second tenant) |
-| TC-APP022-033 | JRN-APP022-011 | Write without the write privilege | Security | High | row 109 | 12 | `tests/modules/22-services/not-automated.spec.ts` | U1 / Podomoro | fixme | Needs user U10 "Second tenant, tenant without a licence, platform superadmin" (00-prerequisites.xlsx \| Users \| row 14: Deferred: needs a decision and a second tenant) / TBD in step(s) 1: stated part only (Q8) |
+| TC-APP022-031 | JRN-APP022-011 | Deep link without a session | Security | High | row 106 | 12 | `tests/modules/22-services/not-automated.spec.ts` | signed out / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
+| TC-APP022-032 | JRN-APP022-011 | Tenant without the licence | Security | High | rows 107-108 | 12 | `tests/modules/22-services/not-automated.spec.ts` | U1 / Podomoro | fixme | Blocker 59 (found by automation, docs/qa/blockers-found.md): No tenant without a licence can be reached: the showcase has one tenant, and Tenants and Entitlements refuse the administrator / Needs user U10 "Second tenant, tenant without a licence, platform superadmin" (00-prerequisites.xlsx \| Users \| row 14: Deferred: needs a decision and a second tenant) |
+| TC-APP022-033 | JRN-APP022-011 | Write without the write privilege | Security | High | row 109 | 12 | `tests/modules/22-services/not-automated.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) | TBD in step(s) 1: stated part only (Q8) |
 | TC-APP022-034 | JRN-APP022-012 | List of /services/orders with "All branches" | Negative | High | row 110 | 13 | `tests/modules/22-services/not-automated.spec.ts` | U2 / All branches | fixme | Blocker 5: 28 lists do not load with "All branches" (00-blockers-checklist-linked.xlsx \| Checklist \| row 9) / TBD in step(s) 1: stated part only (Q8) |
 | TC-APP022-035 | JRN-APP022-012 | List of /services/purchase-requests with "All branches" | Negative | High | row 111 | 13 | `tests/modules/22-services/not-automated.spec.ts` | U2 / All branches | fixme | Blocker 5: 28 lists do not load with "All branches" (00-blockers-checklist-linked.xlsx \| Checklist \| row 9) / TBD in step(s) 1: stated part only (Q8) |
 | TC-APP022-036 | JRN-APP022-012 | List of /services/requests with "All branches" | Negative | High | row 112 | 13 | `tests/modules/22-services/not-automated.spec.ts` | U2 / All branches | fixme | Blocker 5: 28 lists do not load with "All branches" (00-blockers-checklist-linked.xlsx \| Checklist \| row 9) / TBD in step(s) 1: stated part only (Q8) |
@@ -46,8 +46,8 @@ Test title = `<TC ID> <Scenario Name> [<file> | Steps | rows a-b | <TC ID>]`; an
 ## Counts
 
 - automate (read-only): 0
-- automate (saves; needs QA_ALLOW_WRITES): 23
+- automate (saves; needs QA_ALLOW_WRITES): 25
 - automate (chain; needs a record from another app): 0
-- fixme: 13
+- fixme: 11
 - skip: 0
 - test cases with a "TBD" step (asserted partially): 22

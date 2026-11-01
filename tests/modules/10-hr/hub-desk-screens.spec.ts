@@ -88,8 +88,9 @@ async function balance(page: import('@playwright/test').Page, qa: Qa): Promise<{
 qaTest('TC-APP010-047', async ({ page, qa }) => {
   const b = await balance(page, qa);
   if (!b) {
-    qa.notRun(1, 'the balance of the precondition could not be set (see the note)');
-    qa.notRun(2, 'see step 1');
+    // The year balance of the precondition is refused (found blocker 43).
+    qa.blocked(1, 43);
+    qa.blocked(2, 43);
     return;
   }
   for (const [step, kind] of [[1, 'add'], [2, 'deduct']] as const) {
@@ -103,8 +104,9 @@ qaTest('TC-APP010-047', async ({ page, qa }) => {
 qaTest('TC-APP010-048', async ({ page, qa }) => {
   const b = await balance(page, qa);
   if (!b) {
-    qa.notRun(1, 'the balance of the precondition could not be set (see the note)');
-    qa.notRun(2, 'see step 1');
+    // The year balance of the precondition is refused (found blocker 43).
+    qa.blocked(1, 43);
+    qa.blocked(2, 43);
     return;
   }
   await qa.step(1, async () => {

@@ -14,7 +14,7 @@ Test title = `<TC ID> <Scenario Name> [<file> | Steps | rows a-b | <TC ID>]`; an
 | TC-APP004-006 | JRN-APP004-006 | Admission without a bed, bed given later | Positive | High | rows 25-28 | 7 | `tests/modules/04-inpatient/admissions.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP004-007 | JRN-APP004-007 | Admission with a typed admission number | Positive | Medium | rows 29-31 | 8 | `tests/modules/04-inpatient/admissions.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP004-008 | JRN-APP004-008 | Admission list: search, sort, paging and census | Positive | High | rows 32-37 | 9 | `tests/modules/04-inpatient/admissions.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
-| TC-APP004-009 | JRN-APP004-009 | Printing the admission barcode | Positive | Medium | rows 38-41 | 10 | `tests/modules/04-inpatient/not-automated.spec.ts` | U1 / Podomoro | skip | 04-inpatient.xlsx \| Journeys \| row 10: Automation Candidate = No |
+| TC-APP004-009 | JRN-APP004-009 | Printing the admission barcode | Positive | Medium | rows 38-41 | 10 | `tests/modules/04-inpatient/barcode-label.spec.ts` | U1 / Podomoro | automate (read-only) |  |
 | TC-APP004-010 | JRN-APP004-010 | Transferring a patient to another bed | Positive | Critical | rows 42-46 | 11 | `tests/modules/04-inpatient/admissions.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP004-011 | JRN-APP004-011 | Marking billing cleared | Positive | Critical | rows 47-49 | 12 | `tests/modules/04-inpatient/admissions.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP004-012 | JRN-APP004-012 | Discharging a patient | Positive | Critical | rows 50-54 | 13 | `tests/modules/04-inpatient/admissions.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
@@ -24,7 +24,7 @@ Test title = `<TC ID> <Scenario Name> [<file> | Steps | rows a-b | <TC ID>]`; an
 | TC-APP004-016 | JRN-APP004-016 | Ward refuses a delivery | Positive | High | rows 65-67 | 17 | `tests/modules/04-inpatient/evaluation.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP004-017 | JRN-APP004-017 | Return request for medicine issued to a stay | Positive | High | rows 68-71 | 18 | `tests/modules/04-inpatient/evaluation.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP004-018 | JRN-APP004-018 | Nurse working on "All branches" | Positive | High | rows 72-77 | 19 | `tests/modules/04-inpatient/access.spec.ts` | U2 / All branches | automate (saves; needs QA_ALLOW_WRITES) |  |
-| TC-APP004-019 | JRN-APP004-019 | Audit trail of beds and stays | Positive | High | rows 78-80 | 20 | `tests/modules/04-inpatient/not-automated.spec.ts` | U1 / Podomoro | fixme | Needs user U10 "Second tenant, tenant without a licence, platform superadmin" (00-prerequisites.xlsx \| Users \| row 14: Deferred: needs a decision and a second tenant) |
+| TC-APP004-019 | JRN-APP004-019 | Audit trail of beds and stays | Positive | High | rows 78-80 | 20 | `tests/modules/04-inpatient/not-automated.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP004-020 | JRN-APP004-020 | Hub, navigation and Indonesian | Positive | Medium | rows 81-83 | 21 | `tests/modules/04-inpatient/hub.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP004-021 | JRN-APP004-021 | Admitting someone who is not a registered patient | Negative | Critical | rows 84-86 | 22 | `tests/modules/04-inpatient/admissions.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP004-022 | JRN-APP004-022 | Name typed differently from the register | Negative | Critical | rows 87-89 | 23 | `tests/modules/04-inpatient/evaluation.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
@@ -41,12 +41,12 @@ Test title = `<TC ID> <Scenario Name> [<file> | Steps | rows a-b | <TC ID>]`; an
 | TC-APP004-033 | JRN-APP004-033 | Admission and discharge numbers | Negative | High | rows 117-119 | 34 | `tests/modules/04-inpatient/evaluation.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP004-034 | JRN-APP004-034 | Census figures at the edges | Negative | High | rows 120-122 | 35 | `tests/modules/04-inpatient/admissions.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP004-035 | JRN-APP004-035 | Transfer that must be refused | Negative | High | rows 123-125 | 36 | `tests/modules/04-inpatient/evaluation.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
-| TC-APP004-036 | JRN-APP004-036 | History of a patient's beds | Negative | High | rows 126-127 | 37 | `tests/modules/04-inpatient/not-automated.spec.ts` | U1 / Podomoro | fixme | Needs user U10 "Second tenant, tenant without a licence, platform superadmin" (00-prerequisites.xlsx \| Users \| row 14: Deferred: needs a decision and a second tenant) |
+| TC-APP004-036 | JRN-APP004-036 | History of a patient's beds | Negative | High | rows 126-127 | 37 | `tests/modules/04-inpatient/bed-history.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP004-037 | JRN-APP004-037 | Discharge before billing is cleared | Negative | Critical | rows 128-129 | 38 | `tests/modules/04-inpatient/admissions.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP004-038 | JRN-APP004-038 | Billing marked cleared without a settled bill | Negative | Critical | rows 130-132 | 39 | `tests/modules/04-inpatient/evaluation.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP004-039 | JRN-APP004-039 | Discharge while a return request is pending | Negative | High | rows 133-136 | 40 | `tests/modules/04-inpatient/evaluation.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP004-040 | JRN-APP004-040 | Discharge that must be refused | Negative | High | rows 137-139 | 41 | `tests/modules/04-inpatient/evaluation.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
-| TC-APP004-041 | JRN-APP004-041 | Discharge when the approval chain is missing or switched off | Negative | High | rows 140-142 | 42 | `tests/modules/04-inpatient/not-automated.spec.ts` | U1 / Podomoro | fixme | Needs user U10 "Second tenant, tenant without a licence, platform superadmin" (00-prerequisites.xlsx \| Users \| row 14: Deferred: needs a decision and a second tenant) |
+| TC-APP004-041 | JRN-APP004-041 | Discharge when the approval chain is missing or switched off | Negative | High | rows 140-142 | 42 | `tests/modules/04-inpatient/discharge-chain-off.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP004-042 | JRN-APP004-042 | Discharge takes effect before it is approved | Negative | Critical | rows 143-145 | 43 | `tests/modules/04-inpatient/evaluation.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP004-043 | JRN-APP004-043 | What a discharge record holds | Negative | Critical | rows 146-148 | 44 | `tests/modules/04-inpatient/admissions.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP004-044 | JRN-APP004-044 | Ward group that must be refused | Negative | High | rows 149-152 | 45 | `tests/modules/04-inpatient/supply.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
@@ -57,7 +57,7 @@ Test title = `<TC ID> <Scenario Name> [<file> | Steps | rows a-b | <TC ID>]`; an
 | TC-APP004-049 | JRN-APP004-049 | User without the inpatient right | Security | Critical | rows 165-168 | 50 | `tests/modules/04-inpatient/access.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP004-050 | JRN-APP004-050 | User with no ward role reads the stays | Negative | Critical | rows 169-171 | 51 | `tests/modules/04-inpatient/access.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP004-051 | JRN-APP004-051 | Stays and beds of another branch | Security | Critical | rows 172-175 | 52 | `tests/modules/04-inpatient/access.spec.ts` | U1 / Two branches | automate (saves; needs QA_ALLOW_WRITES) |  |
-| TC-APP004-052 | JRN-APP004-052 | Tenant without the Inpatient licence | Security | High | rows 176-177 | 53 | `tests/modules/04-inpatient/not-automated.spec.ts` | U1 / Podomoro | fixme | Needs user U10 "Second tenant, tenant without a licence, platform superadmin" (00-prerequisites.xlsx \| Users \| row 14: Deferred: needs a decision and a second tenant) |
+| TC-APP004-052 | JRN-APP004-052 | Tenant without the Inpatient licence | Security | High | rows 176-177 | 53 | `tests/modules/04-inpatient/not-automated.spec.ts` | U1 / Podomoro | fixme | Blocker 59 (found by automation, docs/qa/blockers-found.md): No tenant without a licence can be reached: the showcase has one tenant, and Tenants and Entitlements refuse the administrator / Needs user U10 "Second tenant, tenant without a licence, platform superadmin" (00-prerequisites.xlsx \| Users \| row 14: Deferred: needs a decision and a second tenant) |
 | TC-APP004-053 | JRN-APP004-053 | Opening admissions without being signed in | Negative | Critical | rows 178-180 | 54 | `tests/modules/04-inpatient/evaluation.spec.ts` | signed out / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP004-054 | JRN-APP004-054 | Script text in names and descriptions | Negative | Medium | rows 181-183 | 55 | `tests/modules/04-inpatient/admissions.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP004-055 | JRN-APP004-055 | Double click, two nurses at once, and reload | Other | High | rows 184-187 | 56 | `tests/modules/04-inpatient/evaluation.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
@@ -93,15 +93,15 @@ Test title = `<TC ID> <Scenario Name> [<file> | Steps | rows a-b | <TC ID>]`; an
 | TC-APP004-085 | JRN-APP004-067 | Screen /adt/discharges opens | Regression | Medium | row 236 | 68 | `tests/modules/04-inpatient/screens.spec.ts` | U2 / All branches | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP004-086 | JRN-APP004-067 | Screen /adt/requests opens | Regression | Medium | row 237 | 68 | `tests/modules/04-inpatient/screens.spec.ts` | U2 / All branches | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP004-087 | JRN-APP004-067 | Screen /adt/ward opens | Regression | Medium | row 238 | 68 | `tests/modules/04-inpatient/screens.spec.ts` | U2 / All branches | automate (saves; needs QA_ALLOW_WRITES) |  |
-| TC-APP004-088 | JRN-APP004-068 | Deep link without a session | Security | High | row 239 | 69 | `tests/modules/04-inpatient/not-automated.spec.ts` | U1 / Podomoro | fixme | Needs user U10 "Second tenant, tenant without a licence, platform superadmin" (00-prerequisites.xlsx \| Users \| row 14: Deferred: needs a decision and a second tenant) |
-| TC-APP004-089 | JRN-APP004-068 | Tenant without the licence | Security | High | rows 240-241 | 69 | `tests/modules/04-inpatient/not-automated.spec.ts` | U1 / Podomoro | fixme | Needs user U10 "Second tenant, tenant without a licence, platform superadmin" (00-prerequisites.xlsx \| Users \| row 14: Deferred: needs a decision and a second tenant) |
-| TC-APP004-090 | JRN-APP004-068 | Write without the write privilege | Security | High | row 242 | 69 | `tests/modules/04-inpatient/not-automated.spec.ts` | U1 / Podomoro | fixme | Needs user U10 "Second tenant, tenant without a licence, platform superadmin" (00-prerequisites.xlsx \| Users \| row 14: Deferred: needs a decision and a second tenant) / TBD in step(s) 1: stated part only (Q8) |
+| TC-APP004-088 | JRN-APP004-068 | Deep link without a session | Security | High | row 239 | 69 | `tests/modules/04-inpatient/not-automated.spec.ts` | signed out / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
+| TC-APP004-089 | JRN-APP004-068 | Tenant without the licence | Security | High | rows 240-241 | 69 | `tests/modules/04-inpatient/not-automated.spec.ts` | U1 / Podomoro | fixme | Blocker 59 (found by automation, docs/qa/blockers-found.md): No tenant without a licence can be reached: the showcase has one tenant, and Tenants and Entitlements refuse the administrator / Needs user U10 "Second tenant, tenant without a licence, platform superadmin" (00-prerequisites.xlsx \| Users \| row 14: Deferred: needs a decision and a second tenant) |
+| TC-APP004-090 | JRN-APP004-068 | Write without the write privilege | Security | High | row 242 | 69 | `tests/modules/04-inpatient/not-automated.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) | TBD in step(s) 1: stated part only (Q8) |
 
 ## Counts
 
-- automate (read-only): 2
-- automate (saves; needs QA_ALLOW_WRITES): 80
+- automate (read-only): 3
+- automate (saves; needs QA_ALLOW_WRITES): 85
 - automate (chain; needs a record from another app): 0
-- fixme: 7
-- skip: 1
+- fixme: 2
+- skip: 0
 - test cases with a "TBD" step (asserted partially): 3

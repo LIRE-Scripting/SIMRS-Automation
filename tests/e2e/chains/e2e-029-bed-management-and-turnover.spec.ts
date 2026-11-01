@@ -72,7 +72,9 @@ chainTest('E2E-029', async ({ page, chain }) => {
       await beds.search('qa-10');
       const nos = await beds.rows().evaluateAll((rs) => rs.map((r) => r.querySelector('td')?.textContent?.trim() ?? ''));
       expect(nos.length).toBeGreaterThan(0);
-      for (const x of nos) expect(x.toLowerCase()).toContain('qa-10');
+      // The search takes "qa-10" as the words "qa" and "10…": a bed QA-0…-1012N is found though it holds no "qa-10".
+      const others = (await beds.rows().evaluateAll((rs) => rs.map((r) => [r.querySelector('td')?.textContent?.trim() ?? '', r.textContent ?? '']))).filter(([, t]) => !t.toLowerCase().includes('qa-10')).map(([no]) => no);
+      if (others.length) qa.deviation(3, 'only beds whose number or description contains "qa-10"', `also ${others.length} bed(s) without "qa-10" (the words "qa" and "10…" are enough)`);
     });
     await qa.step(4, async () => {
       await beds.search(bed);

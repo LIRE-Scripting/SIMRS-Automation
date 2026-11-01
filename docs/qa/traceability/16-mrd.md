@@ -12,7 +12,7 @@ Test title = `<TC ID> <Scenario Name> [<file> | Steps | rows a-b | <TC ID>]`; an
 | TC-APP016-004 | JRN-APP016-004 | Finding the patient in the issue dialog | Positive | High | rows 14-17 | 5 | `tests/modules/16-mrd/mrd.spec.ts` | U1 / Podomoro | automate (read-only) |  |
 | TC-APP016-005 | JRN-APP016-005 | Request list and record list: columns, order and paging | Positive | High | rows 18-21 | 6 | `tests/modules/16-mrd/mrd.spec.ts` | U1 / Podomoro | automate (read-only) |  |
 | TC-APP016-006 | JRN-APP016-006 | Records officer working on "All branches" | Positive | High | rows 22-27 | 7 | `tests/modules/16-mrd/access.spec.ts` | U2 / All branches | automate (saves; needs QA_ALLOW_WRITES) |  |
-| TC-APP016-007 | JRN-APP016-007 | Audit trail of requests, issues and returns | Positive | High | rows 28-29 | 8 | `tests/modules/16-mrd/not-automated.spec.ts` | U1 / Podomoro | fixme | Needs user U10 "Second tenant, tenant without a licence, platform superadmin" (00-prerequisites.xlsx \| Users \| row 14: Deferred: needs a decision and a second tenant) |
+| TC-APP016-007 | JRN-APP016-007 | Audit trail of requests, issues and returns | Positive | High | rows 28-29 | 8 | `tests/modules/16-mrd/not-automated.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP016-008 | JRN-APP016-008 | Hub, navigation and Indonesian | Positive | Medium | rows 30-32 | 9 | `tests/modules/16-mrd/mrd.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP016-009 | JRN-APP016-009 | File request without a patient or a requester | Negative | Critical | rows 33-35 | 10 | `tests/modules/16-mrd/mrd.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP016-010 | JRN-APP016-010 | Request and issue are not connected | Negative | Critical | rows 36-38 | 11 | `tests/modules/16-mrd/mrd.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
@@ -30,7 +30,7 @@ Test title = `<TC ID> <Scenario Name> [<file> | Steps | rows a-b | <TC ID>]`; an
 | TC-APP016-022 | JRN-APP016-022 | User without the medical records right | Security | Critical | rows 78-80 | 23 | `tests/modules/16-mrd/access.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP016-023 | JRN-APP016-023 | User with no records role reads the loan list | Negative | Critical | rows 81-83 | 24 | `tests/modules/16-mrd/access.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP016-024 | JRN-APP016-024 | Requests and records of another branch | Security | Critical | rows 84-86 | 25 | `tests/modules/16-mrd/access.spec.ts` | U1 / Two branches | automate (saves; needs QA_ALLOW_WRITES) |  |
-| TC-APP016-025 | JRN-APP016-025 | Tenant without the MRD licence | Security | High | rows 87-88 | 26 | `tests/modules/16-mrd/not-automated.spec.ts` | U1 / Podomoro | fixme | Needs user U10 "Second tenant, tenant without a licence, platform superadmin" (00-prerequisites.xlsx \| Users \| row 14: Deferred: needs a decision and a second tenant) |
+| TC-APP016-025 | JRN-APP016-025 | Tenant without the MRD licence | Security | High | rows 87-88 | 26 | `tests/modules/16-mrd/not-automated.spec.ts` | U1 / Podomoro | fixme | Blocker 59 (found by automation, docs/qa/blockers-found.md): No tenant without a licence can be reached: the showcase has one tenant, and Tenants and Entitlements refuse the administrator / Needs user U10 "Second tenant, tenant without a licence, platform superadmin" (00-prerequisites.xlsx \| Users \| row 14: Deferred: needs a decision and a second tenant) |
 | TC-APP016-026 | JRN-APP016-026 | Opening the records without being signed in | Negative | Critical | rows 89-92 | 27 | `tests/modules/16-mrd/evaluation.spec.ts` | signed out / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP016-027 | JRN-APP016-027 | Script text in the fields of a request and a record | Negative | Medium | rows 93-96 | 28 | `tests/modules/16-mrd/mrd.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP016-028 | JRN-APP016-028 | Double click, two officers at once, and reload | Other | Medium | rows 97-100 | 29 | `tests/modules/16-mrd/evaluation.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
@@ -52,15 +52,15 @@ Test title = `<TC ID> <Scenario Name> [<file> | Steps | rows a-b | <TC ID>]`; an
 | TC-APP016-044 | JRN-APP016-035 | Screen /mrd/outpatient opens | Regression | Medium | row 157 | 36 | `tests/modules/16-mrd/mrd.spec.ts` | U2 / All branches | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP016-045 | JRN-APP016-035 | Screen /mrd/records opens | Regression | Medium | row 158 | 36 | `tests/modules/16-mrd/mrd.spec.ts` | U2 / All branches | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP016-046 | JRN-APP016-035 | Screen /mrd/requests opens | Regression | Medium | row 159 | 36 | `tests/modules/16-mrd/mrd.spec.ts` | U2 / All branches | automate (saves; needs QA_ALLOW_WRITES) |  |
-| TC-APP016-047 | JRN-APP016-036 | Deep link without a session | Security | High | row 160 | 37 | `tests/modules/16-mrd/not-automated.spec.ts` | U1 / Podomoro | fixme | Needs user U10 "Second tenant, tenant without a licence, platform superadmin" (00-prerequisites.xlsx \| Users \| row 14: Deferred: needs a decision and a second tenant) |
-| TC-APP016-048 | JRN-APP016-036 | Tenant without the licence | Security | High | rows 161-162 | 37 | `tests/modules/16-mrd/not-automated.spec.ts` | U1 / Podomoro | fixme | Needs user U10 "Second tenant, tenant without a licence, platform superadmin" (00-prerequisites.xlsx \| Users \| row 14: Deferred: needs a decision and a second tenant) |
-| TC-APP016-049 | JRN-APP016-036 | Write without the write privilege | Security | High | row 163 | 37 | `tests/modules/16-mrd/not-automated.spec.ts` | U1 / Podomoro | fixme | Needs user U10 "Second tenant, tenant without a licence, platform superadmin" (00-prerequisites.xlsx \| Users \| row 14: Deferred: needs a decision and a second tenant) / TBD in step(s) 1: stated part only (Q8) |
+| TC-APP016-047 | JRN-APP016-036 | Deep link without a session | Security | High | row 160 | 37 | `tests/modules/16-mrd/not-automated.spec.ts` | signed out / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
+| TC-APP016-048 | JRN-APP016-036 | Tenant without the licence | Security | High | rows 161-162 | 37 | `tests/modules/16-mrd/not-automated.spec.ts` | U1 / Podomoro | fixme | Blocker 59 (found by automation, docs/qa/blockers-found.md): No tenant without a licence can be reached: the showcase has one tenant, and Tenants and Entitlements refuse the administrator / Needs user U10 "Second tenant, tenant without a licence, platform superadmin" (00-prerequisites.xlsx \| Users \| row 14: Deferred: needs a decision and a second tenant) |
+| TC-APP016-049 | JRN-APP016-036 | Write without the write privilege | Security | High | row 163 | 37 | `tests/modules/16-mrd/not-automated.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) | TBD in step(s) 1: stated part only (Q8) |
 
 ## Counts
 
 - automate (read-only): 2
-- automate (saves; needs QA_ALLOW_WRITES): 37
+- automate (saves; needs QA_ALLOW_WRITES): 40
 - automate (chain; needs a record from another app): 1
-- fixme: 9
+- fixme: 6
 - skip: 0
 - test cases with a "TBD" step (asserted partially): 11

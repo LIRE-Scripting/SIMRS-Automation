@@ -16,7 +16,7 @@ Test title = `<TC ID> <Scenario Name> [<file> | Steps | rows a-b | <TC ID>]`; an
 | TC-APP018-008 | JRN-APP018-008 | Tax code: create, find and edit | Positive | High | rows 35-39 | 9 | `tests/modules/18-settings/mdm.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP018-009 | JRN-APP018-009 | Master data lists: search, status filter, order and paging | Positive | High | rows 40-43 | 10 | `tests/modules/18-settings/mdm.spec.ts` | U1 / Podomoro | automate (read-only) |  |
 | TC-APP018-010 | JRN-APP018-010 | Admin working on "All branches" | Positive | High | rows 44-50 | 11 | `tests/modules/18-settings/access.spec.ts` | U2 / All branches | automate (saves; needs QA_ALLOW_WRITES) |  |
-| TC-APP018-011 | JRN-APP018-011 | Audit trail of master data | Positive | High | rows 51-52 | 12 | `tests/modules/18-settings/not-automated.spec.ts` | U1 / Podomoro | fixme | Needs user U10 "Second tenant, tenant without a licence, platform superadmin" (00-prerequisites.xlsx \| Users \| row 14: Deferred: needs a decision and a second tenant) |
+| TC-APP018-011 | JRN-APP018-011 | Audit trail of master data | Positive | High | rows 51-52 | 12 | `tests/modules/18-settings/not-automated.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP018-012 | JRN-APP018-012 | Two hubs, navigation and Indonesian | Positive | Medium | rows 53-56 | 13 | `tests/modules/18-settings/mdm.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP018-013 | JRN-APP018-013 | User without the master data right changes departments and service centers | Security | Critical | rows 57-60 | 14 | `tests/modules/18-settings/access.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP018-014 | JRN-APP018-014 | User without the master data right: sites, reference lists and tax codes | Security | Critical | rows 61-64 | 15 | `tests/modules/18-settings/access.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
@@ -32,7 +32,7 @@ Test title = `<TC ID> <Scenario Name> [<file> | Steps | rows a-b | <TC ID>]`; an
 | TC-APP018-024 | JRN-APP018-024 | Tax code: rate and kind at their limits | Boundary | High | rows 97-100 | 25 | `tests/modules/18-settings/mdm.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP018-025 | JRN-APP018-025 | Changing or retiring a tax code, and where rates apply | Negative | High | rows 101-104 | 26 | `tests/modules/18-settings/evaluation.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP018-026 | JRN-APP018-026 | Departments and service centers of another branch | Security | Critical | rows 105-108 | 27 | `tests/modules/18-settings/access.spec.ts` | U1 / Two branches | automate (saves; needs QA_ALLOW_WRITES) |  |
-| TC-APP018-027 | JRN-APP018-027 | Settings in a tenant with a small edition | Negative | Medium | rows 109-110 | 28 | `tests/modules/18-settings/not-automated.spec.ts` | U1 / Podomoro | fixme | Needs user U10 "Second tenant, tenant without a licence, platform superadmin" (00-prerequisites.xlsx \| Users \| row 14: Deferred: needs a decision and a second tenant) |
+| TC-APP018-027 | JRN-APP018-027 | Settings in a tenant with a small edition | Negative | Medium | rows 109-110 | 28 | `tests/modules/18-settings/not-automated.spec.ts` | U1 / Podomoro | fixme | Blocker 59 (found by automation, docs/qa/blockers-found.md): No tenant without a licence can be reached: the showcase has one tenant, and Tenants and Entitlements refuse the administrator / Needs user U10 "Second tenant, tenant without a licence, platform superadmin" (00-prerequisites.xlsx \| Users \| row 14: Deferred: needs a decision and a second tenant) |
 | TC-APP018-028 | JRN-APP018-028 | Opening Settings without being signed in | Negative | Critical | rows 111-114 | 29 | `tests/modules/18-settings/evaluation.spec.ts` | signed out / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP018-029 | JRN-APP018-029 | Script text in codes, names and the search box | Negative | Medium | rows 115-117 | 30 | `tests/modules/18-settings/mdm.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP018-030 | JRN-APP018-030 | Double click, two admins at once, and reload | Other | Medium | rows 118-120 | 31 | `tests/modules/18-settings/evaluation.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
@@ -96,14 +96,14 @@ Test title = `<TC ID> <Scenario Name> [<file> | Steps | rows a-b | <TC ID>]`; an
 | TC-APP018-088 | JRN-APP018-046 | Screen /tenants opens | Regression | Medium | row 271 | 47 | `tests/modules/18-settings/screens.spec.ts` | U2 / All branches | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP018-089 | JRN-APP018-046 | Screen /workflow opens | Regression | Medium | row 272 | 47 | `tests/modules/18-settings/screens.spec.ts` | U2 / All branches | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP018-090 | JRN-APP018-046 | Screen /workflow/process-definitions opens | Regression | Medium | row 273 | 47 | `tests/modules/18-settings/screens.spec.ts` | U2 / All branches | automate (saves; needs QA_ALLOW_WRITES) |  |
-| TC-APP018-091 | JRN-APP018-047 | Deep link without a session | Security | High | row 274 | 48 | `tests/modules/18-settings/not-automated.spec.ts` | U1 / Podomoro | fixme | Needs user U10 "Second tenant, tenant without a licence, platform superadmin" (00-prerequisites.xlsx \| Users \| row 14: Deferred: needs a decision and a second tenant) |
-| TC-APP018-092 | JRN-APP018-047 | Write without the write privilege | Security | High | row 275 | 48 | `tests/modules/18-settings/not-automated.spec.ts` | U1 / Podomoro | fixme | Needs user U10 "Second tenant, tenant without a licence, platform superadmin" (00-prerequisites.xlsx \| Users \| row 14: Deferred: needs a decision and a second tenant) / TBD in step(s) 1: stated part only (Q8) |
+| TC-APP018-091 | JRN-APP018-047 | Deep link without a session | Security | High | row 274 | 48 | `tests/modules/18-settings/not-automated.spec.ts` | signed out / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
+| TC-APP018-092 | JRN-APP018-047 | Write without the write privilege | Security | High | row 275 | 48 | `tests/modules/18-settings/not-automated.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) | TBD in step(s) 1: stated part only (Q8) |
 
 ## Counts
 
 - automate (read-only): 2
-- automate (saves; needs QA_ALLOW_WRITES): 83
+- automate (saves; needs QA_ALLOW_WRITES): 86
 - automate (chain; needs a record from another app): 2
-- fixme: 5
+- fixme: 2
 - skip: 0
 - test cases with a "TBD" step (asserted partially): 29

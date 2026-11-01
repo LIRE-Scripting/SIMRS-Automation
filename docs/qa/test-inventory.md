@@ -435,31 +435,31 @@ Journey IDs are shortened: `001-003` = `JRN-APP001-003`.
 
 | Module | TCs | read-only | saves | chain | fixme | skip | with TBD step |
 |---|---|---|---|---|---|---|---|
-| [01 Ambulatory Care](traceability/01-ambulatory-care.md) | 89 | 4 | 78 | 0 | 6 | 1 | 8 |
-| [02 Appointment](traceability/02-appointment.md) | 33 | 2 | 28 | 0 | 3 | 0 | 1 |
-| [03 Patient Care](traceability/03-patient-care.md) | 63 | 1 | 52 | 0 | 10 | 0 | 6 |
-| [04 Inpatient](traceability/04-inpatient.md) | 90 | 2 | 80 | 0 | 7 | 1 | 3 |
-| [05 Pharmacy](traceability/05-pharmacy.md) | 78 | 0 | 72 | 0 | 6 | 0 | 11 |
-| [06 Transfusion Medicine](traceability/06-transfusion-medicine.md) | 81 | 1 | 46 | 0 | 33 | 1 | 5 |
-| [07 Inventory](traceability/07-inventory.md) | 67 | 2 | 57 | 0 | 8 | 0 | 16 |
-| [08 Operation Theater](traceability/08-operation-theater.md) | 53 | 1 | 47 | 0 | 5 | 0 | 11 |
-| [09 Procurement](traceability/09-procurement.md) | 65 | 2 | 50 | 0 | 13 | 0 | 19 |
-| [10 HR](traceability/10-hr.md) | 68 | 2 | 51 | 0 | 15 | 0 | 17 |
-| [11 Laboratory](traceability/11-laboratory.md) | 54 | 1 | 47 | 0 | 5 | 1 | 11 |
-| [12 RIS](traceability/12-ris.md) | 35 | 1 | 28 | 1 | 5 | 0 | 6 |
-| [13 Dietary](traceability/13-dietary.md) | 62 | 3 | 46 | 0 | 13 | 0 | 18 |
-| [14 Hospital Accounts](traceability/14-hospital-accounts.md) | 85 | 0 | 67 | 2 | 16 | 0 | 25 |
-| [15 Emergency](traceability/15-emergency.md) | 69 | 1 | 54 | 2 | 12 | 0 | 28 |
-| [16 MRD](traceability/16-mrd.md) | 49 | 2 | 37 | 1 | 9 | 0 | 11 |
-| [17 Payroll](traceability/17-payroll.md) | 69 | 1 | 36 | 5 | 27 | 0 | 32 |
-| [18 Settings](traceability/18-settings.md) | 92 | 2 | 83 | 2 | 5 | 0 | 29 |
-| [19 Finance](traceability/19-finance.md) | 128 | 4 | 105 | 7 | 12 | 0 | 31 |
-| [20 Budget](traceability/20-budget.md) | 64 | 0 | 42 | 11 | 11 | 0 | 13 |
-| [21 CSSD](traceability/21-cssd.md) | 57 | 0 | 42 | 4 | 11 | 0 | 14 |
-| [22 Services](traceability/22-services.md) | 36 | 0 | 23 | 0 | 13 | 0 | 22 |
-| [23 Sourcing](traceability/23-sourcing.md) | 34 | 0 | 18 | 9 | 7 | 0 | 26 |
-| [24 Housekeeping](traceability/24-housekeeping.md) | 22 | 0 | 19 | 0 | 3 | 0 | 14 |
-| [25 Linen](traceability/25-linen.md) | 21 | 0 | 15 | 3 | 3 | 0 | 14 |
-| [26 Maintenance](traceability/26-maintenance.md) | 20 | 0 | 13 | 4 | 3 | 0 | 14 |
-| [27 Fixed assets](traceability/27-fixed-assets.md) | 20 | 0 | 11 | 6 | 3 | 0 | 13 |
-| **Total** | **1604** | **32** | **1247** | **57** | **264** | **4** | **418** |
+| [01 Ambulatory Care](traceability/01-ambulatory-care.md) | 89 | 5 | 81 | 0 | 3 | 0 | 8 |
+| [02 Appointment](traceability/02-appointment.md) | 33 | 2 | 30 | 0 | 1 | 0 | 1 |
+| [03 Patient Care](traceability/03-patient-care.md) | 63 | 1 | 55 | 0 | 7 | 0 | 6 |
+| [04 Inpatient](traceability/04-inpatient.md) | 90 | 3 | 85 | 0 | 2 | 0 | 3 |
+| [05 Pharmacy](traceability/05-pharmacy.md) | 78 | 0 | 74 | 0 | 4 | 0 | 11 |
+| [06 Transfusion Medicine](traceability/06-transfusion-medicine.md) | 81 | 1 | 49 | 0 | 31 | 0 | 5 |
+| [07 Inventory](traceability/07-inventory.md) | 67 | 2 | 60 | 0 | 5 | 0 | 16 |
+| [08 Operation Theater](traceability/08-operation-theater.md) | 53 | 1 | 50 | 0 | 2 | 0 | 11 |
+| [09 Procurement](traceability/09-procurement.md) | 65 | 2 | 55 | 0 | 8 | 0 | 19 |
+| [10 HR](traceability/10-hr.md) | 68 | 2 | 54 | 0 | 12 | 0 | 17 |
+| [11 Laboratory](traceability/11-laboratory.md) | 54 | 1 | 51 | 0 | 2 | 0 | 11 |
+| [12 RIS](traceability/12-ris.md) | 35 | 1 | 31 | 1 | 2 | 0 | 6 |
+| [13 Dietary](traceability/13-dietary.md) | 62 | 3 | 49 | 0 | 10 | 0 | 18 |
+| [14 Hospital Accounts](traceability/14-hospital-accounts.md) | 85 | 0 | 70 | 2 | 13 | 0 | 25 |
+| [15 Emergency](traceability/15-emergency.md) | 69 | 1 | 57 | 2 | 9 | 0 | 28 |
+| [16 MRD](traceability/16-mrd.md) | 49 | 2 | 40 | 1 | 6 | 0 | 11 |
+| [17 Payroll](traceability/17-payroll.md) | 69 | 1 | 39 | 5 | 24 | 0 | 32 |
+| [18 Settings](traceability/18-settings.md) | 92 | 2 | 86 | 2 | 2 | 0 | 29 |
+| [19 Finance](traceability/19-finance.md) | 128 | 4 | 108 | 7 | 9 | 0 | 31 |
+| [20 Budget](traceability/20-budget.md) | 64 | 0 | 44 | 11 | 9 | 0 | 13 |
+| [21 CSSD](traceability/21-cssd.md) | 57 | 0 | 44 | 4 | 9 | 0 | 14 |
+| [22 Services](traceability/22-services.md) | 36 | 0 | 25 | 0 | 11 | 0 | 22 |
+| [23 Sourcing](traceability/23-sourcing.md) | 34 | 0 | 20 | 9 | 5 | 0 | 26 |
+| [24 Housekeeping](traceability/24-housekeeping.md) | 22 | 0 | 21 | 0 | 1 | 0 | 14 |
+| [25 Linen](traceability/25-linen.md) | 21 | 0 | 17 | 3 | 1 | 0 | 14 |
+| [26 Maintenance](traceability/26-maintenance.md) | 20 | 0 | 15 | 4 | 1 | 0 | 14 |
+| [27 Fixed assets](traceability/27-fixed-assets.md) | 20 | 0 | 13 | 6 | 1 | 0 | 13 |
+| **Total** | **1604** | **34** | **1323** | **57** | **190** | **0** | **418** |

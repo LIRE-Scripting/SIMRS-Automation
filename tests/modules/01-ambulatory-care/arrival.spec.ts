@@ -259,14 +259,6 @@ qaTest('TC-APP001-056', async ({ page, qa }) => {
   });
 });
 
-qaTest('TC-APP001-058', async () => {
-  test.skip(true, 'needs arrivals at 06:50 and 07:05 WIB in one run (open question Q16)');
-});
-
-qaTest('TC-APP001-059', async () => {
-  test.skip(true, 'needs an arrival made yesterday under "Keep counting" (two-day run, open question Q16)');
-});
-
 qaTest('TC-APP001-060', async ({ page, context, qa }) => {
   const arrival = new ArrivalPage(page);
   const appts = new AppointmentsPage(page);

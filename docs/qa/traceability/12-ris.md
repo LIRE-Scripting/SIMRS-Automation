@@ -10,7 +10,7 @@ Test title = `<TC ID> <Scenario Name> [<file> | Steps | rows a-b | <TC ID>]`; an
 | TC-APP012-002 | JRN-APP012-002 | Registering an order with the study only | Positive | High | rows 7-8 | 3 | `tests/modules/12-ris/ris.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP012-003 | JRN-APP012-003 | Order list: order of rows and paging | Positive | High | rows 9-11 | 4 | `tests/modules/12-ris/ris.spec.ts` | U1 / Podomoro | automate (read-only) |  |
 | TC-APP012-004 | JRN-APP012-004 | Radiographer working on "All branches" | Positive | High | rows 12-16 | 5 | `tests/modules/12-ris/access.spec.ts` | U2 / All branches | automate (saves; needs QA_ALLOW_WRITES) |  |
-| TC-APP012-005 | JRN-APP012-005 | Audit trail of radiology orders | Positive | High | row 17 | 6 | `tests/modules/12-ris/not-automated.spec.ts` | U1 / Podomoro | fixme | Needs user U10 "Second tenant, tenant without a licence, platform superadmin" (00-prerequisites.xlsx \| Users \| row 14: Deferred: needs a decision and a second tenant) |
+| TC-APP012-005 | JRN-APP012-005 | Audit trail of radiology orders | Positive | High | row 17 | 6 | `tests/modules/12-ris/not-automated.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP012-006 | JRN-APP012-006 | Hub, navigation and Indonesian | Positive | Medium | rows 18-20 | 7 | `tests/modules/12-ris/ris.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP012-007 | JRN-APP012-007 | Radiology order without a patient | Negative | Critical | rows 21-23 | 8 | `tests/modules/12-ris/ris.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP012-008 | JRN-APP012-008 | Doctor's request for an examination | Negative | Critical | rows 24-26 | 9 | `tests/modules/12-ris/evaluation.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
@@ -26,7 +26,7 @@ Test title = `<TC ID> <Scenario Name> [<file> | Steps | rows a-b | <TC ID>]`; an
 | TC-APP012-018 | JRN-APP012-018 | User without the radiology right | Security | Critical | rows 54-55 | 19 | `tests/modules/12-ris/access.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP012-019 | JRN-APP012-019 | User with no radiology role reads the orders | Negative | High | rows 56-57 | 20 | `tests/modules/12-ris/access.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP012-020 | JRN-APP012-020 | Orders of another branch | Security | Critical | rows 58-59 | 21 | `tests/modules/12-ris/access.spec.ts` | U1 / Two branches | automate (saves; needs QA_ALLOW_WRITES) |  |
-| TC-APP012-021 | JRN-APP012-021 | Tenant without the RIS licence | Security | High | rows 60-61 | 22 | `tests/modules/12-ris/not-automated.spec.ts` | U1 / Podomoro | fixme | Needs user U10 "Second tenant, tenant without a licence, platform superadmin" (00-prerequisites.xlsx \| Users \| row 14: Deferred: needs a decision and a second tenant) |
+| TC-APP012-021 | JRN-APP012-021 | Tenant without the RIS licence | Security | High | rows 60-61 | 22 | `tests/modules/12-ris/not-automated.spec.ts` | U1 / Podomoro | fixme | Blocker 59 (found by automation, docs/qa/blockers-found.md): No tenant without a licence can be reached: the showcase has one tenant, and Tenants and Entitlements refuse the administrator / Needs user U10 "Second tenant, tenant without a licence, platform superadmin" (00-prerequisites.xlsx \| Users \| row 14: Deferred: needs a decision and a second tenant) |
 | TC-APP012-022 | JRN-APP012-022 | Opening the orders without being signed in | Negative | Critical | rows 62-64 | 23 | `tests/modules/12-ris/evaluation.spec.ts` | signed out / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP012-023 | JRN-APP012-023 | Script text in the fields | Negative | Medium | rows 65-66 | 24 | `tests/modules/12-ris/ris.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP012-024 | JRN-APP012-024 | Double click, two radiographers at once, and reload | Other | Medium | rows 67-69 | 25 | `tests/modules/12-ris/evaluation.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
@@ -38,15 +38,15 @@ Test title = `<TC ID> <Scenario Name> [<file> | Steps | rows a-b | <TC ID>]`; an
 | TC-APP012-030 | JRN-APP012-028 | Screen /radiology opens | Regression | High | row 85 | 29 | `tests/modules/12-ris/ris.spec.ts` | U2 / All branches | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP012-031 | JRN-APP012-028 | Screen /radiology/orders opens | Regression | Medium | row 86 | 29 | `tests/modules/12-ris/ris.spec.ts` | U2 / All branches | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP012-032 | JRN-APP012-028 | Screen /radiology/studies opens | Regression | Medium | row 87 | 29 | `tests/modules/12-ris/ris.spec.ts` | U2 / All branches | automate (saves; needs QA_ALLOW_WRITES) |  |
-| TC-APP012-033 | JRN-APP012-029 | Deep link without a session | Security | High | row 88 | 30 | `tests/modules/12-ris/not-automated.spec.ts` | U1 / Podomoro | fixme | Needs user U10 "Second tenant, tenant without a licence, platform superadmin" (00-prerequisites.xlsx \| Users \| row 14: Deferred: needs a decision and a second tenant) |
-| TC-APP012-034 | JRN-APP012-029 | Tenant without the licence | Security | High | rows 89-90 | 30 | `tests/modules/12-ris/not-automated.spec.ts` | U1 / Podomoro | fixme | Needs user U10 "Second tenant, tenant without a licence, platform superadmin" (00-prerequisites.xlsx \| Users \| row 14: Deferred: needs a decision and a second tenant) |
-| TC-APP012-035 | JRN-APP012-029 | Write without the write privilege | Security | High | row 91 | 30 | `tests/modules/12-ris/not-automated.spec.ts` | U1 / Podomoro | fixme | Needs user U10 "Second tenant, tenant without a licence, platform superadmin" (00-prerequisites.xlsx \| Users \| row 14: Deferred: needs a decision and a second tenant) / TBD in step(s) 1: stated part only (Q8) |
+| TC-APP012-033 | JRN-APP012-029 | Deep link without a session | Security | High | row 88 | 30 | `tests/modules/12-ris/not-automated.spec.ts` | signed out / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
+| TC-APP012-034 | JRN-APP012-029 | Tenant without the licence | Security | High | rows 89-90 | 30 | `tests/modules/12-ris/not-automated.spec.ts` | U1 / Podomoro | fixme | Blocker 59 (found by automation, docs/qa/blockers-found.md): No tenant without a licence can be reached: the showcase has one tenant, and Tenants and Entitlements refuse the administrator / Needs user U10 "Second tenant, tenant without a licence, platform superadmin" (00-prerequisites.xlsx \| Users \| row 14: Deferred: needs a decision and a second tenant) |
+| TC-APP012-035 | JRN-APP012-029 | Write without the write privilege | Security | High | row 91 | 30 | `tests/modules/12-ris/not-automated.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) | TBD in step(s) 1: stated part only (Q8) |
 
 ## Counts
 
 - automate (read-only): 1
-- automate (saves; needs QA_ALLOW_WRITES): 28
+- automate (saves; needs QA_ALLOW_WRITES): 31
 - automate (chain; needs a record from another app): 1
-- fixme: 5
+- fixme: 2
 - skip: 0
 - test cases with a "TBD" step (asserted partially): 6

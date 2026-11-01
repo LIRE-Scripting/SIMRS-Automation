@@ -18,7 +18,7 @@ Test title = `<TC ID> <Scenario Name> [<file> | Steps | rows a-b | <TC ID>]`; an
 | TC-APP019-010 | JRN-APP019-010 | Pharmacy sale and return in the voucher register | Positive | Critical | rows 36-38 | 11 | `tests/modules/19-finance/evaluation.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP019-011 | JRN-APP019-011 | ERP staging list | Positive | Medium | rows 39-41 | 12 | `tests/modules/19-finance/vouchers.spec.ts` | U1 / Podomoro | automate (read-only) |  |
 | TC-APP019-012 | JRN-APP019-012 | Accountant working on "All branches" | Positive | High | rows 42-46 | 13 | `tests/modules/19-finance/access.spec.ts` | U2 / All branches | automate (saves; needs QA_ALLOW_WRITES) |  |
-| TC-APP019-013 | JRN-APP019-013 | Audit trail of Finance | Positive | High | rows 47-48 | 14 | `tests/modules/19-finance/not-automated.spec.ts` | U1 / Podomoro | fixme | Needs user U10 "Second tenant, tenant without a licence, platform superadmin" (00-prerequisites.xlsx \| Users \| row 14: Deferred: needs a decision and a second tenant) |
+| TC-APP019-013 | JRN-APP019-013 | Audit trail of Finance | Positive | High | rows 47-48 | 14 | `tests/modules/19-finance/not-automated.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP019-014 | JRN-APP019-014 | Hub, navigation and Indonesian | Positive | Medium | rows 49-51 | 15 | `tests/modules/19-finance/vouchers.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP019-015 | JRN-APP019-015 | Voucher without accounts or debit and credit lines | Negative | Critical | rows 52-54 | 16 | `tests/modules/19-finance/vouchers.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP019-016 | JRN-APP019-016 | Voucher made by hand stays "Open" | Negative | Critical | rows 55-57 | 17 | `tests/modules/19-finance/evaluation.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
@@ -36,7 +36,7 @@ Test title = `<TC ID> <Scenario Name> [<file> | Steps | rows a-b | <TC ID>]`; an
 | TC-APP019-028 | JRN-APP019-028 | User without the finance right | Security | Critical | rows 97-100 | 29 | `tests/modules/19-finance/access.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP019-029 | JRN-APP019-029 | User with no finance role reads vouchers and staged invoices | Negative | Critical | rows 101-103 | 30 | `tests/modules/19-finance/access.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP019-030 | JRN-APP019-030 | Vouchers of another branch | Security | Critical | rows 104-106 | 31 | `tests/modules/19-finance/access.spec.ts` | U1 / Two branches | automate (saves; needs QA_ALLOW_WRITES) |  |
-| TC-APP019-031 | JRN-APP019-031 | Tenant without the licence that carries Finance | Security | High | rows 107-108 | 32 | `tests/modules/19-finance/not-automated.spec.ts` | U1 / Podomoro | fixme | Needs user U10 "Second tenant, tenant without a licence, platform superadmin" (00-prerequisites.xlsx \| Users \| row 14: Deferred: needs a decision and a second tenant) |
+| TC-APP019-031 | JRN-APP019-031 | Tenant without the licence that carries Finance | Security | High | rows 107-108 | 32 | `tests/modules/19-finance/not-automated.spec.ts` | U1 / Podomoro | fixme | Blocker 59 (found by automation, docs/qa/blockers-found.md): No tenant without a licence can be reached: the showcase has one tenant, and Tenants and Entitlements refuse the administrator / Needs user U10 "Second tenant, tenant without a licence, platform superadmin" (00-prerequisites.xlsx \| Users \| row 14: Deferred: needs a decision and a second tenant) |
 | TC-APP019-032 | JRN-APP019-032 | Opening Finance without being signed in | Negative | Critical | rows 109-112 | 33 | `tests/modules/19-finance/evaluation.spec.ts` | signed out / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP019-033 | JRN-APP019-033 | Script text in vouchers, accounts and years | Negative | Medium | rows 113-115 | 34 | `tests/modules/19-finance/vouchers.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP019-034 | JRN-APP019-034 | Double click, two accountants at once, and reload | Other | Medium | rows 116-118 | 35 | `tests/modules/19-finance/evaluation.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
@@ -131,15 +131,15 @@ Test title = `<TC ID> <Scenario Name> [<file> | Steps | rows a-b | <TC ID>]`; an
 | TC-APP019-123 | JRN-APP019-058 | Screen /finance/trial-balance opens | Regression | Medium | row 385 | 59 | `tests/modules/19-finance/vouchers.spec.ts` | U2 / All branches | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP019-124 | JRN-APP019-058 | Screen /finance/vouchers opens | Regression | Medium | row 386 | 59 | `tests/modules/19-finance/vouchers.spec.ts` | U2 / All branches | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP019-125 | JRN-APP019-058 | Screen /finance/year-end opens | Regression | Medium | row 387 | 59 | `tests/modules/19-finance/vouchers.spec.ts` | U2 / All branches | automate (saves; needs QA_ALLOW_WRITES) |  |
-| TC-APP019-126 | JRN-APP019-059 | Deep link without a session | Security | High | row 388 | 60 | `tests/modules/19-finance/not-automated.spec.ts` | U1 / Podomoro | fixme | Needs user U10 "Second tenant, tenant without a licence, platform superadmin" (00-prerequisites.xlsx \| Users \| row 14: Deferred: needs a decision and a second tenant) |
-| TC-APP019-127 | JRN-APP019-059 | Tenant without the licence | Security | High | rows 389-390 | 60 | `tests/modules/19-finance/not-automated.spec.ts` | U1 / Podomoro | fixme | Needs user U10 "Second tenant, tenant without a licence, platform superadmin" (00-prerequisites.xlsx \| Users \| row 14: Deferred: needs a decision and a second tenant) |
-| TC-APP019-128 | JRN-APP019-059 | Write without the write privilege | Security | High | row 391 | 60 | `tests/modules/19-finance/not-automated.spec.ts` | U1 / Podomoro | fixme | Needs user U10 "Second tenant, tenant without a licence, platform superadmin" (00-prerequisites.xlsx \| Users \| row 14: Deferred: needs a decision and a second tenant) / TBD in step(s) 1: stated part only (Q8) |
+| TC-APP019-126 | JRN-APP019-059 | Deep link without a session | Security | High | row 388 | 60 | `tests/modules/19-finance/not-automated.spec.ts` | signed out / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
+| TC-APP019-127 | JRN-APP019-059 | Tenant without the licence | Security | High | rows 389-390 | 60 | `tests/modules/19-finance/not-automated.spec.ts` | U1 / Podomoro | fixme | Blocker 59 (found by automation, docs/qa/blockers-found.md): No tenant without a licence can be reached: the showcase has one tenant, and Tenants and Entitlements refuse the administrator / Needs user U10 "Second tenant, tenant without a licence, platform superadmin" (00-prerequisites.xlsx \| Users \| row 14: Deferred: needs a decision and a second tenant) |
+| TC-APP019-128 | JRN-APP019-059 | Write without the write privilege | Security | High | row 391 | 60 | `tests/modules/19-finance/not-automated.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) | TBD in step(s) 1: stated part only (Q8) |
 
 ## Counts
 
 - automate (read-only): 4
-- automate (saves; needs QA_ALLOW_WRITES): 105
+- automate (saves; needs QA_ALLOW_WRITES): 108
 - automate (chain; needs a record from another app): 7
-- fixme: 12
+- fixme: 9
 - skip: 0
 - test cases with a "TBD" step (asserted partially): 31

@@ -15,7 +15,7 @@ Test title = `<TC ID> <Scenario Name> [<file> | Steps | rows a-b | <TC ID>]`; an
 | TC-APP013-007 | JRN-APP013-007 | Saving and reusing a TPN template | Positive | High | rows 24-27 | 8 | `tests/modules/13-dietary/tpn.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP013-008 | JRN-APP013-008 | Compounding workbench list | Positive | High | rows 28-30 | 9 | `tests/modules/13-dietary/tpn.spec.ts` | U1 / Podomoro | automate (read-only) |  |
 | TC-APP013-009 | JRN-APP013-009 | Dietitian working on "All branches" | Positive | High | rows 31-36 | 10 | `tests/modules/13-dietary/access.spec.ts` | U2 / All branches | automate (saves; needs QA_ALLOW_WRITES) |  |
-| TC-APP013-010 | JRN-APP013-010 | Audit trail of diet requests and TPN | Positive | High | rows 37-38 | 11 | `tests/modules/13-dietary/not-automated.spec.ts` | U1 / Podomoro | fixme | Needs user U10 "Second tenant, tenant without a licence, platform superadmin" (00-prerequisites.xlsx \| Users \| row 14: Deferred: needs a decision and a second tenant) |
+| TC-APP013-010 | JRN-APP013-010 | Audit trail of diet requests and TPN | Positive | High | rows 37-38 | 11 | `tests/modules/13-dietary/not-automated.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP013-011 | JRN-APP013-011 | Hub, navigation and Indonesian | Positive | Medium | rows 39-41 | 12 | `tests/modules/13-dietary/catalogue-orders-screens.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP013-012 | JRN-APP013-012 | Diet request without a patient or a diet | Negative | Critical | rows 42-45 | 13 | `tests/modules/13-dietary/requests.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP013-013 | JRN-APP013-013 | Diet request and the patient's admission | Negative | Critical | rows 46-48 | 14 | `tests/modules/13-dietary/evaluation.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
@@ -35,7 +35,7 @@ Test title = `<TC ID> <Scenario Name> [<file> | Steps | rows a-b | <TC ID>]`; an
 | TC-APP013-027 | JRN-APP013-027 | User without the diet right | Security | Critical | rows 101-104 | 28 | `tests/modules/13-dietary/access.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP013-028 | JRN-APP013-028 | User with no dietary role reads requests and TPN prescriptions | Negative | Critical | rows 105-107 | 29 | `tests/modules/13-dietary/access.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP013-029 | JRN-APP013-029 | Requests, TPN and templates of another branch | Security | Critical | rows 108-111 | 30 | `tests/modules/13-dietary/access.spec.ts` | U1 / Two branches | automate (saves; needs QA_ALLOW_WRITES) |  |
-| TC-APP013-030 | JRN-APP013-030 | Tenant without the licence that carries Dietary | Security | High | rows 112-114 | 31 | `tests/modules/13-dietary/not-automated.spec.ts` | U1 / Podomoro | fixme | Needs user U10 "Second tenant, tenant without a licence, platform superadmin" (00-prerequisites.xlsx \| Users \| row 14: Deferred: needs a decision and a second tenant) |
+| TC-APP013-030 | JRN-APP013-030 | Tenant without the licence that carries Dietary | Security | High | rows 112-114 | 31 | `tests/modules/13-dietary/not-automated.spec.ts` | U1 / Podomoro | fixme | Blocker 59 (found by automation, docs/qa/blockers-found.md): No tenant without a licence can be reached: the showcase has one tenant, and Tenants and Entitlements refuse the administrator / Needs user U10 "Second tenant, tenant without a licence, platform superadmin" (00-prerequisites.xlsx \| Users \| row 14: Deferred: needs a decision and a second tenant) |
 | TC-APP013-031 | JRN-APP013-031 | Opening Dietary without being signed in | Negative | Critical | rows 115-118 | 32 | `tests/modules/13-dietary/evaluation.spec.ts` | signed out / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP013-032 | JRN-APP013-032 | Script text in the fields of a request and a TPN | Negative | Medium | rows 119-120 | 33 | `tests/modules/13-dietary/requests.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP013-033 | JRN-APP013-033 | Double click, two dietitians at once, and reload | Other | Medium | rows 121-124 | 34 | `tests/modules/13-dietary/evaluation.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
@@ -65,15 +65,15 @@ Test title = `<TC ID> <Scenario Name> [<file> | Steps | rows a-b | <TC ID>]`; an
 | TC-APP013-057 | JRN-APP013-041 | Screen /diet/requests opens | Regression | Medium | row 195 | 42 | `tests/modules/13-dietary/catalogue-orders-screens.spec.ts` | U2 / All branches | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP013-058 | JRN-APP013-041 | Screen /diet/service opens | Regression | Medium | row 196 | 42 | `tests/modules/13-dietary/catalogue-orders-screens.spec.ts` | U2 / All branches | automate (saves; needs QA_ALLOW_WRITES) |  |
 | TC-APP013-059 | JRN-APP013-041 | Screen /diet/tpn opens | Regression | Medium | row 197 | 42 | `tests/modules/13-dietary/catalogue-orders-screens.spec.ts` | U2 / All branches | automate (saves; needs QA_ALLOW_WRITES) |  |
-| TC-APP013-060 | JRN-APP013-042 | Deep link without a session | Security | High | row 198 | 43 | `tests/modules/13-dietary/not-automated.spec.ts` | U1 / Podomoro | fixme | Needs user U10 "Second tenant, tenant without a licence, platform superadmin" (00-prerequisites.xlsx \| Users \| row 14: Deferred: needs a decision and a second tenant) |
-| TC-APP013-061 | JRN-APP013-042 | Tenant without the licence | Security | High | rows 199-200 | 43 | `tests/modules/13-dietary/not-automated.spec.ts` | U1 / Podomoro | fixme | Needs user U10 "Second tenant, tenant without a licence, platform superadmin" (00-prerequisites.xlsx \| Users \| row 14: Deferred: needs a decision and a second tenant) |
-| TC-APP013-062 | JRN-APP013-042 | Write without the write privilege | Security | High | row 201 | 43 | `tests/modules/13-dietary/not-automated.spec.ts` | U1 / Podomoro | fixme | Needs user U10 "Second tenant, tenant without a licence, platform superadmin" (00-prerequisites.xlsx \| Users \| row 14: Deferred: needs a decision and a second tenant) / TBD in step(s) 1: stated part only (Q8) |
+| TC-APP013-060 | JRN-APP013-042 | Deep link without a session | Security | High | row 198 | 43 | `tests/modules/13-dietary/not-automated.spec.ts` | signed out / Podomoro | automate (saves; needs QA_ALLOW_WRITES) |  |
+| TC-APP013-061 | JRN-APP013-042 | Tenant without the licence | Security | High | rows 199-200 | 43 | `tests/modules/13-dietary/not-automated.spec.ts` | U1 / Podomoro | fixme | Blocker 59 (found by automation, docs/qa/blockers-found.md): No tenant without a licence can be reached: the showcase has one tenant, and Tenants and Entitlements refuse the administrator / Needs user U10 "Second tenant, tenant without a licence, platform superadmin" (00-prerequisites.xlsx \| Users \| row 14: Deferred: needs a decision and a second tenant) |
+| TC-APP013-062 | JRN-APP013-042 | Write without the write privilege | Security | High | row 201 | 43 | `tests/modules/13-dietary/not-automated.spec.ts` | U1 / Podomoro | automate (saves; needs QA_ALLOW_WRITES) | TBD in step(s) 1: stated part only (Q8) |
 
 ## Counts
 
 - automate (read-only): 3
-- automate (saves; needs QA_ALLOW_WRITES): 46
+- automate (saves; needs QA_ALLOW_WRITES): 49
 - automate (chain; needs a record from another app): 0
-- fixme: 13
+- fixme: 10
 - skip: 0
 - test cases with a "TBD" step (asserted partially): 18

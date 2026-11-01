@@ -1,38 +1,38 @@
 # Deviasi: langkah yang berjalan tetapi hasilnya berbeda dari workbook
 
-Dibangun 2026-10-31 17:35 UTC dari `reports/summary/run-summary.json` (hasil terbaru tiap test case dan rantai). Bangun ulang: `npm run qa:run-summary && npm run qa:findings-md`.
+Dibangun 2026-11-01 06:30 UTC dari `reports/summary/run-summary.json` (hasil terbaru tiap test case dan rantai). Bangun ulang: `npm run qa:run-summary && npm run qa:findings-md`.
 
 Deviasi = langkah **bisa dijalankan**, tetapi yang tampil di site tidak sama dengan *Expected Result* workbook. Di workbook hasil, langkahnya berstatus **Failed** dengan perilaku site di *Actual Result*. Blocker (langkah tidak bisa dijalankan sama sekali) ada di `docs/qa/blockers-found.md`.
 
-**705 deviasi** di **348 test case** dan **15 rantai E2E**.
+**738 deviasi** di **370 test case** dan **17 rantai E2E**.
 
 | Modul | Test case / rantai dengan deviasi | Jumlah deviasi |
 |---|---:|---:|
-| [01 Rawat Jalan](#01-rawat-jalan) | 34 | 67 |
-| [02 Janji Temu](#02-janji-temu) | 13 | 22 |
-| [03 Patient Care](#03-patient-care) | 21 | 28 |
-| [04 Rawat Inap](#04-rawat-inap) | 22 | 35 |
+| [01 Rawat Jalan](#01-rawat-jalan) | 35 | 70 |
+| [02 Janji Temu](#02-janji-temu) | 14 | 23 |
+| [03 Patient Care](#03-patient-care) | 22 | 30 |
+| [04 Rawat Inap](#04-rawat-inap) | 27 | 44 |
 | [05 Farmasi](#05-farmasi) | 20 | 28 |
-| [06 Transfusi Darah](#06-transfusi-darah) | 9 | 13 |
-| [07 Persediaan](#07-persediaan) | 21 | 37 |
-| [08 Kamar Operasi](#08-kamar-operasi) | 17 | 32 |
-| [09 Pengadaan](#09-pengadaan) | 18 | 42 |
-| [10 SDM](#10-sdm) | 17 | 39 |
-| [11 Laboratorium](#11-laboratorium) | 13 | 29 |
+| [06 Transfusi Darah](#06-transfusi-darah) | 10 | 15 |
+| [07 Persediaan](#07-persediaan) | 22 | 38 |
+| [08 Kamar Operasi](#08-kamar-operasi) | 18 | 33 |
+| [09 Pengadaan](#09-pengadaan) | 19 | 43 |
+| [10 SDM](#10-sdm) | 18 | 40 |
+| [11 Laboratorium](#11-laboratorium) | 14 | 31 |
 | [12 RIS](#12-ris) | 13 | 21 |
-| [13 Diet](#13-diet) | 18 | 54 |
-| [14 Hospital Accounts](#14-hospital-accounts) | 14 | 19 |
-| [15 IGD](#15-igd) | 17 | 36 |
-| [16 MRD](#16-mrd) | 18 | 48 |
-| [17 Penggajian](#17-penggajian) | 4 | 8 |
-| [18 Settings](#18-settings) | 21 | 52 |
-| [19 Finance](#19-finance) | 25 | 44 |
+| [13 Diet](#13-diet) | 19 | 55 |
+| [14 Hospital Accounts](#14-hospital-accounts) | 15 | 21 |
+| [15 IGD](#15-igd) | 18 | 37 |
+| [16 MRD](#16-mrd) | 19 | 49 |
+| [17 Penggajian](#17-penggajian) | 5 | 9 |
+| [18 Settings](#18-settings) | 23 | 54 |
+| [19 Finance](#19-finance) | 26 | 45 |
 | [20 Anggaran](#20-anggaran) | 5 | 7 |
 | [21 CSSD](#21-cssd) | 4 | 11 |
 | [22 Services](#22-services) | 1 | 1 |
 | [23 Sourcing](#23-sourcing) | 1 | 1 |
 | [24 Housekeeping](#24-housekeeping) | 2 | 2 |
-| [Rantai E2E](#rantai-e2e) | 15 | 29 |
+| [Rantai E2E](#rantai-e2e) | 17 | 30 |
 
 ## 01 Rawat Jalan
 
@@ -41,6 +41,9 @@ Deviasi = langkah **bisa dijalankan**, tetapi yang tampil di site tidak sama den
 | TC-APP001-006 | Mendaftarkan bayi baru lahir bersama ibunya | 5 | "Mother" menampilkan MRN dan nama PT-MOM sebagai tautan | "Mother" menampilkan id internal (UUID) sebagai teks biasa |
 | TC-APP001-006 | Mendaftarkan bayi baru lahir bersama ibunya | 6 | Dialog berubah ke PT-MOM | tidak ada tautan ibu yang bisa diklik |
 | TC-APP001-019 | Kedatangan: nomor diberikan dan pasien dipanggil | 4 | tombol diganti kata "Called" | tombol diganti "Start encounter" (aksi: Start encounter Set MLC Record document) |
+| TC-APP001-025 | Jejak audit front desk | 2 | REGISTER_PATIENT dengan nomor RM dan MERGE_PATIENT dengan kedua nomor RM | entri hanya menampilkan Waktu, Aksi, Modul, User dan Hasil: tanpa nomor RM (Rumah sakit, Pasien, RM dan Alasan kosong; entri tidak bisa dibuka) |
+| TC-APP001-025 | Jejak audit front desk | 3 | SCHEDULE_APPOINTMENT dengan tokennya, RESCHEDULE_APPOINTMENTS, CANCEL_APPOINTMENTS dan BLOCK_CONSULTANT | entri hanya menampilkan Waktu, Aksi, Modul, User dan Hasil: tanpa token (Rumah sakit, Pasien, RM dan Alasan kosong; entri tidak bisa dibuka) |
+| TC-APP001-025 | Jejak audit front desk | 4 | ARRIVE_PATIENT dan CALL_ARRIVAL dengan nomornya | entri hanya menampilkan Waktu, Aksi, Modul, User dan Hasil: tanpa nomor (Rumah sakit, Pasien, RM dan Alasan kosong; entri tidak bisa dibuka) |
 | TC-APP001-026 | Hub, navigasi, dan bahasa Indonesia | 1 | tombol "New Registration" | "New Registration" adalah tautan |
 | TC-APP001-027 | Orang yang sama didaftarkan dua kali saat kolom duplikat diatur | 1 | Toast "A patient already matches the duplicate fields" | toast "Registration failed" (HTTP 500) |
 | TC-APP001-028 | Orang yang sama didaftarkan dua kali dengan pengaturan bawaan | 1 | Peringatan bahwa pasien dengan data ini sudah ada, sebelum atau sebagai ganti penyimpanan | tersimpan tanpa peringatan (toast "Patient registered") |
@@ -132,6 +135,7 @@ Deviasi = langkah **bisa dijalankan**, tetapi yang tampil di site tidak sama den
 | TC-APP002-021 | Kode atau nama kosong | 2 | Toast "Save failed"; tidak ada baris yang ditambahkan | toast "Saved": jenis yang kode dan namanya hanya spasi tersimpan (25 baris, sebelumnya 25) |
 | TC-APP002-024 | Kode atau nama sudah dipakai | 1 | Toast "That code or name is already used"; the dialog stays open; no second row | toast "Saved"; dialog closes |
 | TC-APP002-025 | Kode atau nama kosong | 2 | Toast "Save failed"; tidak ada baris yang ditambahkan | toast "Saved": jenis yang kode dan namanya hanya spasi tersimpan (25 baris, sebelumnya 25) |
+| TC-APP002-033 | Menulis tanpa privilege tulis | 1 | API menjawab 403 "missing required privilege"; tidak ada yang tersimpan | Add (Referral types) tersimpan untuk U3 (peran tanpa hak apa pun): "Saved" |
 
 ## 03 Patient Care
 
@@ -139,6 +143,8 @@ Deviasi = langkah **bisa dijalankan**, tetapi yang tampil di site tidak sama den
 |---|---|---:|---|---|
 | TC-APP003-001 | Membuka konsultasi untuk pasien | 3 | Panel kiri: nama, MRN, dan "DOB" | nama dan MRN; tanpa tanggal lahir |
 | TC-APP003-002 | Order obat tunggal sampai ke farmasi | 4 | Sisa 10 | Sisa menunjukkan "10 / 10" |
+| TC-APP003-013 | Jejak audit order | 2 | PLACE_DRUG_ORDER untuk tiap order dengan obat dan nama pasien, dan AUTHORISE_DRUG_ORDER dengan pemberi otorisasinya | entri hanya menampilkan Waktu, Aksi, Modul, User dan Hasil: tanpa obat (Rumah sakit, Pasien, RM dan Alasan kosong; entri tidak bisa dibuka) |
+| TC-APP003-013 | Jejak audit order | 3 | Ada entri untuk catatan | tidak ada entri untuk catatan di halaman pertama modul "clinical" (aksi: PLACE_DRUG_ORDER, RECORD_ALLERGY) |
 | TC-APP003-014 | Hub, navigasi, dan bahasa Indonesia | 1 | Tombol "Open Consultation" | "Open Consultation" adalah tautan |
 | TC-APP003-016 | Formulir order yang belum lengkap | 3 | Kolom yang kosong ditandai | tidak ada kolom yang ditandai dan tidak ada pesan; "Submit order" hanya nonaktif |
 | TC-APP003-020 | Dokter mengotorisasi order terbatasnya sendiri | 1 | Ditolak: yang mengorder tidak boleh mengotorisasi | langsung diotorisasi (toast "Order authorised.") |
@@ -170,10 +176,13 @@ Deviasi = langkah **bisa dijalankan**, tetapi yang tampil di site tidak sama den
 
 | Test case | Judul | Langkah | Workbook mengharapkan | Di site |
 |---|---|---:|---|---|
+| TC-APP004-003 | Daftar tempat tidur: pencarian, filter kosong, dan tempat tidur terisi | 3 | hanya bed yang nomor atau deskripsinya memuat "qa-10" | juga 1 bed tanpa "qa-10" (cukup memuat kata "qa" dan "10…") |
 | TC-APP004-004 | Memasukkan pasien ke tempat tidur kosong | 2 | Petunjuk "Bed no or description…" | petunjuk "No. atau deskripsi…" |
 | TC-APP004-008 | Daftar rawat inap: pencarian, urutan, halaman, dan sensus | 5 | Masuk rawat terbaru di atas | daftar tetap berurutan menurut nama pasien |
 | TC-APP004-012 | Memulangkan pasien | 1 | "Configured chain has 7 steps" (rantai data awal) | rantai yang dikonfigurasi punya 1 langkah |
 | TC-APP004-016 | Bangsal menolak pengantaran | 2 | Baris grup yang sudah dikeluarkan diretur penuh | tidak ada baris Paracetamol 500mg Tablet di Issue Lines yang menunjukkan Issued 10 dan Returned 10 |
+| TC-APP004-019 | Jejak audit tempat tidur dan rawat inap | 2 | bed.create, admission.create dengan nomor rawat inap, admission.transfer dengan bed baru, admission.billing_clearance dan discharge.create dengan nomor pulang | entri hanya menampilkan Waktu, Aksi, Modul, User dan Hasil: tanpa nomor rawat inap (Rumah sakit, Pasien, RM dan Alasan kosong; entri tidak bisa dibuka) |
+| TC-APP004-019 | Jejak audit tempat tidur dan rawat inap | 3 | ward.group, ward.received dan ward.return_request | tidak ada entri ward.return_request di Audit Log (modul "adt"): tidak tercatat, atau aksinya belum pernah dilakukan di situs (alurnya terblokir lebih awal) |
 | TC-APP004-020 | Hub, navigasi, dan bahasa Indonesia | 1 | Tombol "Open admissions" | "Open admissions" adalah tautan |
 | TC-APP004-021 | Memasukkan orang yang bukan pasien terdaftar | 1 | Pencarian pasien terdaftar menurut MRN atau nama, bukan kolom teks bebas | "Patient name" adalah kolom teks bebas |
 | TC-APP004-021 | Memasukkan orang yang bukan pasien terdaftar | 2 | Ditolak: orang tersebut harus didaftarkan dulu | dimasukkan (toast "Patient admitted") |
@@ -191,12 +200,18 @@ Deviasi = langkah **bisa dijalankan**, tetapi yang tampil di site tidak sama den
 | TC-APP004-032 | Masuk atau pulang yang salah dibuat | 3 | Aksi buka kembali, atau catatan bahwa pasien harus dimasukkan lagi | hanya tombol barcode yang tersisa |
 | TC-APP004-033 | Nomor masuk dan nomor pulang | 1 | Ditolak: nomor sedang dipakai | dimasukkan dengan QA-RI-84Q004 untuk kedua kalinya |
 | TC-APP004-033 | Nomor masuk dan nomor pulang | 2 | Dua nomor yang berbeda | keduanya mendapat ADM-1793464796 |
+| TC-APP004-036 | Riwayat tempat tidur pasien | 1 | Daftar perpindahan beserta waktunya | rawat inap hanya menampilkan bed saat ini QA-0D42LBDKE-10303: tanpa bed sebelumnya (QA-0D42LBDKE-10101, QA-0D42LBDKE-10202) dan tanpa riwayat di baris |
+| TC-APP004-036 | Riwayat tempat tidur pasien | 2 | Setiap entri menampilkan bed yang ditinggalkan, bed yang ditempati, dan waktunya | entri hanya menampilkan waktu, aksi, modul dan user: tanpa bed yang ditinggalkan, tanpa bed yang ditempati (entri tidak bisa dibuka) |
 | TC-APP004-038 | Tagihan ditandai lunas tanpa tagihan yang diselesaikan | 1 | Ditolak: tagihan belum lunas, atau hanya kasir yang boleh melakukan ini | perawat menandai tagihan lunas |
 | TC-APP004-038 | Tagihan ditandai lunas tanpa tagihan yang diselesaikan | 3 | Ada: cara untuk menarik kembali tanda yang salah | baris menawarkan , , Discharge |
+| TC-APP004-041 | Pulang saat rantai persetujuan tidak ada atau dimatikan | 1 | Dialog menyebutkan bahwa tidak ada rantai persetujuan yang aktif | dialog tetap berbunyi "Discharge QA-INP Pasien Satu MVXEUKXP002 · ADM-1793512194 Discharge no Cancel Discharge" |
+| TC-APP004-041 | Pulang saat rantai persetujuan tidak ada atau dimatikan | 2 | Ditolak dengan alasannya | ditolak dengan "failed to discharge / failed to discharge": alasannya (tidak ada rantai persetujuan aktif) tidak disebutkan |
 | TC-APP004-042 | Pulang berlaku sebelum disetujui | 1 | Rawat inap menunjukkan ada kepulangan yang menunggu persetujuan; pasien masih menempati tempat tidur | rawat inap langsung bertuliskan "Discharged" |
 | TC-APP004-043 | Isi catatan pulang | 1 | Nama dan nomor masuk rawat pasien ditampilkan dan bisa dicari | kolom Discharge no, Admitted, Discharged, Length of stay; tanpa pencarian |
 | TC-APP004-043 | Isi catatan pulang | 2 | Ditampilkan | tidak ada tempat tidur, user, atau cara keluar di daftar |
 | TC-APP004-043 | Isi catatan pulang | 3 | Bisa diisi | dialog hanya menanyakan nomor pulang yang opsional |
+| TC-APP004-046 | Menolak pengantaran karena salah klik | 1 | Pertanyaan konfirmasi, dengan tempat untuk alasan | pengiriman langsung ditolak saat diklik: tanpa pertanyaan konfirmasi dan tanpa tempat untuk alasan |
+| TC-APP004-046 | Menolak pengantaran karena salah klik | 2 | Ada cara membatalkan penolakan, atau catatan bahwa order harus dikelompokkan lagi | tidak keduanya: grup tercantum sebagai "Refused" tanpa tombol untuk membatalkan penolakan, dan tidak ada catatan bahwa order harus dikelompokkan lagi |
 | TC-APP004-050 | User tanpa peran bangsal membaca rawat inap | 1 | Tidak ada kartu "Inpatient", atau kartunya membuka halaman "no access" | kartu ditampilkan ke U3 (tanpa hak) dan membuka /id/adt |
 | TC-APP004-050 | User tanpa peran bangsal membaca rawat inap | 2 | Akses ditolak | U3 (tanpa hak) membaca /adt/admissions ("Admissions", 10 baris) |
 | TC-APP004-050 | User tanpa peran bangsal membaca rawat inap | 3 | Akses ditolak | U3 (tanpa hak) membaca /adt/beds ("Bed management", 10 baris) dan /adt/discharges ("Discharges", 10 baris) |
@@ -244,6 +259,8 @@ Deviasi = langkah **bisa dijalankan**, tetapi yang tampil di site tidak sama den
 | Test case | Judul | Langkah | Workbook mengharapkan | Di site |
 |---|---|---:|---|---|
 | TC-APP006-020 | Permintaan darah yang ditulis dokter | 4 | Formulir menampilkan nomor permintaan dan status "Approved" | statusnya "Pending" (butuh persetujuan lewat "Approve") |
+| TC-APP006-031 | Jejak audit bank darah | 2 | donor.create, donor.screen, donor.bag_number, stock.collect, stock.authorise_grouping, stock.confirm_grouping, stock.validate_serology, separation.approve | tidak ada entri donor.create, donor.screen, donor.bag_number, stock.collect, stock.authorise_grouping, stock.confirm_grouping, stock.validate_serology, separation.approve di Audit Log (modul "bloodbank"): tidak tercatat, atau aksinya belum pernah dilakukan di situs (alurnya terblokir lebih awal) |
+| TC-APP006-031 | Jejak audit bank darah | 3 | requisition.save, requisition.crossmatch, requisition.issue, issue.receipt, issue.transfusion | tidak ada entri requisition.crossmatch, requisition.issue, issue.receipt, issue.transfusion di Audit Log (modul "bloodbank"): tidak tercatat, atau aksinya belum pernah dilakukan di situs (alurnya terblokir lebih awal) |
 | TC-APP006-032 | Hub, navigasi, dan bahasa Indonesia | 1 | Tombol "New request" | "New request" adalah tautan |
 | TC-APP006-047 | Tes infeksi mana yang melepas unit | 2 | Pesan bahwa daftar tes harus disiapkan dulu | tidak ada pesan seperti itu; dialog tidak menampilkan baris tes |
 | TC-APP006-049 | Kantong masuk stok lewat penerimaan biasa | 2 | Status "Unscreened", dengan "Group" dan "Serology" belum dikerjakan | Status "Available" (tombol: Group, Serology, Separate, Discard, Convert, Send out) |
@@ -263,6 +280,7 @@ Deviasi = langkah **bisa dijalankan**, tetapi yang tampil di site tidak sama den
 |---|---|---:|---|---|
 | TC-APP007-006 | Stok tersedia per gudang dan batch | 1 | Dua baris, masing-masing dengan kode gudang, kode batch, jumlah, dan tanggal kedaluwarsa | "Stock on hand" bertuliskan: Stock on hand No batches for this item yet. Add batch |
 | TC-APP007-013 | Gudang yang bekerja di "All branches" | 4 | Toast "Choose a branch before creating a stock request." | "Please select an item in the list." |
+| TC-APP007-014 | Jejak audit persediaan | 2 | item.create, stock.receive, kit.replace, store.visits, stock.freeze, stock_request.create, stock_request.approve, stock_request.fulfill | tidak ada entri kit.replace di Audit Log (modul "inventory"): tidak tercatat, atau aksinya belum pernah dilakukan di situs (alurnya terblokir lebih awal) |
 | TC-APP007-015 | Hub, navigasi, dan bahasa Indonesia | 1 | Tombol "Item Master" | "Item Master" adalah tautan |
 | TC-APP007-016 | Formulir item yang belum lengkap atau tidak valid | 2 | Ditolak: kode sudah dipakai | toast "Failed to save item." |
 | TC-APP007-016 | Formulir item yang belum lengkap atau tidak valid | 3 | Ditolak: minimum di atas maksimum | toast "Failed to save item." |
@@ -305,6 +323,7 @@ Deviasi = langkah **bisa dijalankan**, tetapi yang tampil di site tidak sama den
 |---|---|---:|---|---|
 | TC-APP008-001 | Membuat permintaan kamar operasi | 2 | Petunjuk "Optional" pada "Blocked amount" | tidak ada petunjuk seperti itu; dialog bertuliskan "procedures_display required; blocked_amount optional." |
 | TC-APP008-005 | Daftar permintaan dan halaman | 1 | Kolom Request no, Procedures, Blocked, List prepared, Actions | kolom Request no, Procedures, Status, Blocked, List prepared, Actions |
+| TC-APP008-007 | Jejak audit permintaan kamar operasi | 2 | request.create, request.schedule dan request.consume, masing-masing dengan nomor permintaan | entri hanya menampilkan Waktu, Aksi, Modul, User dan Hasil: tanpa nomor permintaan (Rumah sakit, Pasien, RM dan Alasan kosong; entri tidak bisa dibuka) |
 | TC-APP008-008 | Hub, navigasi, dan bahasa Indonesia | 1 | Tombol "Open requests" | "Open requests" adalah tautan |
 | TC-APP008-008 | Hub, navigasi, dan bahasa Indonesia | 1 | Satu ubin "Requests" di bawah "Workflow" | ubin: Requests, Case |
 | TC-APP008-008 | Hub, navigasi, dan bahasa Indonesia | 3 | Judul, nama kolom, tombol, dan toast berbahasa Indonesia ("Permintaan OT", "Jadwalkan", …) | Bahasa Inggris: "Blocked" |
@@ -343,6 +362,7 @@ Deviasi = langkah **bisa dijalankan**, tetapi yang tampil di site tidak sama den
 | TC-APP009-001 | Membuat order pembelian | 4 | "Persetujuan Purchase Order (4 steps)"; empat langkah, yang pertama "Current", yang lain "Pending" | "PURCHASE ORDER (1 LANGKAH)": Approval Step 1 Current (blocker temuan 30) |
 | TC-APP009-004 | Memajukan satu langkah persetujuan | 1 | Langkah 1 "Pengajuan Departemen" ditandai "Current" | langkah 1 "Approval Step 1 Current" (blocker temuan 30) |
 | TC-APP009-005 | Order pembelian disetujui melewati keempat langkah | 1 | Baris Approval "Step 2" | rantai punya 1 langkah: order sudah disetujui penuh (blocker temuan 30) |
+| TC-APP009-010 | Jejak audit order pembelian | 2 | Satu purchase_order.create dengan nomor dokumen, dan empat purchase_order.advance dengan nomor dokumen, langkah yang dicapai dan statusnya | entri hanya menampilkan Waktu, Aksi, Modul, User dan Hasil: tanpa nomor dokumen (Rumah sakit, Pasien, RM dan Alasan kosong; entri tidak bisa dibuka) |
 | TC-APP009-012 | Order pembelian tanpa item, jumlah, atau total | 1 | Baris item dengan item, jumlah, satuan, dan harga | tidak ada baris item; formulir berisi nomor, tanggal, vendor, departemen, mata uang, jumlah uang muka, dan jumlah dibayar |
 | TC-APP009-012 | Order pembelian tanpa item, jumlah, atau total | 2 | Total yang dihitung dari baris-barisnya | tidak ada total |
 | TC-APP009-012 | Order pembelian tanpa item, jumlah, atau total | 3 | Tanggal kirim, alamat kirim, dan syarat pembayaran | tidak ada satu pun kolom ini |
@@ -389,6 +409,7 @@ Deviasi = langkah **bisa dijalankan**, tetapi yang tampil di site tidak sama den
 |---|---|---:|---|---|
 | TC-APP010-004 | Atasan pelapor dan akun user yang ditautkan | 3 | Berkas karyawan yang ditautkan terbuka sendiri sebagai "Edit employee" | daftar terbuka; tidak ada berkas sendiri |
 | TC-APP010-004 | Atasan pelapor dan akun user yang ditautkan | 3 | Pemberitahuan "Configuration is missed" tidak ditampilkan | pemberitahuan ditampilkan ke akun yang ditautkan |
+| TC-APP010-014 | Jejak audit karyawan dan cuti | 2 | employee.create dan employee.update dengan nomor pegawai, leave_type.create dengan namanya, leave.submit dengan "PENDING" dan leave.approve dengan "APPROVED" | entri hanya menampilkan Waktu, Aksi, Modul, User dan Hasil: tanpa nomor pegawai (Rumah sakit, Pasien, RM dan Alasan kosong; entri tidak bisa dibuka) |
 | TC-APP010-015 | Hub, navigasi, dan bahasa Indonesia | 2 | "Duty roster" mengarah ke modul Duty Roster | tautan (/id/roster) tetap di hub HR |
 | TC-APP010-019 | Jumlah hari yang tidak cocok dengan tanggal | 1 | "Days" berubah menjadi 5 | "Days" tetap 1 |
 | TC-APP010-020 | Menyetujui cuti sendiri, dan cuti yang tidak perlu persetujuan | 3 | Penyetuju ditampilkan | tidak ada kolom yang menyebut siapa yang memutuskan (kolom: Type, From, To, Days, Slot, Status, Reason, Actions) |
@@ -431,6 +452,8 @@ Deviasi = langkah **bisa dijalankan**, tetapi yang tampil di site tidak sama den
 
 | Test case | Judul | Langkah | Workbook mengharapkan | Di site |
 |---|---|---:|---|---|
+| TC-APP011-009 | Jejak audit order lab | 2 | Satu CREATE_LAB_ORDER dengan jenis hasil dan lima TRANSITION_LAB_ORDER: generated, sent, accepted, resulted dan resulted lagi | entri hanya menampilkan Waktu, Aksi, Modul, User dan Hasil: tanpa jenis hasil (Rumah sakit, Pasien, RM dan Alasan kosong; entri tidak bisa dibuka) |
+| TC-APP011-009 | Jejak audit order lab | 3 | Hasil pertama, hasil yang diubah, dan alasan perubahannya | entri tidak bisa dibuka: baris hanya menampilkan Waktu, Aksi, Modul, User dan Hasil (tanpa hasil, tanpa alasan) |
 | TC-APP011-010 | Hub, navigasi, dan bahasa Indonesia | 1 | Tombol "Open worklist" | "Open worklist" adalah tautan |
 | TC-APP011-011 | Order lab tanpa pasien | 1 | Nama dan MRN PT-1 di baris | baris tidak menyebut pasien; hanya keterangan yang membedakan kedua order |
 | TC-APP011-011 | Order lab tanpa pasien | 2 | Label memuat nama, MRN, dan tanggal lahir pasien di samping ID sampel | tidak ada label Sample workflow yang menyebut pasien |
@@ -491,6 +514,7 @@ Deviasi = langkah **bisa dijalankan**, tetapi yang tampil di site tidak sama den
 
 | Test case | Judul | Langkah | Workbook mengharapkan | Di site |
 |---|---|---:|---|---|
+| TC-APP013-010 | Jejak audit permintaan diet dan TPN | 2 | request.create dengan nomor dokumen, tpn.save dan tpn.template | entri hanya menampilkan Waktu, Aksi, Modul, User dan Hasil: tanpa nomor dokumen (Rumah sakit, Pasien, RM dan Alasan kosong; entri tidak bisa dibuka) |
 | TC-APP013-011 | Hub, navigasi, dan bahasa Indonesia | 1 | Tombol "Open requests" | "Open requests" adalah tautan |
 | TC-APP013-012 | Permintaan diet tanpa pasien atau diet | 1 | Pasien harus dipilih dari pasien rawat inap | tidak ada kolom pasien |
 | TC-APP013-012 | Permintaan diet tanpa pasien atau diet | 2 | Kolom atau daftar untuk jenis diet, waktu makan, dan alergi | tidak ada; diet hanya bisa ditulis di "Comments" |
@@ -555,6 +579,8 @@ Deviasi = langkah **bisa dijalankan**, tetapi yang tampil di site tidak sama den
 | TC-APP014-016 | Pengaturan harga item dan estimasi | 4 | Pasien neto Rp 12.500, pajak Rp 1.375, total Rp 13.875 | estimasi bertuliskan "t. Nothing is saved to stock or to a charge. Patient Item code Add line QA-PARA · Paracetamol 500mg Tablet 1 Estimating…" |
 | TC-APP014-017 | Klaim asuransi dari kelayakan sampai rekonsiliasi | 2 | Baris panel "This charge uses that split: Rp 1.000.000 / Rp 4.000.000" | tidak ada baris pembagian |
 | TC-APP014-019 | Penjualan hanya dengan keyboard | 2 | Kursor pindah ke jumlah tunai | kursor ada di "" |
+| TC-APP014-020 | Jejak audit penjualan | 2 | invoice.create (nomor invoice, keterangan), deposit.take, discount.apply, sale.approve, payment.cash, refund.apply, sale.cancel, masing-masing dengan user dan jumlahnya | tidak ada entri sale.approve di Audit Log (modul "billing"): tidak tercatat, atau aksinya belum pernah dilakukan di situs (alurnya terblokir lebih awal) |
+| TC-APP014-020 | Jejak audit penjualan | 3 | counter.close dengan kas yang dilaporkan dan kas sistem; counter.settings dan price.save bila diubah | entri hanya menampilkan Waktu, Aksi, Modul, User dan Hasil: tanpa kas yang dilaporkan (Rumah sakit, Pasien, RM dan Alasan kosong; entri tidak bisa dibuka) |
 | TC-APP014-023 | Membayar lebih dari jumlah tagihan | 1 | Kasir diberi tahu ada kembalian 33.500, atau kelebihannya ditolak | diterima: Deposits Rp 200.000, tidak ada kembalian yang ditampilkan |
 | TC-APP014-024 | Jumlah yang diketik dengan titik sebagai pemisah ribuan | 1 | Penjualan Rp 150.000 sebelum pajak | penjualan Rp 150: titik dibaca sebagai titik desimal |
 | TC-APP014-032 | Refund penuh penjualan yang sudah dibayar | 2 | Status yang menunjukkan penjualan sudah di-refund, tanpa sisa tagihan | status "Draft", Amount due Rp 166.500 |
@@ -575,6 +601,7 @@ Deviasi = langkah **bisa dijalankan**, tetapi yang tampil di site tidak sama den
 | Test case | Judul | Langkah | Workbook mengharapkan | Di site |
 |---|---|---:|---|---|
 | TC-APP015-003 | Menempatkan bay | 3 | Prioritas 4 | Prioritas 2 |
+| TC-APP015-006 | Jejak audit kunjungan IGD | 2 | visit.create, visit.triage dan visit.assign_bay, yang terakhir dengan bed-nya | entri hanya menampilkan Waktu, Aksi, Modul, User dan Hasil: tanpa bed (Rumah sakit, Pasien, RM dan Alasan kosong; entri tidak bisa dibuka) |
 | TC-APP015-007 | Hub, navigasi, dan bahasa Indonesia | 1 | "Triage & bay assignment (IGD)", tombol "Open visits", dan satu ubin "Visits" di bawah "Workflow" | "Register Emergency Patient, do Triage and Monitor the status."; ubin Registration, Emergency Patients, Triage di bawah "Accident & Emergency" |
 | TC-APP015-007 | Hub, navigasi, dan bahasa Indonesia | 2 | Ubin dan item sidebar "Visits" membuka Visits | hub dan sidebar tidak punya "Visits"; layar hanya terbuka lewat alamatnya |
 | TC-APP015-008 | Mencari pasien dan tempat tidur | 1 | Daftar pasien yang cocok untuk dipilih | "Patient ID (UUID)" hanya menerima id internal; nama ditolak ("patient_id required") |
@@ -615,6 +642,7 @@ Deviasi = langkah **bisa dijalankan**, tetapi yang tampil di site tidak sama den
 
 | Test case | Judul | Langkah | Workbook mengharapkan | Di site |
 |---|---|---:|---|---|
+| TC-APP016-007 | Jejak audit permintaan, pengeluaran, dan retur | 2 | CREATE_MRD_REQUEST, ISSUE_PATIENT_RECORD dan RETURN_PATIENT_RECORD, masing-masing dengan nomor dokumen | entri hanya menampilkan Waktu, Aksi, Modul, User dan Hasil: tanpa nomor dokumen (Rumah sakit, Pasien, RM dan Alasan kosong; entri tidak bisa dibuka) |
 | TC-APP016-008 | Hub, navigasi, dan bahasa Indonesia | 1 | Tombol "File Requests" | "File Requests" adalah tautan |
 | TC-APP016-008 | Hub, navigasi, dan bahasa Indonesia | 3 | Nama kolom, tombol, status, dan toast berbahasa Indonesia | Bahasa Inggris: No. dokumen, Tanggal, Pasien, Status, Aksi |
 | TC-APP016-009 | Permintaan berkas tanpa pasien atau peminta | 1 | Pasien harus dipilih dari pasien terdaftar | formulir berisi Document number, Document date, Request type, Purpose |
@@ -668,6 +696,7 @@ Deviasi = langkah **bisa dijalankan**, tetapi yang tampil di site tidak sama den
 
 | Test case | Judul | Langkah | Workbook mengharapkan | Di site |
 |---|---|---:|---|---|
+| TC-APP017-006 | Jejak audit run penggajian | 2 | payroll.batch.run dengan nomor batch, net=24550000.04 dan lines=12 | entri hanya menampilkan Waktu, Aksi, Modul, User dan Hasil: tanpa nomor batch (Rumah sakit, Pasien, RM dan Alasan kosong; entri tidak bisa dibuka) |
 | TC-APP017-014 | Periode diketik sebagai teks bebas | 1 | Bulan bisa dipilih | kolom teks (type "null", petunjuk "YYYY-MM") |
 | TC-APP017-020 | Komponen gaji tidak bisa dilihat atau dikelola | 1 | Daftar dengan nama, jenis, tarif atau jumlah, dan apakah penghasilan atau potongan | tidak ada layar seperti itu (hub: Batches) |
 | TC-APP017-020 | Komponen gaji tidak bisa dilihat atau dikelola | 2 | Komponen bisa diedit | tidak ada layar untuk mengedit komponen (menu Payroll: Batches, Year, Payroll record, Tax, Calculate, Payslip, Reimburse) |
@@ -683,6 +712,7 @@ Deviasi = langkah **bisa dijalankan**, tetapi yang tampil di site tidak sama den
 |---|---|---:|---|---|
 | TC-APP018-001 | Direktori Settings: grup, pencarian, dan tautan | 1 | enam grup: Organization, Reference, Access, Appearance, Workflow, Trail | 7 grup: Organization, Reference, Access, Appearance, Workflow, Licensing, Trail |
 | TC-APP018-001 | Direktori Settings: grup, pencarian, dan tautan | 2 | "Settings", "Jump to a group", dan Organization 3 Reference 3 Access 6 Appearance 7 Workflow 1 Trail 1 | "Settings Jump to a group Organization 4 Reference 3 Access 6 Appearance 7 Workflow 1 Licensing 2 Trail 1" |
+| TC-APP018-011 | Jejak audit data master | 2 | site.create, department.create, department.update dan service_center.create dengan kodenya, pack.create dengan "countries:QA", dan tax_code.create dengan kodenya | entri hanya menampilkan Waktu, Aksi, Modul, User dan Hasil: tanpa kode (Rumah sakit, Pasien, RM dan Alasan kosong; entri tidak bisa dibuka) |
 | TC-APP018-012 | Dua hub, navigasi, dan bahasa Indonesia | 2 | Direktori Settings dari langkah 1 | halaman kedua "Settings" dengan "Master Data — org hierarchy and reference packs" dan ubin Add Site, Sites, Facility time, Departments, Service Centers, Countries, Cities, Units of Measure, Tax Codes |
 | TC-APP018-012 | Dua hub, navigasi, dan bahasa Indonesia | 4 | "Tambah Departemen", "Kode departemen", "Departemen ditambahkan." | "Tambah Departemen", Kode departemen, Nama departemen, toast "Department added." |
 | TC-APP018-013 | User tanpa hak data master mengubah departemen dan pusat layanan | 1 | Ditolak | Menambah departemen diterima untuk U3 (tanpa hak): toast "Department added." |
@@ -733,6 +763,7 @@ Deviasi = langkah **bisa dijalankan**, tetapi yang tampil di site tidak sama den
 | TC-APP018-047 | Aturan notifikasi: siapa diberi tahu saat klaim BPJS diajukan | 2 | Daftar "Alert type" dan "Severity" | kolom teks, diisi "bpjs.claim.submitted" dan "SUBMITTED" |
 | TC-APP018-047 | Aturan notifikasi: siapa diberi tahu saat klaim BPJS diajukan | 3 | baris dengan ketiga nilai (role "finance") | role ditampilkan sebagai "fe3c6bd7-2d97-5d7c-a50d-03cad2a3145a" |
 | TC-APP018-055 | Rantai yang ditolak atau meragukan | 1 | Teks "Add at least one approval step." | "Remove step 1" nonaktif di langkah terakhir, jadi rantai tanpa langkah tidak bisa dibuat; kalau nama satu-satunya langkah dikosongkan, "Next" nonaktif dan teksnya tidak ditampilkan |
+| TC-APP018-092 | Menulis tanpa privilege tulis | 1 | API menjawab 403 "missing required privilege"; tidak ada yang tersimpan | Add Department (Departments) tersimpan untuk U3 (peran tanpa hak apa pun): "Department added." |
 
 ## 19 Finance
 
@@ -740,6 +771,7 @@ Deviasi = langkah **bisa dijalankan**, tetapi yang tampil di site tidak sama den
 |---|---|---:|---|---|
 | TC-APP019-002 | Membaca periode tahun buku | 2 | Setiap baris punya … "Open" | baris tidak menampilkan status; periode terbuka menawarkan "Lock" dan "Mark adjustment" |
 | TC-APP019-004 | Bagan akun: grup dan akun daun di bawahnya | 2 | "Branch restriction" ("All branches") | daftar "Branches allowed to use this account" (tidak ada yang dipilih: "Global account") dan daftar "Users allowed to use this account" |
+| TC-APP019-013 | Jejak audit Finance | 2 | financial_year.create dan financial_year.lock dengan kode tahun, account.create dengan kode, nama dan jenis, posting_rule.save dengan jenis dan kode akun, serta voucher.create dengan nomor dokumen | entri hanya menampilkan Waktu, Aksi, Modul, User dan Hasil: tanpa kode tahun (Rumah sakit, Pasien, RM dan Alasan kosong; entri tidak bisa dibuka) |
 | TC-APP019-014 | Hub, navigasi, dan bahasa Indonesia | 1 | lima ubin: Financial years, Chart of accounts, Budget posting rules, Vouchers, ERP staging | 10 ubin di bawah MASTER, BUKU BESAR: Financial years, Chart of accounts, Branch configuration, Currency, Cost centres, Account maps, Budget posting rules, Vouchers, Journals, ERP staging |
 | TC-APP019-015 | Voucher tanpa akun atau baris debit dan kredit | 1 | Formulir menanyakan rekening bank | kolom yang sama untuk setiap jenis: Doc no, Doc date, Doc type 1. Journal 2. Cash Payment 3. Cash Receipt 4. Bank Payment 5. Bank Receipt 6. Contra 7. Credit Memo 8. Debit Memo 9. Opening Balance 10. Purchase 11. Sales 12. Payroll, Currency, Voucher value, Party, Narration |
 | TC-APP019-015 | Voucher tanpa akun atau baris debit dan kredit | 2 | Baris bisa ditambah; total kedua sisi ditampilkan dan harus sama | tidak ada baris, debit, maupun kredit |
@@ -838,7 +870,6 @@ Deviasi = langkah **bisa dijalankan**, tetapi yang tampil di site tidak sama den
 | E2E-001 | Rawat jalan: pasien daftar sampai invoice dibayar, struk dicetak, dan masuk Finance | 4 (TC-APP003-001 langkah 3) | Panel kiri: nama, MRN, dan "DOB" | nama dan MRN; tanpa tanggal lahir |
 | E2E-001 | Rawat jalan: pasien daftar sampai invoice dibayar, struk dicetak, dan masuk Finance | 5 (TC-APP003-002 langkah 4) | Sisa 10 | Sisa menunjukkan "10 / 10" (sisa / diorder) |
 | E2E-001 | Rawat jalan: pasien daftar sampai invoice dibayar, struk dicetak, dan masuk Finance | 6 (TC-APP005-001 langkah 7) | Cabang BR-A saat Confirm | Confirm menampilkan gudang dan ringkasan; tanpa cabang |
-| E2E-001 | Rawat jalan: pasien daftar sampai invoice dibayar, struk dicetak, dan masuk Finance | 7 (TC-APP005-014 langkah 3) | One sales voucher referring to the invoice RX-a1db58a3 | the newest SV- voucher does not name RX-a1db58a3: "SV-f8763bc8-ee91-49d3-888a-833a9b519254 Sales Close Doc date 2026-10-31 Voucher value IDR 13.875,00 Party QA-PHA Pasien Satu MVW7T649003 Status Posted Narration" |
 | E2E-001 | Rawat jalan: pasien daftar sampai invoice dibayar, struk dicetak, dan masuk Finance | 9 (TC-APP014-040 langkah 2) | Tombol Print atau halaman yang bisa dicetak | no print or download control on the receipt; the printout is the browser print of the screen |
 | E2E-001 | Rawat jalan: pasien daftar sampai invoice dibayar, struk dicetak, dan masuk Finance | 9 (TC-APP014-040 langkah 3) | Struk bisa ditampilkan lagi | struk tidak ditampilkan saat penjualan yang sudah dibayar dicari lagi |
 | E2E-004 | Rawat inap: masuk sampai pulang, tagihan dan koding | 1 (TC-APP004-058 langkah 1) | Kolom "Branch" | tidak ada kolom Branch (U1 bekerja di satu cabang) |
@@ -848,18 +879,20 @@ Deviasi = langkah **bisa dijalankan**, tetapi yang tampil di site tidak sama den
 | E2E-017 | Farmasi: terima stok, jual di kasir, retur, bayar, dan Finance | 4 (TC-APP005-009 langkah 6) | Wizard kosong | item dikosongkan tetapi pasien tetap terpilih |
 | E2E-021 | Order klinis (CPOE) dari satu konsultasi | 1 (TC-APP003-001 langkah 3) | Panel kiri: nama, MRN, dan "DOB" | nama dan MRN; tanpa tanggal lahir |
 | E2E-022 | IGD kasus ringan: triase, penunjang, pulang | 3 (TC-APP015-003 langkah 3) | Prioritas 4 | Prioritas 2 |
+| E2E-023 | IGD ke operasi ke ruang rawat | 9 (TC-APP004-012 langkah 1) | "Configured chain has 7 steps" (rantai data awal) | rantai yang dikonfigurasi punya 1 langkah |
 | E2E-026 | Persalinan: bayi didaftarkan bersama ibu dan dirawat | 1 (TC-APP001-006 langkah 5) | "Mother" menampilkan MRN dan nama PT-MOM sebagai tautan | "Mother" menampilkan id internal (UUID) sebagai teks biasa |
 | E2E-026 | Persalinan: bayi didaftarkan bersama ibu dan dirawat | 1 (TC-APP001-006 langkah 6) | Dialog berubah ke PT-MOM | tidak ada tautan ibu yang bisa diklik |
+| E2E-026 | Persalinan: bayi didaftarkan bersama ibu dan dirawat | 4 (TC-APP004-012 langkah 1) | "Configured chain has 7 steps" (rantai data awal) | rantai yang dikonfigurasi punya 1 langkah |
 | E2E-028 | Obat rawat inap tertutup (closed-loop) | 4 (TC-APP005-005 langkah 4) | Memilih grup di "Ward group": hanya order yang dikelompokkan yang tercantum | pilihannya tidak menyebut grup (1 · Kelompok bangsal, 2 · Kelompok bangsal), jadi grup test ini tidak bisa dibedakan; order dibuka dari barisnya |
 | E2E-028 | Obat rawat inap tertutup (closed-loop) | 5 (TC-APP004-077 langkah 2) | "Branch", "Patient", "Order", "Status", dan "Reason" | tidak ada kolom "Branch" (U1 bekerja di satu cabang) |
+| E2E-029 | Manajemen bed dan pergantian pasien | 3 (TC-APP004-003 langkah 3) | hanya bed yang nomor atau deskripsinya memuat "qa-10" | juga 1 bed tanpa "qa-10" (cukup memuat kata "qa" dan "10…") |
+| E2E-029 | Manajemen bed dan pergantian pasien | 5 (TC-APP004-012 langkah 1) | "Configured chain has 7 steps" (rantai data awal) | rantai yang dikonfigurasi punya 1 langkah |
+| E2E-029 | Manajemen bed dan pergantian pasien | 6 (TC-APP024-007 langkah 3) | baris dengan status "draft" | log baru bertuliskan "sent" |
 | E2E-030 | Operasi dengan darah, instrumen steril, dan bahan | 3 (TC-APP006-020 langkah 4) | Formulir menampilkan nomor permintaan dan status "Approved" | statusnya "Pending" (butuh persetujuan lewat "Approve") |
 | E2E-034 | Estimasi biaya sampai pembayaran | 1 (TC-APP014-016 langkah 3) | Memilih QA-PARA, jumlah 10 | kartu tidak punya kolom jumlah: setiap baris adalah satu unit |
 | E2E-034 | Estimasi biaya sampai pembayaran | 1 (TC-APP014-016 langkah 4) | Pasien neto Rp 12.500, pajak Rp 1.375, total Rp 13.875 | estimasi bertuliskan "t. Nothing is saved to stock or to a charge. Patient Item code Add line QA-PARA · Paracetamol 500mg Tablet 1 Estimating…" |
 | E2E-039 | Onboarding staf dengan akses | 4 (TC-APP010-004 langkah 3) | Berkas karyawan yang ditautkan terbuka sendiri sebagai "Edit employee" | daftar terbuka; tidak ada berkas sendiri |
 | E2E-039 | Onboarding staf dengan akses | 4 (TC-APP010-004 langkah 3) | Pemberitahuan "Configuration is missed" tidak ditampilkan | pemberitahuan ditampilkan ke akun yang ditautkan |
 | E2E-039 | Onboarding staf dengan akses | 5 (TC-APP018-031 langkah 3) | baris dengan role "perawat" | "Roles" bertuliskan "—" |
-| E2E-039 | Onboarding staf dengan akses | 5 (TC-APP018-031 langkah 5) | Hanya cabang yang dipilih di header | header tidak menyebut cabang: "KlikMed Home Dashboard Preferences Apps Reports Analytics Notifications No notifications yet. ID Language ID EN AR Q QA-Perawat Uji MVW91ISD00K QA-Perawat Uji MVW91ISD00K perawat Profile Preferences Sign out" |
-| E2E-039 | Onboarding staf dengan akses | 5 (TC-APP018-031 langkah 6) | Entri user.create dengan login-nya | entri tidak menyebut login-nya: "31/10/2026, 17.33.29 user.create platform/identity admin2 succeeded admin2" |
-| E2E-039 | Onboarding staf dengan akses | 7 (TC-APP010-040 langkah 4) | Toast "Saved." | ditolak: "hr: invalid input: duplicate": U1 tertaut ke karyawan dari run sebelumnya test ini, dan tautannya tidak dipindah ke QA-EMP-01-MVW91ISD00N |
 | E2E-041 | Finance: pencatatan sampai laporan | 2 (TC-APP019-004 langkah 2) | "Branch restriction" ("All branches") | daftar "Branches allowed to use this account" (tidak ada yang dipilih: "Global account") dan daftar "Users allowed to use this account" |
 | E2E-048 | Tata kelola identitas pasien | 4 (TC-APP005-060 langkah 2) | Blok mencantumkan nama item dengan jumlah yang dikeluarkan | tidak ada yang tercantum untuk nama atau MRN |

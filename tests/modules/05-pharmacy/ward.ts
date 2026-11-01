@@ -133,8 +133,8 @@ export async function groupButton(ws: WardSupply, group: string, action: 'Receiv
 }
 
 /** Admitted patient, an inpatient order (OR-IP unless given) grouped and dispensed in full; returns the patient and the group. */
-export async function dispensedGroup(page: Page, qa: Qa, order?: DrugOrder): Promise<{ pt: Patient & { bed: string; admissionNo: string }; group: string }> {
-  const pt = await admittedWithOrder(page, qa, { order });
+export async function dispensedGroup(page: Page, qa: Qa, order?: DrugOrder, admissionNo?: string): Promise<{ pt: Patient & { bed: string; admissionNo: string }; group: string }> {
+  const pt = await admittedWithOrder(page, qa, { order, admissionNo });
   const { toasts, group } = await groupOrders(page, pt);
   expect(toasts).toContain('Orders grouped for the pharmacy queue.');
   const d = await dispenseGroup(page, pt, group);

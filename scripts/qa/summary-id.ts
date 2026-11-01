@@ -51,11 +51,11 @@ export function titleId(en: string): string {
 
 /**
  * The values that change from run to run, replaced by {0}, {1}, … in a template: a UUID, a QA token
- * (letters and digits, 8 or more, e.g. MVWK3JL2004) and any number. A text of the notes recorded by the
+ * (letters and digits, 8 or more, e.g. MVWK3JL2004), a login of the test (qa.perawat1.mvx2dcc830g) and any number. A text of the notes recorded by the
  * tests ("2 patient(s) named QA-AMB Calon Dua MVWK3JL2004") is kept in texts.json as its template
  * ("{0} patient(s) named QA-AMB Calon Dua {1}"), so its translation holds for every run.
  */
-const VALUE = /\b[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\b|\b(?=[A-Z0-9]*\d)(?=[A-Z0-9]*[A-Z])[A-Z0-9]{8,}\b|\d+(?:[.,]\d+)*/g;
+const VALUE = /\bqa\.[a-z]+\d*\.[a-z0-9]{8,}\b|\b[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\b|\b(?=[A-Z0-9]*\d)(?=[A-Z0-9]*[A-Z])[A-Z0-9]{8,}\b|\d+(?:[.,]\d+)*/g;
 export function templateOf(text: string): { key: string; values: string[] } {
   const values: string[] = [];
   const key = text.replace(VALUE, (v) => `{${values.push(v) - 1}}`);
@@ -94,12 +94,12 @@ export function deviationParts(text: string): { expected: string; site: string }
 
 const SOURCE = String.raw`\((?:found by automation, docs/qa/blockers-found\.md|00-blockers-checklist-linked\.xlsx \| Checklist \| row \d+)\)`;
 /**
- * The forms a blocker takes in a reason: "Blocker 40: [TC-… step 3, ]blocker 40 (<source>): <title>[…]",
+ * The forms a blocker takes in a reason: "Blocker 40: [TC-…[ step 3], ]blocker 40 (<source>): <title>[…]",
  * "Blocker 19 (<source>): <title>;", "Blocker 13: <title> (<source>);", "blocker 17 (<source>): <title>"
  * → "blocker 40 – <judul>[; <more>]".
  */
 function blockerPart(text: string): string | null {
-  const m = new RegExp(String.raw`^(?:Blocker (\d+):? )?(?:TC-APP\d{3}-\d{3} step \d+, )?(?:blocker (\d+) )?(${SOURCE})?:?\s*([\s\S]*)$`).exec(text.trim());
+  const m = new RegExp(String.raw`^(?:Blocker (\d+):? )?(?:TC-APP\d{3}-\d{3}(?: step \d+)?, )?(?:blocker (\d+) )?(${SOURCE})?:?\s*([\s\S]*)$`).exec(text.trim());
   const no = Number(m?.[1] ?? m?.[2]);
   if (!m || !no || (!m[1] && !m[3])) return null;
   let rest = m[4];

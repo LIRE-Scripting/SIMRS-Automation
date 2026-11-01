@@ -268,7 +268,7 @@ export const FOUND_BLOCKERS: FoundBlocker[] = [
     cause:
       'A new purchase order shows "Purchase order (1 steps)" with the single step "Persetujuan"; one "Advance approval" completes it ' +
       '(seen 2026-10-15). No order can wait at step 2, 3 or 4, so PO-S2, PO-S3 and PO-S4 cannot exist and the role of each step cannot be checked.',
-    fix: '1. Load the four-step chain of the shared data (or name the Workflow screen that does it).\n2. Run TC-APP009-001, 004, 006, 015 and 016 again.',
+    fix: '1. Load the four-step chain of the shared data (Workflow, Process Definitions, "Ubah rantai: purchase_order", part "Langkah": the administrator can add steps there, seen 2026-11-01).\n2. Run TC-APP009-001, 004, 006, 015, 016, 027 and 029 again.',
     who: 'Site administrator (Workflow)',
     howFound: 'Seen on the site (automation of 09 Procurement)',
     testCases: [
@@ -280,6 +280,8 @@ export const FOUND_BLOCKERS: FoundBlocker[] = [
       { id: 'TC-APP009-006' },
       { id: 'TC-APP009-015', steps: [1] },
       { id: 'TC-APP009-016' },
+      { id: 'TC-APP009-027', steps: [1, 2] },
+      { id: 'TC-APP009-029', steps: [1, 2, 3] },
     ],
   },
   {
@@ -350,7 +352,7 @@ export const FOUND_BLOCKERS: FoundBlocker[] = [
     fix: '1. Add the process "billingdiscount" to Workflow (Development: the screen offers only discharge and purchase_order), then give it one step, approver Head cashier.\n2. Run TC-APP014-007, 028 and 029 again.',
     who: 'Development (the process), then Site administrator (its step)',
     howFound: 'Seen on the site (automation of 14 Hospital Accounts)',
-    testCases: [{ id: 'TC-APP014-029' }, { id: 'TC-APP014-009', steps: [1, 2, 3, 4] }],
+    testCases: [{ id: 'TC-APP014-029' }, { id: 'TC-APP014-009', steps: [1, 2, 3, 4] }, { id: 'TC-APP014-028', steps: [1, 2, 3] }],
   },
   {
     no: 35,
@@ -468,6 +470,8 @@ export const FOUND_BLOCKERS: FoundBlocker[] = [
     who: 'Development',
     howFound: 'Seen on the site (full run of 2026-10-21, docs/qa/run-summary-2026-10-21.md)',
     testCases: [
+      { id: 'TC-APP012-029', steps: [2] },
+      { id: 'TC-APP004-047', steps: [1, 2, 3, 4, 5] },
       { id: 'TC-APP022-005', steps: [3, 4, 5, 6] },
       { id: 'TC-APP022-006', steps: [3] },
       { id: 'TC-APP005-017', steps: [1, 2, 3, 4, 5] },
@@ -595,12 +599,14 @@ export const FOUND_BLOCKERS: FoundBlocker[] = [
       'Saving a year balance 2027 (2027-01-01 to 2027-12-31, 12 days) for an employee of the test answers HTTP 500 (digest 3646853607), ' +
       'toast "Minified React error #441", with the typed leave type and with the code of a leave type made just before (seen 2026-10-28; ' +
       'the same answer on every run since 2026-10-18, TC-APP010-047 and 048). No balance, so no application against it, no approval and no cancellation. Seen again on 2026-10-31 after the fixes of 2026-10-30: no HTTP 500 is recorded any more; the year balance of a new employee of the test, with no application of any kind, is refused with "hr: invalid input: pending approval" (the text the workbook gives for a second balance while an application waits, TC-APP010-043 step 4).',
-    fix: '1. Fix the save of a year balance on the HR desk.\n2. Run TC-APP010-042, TC-APP010-043 and E2E-040 again.',
+    fix: '1. Fix the save of a year balance on the HR desk.\n2. Run TC-APP010-042, TC-APP010-043, TC-APP010-047, TC-APP010-048 and E2E-040 again.',
     who: 'Development',
     howFound: 'Seen on the site (TC-APP010-042, written 2026-10-22, run 2026-10-28)',
     testCases: [
       { id: 'TC-APP010-042', steps: [3, 4, 5, 6] },
       { id: 'TC-APP010-043', steps: [4] },
+      { id: 'TC-APP010-047', steps: [1, 2] },
+      { id: 'TC-APP010-048', steps: [1, 2] },
     ],
   },
   {
@@ -627,7 +633,7 @@ export const FOUND_BLOCKERS: FoundBlocker[] = [
       'this date." and a payment "no period for the voucher date" (seen 2026-10-28). The site checks the period first, so the other refusals of ' +
       'the dialog (balance, lines, narration, dates) are not reached either. The periods are made by "Periods" on the year, a set-up of the ' +
       'books for every user, left to the finance administrator.',
-    fix: '1. Generate the periods of the financial year 2026 (Financial years, "Periods").\n2. Run TC-APP019-044 to 055 again.',
+    fix: '1. Generate the periods of the financial year 2026 (Financial years, "Periods").\n2. Run TC-APP019-037 and TC-APP019-044 to 055 again.',
     who: 'Finance administrator',
     howFound: 'Seen on the site (TC-APP019-044, written 2026-10-28)',
     testCases: [
@@ -641,6 +647,8 @@ export const FOUND_BLOCKERS: FoundBlocker[] = [
       { id: 'TC-APP019-052', steps: [2, 3, 4] },
       { id: 'TC-APP019-054', steps: [3, 4] },
       { id: 'TC-APP019-055', steps: [2] },
+      { id: 'TC-APP019-037', steps: [1, 2, 3] },
+      { id: 'TC-APP019-047', steps: [1, 2, 3] },
     ],
   },
   {
@@ -874,6 +882,72 @@ export const FOUND_BLOCKERS: FoundBlocker[] = [
       { id: 'TC-APP003-027', steps: [1, 2] },
       { id: 'TC-APP004-023', steps: [1, 2, 3] },
       { id: 'TC-APP005-028', steps: [1, 2, 3] },
+    ],
+  },
+  {
+    no: 59,
+    blocker: 'No tenant without a licence can be reached: the showcase has one tenant, and Tenants and Entitlements refuse the administrator',
+    category: 'Data',
+    scope: 'Every application\nSettings, Tenants (/id/tenants) and Entitlements (/id/entitlements); the cases "Tenant without the licence" of every workbook, the pharmacy-only tenant and the small edition',
+    cause:
+      'The licence cases need a second tenant, or the tenant of the showcase with a licence taken away (00-prerequisites.xlsx | Users, U10 ' +
+      '"Second tenant, tenant without a licence, platform superadmin": "Deferred: needs a decision and a second tenant"; U9 "Account with the ' +
+      'licensing right": the tenant has no privilege LICENSING_WRITE). Seen 2026-11-01: Settings lists "Tenant" and "Entitlement", but both ' +
+      'answer "missing required privilege" for U1 (rs.admin2) and U2 (rs.admin); the workbooks name "the other showcase hosts" of a README ' +
+      'that is not part of the reference files. No account of another tenant is known, so no application can be opened without its licence.',
+    fix:
+      '1. Make a second tenant (or a host of the showcase) with a small edition and without each licence, with an administrator account, ' +
+      'or give an account of the showcase the platform right to switch a licence off and on.\n2. Record the account in 00-prerequisites.xlsx ' +
+      '(U10) and run the cases "Tenant without the licence" of every workbook, TC-APP005-048, TC-APP014-050, TC-APP014-073 and TC-APP018-027 again.',
+    who: 'Site administrator (platform)',
+    howFound: 'Seen on the site (Settings, Tenants and Entitlements, 2026-11-01)',
+    testCases: [
+      { id: 'TC-APP001-064' },
+      { id: 'TC-APP001-088' },
+      { id: 'TC-APP002-032' },
+      { id: 'TC-APP003-038' },
+      { id: 'TC-APP003-062' },
+      { id: 'TC-APP004-052' },
+      { id: 'TC-APP004-089' },
+      { id: 'TC-APP005-047' },
+      { id: 'TC-APP005-048' },
+      { id: 'TC-APP005-077' },
+      { id: 'TC-APP006-066' },
+      { id: 'TC-APP006-079' },
+      { id: 'TC-APP007-035' },
+      { id: 'TC-APP007-063' },
+      { id: 'TC-APP008-021' },
+      { id: 'TC-APP008-052' },
+      { id: 'TC-APP009-033' },
+      { id: 'TC-APP009-061' },
+      { id: 'TC-APP010-036' },
+      { id: 'TC-APP010-063' },
+      { id: 'TC-APP011-027' },
+      { id: 'TC-APP011-053' },
+      { id: 'TC-APP012-021' },
+      { id: 'TC-APP012-034' },
+      { id: 'TC-APP013-030' },
+      { id: 'TC-APP013-061' },
+      { id: 'TC-APP014-050' },
+      { id: 'TC-APP014-073' },
+      { id: 'TC-APP014-080' },
+      { id: 'TC-APP015-021' },
+      { id: 'TC-APP015-068' },
+      { id: 'TC-APP016-025' },
+      { id: 'TC-APP016-048' },
+      { id: 'TC-APP017-024' },
+      { id: 'TC-APP017-062' },
+      { id: 'TC-APP018-027' },
+      { id: 'TC-APP019-031' },
+      { id: 'TC-APP019-127' },
+      { id: 'TC-APP020-063' },
+      { id: 'TC-APP021-056' },
+      { id: 'TC-APP022-032' },
+      { id: 'TC-APP023-029' },
+      { id: 'TC-APP024-021' },
+      { id: 'TC-APP025-020' },
+      { id: 'TC-APP026-019' },
+      { id: 'TC-APP027-019' },
     ],
   },
 ];

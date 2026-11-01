@@ -12,8 +12,9 @@ export type CaseArgs = { page: Page; qa: Qa };
 
 export const TC_APP026_001 = async ({ page, qa }: CaseArgs): Promise<void> => {
   const p = plans(page);
-  const card = qa.code('X-JC-AC');
-  const asset = qa.code('X-AST-AC1');
+  // The plans list holds its first rows only, by code (found blocker 40): codes that sort first.
+  const card = qa.bed('X-JC-AC');
+  const asset = qa.bed('X-AST-AC1');
   await qa.step(1, async () => {
     await page.goto('/id/maintenance');
     await page.getByRole('main').getByRole('link', { name: 'Plans' }).click();

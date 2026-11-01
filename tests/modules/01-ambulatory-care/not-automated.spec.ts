@@ -1,4 +1,6 @@
 import { qaTest } from '../../../fixtures/e2e';
+import { testCaseRef } from '../../../lib/qa-data';
+import { planFor } from '../../../lib/qa-data/plan';
 
 /**
  * Test cases of 01-ambulatory-care.xlsx that the plan (lib/qa-data/plan.ts)
@@ -16,7 +18,8 @@ const DECLARED_ONLY = [
   'TC-APP001-088', 'TC-APP001-089',
 ];
 
-for (const id of DECLARED_ONLY) {
+// Those the plan now automates are written elsewhere (tests/modules/00-access, the simulated print cases).
+for (const id of DECLARED_ONLY.filter((x) => planFor(testCaseRef(x)).disposition !== 'automate')) {
   qaTest(id, async () => {
     throw new Error(`${id} is now "automate" in the plan: write its test`);
   });
