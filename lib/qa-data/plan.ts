@@ -1,5 +1,5 @@
 import { foundBlockersOf } from './found-blockers';
-import { blockersOfJourney, prerequisites, type TestCaseRef } from './index';
+import { blockers, blockersOfJourney, prerequisites, type TestCaseRef } from './index';
 
 /**
  * How a test case is run, derived only from workbook fields and the answers
@@ -61,6 +61,38 @@ function usersOfCase(ref: TestCaseRef): string[] | null {
  */
 const SIMULATED = new Set(['TC-APP001-004', 'TC-APP004-009', 'TC-APP006-011', 'TC-APP011-002']);
 
+/**
+ * Checklist blockers that stop a test case whose journey the checklist does not
+ * link (00-blockers-checklist-linked.xlsx links journeys only). Blocker 4,
+ * "Tenants and Entitlements answer HTTP 500 for the hospital administrator":
+ * seen 2026-11-01 they answer "missing required privilege" for U1 and U2, so
+ * no tenant without a licence can be made or reached; the cases "Tenant without
+ * the licence" of every workbook, the pharmacy-only tenant, the small edition
+ * and the licences of Hospital Accounts wait for it (with U10).
+ */
+const CHECKLIST_EXTRA: Record<number, string[]> = {
+  4: [
+  'TC-APP001-064', 'TC-APP001-088', 'TC-APP002-032', 'TC-APP003-038', 'TC-APP003-062', 'TC-APP004-052',
+  'TC-APP004-089', 'TC-APP005-047', 'TC-APP005-048', 'TC-APP005-077', 'TC-APP006-066', 'TC-APP006-079',
+  'TC-APP007-035', 'TC-APP007-063', 'TC-APP008-021', 'TC-APP008-052', 'TC-APP009-033', 'TC-APP009-061',
+  'TC-APP010-036', 'TC-APP010-063', 'TC-APP011-027', 'TC-APP011-053', 'TC-APP012-021', 'TC-APP012-034',
+  'TC-APP013-030', 'TC-APP013-061', 'TC-APP014-050', 'TC-APP014-073', 'TC-APP014-080', 'TC-APP015-021',
+  'TC-APP015-068', 'TC-APP016-025', 'TC-APP016-048', 'TC-APP017-024', 'TC-APP017-062', 'TC-APP018-027',
+  'TC-APP019-031', 'TC-APP019-127', 'TC-APP020-063', 'TC-APP021-056', 'TC-APP022-032', 'TC-APP023-029',
+  'TC-APP024-021', 'TC-APP025-020', 'TC-APP026-019', 'TC-APP027-019',
+  ],
+};
+
+/**
+ * Checklist blockers seen resolved on the site for a journey (re-checked 2026-11-01): the journey runs again.
+ * 13 "Set-up missing on the branch": the Reorder list of Podomoro lists items (JRN-APP009-043), and Punch saves for
+ * a user linked to an employee, U7 (JRN-APP010-044).
+ */
+const CHECKLIST_RESOLVED: Record<string, number[]> = {
+  'JRN-APP009-043': [13],
+  'JRN-APP010-044': [13],
+};
+
 export function planFor(ref: TestCaseRef): Plan {
   const { module, testCase, journey, needs } = ref;
   const users = usersOfCase(ref) ?? needs.usersNeeded.split(',').map((u) => u.trim());
@@ -75,7 +107,10 @@ export function planFor(ref: TestCaseRef): Plan {
     disposition = 'skip';
     reasons.push(`${module.source} | Journeys | row ${journey.row}: Automation Candidate = No`);
   } else {
-    for (const b of blockersOfJourney(journey.id)) {
+    const extra = Object.entries(CHECKLIST_EXTRA).filter(([, ids]) => ids.includes(testCase.id)).map(([no]) => Number(no));
+    const linked = blockersOfJourney(journey.id);
+    const resolved = CHECKLIST_RESOLVED[journey.id] ?? [];
+    for (const b of [...linked, ...blockers().blockers.filter((x) => extra.includes(x.no) && !linked.some((l) => l.no === x.no))].filter((x) => !resolved.includes(x.no))) {
       if (NON_BLOCKING.has(b.no)) continue;
       if (b.no === 5 && needs.branch !== 'All branches') continue;
       reasons.push(`Blocker ${b.no}: ${b.blocker} (00-blockers-checklist-linked.xlsx | Checklist | row ${b.row})`);

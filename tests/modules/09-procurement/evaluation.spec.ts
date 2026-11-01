@@ -5,13 +5,13 @@ import { PROCUREMENT } from '../../../lib/procurement-data';
 import { PurchaseOrdersPage } from '../../../pages/procurement/ProcurementPages';
 import { Vouchers } from '../19-finance/helpers';
 import { signedOutJourney, userPage } from '../shared/access';
-import { createOrder, docNo, openOrder, poToastsAfter as toastsAfter } from './cases';
+import { approvalOf, createOrder, docNo, openOrder, orderAtStep, poToastsAfter as toastsAfter } from './cases';
 
 /**
  * 09-procurement.xlsx, the journeys marked "Needs Evaluation" (automated
- * since 2026-10-29, open question Q10). The purchase order chain of the site
- * has one step, not four (found blocker 30): no order can wait at step 2, 3
- * or 4. Goods receipts answer HTTP 500 (found blocker 31). "Approver 2",
+ * since 2026-10-29, open question Q10). The purchase order chain has its
+ * four steps since 2026-11-01 (set in Workflow; found blocker 30 before),
+ * with no role per step. Goods receipts answer HTTP 500 (found blocker 31).
  * "Director" and "the second user" are U4 (qa.admin3).
  */
 
@@ -46,18 +46,43 @@ async function tiles(page: Page): Promise<Record<string, number>> {
   return out;
 }
 
-qaTest('TC-APP009-005', async ({ page, qa }) => {
-  const doc = docNo(qa);
-  expect(await createOrder(page, po(doc))).toContain('Purchase order created');
-  qa.note(1, `PO-S1 is an order of this test (${doc})`);
-  await qa.step(1, async () => {
-    expect(await advance(page, doc)).toContain('Approval advanced');
-    const p = await openOrder(page, doc);
-    const steps = await p.steps();
-    qa.note(1, `chain after the advance: ${steps.map((s) => s.join(' ')).join(' / ')}`);
-    if (steps.length < 2) qa.deviation(1, 'Row Approval "Step 2"', `the chain has ${steps.length} step: the order is fully approved (found blocker 30)`);
-  });
-  for (const st of [2, 3, 4]) qa.blocked(st, 30);
+qaTest('TC-APP009-005', async ({ page, qa, browser }) => {
+  // The four users of the workbook: Officer U1, Approver 2 U5 (qa.approver), Approver 3 U4 (qa.admin3), Director U1 again
+  // (the second admin of the tenant is U4, already Approver 3). The chain of the site names no role per step (Workflow has none).
+  const doc = await orderAtStep(page, qa, 1);
+  qa.note(1, `PO-S1 is an order of this test (${doc}); Officer U1, Approver 2 U5, Approver 3 U4, Director U1 (no other admin of BR-A)`);
+  const u5 = await userPage(browser, 'U5');
+  const u4 = await userPage(browser, 'U4');
+  try {
+    const at: [number, Page, string, string][] = [
+      [1, page, 'Step 2', 'Verifikasi Gudang'],
+      [2, u5, 'Step 3', 'Persetujuan Manajer Keuangan'],
+      [3, u4, 'Step 4', 'Persetujuan Direktur'],
+    ];
+    for (const [step, who, row, current] of at) {
+      await qa.step(step, async () => {
+        await installToastRecorder(who);
+        expect(await advance(who, doc)).toContain('Approval advanced');
+        const steps = await (await openOrder(page, doc)).steps();
+        expect(steps.find((x) => x.includes('Current'))?.[0]).toBe(current);
+        expect(await approvalOf(page, doc)).toBe(row);
+      });
+    }
+    await qa.step(4, async () => {
+      expect(await advance(page, doc)).toContain('Approval advanced');
+      const p = await openOrder(page, doc);
+      const steps = await p.steps();
+      qa.note(4, `after the Director: ${steps.map((x) => x.join(' ')).join(' / ')}; row "${await approvalOf(page, doc)}"`);
+      const v = await openOrder(page, doc);
+      const disabled = !(await v.advance().count()) || (await v.advance().isDisabled());
+      if (!steps.every((x) => x.includes('Done')) || !disabled) {
+        qa.deviation(4, 'All four steps "Done"; the button "Advance approval" is disabled', `steps ${steps.map((x) => x.join(' ')).join(' / ')}; "Advance approval" ${disabled ? 'disabled' : 'still enabled'} (a fifth click answers "workflow: instance is already completed or rejected")`);
+      }
+    });
+  } finally {
+    await u5.context().close();
+    await u4.context().close();
+  }
 });
 
 qaTest('TC-APP009-009', async ({ page, qa, browser }) => {
@@ -95,9 +120,10 @@ qaTest('TC-APP009-009', async ({ page, qa, browser }) => {
 });
 
 qaTest('TC-APP009-017', async ({ qa }) => {
-  qa.blocked(1, 30);
-  qa.blocked(2, 30);
-  qa.note(1, 'PO-S2 and PO-S3 cannot wait at steps 2 and 3: the chain has one step (found blocker 30); the Pharmacist and Cashier accounts are not prepared either (blocker 38)');
+  // A Pharmacist and a Cashier account with one role each are not prepared: the rights of a new role cannot be saved (blocker 38).
+  qa.note(1, 'the chain has its four steps (since 2026-11-01), but no Pharmacist or Cashier account with one role exists (00-prerequisites.xlsx | Role accounts, blocker 38)');
+  qa.blocked(1, 38);
+  qa.blocked(2, 38);
 });
 
 qaTest('TC-APP009-018', async ({ page, qa, browser }) => {
@@ -116,20 +142,29 @@ qaTest('TC-APP009-018', async ({ page, qa, browser }) => {
       const results: string[] = [];
       for (let i = 0; i < 4; i++) results.push((await advance(second, doc)).join(' / ') || 'no toast');
       qa.note(2, `U4 advances its own order four times: ${results.join(' ; ')}`);
-      if (results[0].includes('Approval advanced')) qa.deviation(2, 'Refused: the creator cannot approve (and one person not consecutive steps)', 'U4 approves its own order');
+      const passed = results.filter((r) => r.includes('Approval advanced')).length;
+      if (passed > 1) qa.deviation(2, 'Refused after the first step: one person cannot approve consecutive steps', `U4 approves ${passed} consecutive steps of its own order`);
     });
   } finally {
     await second.context().close();
   }
-  qa.blocked(2, 30);
-  qa.blocked(3, 30);
-  qa.note(3, 'with one step per order (found blocker 30) Audit cannot show a different user per step');
+  await qa.step(3, async () => {
+    // Audit names the action and the user only, not the order (an entry cannot be opened): the newest advances are read.
+    await page.goto('/id/audit');
+    await page.getByRole('textbox', { name: 'Module' }).fill('procurement');
+    await page.getByRole('textbox', { name: 'Action' }).fill('purchase_order.advance');
+    await page.getByRole('button', { name: 'Search' }).click();
+    await page.waitForLoadState('networkidle').catch(() => {});
+    const rows = (await page.locator('table tbody tr').allInnerTexts()).slice(0, 5).map((r) => r.replace(/\s+/g, ' ').trim());
+    qa.note(3, `the newest purchase_order.advance entries: ${rows.join(' | ')}`);
+    qa.deviation(3, 'Each step shows a different user', 'the entries name no order, so the steps of one order cannot be told apart; the four steps of the second order were approved by one user (step 2)');
+  });
 });
 
 qaTest('TC-APP009-021', async ({ qa }) => {
   for (const st of [1, 2, 3]) qa.blocked(st, 31);
   qa.note(1, 'goods are received on /procurement/receipts, whose "grn" answers HTTP 500 (found blocker 31); Inventory has no receipt against an order');
-  qa.blocked(4, 30);
+  qa.blocked(4, 31);
 });
 
 qaTest('TC-APP009-022', async ({ page, qa }) => {

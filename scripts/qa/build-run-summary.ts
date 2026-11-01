@@ -25,6 +25,7 @@
  *
  * Usage: npm run qa:run-summary
  */
+import { reviewCase, reviewDeviation } from './deviation-review';
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import fs from 'node:fs';
@@ -109,8 +110,10 @@ export interface TestOutcome {
   noTest?: boolean;
   /** A spec declares it, but no results file has it yet (written after the last run). */
   notRunYet?: boolean;
-  /** The screenshot of the moment it failed, else the one at its end. */
+  /** The screenshot of the moment it failed, else the one at its end (else the starting screen of a test case a blocker kept from running). */
   screenshot?: string;
+  /** The screenshot is the starting screen of the journey (scripts/qa/blocked-screenshots.ts): the test case did not run. */
+  screenshotStart?: boolean;
 }
 
 /** A hint from the error text of a failed test; the reviewed cause is in scripts/qa/run-triage.ts. */
@@ -181,7 +184,10 @@ function outcome(kind: TestOutcome['kind'], id: string, spec: PwSpec, errors: Se
     notRun: of('not-run'),
     http5xx: errors.filter((e) => e.test.startsWith(`${id} `) && e.at >= (result?.startTime ?? '')).map((e) => `${e.status} ${e.method} ${new URL(e.url).pathname}${e.digest ? ` (digest ${e.digest})` : ''}`),
     seconds: Math.round((result?.duration ?? 0) / 1000),
-    screenshot: ['screenshot', 'final screenshot'].map((n) => result?.attachments?.find((a) => a.name === n && a.path && fs.existsSync(a.path))?.path).find(Boolean),
+    screenshot:
+      ['screenshot', 'final screenshot'].map((n) => result?.attachments?.find((a) => a.name === n && a.path && fs.existsSync(a.path))?.path).find(Boolean) ??
+      [`reports/screenshots/${id}.png`, `reports/screenshots/blocked/${id}.png`].find((f) => result?.status !== 'skipped' || f.includes('/blocked/') ? fs.existsSync(f) : false),
+    screenshotStart: !['screenshot', 'final screenshot'].some((n) => result?.attachments?.some((a) => a.name === n && a.path && fs.existsSync(a.path))) && !(result?.status !== 'skipped' && fs.existsSync(`reports/screenshots/${id}.png`)) && fs.existsSync(`reports/screenshots/blocked/${id}.png`),
     failedStep: '',
     error: '',
     cause: '',
@@ -449,41 +455,100 @@ function thumbnail(png: string): { file: string; width: number; height: number }
   return { file, width, height };
 }
 
+/** A small JPEG of a screenshot (at most 300 x 220) for the module sheets, which show one per test case. */
+function smallThumbnail(png: string): { file: string; width: number; height: number } {
+  const file = path.join(THUMBS, `s-${createHash('sha1').update(png).digest('hex').slice(0, 16)}.jpg`);
+  if (!fs.existsSync(file)) {
+    fs.mkdirSync(THUMBS, { recursive: true });
+    execFileSync('magick', [png, '-resize', '300x220>', '-quality', '60', file]);
+  }
+  const [width, height] = execFileSync('magick', ['identify', '-format', '%w %h', file]).toString().split(' ').map(Number);
+  return { file, width, height };
+}
+
+/** One plain sentence on a test case: what happened, in Indonesian. */
+function simpleLine(o: TestOutcome): string {
+  const cut = (t: string, n = 280) => (t.length > n ? `${t.slice(0, n - 1)}…` : t);
+  if (o.status === 'Passed') return o.notRun.length ? `Lulus; ${o.notRun.length} langkah tidak dijalankan: ${cut(idText(o.notRun[0]), 200)}` : 'Lulus: semua langkah sesuai harapan.';
+  if (o.status === 'Deviation') return `${o.deviations.length} deviasi. ${cut(idText(o.deviations[0] ?? ''))}`;
+  if (o.status === 'Failed') return `Gagal${o.failedStep ? ` di ${o.failedStep.replace(/^Step (\d+).*$/, 'langkah $1')}` : ''}: ${cut(o.error, 220)}`;
+  if (o.status === 'Blocked') {
+    const stop = o.reason.match(/(?:Step (\d+): )?Blocker (\d+)/);
+    if (stop) {
+      const where = stop[1] ? `Terhenti di langkah ${stop[1]}` : 'Tidak bisa dijalankan';
+      return `${where}: blocker ${stop[2]} – ${blockerTitle(Number(stop[2])).title}${o.deviations.length ? ` (${o.deviations.length} deviasi sebelumnya)` : ''}`;
+    }
+    return cut(idText(o.reason));
+  }
+  return `Belum dijalankan: ${cut(idText(o.reason), 240)}`;
+}
+
+/** The picture a link opens: the copy the test keeps in reports/screenshots (its run folder under .qa-state is temporary). */
+const keptShot = (o: TestOutcome): string => [`reports/screenshots/${o.id}.png`, `reports/screenshots/blocked/${o.id}.png`].find((f) => f === o.screenshot || (!o.screenshotStart && f.endsWith(`/${o.id}.png`) && !f.includes('/blocked/') && fs.existsSync(f))) ?? o.screenshot!;
+
+/** A sheet name of a module ("01 Rawat Jalan"): at most 31 characters, without the characters Excel refuses. */
+const moduleSheetName = (group: string): string => wordId(group).replace(/[\\/?*[\]:]/g, ' ').slice(0, 31);
+
+/**
+ * One sheet per module (01 to 27): every test case of the workbook, with its
+ * status, one plain sentence and its screenshot (the starting screen when a
+ * blocker kept it from running). The steps are in the module's result workbook
+ * (reports/e2e/<module>.xlsx).
+ */
+function moduleSheets(wb: ExcelJS.Workbook, s: Summary): void {
+  const groups = [...new Set(s.outcomes.filter((o) => o.kind === 'module').map((o) => o.group ?? ''))].sort();
+  for (const g of groups) {
+    const rows = s.outcomes.filter((o) => o.kind === 'module' && o.group === g).sort((a, b) => a.id.localeCompare(b.id));
+    const ws = sheet(wb, moduleSheetName(g), [
+      { header: 'No', key: 'no', width: 5 },
+      { header: 'Id', key: 'id', width: 15 },
+      { header: 'Kasus uji', key: 'title', width: 42 },
+      { header: 'Status', key: 'status', width: 12 },
+      { header: 'Keterangan', key: 'line', width: 70 },
+      { header: 'Tinjauan deviasi', key: 'review', width: 46 },
+      { header: 'Tangkapan layar', key: 'shot', width: 44 },
+    ], rows.map((o, i) => ({
+      review: reviewText(o),
+      no: i + 1,
+      id: o.id,
+      title: idTitle(o),
+      status: statusId(o.status),
+      line: simpleLine(o),
+      shot: o.screenshot ? { text: o.screenshotStart ? 'layar awal (tidak dijalankan) – buka' : 'buka gambar penuh', hyperlink: path.relative(OUT_DIR, keptShot(o)) } : 'tidak ada',
+    })), 'status');
+    rows.forEach((o, i) => {
+      if (!o.screenshot) return;
+      const t = smallThumbnail(o.screenshot);
+      const row = ws.getRow(i + 2);
+      row.height = Math.max(40, t.height * 0.75 + 16);
+      row.getCell('shot').alignment = { vertical: 'bottom', wrapText: true };
+      ws.addImage(wb.addImage({ filename: t.file, extension: 'jpeg' }), { tl: { col: 6, row: i + 1 }, ext: { width: t.width, height: t.height }, editAs: 'oneCell' });
+    });
+    ws.eachRow((row, i) => {
+      const fill = REVIEW_FILL[String(row.getCell('review').value).split(':')[0]];
+      if (i > 1 && fill) row.getCell('review').fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: fill } };
+    });
+  }
+}
+
+const REVIEW_FILL: Record<string, string> = { 'Bisa dianggap lulus': 'FFD9EAD3', 'Perlu keputusan': 'FFFFF2CC', 'Deviasi nyata': 'FFF4CCCC' };
+
+/** The review of a test case's deviations (scripts/qa/deviation-review.ts): its verdict and the notes of its deviations. */
+function reviewText(o: TestOutcome): string {
+  const v = reviewCase(o.id, o.deviations);
+  if (!v) return '';
+  const notes = [...new Set(o.deviations.map((d) => reviewDeviation(o.id, d)).map((r) => `${r.verdict === v ? '' : `(${r.verdict}) `}${r.note}`))];
+  return `${v}: ${notes.join(' ')}`;
+}
+
 /** Sheet names of the workbook (Indonesian). */
 const SHEET = {
   overview: 'Ringkasan',
   modules: 'Modul',
   chains: 'Rantai E2E',
-  failures: 'Gagal & Deviasi',
   blockers: 'Blocker',
   http5xx: 'HTTP 5xx',
-  testCases: 'Kasus uji',
-  screenshots: 'Tangkapan layar',
 };
-
-/** Sheet Tangkapan layar: one row per failed test, test with a deviation and chain not passed (row i + 2), with its screenshot. */
-function screenshots(wb: ExcelJS.Workbook, rows: TestOutcome[]): void {
-  const ws = sheet(wb, SHEET.screenshots, [
-    { header: 'Id', key: 'id', width: 15 },
-    { header: 'Status', key: 'status', width: 11 },
-    { header: 'Kasus uji / rantai', key: 'title', width: 36 },
-    { header: 'Penyebab / alasan', key: 'cause', width: 50 },
-    { header: 'Tangkapan layar (saat gagal, selain itu di akhir test)', key: 'shot', width: 92 },
-  ], rows.map((o) => ({
-    id: o.id,
-    status: statusId(o.status),
-    title: idTitle(o),
-    cause: [o.triage ? `${o.triage.cause}: ${o.triage.finding}` : o.error || idText(o.reason).slice(0, 600), o.triage?.next ? `Berikutnya: ${o.triage.next}` : ''].filter(Boolean).join('\n\n'),
-    shot: o.screenshot ? '' : sentenceId('no screenshot'),
-  })), 'status');
-  rows.forEach((o, i) => {
-    const row = i + 2;
-    if (!o.screenshot) return;
-    const t = thumbnail(o.screenshot);
-    ws.getRow(row).height = Math.max(60, t.height * 0.75 + 6);
-    ws.addImage(wb.addImage({ filename: t.file, extension: 'jpeg' }), { tl: { col: 4, row: row - 1 }, ext: { width: t.width, height: t.height }, editAs: 'oneCell' });
-  });
-}
 
 /** The evidence picture of a chain: a screenshot it saved itself (reports/screenshots/E2E-001-receipt.png), else its last screenshot. */
 function chainPicture(o: TestOutcome): string | undefined {
@@ -559,6 +624,9 @@ function overview(wb: ExcelJS.Workbook, s: Summary): void {
   ws.addRow(['Tingkat lulus (lulus / semua kasus uji)', { formula: `${sum('Passed')}/${sum('total')}`, result: m.Passed / s.totals.testCases }]).getCell(2).numFmt = '0%';
   ws.addRow(['Cakupan (dijalankan / semua kasus uji)', { formula: `(${sum('Passed')}+${sum('Deviation')}+${sum('Failed')})/${sum('total')}`, result: (m.Passed + m.Deviation + m.Failed) / s.totals.testCases }]).getCell(2).numFmt = '0%';
   ws.addRow(['Jawaban HTTP 5xx dari situs', s.totals.http5xx]);
+  const dev = s.outcomes.filter((o) => o.kind === 'module' && o.status === 'Deviation');
+  const verdicts = (['Bisa dianggap lulus', 'Perlu keputusan', 'Deviasi nyata'] as const).map((v) => `${dev.filter((o) => reviewCase(o.id, o.deviations) === v).length} ${v.toLowerCase()}`);
+  ws.addRow(['Tinjauan kasus uji berstatus Deviasi', `${verdicts.join(' · ')} (kolom "Tinjauan deviasi" di sheet modul)`]);
   for (let r = 8; r <= ws.rowCount; r++) ws.getRow(r).getCell(2).alignment = { horizontal: 'left' };
   ws.addRow([]);
 
@@ -608,13 +676,30 @@ function overview(wb: ExcelJS.Workbook, s: Summary): void {
   for (const [x, text] of [
     ['Passed', 'setiap langkah memenuhi hasil yang diharapkan'],
     ['Deviation', 'berjalan sampai akhir, ada langkah yang hasilnya berbeda dari referensi (dicatat)'],
-    ['Failed', `berhenti karena error; rinciannya di sheet ${SHEET.failures}`],
+    ['Failed', 'berhenti karena error; rinciannya di sheet modulnya'],
     ['Blocked', `berhenti karena masalah situs yang sudah diketahui; rinciannya di sheet ${SHEET.blockers}`],
     ['Not run', 'tidak dijalankan (butuh user/role yang belum siap, atau tidak diotomasi)'],
   ] as [Status, string][]) {
     fillStatus(ws.addRow([statusId(x), text]).getCell(1));
   }
 }
+
+/** The blocker watch (tests/modules/00-access/blocker-watch.spec.ts): the newest look at each watched blocker. */
+const WATCH: Record<string, { at: string; holds: boolean; symptom: string }> = fs.existsSync('.qa-state/blocker-watch.json') ? JSON.parse(fs.readFileSync('.qa-state/blocker-watch.json', 'utf8')) : {};
+/** Blockers re-checked by hand on the site, with no watch (2026-11-01). */
+const RECHECKED: Record<number, string> = {
+  6: 'Dicek 2026-11-01: masih berlaku. "Record code" dengan "Semua cabang" menjawab "The code could not be recorded".',
+  9: 'Belum bisa dicek: registrasi IGD Podomoro butuh konfigurasi registrasi (blocker 13).',
+  14: 'Bukan cacat situs: journey butuh data dari aplikasi lain; dijalankan lewat rantai E2E dan data buatan test.',
+};
+const recheckOf = (no: number, source: string): string => {
+  const w = WATCH[String(no)];
+  if (w) return `${w.holds ? 'Masih berlaku' : 'TAMPAKNYA SUDAH SELESAI'} (pengawas blocker, ${w.at.slice(0, 10)}): ${w.symptom.slice(0, 120)}`;
+  if (RECHECKED[no]) return RECHECKED[no];
+  // Found blockers that some tests mark without trying the step (no watch yet).
+  if ([18, 20, 22, 26, 29, 31, 36, 37, 38].includes(no)) return 'Sebagian test menandainya tanpa mencoba langkahnya dan belum ada pengawas: belum dicek ulang sejak ditemukan.';
+  return source.startsWith('docs/') ? 'Dicek otomatis oleh test-nya di setiap run (langkah dicoba, ditandai blocker hanya bila gejalanya muncul).' : '';
+};
 
 async function writeWorkbook(s: Summary): Promise<void> {
   const wb = new ExcelJS.Workbook();
@@ -637,35 +722,28 @@ async function writeWorkbook(s: Summary): Promise<void> {
     row.getCell('coverage').value = { ...formula(`SUM(${passedCol}${i}:${failedCol}${i})`), result: row.getCell('coverage').value as number | string };
   });
 
-  const outcomeRow = (o: TestOutcome) => ({
-    id: o.id,
-    group: wordId(o.group ?? ''),
-    title: idTitle(o),
-    status: statusId(o.status),
-    previous: o.previous ? statusId(o.previous) : '',
-    blockers: o.blockers.join(', '),
-    reason: idText(o.reason).slice(0, 2000),
-    failedStep: o.failedStep,
-    error: o.error.slice(0, 1000),
-    cause: o.triage ? `${o.triage.cause}: ${o.triage.finding}` : idText(o.cause),
-    next: o.triage?.next ?? '',
-    owner: o.triage?.owner ?? '',
-    http5xx: o.http5xx.join('\n'),
-    seconds: o.seconds,
+  const chainRows = s.outcomes.filter((o) => o.kind === 'chain').sort((a, b) => a.id.localeCompare(b.id));
+  const chains = sheet(wb, SHEET.chains, [
+    { header: 'Id', key: 'id', width: 10 },
+    { header: 'Skenario', key: 'title', width: 40 },
+    { header: 'Status', key: 'status', width: 12 },
+    { header: 'Sampai mana', key: 'line', width: 70 },
+    { header: 'Tangkapan layar', key: 'shot', width: 44 },
+  ], chainRows.map((o) => ({ id: o.id, title: idTitle(o), status: statusId(o.status), line: chainLine(o), shot: chainPicture(o) ? '' : 'tidak ada' })), 'status');
+  chainRows.forEach((o, i) => {
+    const pic = chainPicture(o);
+    if (!pic) return;
+    const t = smallThumbnail(pic);
+    chains.getRow(i + 2).height = Math.max(40, t.height * 0.75 + 6);
+    chains.addImage(wb.addImage({ filename: t.file, extension: 'jpeg' }), { tl: { col: 4, row: i + 1 }, ext: { width: t.width, height: t.height }, editAs: 'oneCell' });
   });
-  const cols = [
-    { header: 'Id', key: 'id', width: 15 },
-    { header: 'Modul', key: 'group', width: 24 },
-    { header: 'Kasus uji / rantai', key: 'title', width: 44 },
-    { header: 'Status', key: 'status', width: 11 },
-    { header: 'Status run sebelumnya', key: 'previous', width: 11 },
-    { header: 'Blocker', key: 'blockers', width: 10 },
-  ];
-  const shotRows = s.outcomes.filter((o) => (o.kind === 'chain' && o.status !== 'Passed') || (o.kind === 'module' && (o.status === 'Failed' || o.status === 'Deviation')));
-  const shotAt = new Map(shotRows.map((o, i) => [o.id, i + 2]));
-  const link = (o: TestOutcome) => (shotAt.has(o.id) ? { text: o.screenshot ? 'tangkapan layar' : 'tidak ada', hyperlink: `#'${SHEET.screenshots}'!E${shotAt.get(o.id)}` } : '');
-  sheet(wb, SHEET.chains, [...cols, { header: 'Tangkapan layar', key: 'shot', width: 12 }, { header: 'Alasan (berhenti / deviasi)', key: 'reason', width: 70 }, { header: 'Langkah gagal', key: 'failedStep', width: 40 }, { header: 'Pesan error', key: 'error', width: 50 }, { header: 'Penyebab', key: 'cause', width: 50 }, { header: 'Tindak lanjut', key: 'next', width: 50 }, { header: 'HTTP 5xx', key: 'http5xx', width: 40 }], s.outcomes.filter((o) => o.kind === 'chain').map((o) => ({ ...outcomeRow(o), shot: link(o) })), 'status');
-  sheet(wb, SHEET.failures, [...cols, { header: 'Tangkapan layar', key: 'shot', width: 12 }, { header: 'Langkah gagal', key: 'failedStep', width: 50 }, { header: 'Pesan error', key: 'error', width: 60 }, { header: 'Penyebab', key: 'cause', width: 60 }, { header: 'Tindak lanjut', key: 'next', width: 60 }, { header: 'Penanggung jawab', key: 'owner', width: 16 }, { header: 'HTTP 5xx', key: 'http5xx', width: 40 }], s.outcomes.filter((o) => o.status === 'Failed' || o.status === 'Deviation').map((o) => ({ ...outcomeRow(o), shot: link(o), error: o.error || idText(o.reason) })), 'status');
+  moduleSheets(wb, s);
+  // The module names of sheet Modul lead to their sheets.
+  modules.eachRow((row, i) => {
+    if (i === 1) return;
+    const name = String(row.getCell('module').value);
+    if (wb.getWorksheet(name)) row.getCell('module').value = { text: name, hyperlink: `#'${name}'!A1` };
+  });
   sheet(wb, SHEET.blockers, [
     { header: 'No', key: 'no', width: 6 },
     { header: 'Blocker', key: 'title', width: 60 },
@@ -677,7 +755,8 @@ async function writeWorkbook(s: Summary): Promise<void> {
     { header: 'HTTP 5xx terlihat di run ini', key: 'seen', width: 10 },
     { header: 'Perbaikan (tindak lanjut)', key: 'fix', width: 70 },
     { header: 'Siapa', key: 'who', width: 24 },
-  ], s.perBlocker.map((b) => ({ ...b, category: wordId(b.category), fix: wordId(b.fix), who: wordId(b.who), chains: b.chains.join(', '), modules: b.modules.map(wordId).join('\n'), seen: b.seenHttp5xx ? 'Ya' : '' })));
+    { header: 'Cek ulang', key: 'recheck', width: 60 },
+  ], s.perBlocker.map((b) => ({ ...b, category: wordId(b.category), fix: wordId(b.fix), who: wordId(b.who), chains: b.chains.join(', '), modules: b.modules.map(wordId).join('\n'), seen: b.seenHttp5xx ? 'Ya' : '', recheck: recheckOf(b.no, b.source) })));
   sheet(wb, SHEET.http5xx, [
     { header: 'Waktu', key: 'at', width: 22 },
     { header: 'Test', key: 'test', width: 50 },
@@ -692,8 +771,6 @@ async function writeWorkbook(s: Summary): Promise<void> {
     { header: 'Isi request', key: 'request', width: 70 },
     { header: 'Respons', key: 'response', width: 50 },
   ], s.errors.map((e) => ({ ...e, test: `${e.id} ${e.id.startsWith('E2E') ? (CHAIN_NAME_ID[e.id] ?? '') : titleId(e.test.replace(/ \[[^\]]+\].*$/, '').replace(/^\S+ /, ''))}`, testType: TEST_TYPE_ID[e.testType] ?? e.testType, path: new URL(e.url).pathname, testStatus: e.testStatus ? statusId(e.testStatus) : '', kind: sentenceId(e.kind), counted: sentenceId(e.counted) })));
-  sheet(wb, SHEET.testCases, [...cols, { header: 'Alasan', key: 'reason', width: 70 }, { header: 'Pesan error', key: 'error', width: 50 }, { header: 'Detik', key: 'seconds', width: 9 }], s.outcomes.filter((o) => o.kind === 'module').map(outcomeRow), 'status');
-  screenshots(wb, shotRows);
   await wb.xlsx.writeFile(path.join(OUT_DIR, 'simrs-run-summary.xlsx'));
 }
 

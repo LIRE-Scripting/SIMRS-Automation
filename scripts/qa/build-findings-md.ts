@@ -10,6 +10,7 @@
  *
  *   npm run qa:findings-md
  */
+import { reviewCase, reviewDeviation } from './deviation-review';
 import fs from 'node:fs';
 import { CHAIN_NAME_ID } from './chain-names-id';
 import { statusId } from './report-language';
@@ -75,18 +76,25 @@ function deviationsMd(): string {
     '',
     `**${total} deviasi** di **${withDev.filter((o) => o.kind === 'module').length} test case** dan **${withDev.filter((o) => o.kind === 'chain').length} rantai E2E**.`,
     '',
+    'Kolom **Tinjauan** (scripts/qa/deviation-review.ts, ditinjau 2026-11-01): **Bisa dianggap lulus** = tujuan langkah tercapai, hanya bentuk atau teksnya beda dari referensi; **Perlu keputusan** = situs bekerja dengan cara lain atau fiturnya tidak ada, perlu keputusan product owner; **Deviasi nyata** = cacat (validasi tidak ada, data ganda, hak akses, server error, angka/waktu salah).',
+    '',
+    `| Tinjauan | Deviasi | Test case / rantai (semua deviasinya) |`,
+    '|---|---:|---:|',
+    ...(['Bisa dianggap lulus', 'Perlu keputusan', 'Deviasi nyata'] as const).map((v) => `| ${v} | ${withDev.reduce((a, o) => a + o.deviations.filter((d) => reviewDeviation(o.id, d).verdict === v).length, 0)} | ${withDev.filter((o) => reviewCase(o.id, o.deviations) === v).length} |`),
+    '',
     '| Modul | Test case / rantai dengan deviasi | Jumlah deviasi |',
     '|---|---:|---:|',
     ...groups.map((g) => `| [${g}](#${g.toLowerCase().replace(/[^a-z0-9 -]/g, '').replace(/ /g, '-')}) | ${byGroup.get(g)!.length} | ${byGroup.get(g)!.reduce((a, o) => a + o.deviations.length, 0)} |`),
     '',
   ];
   for (const g of groups) {
-    out.push(`## ${g}`, '', '| Test case | Judul | Langkah | Workbook mengharapkan | Di site |', '|---|---|---:|---|---|');
+    out.push(`## ${g}`, '', '| Test case | Judul | Langkah | Workbook mengharapkan | Di site | Tinjauan | Catatan |', '|---|---|---:|---|---|---|---|');
     for (const o of byGroup.get(g)!.sort((a, b) => a.id.localeCompare(b.id))) {
       for (const d of o.deviations) {
         const p = parseDeviation(d);
         const step = p.source ? `${p.step} (${p.source})` : p.step;
-        out.push(`| ${o.id} | ${cell(titleOf(o))} | ${step} | ${cell(p.expected)} | ${cell(p.site)} |`);
+        const r = reviewDeviation(o.id, d);
+        out.push(`| ${o.id} | ${cell(titleOf(o))} | ${step} | ${cell(p.expected)} | ${cell(p.site)} | ${r.verdict} | ${cell(r.note)} |`);
       }
     }
     out.push('');

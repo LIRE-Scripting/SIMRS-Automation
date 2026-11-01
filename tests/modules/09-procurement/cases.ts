@@ -114,7 +114,27 @@ export async function openOrder(page: Page, doc: string): Promise<PurchaseOrders
   return p;
 }
 
-/** TC-APP009-004: an order of the test (PO-S1) on its first approval step, advanced once; the approval chain of the site stops it (found blocker 30). */
+/** An order of the test waiting at step `n` of the four-step chain (PO-S1 … PO-S4): created and advanced n - 1 times by U1; returns its number. */
+export async function orderAtStep(page: Page, qa: Qa, n: number, extra: Partial<PurchaseOrder> = {}): Promise<string> {
+  const doc = docNo(qa);
+  expect(await createOrder(page, { docNumber: doc, vendor: PROCUREMENT.vendor, dept: PROCUREMENT.dept, advance: PROCUREMENT.advance, ...extra })).toContain('Purchase order created');
+  for (let i = 1; i < n; i++) {
+    const p = await openOrder(page, doc);
+    const mark = await toastMark(page);
+    await p.advance().click();
+    expect(await poToastsAfter(page, mark)).toContain('Approval advanced');
+  }
+  return doc;
+}
+
+/** The Approval cell of an order's row ("Step 2", …). */
+export async function approvalOf(page: Page, doc: string): Promise<string> {
+  const p = new PurchaseOrdersPage(page);
+  await p.open();
+  return (await p.cells(await p.find(doc)))[6] ?? '';
+}
+
+/** TC-APP009-004: an order of the test (PO-S1) on its first approval step of the four-step chain, advanced once. */
 export const TC_APP009_004 = async ({ page, qa }: CaseArgs): Promise<void> => {
   const doc = docNo(qa);
   expect(await createOrder(page, { docNumber: doc, vendor: PROCUREMENT.vendor, advance: PROCUREMENT.advance })).toContain('Purchase order created');
@@ -125,7 +145,7 @@ export const TC_APP009_004 = async ({ page, qa }: CaseArgs): Promise<void> => {
     p = await openOrder(page, doc);
     const steps = await p.steps();
     expect(steps[0]).toContain('Current');
-    if (!steps[0].includes('Pengajuan Departemen')) qa.deviation(1, 'Step 1 "Pengajuan Departemen" marked "Current"', `step 1 "${steps[0].join(' ')}" (found blocker 30)`);
+    if (!steps[0].includes('Pengajuan Departemen')) qa.deviation(1, 'Step 1 "Pengajuan Departemen" marked "Current"', `step 1 "${steps[0].join(' ')}"`);
   });
 
   await qa.step(2, async () => {
@@ -135,10 +155,21 @@ export const TC_APP009_004 = async ({ page, qa }: CaseArgs): Promise<void> => {
   });
 
   await qa.step(3, async () => {
-    qa.note(3, `steps after the advance: ${(await p.steps()).map((s) => s.join(' ')).join(' / ')}`);
+    // The chain may be another than the four steps of the workbooks (E2E-050 runs this case on a two-step chain of its own).
+    const steps = await p.steps();
+    qa.note(3, `steps after the advance: ${steps.map((s) => s.join(' ')).join(' / ')}`);
+    expect(steps[0]).toContain('Done');
+    expect(steps[1]).toContain('Current');
+    const fits = steps.length === 4 && steps[1][0] === 'Verifikasi Gudang' && steps.slice(2).every((s) => s.includes('Pending'));
+    if (!fits) qa.deviation(3, 'Step 1 "Done", step 2 "Verifikasi Gudang" "Current", steps 3 and 4 "Pending"', steps.map((s) => s.join(' ')).join(' / '));
   });
-  qa.blocked(3, 30);
-  qa.blocked(4, 30);
+
+  await qa.step(4, async () => {
+    await p.view.getByRole('button', { name: 'Close' }).click();
+    const r = new PurchaseOrdersPage(page);
+    await r.open();
+    expect((await r.cells(await r.find(doc)))[6]).toBe('Step 2');
+  });
 };
 
 /** Fills the order form of /procurement/requests. */

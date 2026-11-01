@@ -4,12 +4,12 @@ import { installToastRecorder, toastMark, SERVER_FAILURE } from '../../../lib/as
 import { addDays, todayWib } from '../../../lib/dates';
 import { PROCUREMENT } from '../../../lib/procurement-data';
 import { PurchaseOrdersPage } from '../../../pages/procurement/ProcurementPages';
-import { createOrder as create, docNo, idr, openOrder, poToastsAfter as toastsAfter, TC_APP009_004 } from './cases';
+import { approvalOf, createOrder as create, docNo, idr, openOrder, orderAtStep, poToastsAfter as toastsAfter, TC_APP009_004 } from './cases';
 
 /**
  * 09-procurement.xlsx, feature "Purchase orders (/procurement/purchase-orders)".
  * Every order of a test carries a document number with a new token. The
- * approval chain on the site has one step (found blocker 30).
+ * approval chain has its four steps since 2026-11-01 (found blocker 30 before), with no role per step.
  */
 
 test.beforeEach(async ({ page }) => {
@@ -67,7 +67,7 @@ qaTest('TC-APP009-001', async ({ page, qa }) => {
     expect(steps[0]).toContain('Current');
     await expect(p.advance()).toBeVisible();
     if (chain !== `${PROCUREMENT.chain} (4 steps)`) {
-      qa.deviation(4, `"${PROCUREMENT.chain} (4 steps)"; four steps, the first "Current", the others "Pending"`, `"${chain}": ${steps.map((s) => s.join(' ')).join(' / ')} (found blocker 30)`);
+      qa.deviation(4, `"${PROCUREMENT.chain} (4 steps)"; four steps, the first "Current", the others "Pending"`, `"${chain}": ${steps.map((s) => s.join(' ')).join(' / ')}`);
     }
   });
 
@@ -219,33 +219,37 @@ qaTest('TC-APP009-014', async ({ page, qa }) => {
 });
 
 qaTest('TC-APP009-015', async ({ page, qa }) => {
-  const done = docNo(qa);
-  expect(await create(page, { docNumber: done, vendor: PROCUREMENT.vendor, advance: PROCUREMENT.advance })).toContain('Purchase order created');
-  const p = new PurchaseOrdersPage(page);
-  const mark = await toastMark(page);
-  await p.advance().click();
-  expect(await toastsAfter(page, mark)).toContain('Approval advanced');
-  qa.note(1, 'PO-DONE is an order of this test, approved with its one step; PO-S4 cannot exist (found blocker 30)');
+  // PO-DONE: an order of the test approved through its four steps; PO-S4: one waiting at step 4.
+  const done = await orderAtStep(page, qa, 5);
+  const s4 = await orderAtStep(page, qa, 4);
+  qa.note(1, `PO-DONE ${done} (four steps approved by U1) and PO-S4 ${s4} are orders of this test`);
 
   await qa.step(1, async () => {
-    const c = await cellsOf(page, done);
-    qa.note(1, `PO-DONE row: Approval "${c[6]}"`);
-    if (!/approved/i.test(c[6])) qa.deviation(1, 'PO-DONE shows a status such as "Approved"', `Approval "${c[6]}"`);
+    const d = await approvalOf(page, done);
+    const w = await approvalOf(page, s4);
+    qa.note(1, `PO-DONE row: Approval "${d}"; PO-S4 row: "${w}"`);
+    expect(w).toBe('Step 4');
+    if (!/approved/i.test(d)) qa.deviation(1, 'PO-DONE shows a status such as "Approved"; PO-S4 shows "Step 4"', `PO-DONE shows "${d}", like PO-S4 ("${w}")`);
   });
-  qa.blocked(1, 30);
 
   await qa.step(2, async () => {
     const v = await openOrder(page, done);
     const steps = await v.steps();
     qa.note(2, `steps of PO-DONE: ${steps.map((s) => s.join(' ')).join(' / ')}`);
-    if (!steps.every((s) => s.includes('Done'))) qa.deviation(2, 'All steps "Done"', `the approved order shows ${steps.map((s) => s.join(' ')).join(' / ')} (its one-step chain, found blocker 30)`);
+    if (!steps.every((s) => s.includes('Done'))) qa.deviation(2, 'All four steps "Done"', `the approved order shows ${steps.map((s) => s.join(' ')).join(' / ')}`);
     const text = (await v.view.innerText()).replace(/\s+/g, ' ');
-    if (!/admin|\d{2}[:.]\d{2}/.test(text)) qa.deviation(2, 'All steps "Done", with the name of the approver and the time', `steps ${steps.map((s) => s.join(' ')).join(' / ')}; no approver or time`);
+    if (!/admin|\d{2}[:.]\d{2}/.test(text)) qa.deviation(2, 'All steps "Done", with the name of the approver and the time', 'no approver or time on the steps');
+    if (await v.advance().isEnabled().catch(() => false)) qa.deviation(2, '"Advance approval" is not offered', 'the approved order still offers "Advance approval"');
   });
 
   await qa.step(3, async () => {
-    const v = new PurchaseOrdersPage(page);
-    if (await v.advance().isEnabled().catch(() => false)) qa.deviation(3, 'No approval button on an approved order', 'the order still offers its approval button');
+    const v = await openOrder(page, done);
+    if (!(await v.advance().count()) || (await v.advance().isDisabled())) return;
+    const mark = await toastMark(page);
+    await v.advance().click();
+    const toasts = await toastsAfter(page, mark);
+    qa.note(3, `"Advance approval" on PO-DONE: "${toasts.join(' / ')}"`);
+    expect(toasts).not.toContain('Approval advanced');
   });
 });
 
@@ -357,15 +361,78 @@ qaTest('TC-APP009-024', async ({ page, qa }) => {
   });
 });
 
+qaTest('TC-APP009-006', async ({ page, qa }) => {
+  const [s1, s3, s4] = [await orderAtStep(page, qa, 1), await orderAtStep(page, qa, 3), await orderAtStep(page, qa, 4)];
+  qa.note(1, `PO-S1 ${s1}, PO-S3 ${s3} and PO-S4 ${s4} are orders of this test`);
+  await qa.step(1, async () => {
+    const v = await openOrder(page, s3);
+    const chain = (await v.view.getByText(/\(\d+ (?:steps|langkah)\)$/).innerText()).trim();
+    const steps = await v.steps();
+    qa.note(1, `"${chain}": ${steps.map((x) => x.join(' ')).join(' / ')}`);
+    expect(steps.length).toBe(4);
+    for (const [i, x] of steps.entries()) expect(x[1]).toBe(`Step ${i + 1}`);
+    if (chain !== `${PROCUREMENT.chain} (4 steps)`) qa.deviation(1, `The chain's name with "(4 steps)"`, `"${chain}"`);
+  });
+  await qa.step(2, async () => {
+    const steps = await (await openOrder(page, s3)).steps();
+    expect(steps.map((x) => x[2])).toEqual(['Done', 'Done', 'Current', 'Pending']);
+  });
+  await qa.step(3, async () => {
+    expect((await (await openOrder(page, s1)).steps())[0][2]).toBe('Current');
+    expect((await (await openOrder(page, s4)).steps()).map((x) => x[2])).toEqual(['Done', 'Done', 'Done', 'Current']);
+  });
+});
+
+qaTest('TC-APP009-016', async ({ page, qa }) => {
+  // PO-S2 waits at step 2 "Verifikasi Gudang" (the Pharmacist role in the workbook); the Officer is U1 (Admin).
+  const s2 = await orderAtStep(page, qa, 2);
+  qa.note(1, `PO-S2 is an order of this test (${s2})`);
+  let v: PurchaseOrdersPage;
+  await qa.step(1, async () => {
+    v = await openOrder(page, s2);
+    const text = (await v.view.innerText()).replace(/\s+/g, ' ');
+    qa.note(1, `the steps: ${(await v.steps()).map((x) => x.join(' ')).join(' / ')}`);
+    if (!/pharmacist|apoteker|role|peran/i.test(text)) qa.deviation(1, 'The order shows which role step 2 waits for', 'no role is shown: the chain of Workflow names its steps only, with no role per step');
+  });
+  await qa.step(2, async () => {
+    const offered = (await v.advance().count()) > 0 && (await v.advance().isEnabled());
+    if (offered) qa.deviation(2, 'The button is not offered to this user, or is disabled', '"Advance approval" is offered and enabled to the Officer (Admin) at step 2');
+  });
+  await qa.step(3, async () => {
+    const mark = await toastMark(page);
+    await v.advance().click();
+    const toasts = await toastsAfter(page, mark);
+    const row = await approvalOf(page, s2);
+    qa.note(3, `"Advance approval": "${toasts.join(' / ')}"; row "${row}"`);
+    if (toasts.includes('Approval advanced')) qa.deviation(3, 'Refused with a message that names the role needed. The row stays at "Step 2"', `the Officer approves step 2: row "${row}" (no role per step in Workflow)`);
+  });
+});
+
 qaTest('TC-APP009-027', async ({ page, qa }) => {
+  // The 25 seeded QA-PO-<digits> orders are not on the site: orders of the test stand in, one at "Step 4" and three at "Step 1".
   const p = new PurchaseOrdersPage(page);
   await p.open();
   const seeded = (await p.rows().evaluateAll((rs) => rs.map((r) => (r.querySelector('td')?.textContent ?? '').trim()))).filter((d) => /^QA-PO-\d+$/.test(d));
-  qa.note(1, `seeded orders numbered QA-PO- and digits on the first page: ${seeded.length} (the workbook expects 25)`);
-  // Seeded orders at "Step 1" to "Step 4" need the four-step chain; the chain of the site has one step (found blocker 30).
-  qa.note(1, 'the 25 seeded QA-PO- orders are not on the site (the list holds three seed orders: PO-001-A, PO-001, PO-USG); orders of the test cannot stand in, as none can wait at "Step 2" to "Step 4"');
-  qa.blocked(1, 30);
-  qa.blocked(2, 30);
+  qa.note(1, `seeded orders QA-PO-<digits> on the first page: ${seeded.length} (the workbook expects 25); orders of the test stand in`);
+  const s4 = await orderAtStep(page, qa, 4);
+  const s1 = [await orderAtStep(page, qa, 1), await orderAtStep(page, qa, 1), await orderAtStep(page, qa, 1)];
+  const go = async (doc: string) => {
+    const v = await openOrder(page, doc);
+    const mark = await toastMark(page);
+    await v.advance().click();
+    return toastsAfter(page, mark);
+  };
+  await qa.step(1, async () => {
+    const toasts = await go(s4);
+    qa.note(1, `${s4} at "Step 4": "${toasts.join(' / ')}"; row "${await approvalOf(page, s4)}"`);
+    expect(toasts).toContain('Approval advanced');
+  });
+  await qa.step(2, async () => {
+    for (const doc of s1) {
+      expect(await go(doc)).toContain('Approval advanced');
+      expect(await approvalOf(page, doc)).toBe('Step 2');
+    }
+  });
 });
 
 qaTest('TC-APP009-035', async ({ page, qa }) => {

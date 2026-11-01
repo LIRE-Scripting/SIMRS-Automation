@@ -260,29 +260,20 @@ export const FOUND_BLOCKERS: FoundBlocker[] = [
   },
   {
     no: 30,
-    blocker: 'The purchase order approval chain has one step, not the four of the shared data',
+    blocker: 'The purchase order approval chain has one step, not the four of the shared data (resolved 2026-11-01)',
     category: 'Data',
     scope:
       '09 Procurement\nPurchase orders, /procurement/purchase-orders, the opened order ("Approval chain")\n' +
       '00-test-data.xlsx | Catalogue, 09 row "Chain" (purchase_order "Persetujuan Purchase Order", four steps with roles)',
     cause:
       'A new purchase order shows "Purchase order (1 steps)" with the single step "Persetujuan"; one "Advance approval" completes it ' +
-      '(seen 2026-10-15). No order can wait at step 2, 3 or 4, so PO-S2, PO-S3 and PO-S4 cannot exist and the role of each step cannot be checked.',
+      '(seen 2026-10-15). No order can wait at step 2, 3 or 4, so PO-S2, PO-S3 and PO-S4 cannot exist and the role of each step cannot be checked. Resolved on 2026-11-01 (the user\'s go-ahead): ' +
+      'U1 set the chain in Workflow, Process Definitions ("Ubah rantai") to "Persetujuan Purchase Order" with the four steps of the workbooks ' +
+      '(Pengajuan Departemen, Verifikasi Gudang, Persetujuan Manajer Keuangan, Persetujuan Direktur); the editor names the steps only, with no role per step.',
     fix: '1. Load the four-step chain of the shared data (Workflow, Process Definitions, "Ubah rantai: purchase_order", part "Langkah": the administrator can add steps there, seen 2026-11-01).\n2. Run TC-APP009-001, 004, 006, 015, 016, 027 and 029 again.',
     who: 'Site administrator (Workflow)',
     howFound: 'Seen on the site (automation of 09 Procurement)',
-    testCases: [
-      { id: 'TC-APP009-005', steps: [2, 3, 4] },
-      { id: 'TC-APP009-017', steps: [1, 2] },
-      { id: 'TC-APP009-018', steps: [2, 3] },
-      { id: 'TC-APP009-021', steps: [4] },
-      { id: 'TC-APP009-004', steps: [3, 4] },
-      { id: 'TC-APP009-006' },
-      { id: 'TC-APP009-015', steps: [1] },
-      { id: 'TC-APP009-016' },
-      { id: 'TC-APP009-027', steps: [1, 2] },
-      { id: 'TC-APP009-029', steps: [1, 2, 3] },
-    ],
+    testCases: [],
   },
   {
     no: 31,
@@ -297,7 +288,7 @@ export const FOUND_BLOCKERS: FoundBlocker[] = [
     who: 'Development',
     howFound: 'Seen on the site (automation of 09 Procurement)',
     testCases: [
-      { id: 'TC-APP009-021', steps: [1, 2, 3] },
+      { id: 'TC-APP009-021', steps: [1, 2, 3, 4] },
       { id: 'TC-APP007-024', steps: [2, 3] },
       { id: 'TC-APP009-046', steps: [3, 4] },
       { id: 'TC-APP009-049', steps: [1, 2] },
@@ -429,7 +420,7 @@ export const FOUND_BLOCKERS: FoundBlocker[] = [
     fix: '1. Fix the save of role privileges (server log, digest 2696407390, 2026-10-15 and 2026-10-20).\n2. PREREQ_RETRY=blocked npm run test:prereq, then npm run qa:prereq-evidence: the four roles get their rights and the four accounts are made.\n3. Run TC-APP018-039 again (and steps 4 and 5 with the 13 Dietary flow), and the journeys of 04, 18, 22 and 23 with their role accounts.',
     who: 'Development',
     howFound: 'Seen on the site (automation of 18 Settings, 2026-10-15; prerequisites run, 2026-10-20)',
-    testCases: [{ id: 'TC-APP018-039', steps: [3] }],
+    testCases: [{ id: 'TC-APP018-039', steps: [3] }, { id: 'TC-APP009-017', steps: [1, 2] }],
   },
   {
     no: 39,
@@ -631,10 +622,13 @@ export const FOUND_BLOCKERS: FoundBlocker[] = [
     cause:
       'The open year 2026 (2026-01-01 to 2026-12-31, monthly) lists 0 periods. A manual journal dated today answers "No financial period covers ' +
       'this date." and a payment "no period for the voucher date" (seen 2026-10-28). The site checks the period first, so the other refusals of ' +
-      'the dialog (balance, lines, narration, dates) are not reached either. The periods are made by "Periods" on the year, a set-up of the ' +
-      'books for every user, left to the finance administrator.',
-    fix: '1. Generate the periods of the financial year 2026 (Financial years, "Periods").\n2. Run TC-APP019-037 and TC-APP019-044 to 055 again.',
-    who: 'Finance administrator',
+      'the dialog (balance, lines, narration, dates) are not reached either. Seen 2026-11-01 (the user asked to make the periods): the ' +
+      'screen cannot make them. A year made on Financial years gets its periods when it is saved (the years of the tests have 12), but ' +
+      'the seeded year 2026 has none ("periods":[] in the page data), the dialog "Periode" only lists periods (Kunci, Jadikan ' +
+      'penyesuaian) with no way to add one, and the list shows the first 22 years only (2059 to 2038, found blocker 40), so the row 2026 ' +
+      'is not even on screen.',
+    fix: '1. Generate the periods of the financial year 2026 on the server (or offer "Generate periods" for a year without periods).\n2. Run TC-APP019-037 and TC-APP019-044 to 055 again.',
+    who: 'Development',
     howFound: 'Seen on the site (TC-APP019-044, written 2026-10-28)',
     testCases: [
       { id: 'TC-APP019-044', steps: [3, 4, 5, 6, 7] },
@@ -882,72 +876,6 @@ export const FOUND_BLOCKERS: FoundBlocker[] = [
       { id: 'TC-APP003-027', steps: [1, 2] },
       { id: 'TC-APP004-023', steps: [1, 2, 3] },
       { id: 'TC-APP005-028', steps: [1, 2, 3] },
-    ],
-  },
-  {
-    no: 59,
-    blocker: 'No tenant without a licence can be reached: the showcase has one tenant, and Tenants and Entitlements refuse the administrator',
-    category: 'Data',
-    scope: 'Every application\nSettings, Tenants (/id/tenants) and Entitlements (/id/entitlements); the cases "Tenant without the licence" of every workbook, the pharmacy-only tenant and the small edition',
-    cause:
-      'The licence cases need a second tenant, or the tenant of the showcase with a licence taken away (00-prerequisites.xlsx | Users, U10 ' +
-      '"Second tenant, tenant without a licence, platform superadmin": "Deferred: needs a decision and a second tenant"; U9 "Account with the ' +
-      'licensing right": the tenant has no privilege LICENSING_WRITE). Seen 2026-11-01: Settings lists "Tenant" and "Entitlement", but both ' +
-      'answer "missing required privilege" for U1 (rs.admin2) and U2 (rs.admin); the workbooks name "the other showcase hosts" of a README ' +
-      'that is not part of the reference files. No account of another tenant is known, so no application can be opened without its licence.',
-    fix:
-      '1. Make a second tenant (or a host of the showcase) with a small edition and without each licence, with an administrator account, ' +
-      'or give an account of the showcase the platform right to switch a licence off and on.\n2. Record the account in 00-prerequisites.xlsx ' +
-      '(U10) and run the cases "Tenant without the licence" of every workbook, TC-APP005-048, TC-APP014-050, TC-APP014-073 and TC-APP018-027 again.',
-    who: 'Site administrator (platform)',
-    howFound: 'Seen on the site (Settings, Tenants and Entitlements, 2026-11-01)',
-    testCases: [
-      { id: 'TC-APP001-064' },
-      { id: 'TC-APP001-088' },
-      { id: 'TC-APP002-032' },
-      { id: 'TC-APP003-038' },
-      { id: 'TC-APP003-062' },
-      { id: 'TC-APP004-052' },
-      { id: 'TC-APP004-089' },
-      { id: 'TC-APP005-047' },
-      { id: 'TC-APP005-048' },
-      { id: 'TC-APP005-077' },
-      { id: 'TC-APP006-066' },
-      { id: 'TC-APP006-079' },
-      { id: 'TC-APP007-035' },
-      { id: 'TC-APP007-063' },
-      { id: 'TC-APP008-021' },
-      { id: 'TC-APP008-052' },
-      { id: 'TC-APP009-033' },
-      { id: 'TC-APP009-061' },
-      { id: 'TC-APP010-036' },
-      { id: 'TC-APP010-063' },
-      { id: 'TC-APP011-027' },
-      { id: 'TC-APP011-053' },
-      { id: 'TC-APP012-021' },
-      { id: 'TC-APP012-034' },
-      { id: 'TC-APP013-030' },
-      { id: 'TC-APP013-061' },
-      { id: 'TC-APP014-050' },
-      { id: 'TC-APP014-073' },
-      { id: 'TC-APP014-080' },
-      { id: 'TC-APP015-021' },
-      { id: 'TC-APP015-068' },
-      { id: 'TC-APP016-025' },
-      { id: 'TC-APP016-048' },
-      { id: 'TC-APP017-024' },
-      { id: 'TC-APP017-062' },
-      { id: 'TC-APP018-027' },
-      { id: 'TC-APP019-031' },
-      { id: 'TC-APP019-127' },
-      { id: 'TC-APP020-063' },
-      { id: 'TC-APP021-056' },
-      { id: 'TC-APP022-032' },
-      { id: 'TC-APP023-029' },
-      { id: 'TC-APP024-021' },
-      { id: 'TC-APP025-020' },
-      { id: 'TC-APP026-019' },
-      { id: 'TC-APP027-019' },
     ],
   },
 ];

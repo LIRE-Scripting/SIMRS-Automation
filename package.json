@@ -19,7 +19,8 @@
     "qa:run-summary": "tsx scripts/qa/build-run-summary.ts",
     "qa:messages": "tsx scripts/qa/fetch-messages.ts",
     "qa:findings-md": "tsx scripts/qa/build-findings-md.ts",
-    "qa:summary-id-missing": "tsx scripts/qa/summary-id-missing.ts"
+    "qa:summary-id-missing": "tsx scripts/qa/summary-id-missing.ts",
+    "qa:blocked-shots": "tsx scripts/qa/blocked-screenshots.ts"
   },
   "keywords": [],
   "author": "",

@@ -5,9 +5,9 @@ import { PROCESS, restoreChain, TC_APP018_054, type Chain } from '../../modules/
 
 /**
  * E2E-050: Approval chains configured and used. Step 1 gives the purchase
- * order chain two steps; step 2 puts a purchase order of the chain on it. The
- * order's approval stops at the site's one-step chain (found blocker 30), so
- * the chain ends there. The purchase order chain applies to every user of the
+ * order chain two steps; step 2 puts a purchase order of the chain on it and
+ * advances it once (the order then waits at the second step). The purchase
+ * order chain applies to every user of the
  * hospital: it is put back as it was at the end, whatever happened.
  */
 chainTest('E2E-050', async ({ page, chain }) => {
