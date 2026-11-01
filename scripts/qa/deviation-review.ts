@@ -22,7 +22,52 @@
  */
 
 export type Verdict = 'Bisa dianggap lulus' | 'Perlu keputusan' | 'Deviasi nyata';
-export interface Review { verdict: Verdict; note: string }
+export interface Review { verdict: Verdict; note: string; fix?: string }
+
+/**
+ * What to do about a deviation, by its note: the fix for a defect, the decision for "Perlu keputusan", or what (if
+ * anything) is left for one that counts as passed. A note without an entry gets the default of its verdict.
+ */
+const FIX: Record<string, string> = {
+  'Server error (HTTP 500/SQL) alih-alih pesan validasi.': 'Tangani input ini di server dan kembalikan pesan validasi yang jelas; jangan biarkan server menjawab error 500.',
+  'User tanpa hak (U3) bisa membuka/membaca/menyimpan: hak akses tidak ditegakkan.': 'Tegakkan hak akses di server untuk baca dan tulis; sembunyikan kartu aplikasi dan tombol dari peran tanpa hak.',
+  'Waktu ditampilkan dalam UTC, bukan WIB.': 'Tampilkan dan simpan waktu dalam zona waktu cabang (WIB).',
+  'Angka desimal/ribuan salah dibaca.': 'Baca angka sesuai format Indonesia (koma desimal, titik ribuan) atau beri petunjuk format pada isian.',
+  'Data cabang lain muncul atau dipakai: pembatasan cabang tidak berlaku.': 'Batasi data dan pilihan ke cabang aktif user (server dan daftar pilihan).',
+  'Papan antrean publik menampilkan nama lengkap dan RM (privasi).': 'Samarkan nama dan sembunyikan nomor RM di papan antrean publik.',
+  'Data ganda tersimpan tanpa penolakan atau peringatan.': 'Tolak data ganda (nomor, kode, atau kunjungan yang sama) atau minta konfirmasi dengan peringatan yang jelas.',
+  'Seharusnya ditolak/diperingatkan, tetapi tersimpan: validasi tidak ada.': 'Tambahkan validasi di server untuk input ini, dengan pesan yang menyebut alasannya.',
+  'Input yang seharusnya ditolak tetap tersimpan.': 'Tambahkan validasi di server untuk input ini, dengan pesan yang menyebut alasannya.',
+  'Pembuat dokumen bisa menyetujui dokumennya sendiri (pemisahan tugas tidak berlaku).': 'Terapkan pemisahan tugas: pembuat dokumen (atau satu orang untuk langkah berurutan) tidak boleh menyetujuinya.',
+  'Fungsinya sama: berupa link, bukan tombol; navigasinya berjalan.': 'Tidak perlu perbaikan; referensi bisa disesuaikan (link, bukan tombol).',
+  'Input tetap tertolak, hanya lewat validasi browser/tombol nonaktif, bukan teks dari situs.': 'Tidak wajib; bila diinginkan, tampilkan pesan dari situs yang menyebut isian yang kurang.',
+  'Penolakannya benar; pesannya umum dan tidak menyebut alasan seperti di referensi.': 'Opsional: ganti pesan umum ("... failed") dengan alasan penolakan yang spesifik.',
+  'Cabang diambil dari sesi (U1 hanya di satu cabang); field cabang tidak diperlukan.': 'Tidak perlu perbaikan; referensi bisa disesuaikan (cabang dari sesi).',
+  'Pencarian per kata menemukan lebih banyak; hasil yang dicari tetap muncul.': 'Tidak perlu perbaikan; referensi bisa disesuaikan (pencarian per kata).',
+  'Format tampilan berbeda (sisa / dipesan); angkanya benar.': 'Tidak perlu perbaikan.',
+  'Setelah dipanggil, baris lanjut ke "Start encounter"; panggilan tercatat.': 'Tidak perlu perbaikan; referensi bisa disesuaikan.',
+  'Petunjuk tampil dalam bahasa Indonesia karena situs dibuka di /id.': 'Tidak perlu perbaikan.',
+  'Pembatasan cabang ada dengan bentuk lain (daftar cabang dan user yang diizinkan).': 'Tidak perlu perbaikan; referensi bisa disesuaikan.',
+  'Periode terbuka dikenali dari tombol "Lock"; statusnya tidak ditulis.': 'Opsional: tampilkan status "Terbuka" pada baris periode.',
+  'Situs menampilkan lebih banyak menu/kolom dari referensi; yang diminta tetap ada.': 'Tidak perlu perbaikan; referensi bisa diperbarui dengan menu/kolom tambahan.',
+  'Ditolak dengan pesan yang setara (teksnya sedikit berbeda).': 'Tidak perlu perbaikan.',
+  'Baris bisa dihapus dengan cara lain (mengosongkan namanya).': 'Opsional: tambahkan tombol hapus per baris.',
+  'Departemen sudah terisi otomatis, jadi tombol aktif wajar.': 'Tidak perlu perbaikan.',
+  'Hasil yang diharapkan masih TBD di referensi; perilaku situs dicatat.': 'Lengkapi hasil yang diharapkan di referensi (masih TBD).',
+  'Status tampil sebagai kode singkat "A"; artinya sama (menunggu).': 'Opsional: tampilkan status dengan kata ("Menunggu") alih-alih kode.',
+  'Situs memakai FIFO (masuk dulu keluar dulu), referensi FEFO (kedaluwarsa dulu): aturan stok perlu diputuskan.': 'Putuskan aturan pengeluaran stok (FEFO atau FIFO), lalu sesuaikan situs atau referensi.',
+  'Audit Log tidak menyimpan rincian (nomor dokumen/RM/alasan) atau aksinya tidak tercatat.': 'Putuskan apakah entri Audit Log harus menyimpan nomor dokumen/RM/alasan dan bisa dibuka; bila ya, lengkapi pencatatannya.',
+  'Isian hilang tanpa peringatan saat meninggalkan layar (perlu keputusan UX).': 'Putuskan apakah perlu peringatan sebelum meninggalkan formulir yang belum disimpan.',
+  'Aksi langsung dijalankan tanpa konfirmasi.': 'Putuskan apakah aksi ini perlu dialog konfirmasi (dan alasan) sebelum dijalankan.',
+  'Fitur yang diminta referensi tidak ada di situs.': 'Putuskan apakah fitur ini dibuat, atau referensi disesuaikan dengan situs.',
+  'Isian berupa teks bebas, bukan pilihan dari daftar.': 'Putuskan apakah isian diganti pilihan dari data master (pasien, pemasok, mata uang, dsb.).',
+};
+const FIX_DEFAULT: Record<Verdict, string> = {
+  'Bisa dianggap lulus': 'Tidak perlu perbaikan; referensi bisa disesuaikan.',
+  'Perlu keputusan': 'Putuskan apakah perilaku situs diterima (lalu sesuaikan referensi) atau situs perlu diubah.',
+  'Deviasi nyata': 'Perbaiki di situs sesuai hasil yang diharapkan referensi.',
+};
+const withFix = (r: Review): Review => ({ ...r, fix: r.fix ?? FIX[r.note] ?? FIX_DEFAULT[r.verdict] });
 
 interface Rule { test: (expected: string, site: string, id: string) => boolean; verdict: Verdict; note: string }
 
@@ -93,11 +138,11 @@ export function reviewDeviation(id: string, text: string): Review {
   const t = text.replace(/\s+/g, ' ');
   const step = /^Step (\d+):/.exec(t)?.[1];
   const hand = BY_HAND[`${id} ${step}`];
-  if (hand) return hand;
+  if (hand) return withFix(hand);
   const m = /Excel expects "(.*?)"; the site: (.*)$/.exec(t);
   const [expected, site] = m ? [m[1], m[2]] : ['', t];
-  for (const r of RULES) if (r.test(expected, site, id)) return { verdict: r.verdict, note: r.note };
-  return { verdict: 'Perlu keputusan', note: 'Perilaku situs berbeda dari referensi; perlu keputusan apakah diterima.' };
+  for (const r of RULES) if (r.test(expected, site, id)) return withFix({ verdict: r.verdict, note: r.note });
+  return withFix({ verdict: 'Perlu keputusan', note: 'Perilaku situs berbeda dari referensi; perlu keputusan apakah diterima.' });
 }
 
 /** The verdict of a test case: passed when every deviation can count as passed. */

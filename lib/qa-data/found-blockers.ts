@@ -459,7 +459,7 @@ export const FOUND_BLOCKERS: FoundBlocker[] = [
       '1. Search pickers and lists on the server (or load all records); give the desk lists paging or a search, newest first.\n' +
       '2. Run the listed test cases and the chains E2E-001, 003, 008, 010, 012, 013, 014, 018, 025, 026, 027, 029, 032, 035, 044 and 048 again.',
     who: 'Development',
-    howFound: 'Seen on the site (full run of 2026-10-21, docs/qa/run-summary-2026-10-21.md)',
+    howFound: 'Seen on the site (full run of 2026-10-21)',
     testCases: [
       { id: 'TC-APP012-029', steps: [2] },
       { id: 'TC-APP004-047', steps: [1, 2, 3, 4, 5] },

@@ -1,5 +1,7 @@
 # Prasyarat: user test dan blocker
 
+> Dokumen ini mencatat hasil eksekusi prasyarat pada 2026-10-20. Status blocker dan hasil terbaru ada di [blocker.md](blocker.md) dan [ringkasan-hasil.md](ringkasan-hasil.md).
+
 Kondisi per **2026-10-20**. Site `https://rs.showcase.atklik.xyz`, cabang uji **Podomoro** (kode `HO`).
 
 Dokumen ini menjelaskan hasil eksekusi `reference/00-prerequisites.xlsx`: akun apa saja yang sudah ada, untuk apa masing-masing, apa yang tidak bisa dibuat, dan alasannya.

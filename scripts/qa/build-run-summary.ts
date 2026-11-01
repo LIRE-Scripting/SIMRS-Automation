@@ -25,6 +25,8 @@
  *
  * Usage: npm run qa:run-summary
  */
+import { BLOCKER_PROBLEM_ID } from './id/blocker-detail-id';
+import { recheckOf } from './blocker-recheck';
 import { reviewCase, reviewDeviation } from './deviation-review';
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
@@ -699,23 +701,6 @@ function overview(wb: ExcelJS.Workbook, s: Summary): void {
   fillStatus(ws.addRow([WITH_NOTES, 'dihitung Lulus: semua perbedaannya dari referensi bisa diterima (hanya bentuk atau teks yang beda); catatannya di kolom "Tinjauan deviasi"']).getCell(1));
 }
 
-/** The blocker watch (tests/modules/00-access/blocker-watch.spec.ts): the newest look at each watched blocker. */
-const WATCH: Record<string, { at: string; holds: boolean; symptom: string }> = fs.existsSync('.qa-state/blocker-watch.json') ? JSON.parse(fs.readFileSync('.qa-state/blocker-watch.json', 'utf8')) : {};
-/** Blockers re-checked by hand on the site, with no watch (2026-11-01). */
-const RECHECKED: Record<number, string> = {
-  6: 'Dicek 2026-11-01: masih berlaku. "Record code" dengan "Semua cabang" menjawab "The code could not be recorded".',
-  9: 'Belum bisa dicek: registrasi IGD Podomoro butuh konfigurasi registrasi (blocker 13).',
-  14: 'Bukan cacat situs: journey butuh data dari aplikasi lain; dijalankan lewat rantai E2E dan data buatan test.',
-};
-const recheckOf = (no: number, source: string): string => {
-  const w = WATCH[String(no)];
-  if (w) return `${w.holds ? 'Masih berlaku' : 'TAMPAKNYA SUDAH SELESAI'} (pengawas blocker, ${w.at.slice(0, 10)}): ${w.symptom.slice(0, 120)}`;
-  if (RECHECKED[no]) return RECHECKED[no];
-  // Found blockers that some tests mark without trying the step (no watch yet).
-  if ([18, 20, 22, 26, 29, 31, 36, 37, 38].includes(no)) return 'Sebagian test menandainya tanpa mencoba langkahnya dan belum ada pengawas: belum dicek ulang sejak ditemukan.';
-  return source.startsWith('docs/') ? 'Dicek otomatis oleh test-nya di setiap run (langkah dicoba, ditandai blocker hanya bila gejalanya muncul).' : '';
-};
-
 async function writeWorkbook(s: Summary): Promise<void> {
   const wb = new ExcelJS.Workbook();
   overview(wb, s);
@@ -762,6 +747,7 @@ async function writeWorkbook(s: Summary): Promise<void> {
   sheet(wb, SHEET.blockers, [
     { header: 'No', key: 'no', width: 6 },
     { header: 'Blocker', key: 'title', width: 60 },
+    { header: 'Masalah', key: 'problem', width: 80 },
     { header: 'Kategori', key: 'category', width: 14 },
     { header: 'Didefinisikan di', key: 'source', width: 26 },
     { header: 'Kasus uji terblokir', key: 'testCases', width: 10 },
@@ -771,7 +757,7 @@ async function writeWorkbook(s: Summary): Promise<void> {
     { header: 'Perbaikan (tindak lanjut)', key: 'fix', width: 70 },
     { header: 'Siapa', key: 'who', width: 24 },
     { header: 'Cek ulang', key: 'recheck', width: 60 },
-  ], s.perBlocker.map((b) => ({ ...b, category: wordId(b.category), fix: wordId(b.fix), who: wordId(b.who), chains: b.chains.join(', '), modules: b.modules.map(wordId).join('\n'), seen: b.seenHttp5xx ? 'Ya' : '', recheck: recheckOf(b.no, b.source) })));
+  ], s.perBlocker.map((b) => ({ ...b, category: wordId(b.category), fix: wordId(b.fix), who: wordId(b.who), chains: b.chains.join(', '), modules: b.modules.map(wordId).join('\n'), seen: b.seenHttp5xx ? 'Ya' : '', recheck: recheckOf(b.no, b.source), problem: BLOCKER_PROBLEM_ID[b.no] ?? '' })));
   sheet(wb, SHEET.http5xx, [
     { header: 'Waktu', key: 'at', width: 22 },
     { header: 'Test', key: 'test', width: 50 },
