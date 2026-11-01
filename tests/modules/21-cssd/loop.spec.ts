@@ -1,3 +1,5 @@
+import { todayWib } from '../../../lib/dates';
+import { ensurePassedBowieDick } from './cases';
 import { expect, qaTest, test } from '../../../fixtures/e2e';
 import { installToastRecorder } from '../../../lib/assertions';
 import { PHARMACY } from '../../../lib/pharmacy-data';
@@ -20,6 +22,8 @@ test.beforeEach(async ({ page }) => {
   // A saved unsterile receipt stalls the site for minutes when it is opened (found blocker 48).
   test.setTimeout(900_000);
   await installToastRecorder(page);
+  // The first cycle of the default autoclave today waits for a passed Bowie Dick test (blocker 13 until 2026-11-01).
+  await ensurePassedBowieDick(page, todayWib());
 });
 
 const ITEM = PHARMACY.para;
@@ -75,14 +79,14 @@ qaTest('TC-APP021-029', async ({ page, qa }) => {
     qa.note(3, `receipt of ${r.request} approved: the set is in the CSSD store, unsterile (packs ${r.packs.join(', ')})`);
   });
   if (stalled) qa.blocked(3, 48);
-  qa.blocked(4, 13);
-  qa.note(4, 'the cycle of the load needs a passed Bowie Dick test of today, which the branch set-up does not allow (blocker 13)');
+  qa.blocked(4, 48);
+  qa.note(4, 'the cycle of the load needs the unsterile packs of an approved receipt, and a saved receipt does not open (found blocker 48); the Bowie Dick test of today is saved since 2026-11-01');
   for (const st of [5, 6]) qa.blocked(st, 3);
-  qa.blocked(7, 13);
+  qa.blocked(7, 48);
 });
 
 qaTest('TC-APP021-030', async ({ qa }) => {
-  qa.blocked(1, 13);
+  qa.blocked(1, 48);
   qa.note(1, 'a failed and a passed cycle need a Bowie Dick test of today (blocker 13)');
   qa.blocked(2, 3);
   qa.blocked(3, 3);

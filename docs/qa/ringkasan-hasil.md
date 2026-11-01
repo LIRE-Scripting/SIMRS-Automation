@@ -1,6 +1,6 @@
 # Ringkasan hasil pengujian SIMRS
 
-Dibangun 2026-11-01 17:21 WIB dari `reports/summary/run-summary.json` (hasil terbaru setiap test case dan rantai). Bangun ulang: `npm run qa:run-summary && npm run qa:findings-md`.
+Dibangun 2026-11-01 22:49 WIB dari `reports/summary/run-summary.json` (hasil terbaru setiap test case dan rantai). Bangun ulang: `npm run qa:run-summary && npm run qa:findings-md`.
 
 Situs https://rs.showcase.atklik.xyz/id (bahasa Indonesia), cabang uji Podomoro. Setiap test case dan rantai dihitung dengan hasil terbarunya dari semua run. Rincian per test case, dengan tangkapan layar, ada di `reports/summary/simrs-run-summary.xlsx` (satu sheet per modul).
 
@@ -8,31 +8,31 @@ Situs https://rs.showcase.atklik.xyz/id (bahasa Indonesia), cabang uji Podomoro.
 
 | Status | Test case modul | Rantai E2E |
 |---|---:|---:|
-| Lulus | 846 | 5 |
-| Deviasi | 306 | 7 |
+| Lulus | 862 | 5 |
+| Deviasi | 310 | 7 |
 | Gagal | 0 | 0 |
-| Terblokir | 446 | 38 |
-| Belum dijalankan | 6 | 0 |
+| Terblokir | 425 | 38 |
+| Belum dijalankan | 7 | 0 |
 | **Total** | **1604** | **50** |
 
-- Tingkat lulus: **53%** (termasuk 43 test case **Lulus dengan catatan**: semua perbedaannya dari referensi bisa diterima).
-- Cakupan (test case yang dijalankan): **72%**.
+- Tingkat lulus: **54%** (termasuk 47 test case **Lulus dengan catatan**: semua perbedaannya dari referensi bisa diterima).
+- Cakupan (test case yang dijalankan): **73%**.
 - HTTP 5xx di hasil terbaru: **1** ([http-5xx.md](http-5xx.md)).
 
 ## Masalah utama
 
-1. **Blocker** ([blocker.md](blocker.md)): 44 blocker masih menghentikan 446 test case. Yang terbesar:
+1. **Blocker** ([blocker.md](blocker.md)): 44 blocker masih menghentikan 425 test case. Yang terbesar:
    - Blocker 40: Picker dan daftar hanya menjangkau data awal: data di luarnya tidak bisa dipilih atau ditemukan (67 test case). Perbaikan: 1. Cari di picker dan daftar lewat server (atau muat semua record); beri daftar desk halaman atau pencarian, terbaru di atas. 2. Jalankan lagi test case yang tercantum dan rantai E2E-001, 003, 008, 010, 012, 013, 014, 01
    - Blocker 2: Halaman Donor tidak memuat daftar donor ("failed to list donors"; sampai 2026-10-30 HTTP 500) (58 test case). Perbaikan: 1. Cari request daftar donor yang gagal di log server dan perbaiki. 2. Tampilkan layar dengan pesan saat daftar gagal, bukan halaman error. 3. Baca lagi layarnya dan tinjau ke-27 alur.
-   - Blocker 13: Set-up cabang belum ada (56 test case). Perbaikan: 09: item di bawah stok minimum di cabang. 10: "Link me" di My profile untuk user uji. 15 dan 19: buka lagi dengan satu cabang dipilih; kalau masih tidak ada, tambahkan konfigurasi untuk cabang itu. 20: Budget posting rul
    - Blocker 4: Tenants dan Entitlements menolak administrator rumah sakit ("missing required privilege"; sampai 2026-10-30 HTTP 500) (50 test case). Perbaikan: Fungsi: sembunyikan tautan untuk user tanpa hak, atau tampilkan "no access" alih-alih halaman error. Data: akun dengan LICENSING_WRITE untuk menguji kedua layar.
    - Blocker 5: 28 daftar tidak termuat dengan "Semua cabang" (29 test case). Perbaikan: 1. Putuskan: layar meminta cabang, atau daftar dimuat untuk semua cabang. 2. Di kedua kasus, tampilkan pesan, bukan HTTP 500 dan tabel kosong. 3. Jalankan lagi delapan alur yang dipertahankan dengan "All branches". Solus
+   - Blocker 13: Set-up cabang belum ada (28 test case). Perbaikan: 09: item di bawah stok minimum di cabang. 10: "Link me" di My profile untuk user uji. 15 dan 19: buka lagi dengan satu cabang dipilih; kalau masih tidak ada, tambahkan konfigurasi untuk cabang itu. 20: Budget posting rul
    - Blocker 14: 34 journey butuh data yang dibuat di aplikasi lain (21 test case). Perbaikan: Jalankan dulu alur pengisi data, di cabang yang sama, dan catat id-nya: Settings, lalu SDM, Persediaan, Pengadaan, dan Finance, lalu yang lain. ID alurnya ada di baris "Needs data or a step of another application" di set
    - Blocker 10: Item yang disimpan tidak tampil di daftar mana pun (14 test case). Perbaikan: Tambahkan daftar untuk kelima jenis record, atau tampilkan di layarnya setelah disimpan.
    - Blocker 23: Ward care tidak menampilkan pasien rawat inap cabang (12 test case). Perbaikan: 1. Buat daftar memuat rawat inap cabang (atau sebutkan apa yang harus ada lebih dulu). 2. Jalankan lagi TC-APP004-065 sampai 076.
-2. **Deviasi** ([deviations.md](deviations.md)): dari 349 test case dengan deviasi, 100 berisi **deviasi nyata** (perlu diperbaiki), 206 **perlu keputusan** product owner, dan 43 **bisa dianggap lulus**.
+2. **Deviasi** ([deviations.md](deviations.md)): dari 357 test case dengan deviasi, 100 berisi **deviasi nyata** (perlu diperbaiki), 210 **perlu keputusan** product owner, dan 47 **bisa dianggap lulus**.
 3. **HTTP 5xx** ([http-5xx.md](http-5xx.md)): 1 masih terjadi; sebagian besar sudah hilang setelah perbaikan situs 2026-10-30.
-4. **Belum dijalankan:** 6 test case yang terikat jam atau hari kerja, dijadwalkan di run pagi (`.qa-state/morning-run-*.sh`).
+4. **Belum dijalankan:** 7 test case yang terikat jam atau hari kerja, dijadwalkan di run pagi (`.qa-state/morning-run-*.sh`).
 
 ## Per modul
 
@@ -42,10 +42,10 @@ Situs https://rs.showcase.atklik.xyz/id (bahasa Indonesia), cabang uji Podomoro.
 | 02 Janji Temu | 33 | 9 | 10 | 0 | 14 | 0 |
 | 03 Pelayanan Pasien | 63 | 35 | 17 | 0 | 11 | 0 |
 | 04 Rawat Inap | 90 | 47 | 21 | 0 | 22 | 0 |
-| 05 Farmasi | 78 | 44 | 17 | 0 | 17 | 0 |
+| 05 Farmasi | 78 | 45 | 16 | 0 | 17 | 0 |
 | 06 Transfusi Darah | 81 | 11 | 7 | 0 | 63 | 0 |
 | 07 Persediaan | 67 | 39 | 18 | 0 | 10 | 0 |
-| 08 Kamar Operasi | 53 | 36 | 15 | 0 | 2 | 0 |
+| 08 Kamar Operasi | 53 | 37 | 14 | 0 | 2 | 0 |
 | 09 Pengadaan | 65 | 34 | 21 | 0 | 10 | 0 |
 | 10 SDM | 68 | 24 | 14 | 0 | 30 | 0 |
 | 11 Laboratorium | 54 | 38 | 13 | 0 | 3 | 0 |
@@ -53,12 +53,12 @@ Situs https://rs.showcase.atklik.xyz/id (bahasa Indonesia), cabang uji Podomoro.
 | 13 Diet | 62 | 34 | 18 | 0 | 10 | 0 |
 | 14 Kasir & Tagihan | 85 | 42 | 13 | 0 | 27 | 3 |
 | 15 IGD | 69 | 31 | 17 | 0 | 21 | 0 |
-| 16 Rekam Medis (MRD) | 49 | 27 | 16 | 0 | 6 | 0 |
+| 16 Rekam Medis (MRD) | 49 | 28 | 15 | 0 | 6 | 0 |
 | 17 Penggajian | 69 | 25 | 3 | 0 | 41 | 0 |
 | 18 Pengaturan | 92 | 66 | 19 | 0 | 7 | 0 |
 | 19 Keuangan | 128 | 75 | 19 | 0 | 34 | 0 |
-| 20 Anggaran | 64 | 37 | 4 | 0 | 23 | 0 |
-| 21 Sterilisasi (CSSD) | 57 | 35 | 2 | 0 | 20 | 0 |
+| 20 Anggaran | 64 | 49 | 10 | 0 | 4 | 1 |
+| 21 Sterilisasi (CSSD) | 57 | 36 | 3 | 0 | 18 | 0 |
 | 22 Layanan Jasa | 36 | 19 | 1 | 0 | 16 | 0 |
 | 23 Tender & Kontrak | 34 | 25 | 0 | 0 | 9 | 0 |
 | 24 Tata Graha | 22 | 18 | 2 | 0 | 2 | 0 |

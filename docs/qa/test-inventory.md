@@ -456,12 +456,12 @@ ID journey disingkat: `001-003` = `JRN-APP001-003`.
 | [17 Penggajian](traceability/17-payroll.md) | 69 | 1 | 39 | 5 | 24 | 0 | 32 |
 | [18 Pengaturan](traceability/18-settings.md) | 92 | 2 | 86 | 2 | 2 | 0 | 29 |
 | [19 Keuangan](traceability/19-finance.md) | 128 | 4 | 108 | 7 | 9 | 0 | 31 |
-| [20 Anggaran](traceability/20-budget.md) | 64 | 0 | 44 | 11 | 9 | 0 | 13 |
-| [21 Sterilisasi (CSSD)](traceability/21-cssd.md) | 57 | 0 | 44 | 4 | 9 | 0 | 14 |
+| [20 Anggaran](traceability/20-budget.md) | 64 | 0 | 48 | 15 | 1 | 0 | 13 |
+| [21 Sterilisasi (CSSD)](traceability/21-cssd.md) | 57 | 0 | 46 | 4 | 7 | 0 | 14 |
 | [22 Layanan Jasa](traceability/22-services.md) | 36 | 0 | 25 | 0 | 11 | 0 | 22 |
 | [23 Tender & Kontrak](traceability/23-sourcing.md) | 34 | 0 | 20 | 9 | 5 | 0 | 26 |
 | [24 Tata Graha](traceability/24-housekeeping.md) | 22 | 0 | 21 | 0 | 1 | 0 | 14 |
 | [25 Linen](traceability/25-linen.md) | 21 | 0 | 17 | 3 | 1 | 0 | 14 |
 | [26 Pemeliharaan](traceability/26-maintenance.md) | 20 | 0 | 15 | 4 | 1 | 0 | 14 |
 | [27 Aset Tetap](traceability/27-fixed-assets.md) | 20 | 0 | 13 | 6 | 1 | 0 | 13 |
-| **Total** | **1604** | **35** | **1328** | **57** | **184** | **0** | **418** |
+| **Total** | **1604** | **35** | **1334** | **61** | **174** | **0** | **418** |

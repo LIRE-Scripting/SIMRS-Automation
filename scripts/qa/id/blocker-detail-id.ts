@@ -18,7 +18,7 @@ export const BLOCKER_PROBLEM_ID: Record<number, string> = {
   10: 'Data Penggajian yang disimpan (tahun, rekam gaji, input massal, deklarasi pajak, jenis reimburse) tidak ditampilkan di layar mana pun, jadi penguji tidak bisa memastikan penyimpanan berhasil.',
   11: 'Layar Penerimaan jasa dan Tagihan vendor selalu kosong: daftar dikosongkan di kode dan server tidak punya rute untuk membacanya. Id penerimaan yang dibutuhkan "Setujui penerimaan" tidak bisa dibaca di mana pun.',
   12: 'Pencarian Terminologi tidak menemukan satu kode pun (I10, J06.9, "hipertensi"): tampaknya belum ada versi kode diagnosis yang aktif, dan tidak ada layar untuk mengimpor atau mengaktifkannya.',
-  13: 'Set-up cabang belum lengkap: konfigurasi registrasi IGD Podomoro, konfigurasi keuangan cabang, aturan posting anggaran dan approver, serta uji Bowie Dick CSSD. Sudah beres sejak 2026-11-01: daftar Reorder Podomoro dan Punch untuk user yang tertaut ke pegawai.',
+  13: 'Set-up cabang belum lengkap. Yang masih kurang: konfigurasi registrasi IGD (tipe 6 dan 7) di semua cabang, tanpa layar untuk membuatnya; dan periode tahun buku 2026 untuk tutup tahun serta penerimaan pasien di Keuangan (blocker 45). Sudah dibuka 2026-11-01 oleh tester: Anggaran (alokasi bisa disetujui dan diposting; aturan posting "Pencairan dana" dan "Penarikan dana" Podomoro disimpan dengan akun uji QA), uji Bowie Dick CSSD (disimpan setiap hari untuk autoklaf bawaan), daftar Reorder Podomoro, dan Punch untuk user yang tertaut ke pegawai.',
   14: '34 journey dimulai dari data yang dibuat aplikasi lain (pegawai, item stok, PR/PO yang disetujui, voucher, rawat inap). Situs tidak menyediakan data uji itu, dan di layar desk data dirujuk dengan id internal yang diketik manual. Dijalankan lewat rantai E2E dan data buatan test.',
   15: 'Belum ada izin membuat data di situs bersama, dan belum dipastikan data pasien di situs adalah data rekaan. Sudah dijawab: izin menulis diberikan 2026-10-21 (QA_ALLOW_WRITES).',
   16: 'Hanya akun administrator yang diizinkan, jadi pembatasan per peran tidak bisa diuji. Sudah dijawab: akun per peran (U3–U8) dibuat 2026-10-20.',
@@ -64,3 +64,17 @@ export const BLOCKER_PROBLEM_ID: Record<number, string> = {
   57: '"Link me" di Profil saya menjawab HTTP 500 untuk akun yang sudah tertaut. Selesai 2026-10-31: kini ditolak dengan "duplicate".',
   58: 'Kadang pasien kedua dengan nama lengkap yang sama tidak bisa didaftarkan ("Registration failed") tanpa alasan; duplikat dan pasien bernama sama dari workbook tidak selalu bisa disiapkan.',
 };
+
+/**
+ * What kind of problem a blocker is, so a reader sees who has to act:
+ * a defect of the site, a feature the site does not have yet (a product decision first),
+ * or set-up and test data the shared site lacks.
+ */
+export type BlockerKind = 'Bug situs' | 'Fitur belum ada' | 'Set-up & data uji';
+const KIND_OF: Record<BlockerKind, number[]> = {
+  'Bug situs': [1, 2, 3, 5, 6, 7, 10, 11, 15, 16, 17, 23, 24, 25, 27, 28, 30, 31, 32, 35, 36, 38, 39, 40, 41, 42, 43, 44, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58],
+  'Fitur belum ada': [8, 9, 19, 20, 21, 22, 26, 29, 33, 34, 37, 45, 47],
+  'Set-up & data uji': [4, 12, 13, 14, 18, 46],
+};
+export const blockerKind = (no: number): BlockerKind | '' =>
+  (Object.keys(KIND_OF) as BlockerKind[]).find((k) => KIND_OF[k].includes(no)) ?? '';

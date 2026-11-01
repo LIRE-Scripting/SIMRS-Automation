@@ -20,8 +20,8 @@ Judul test = `<TC ID> <Nama skenario> [<file> | Steps | rows a-b | <TC ID>]`; an
 | TC-APP021-012 | JRN-APP021-005 | Penerimaan tidak steril: CSSD menerima kiriman bangsal | Positif | Kritis | baris 50-55 | 6 | `tests/modules/21-cssd/receipts.spec.ts` | U1 / Podomoro | otomatis (menyimpan data; butuh QA_ALLOW_WRITES) |  |
 | TC-APP021-013 | JRN-APP021-005 | Penerimaan yang ditolak | Negatif | Kritis | baris 56-61 | 6 | `tests/modules/21-cssd/receipts.spec.ts` | U1 / Podomoro | otomatis (menyimpan data; butuh QA_ALLOW_WRITES) |  |
 | TC-APP021-014 | JRN-APP021-005 | Membatalkan penerimaan yang sudah disetujui | Negatif | Kritis | baris 62-63 | 6 | `tests/modules/21-cssd/receipts.spec.ts` | U1 / Podomoro | otomatis (menyimpan data; butuh QA_ALLOW_WRITES) | TBD di langkah 1, 2: hanya bagian yang tertulis yang dicek (Q8) |
-| TC-APP021-015 | JRN-APP021-006 | Bowie Dick: uji harian autoklaf | Positif | Kritis | baris 64-68 | 7 | `tests/modules/21-cssd/not-automated.spec.ts` | U1 / Podomoro | fixme (terblokir atau menunggu prasyarat) | blocker 13 – Set-up cabang belum ada |
-| TC-APP021-016 | JRN-APP021-006 | Tes dan siklus yang ditolak | Negatif | Kritis | baris 69-73 | 7 | `tests/modules/21-cssd/not-automated.spec.ts` | U1 / Podomoro | fixme (terblokir atau menunggu prasyarat) | blocker 13 – Set-up cabang belum ada / TBD di langkah 3, 4, 5: hanya bagian yang tertulis yang dicek (Q8) |
+| TC-APP021-015 | JRN-APP021-006 | Bowie Dick: uji harian autoklaf | Positif | Kritis | baris 64-68 | 7 | `tests/modules/21-cssd/bowie.spec.ts` | U1 / Podomoro | otomatis (menyimpan data; butuh QA_ALLOW_WRITES) |  |
+| TC-APP021-016 | JRN-APP021-006 | Tes dan siklus yang ditolak | Negatif | Kritis | baris 69-73 | 7 | `tests/modules/21-cssd/bowie.spec.ts` | U1 / Podomoro | otomatis (menyimpan data; butuh QA_ALLOW_WRITES) | TBD di langkah 3, 4, 5: hanya bagian yang tertulis yang dicek (Q8) |
 | TC-APP021-017 | JRN-APP021-007 | Siklus sterilisasi: satu muatan, pemeriksaan mutunya, dan persetujuan | Positif | Kritis | baris 74-80 | 8 | `tests/modules/21-cssd/cycles.spec.ts` | U1 / Podomoro | otomatis (menyimpan data; butuh QA_ALLOW_WRITES) |  |
 | TC-APP021-018 | JRN-APP021-007 | Siklus yang ditolak | Negatif | Kritis | baris 81-86 | 8 | `tests/modules/21-cssd/cycles.spec.ts` | U1 / Podomoro | otomatis (menyimpan data; butuh QA_ALLOW_WRITES) |  |
 | TC-APP021-019 | JRN-APP021-007 | Persetujuan yang ditolak | Negatif | Kritis | baris 87-88 | 8 | `tests/modules/21-cssd/cycles.spec.ts` | U1 / Podomoro | otomatis (menyimpan data; butuh QA_ALLOW_WRITES) |  |
@@ -67,8 +67,8 @@ Judul test = `<TC ID> <Nama skenario> [<file> | Steps | rows a-b | <TC ID>]`; an
 ## Jumlah
 
 - otomatis (hanya membaca): 0
-- otomatis (menyimpan data; butuh QA_ALLOW_WRITES): 44
+- otomatis (menyimpan data; butuh QA_ALLOW_WRITES): 46
 - otomatis (rantai; butuh data dari aplikasi lain): 4
-- fixme (terblokir atau menunggu prasyarat): 9
+- fixme (terblokir atau menunggu prasyarat): 7
 - skip (tidak diotomasi): 0
 - test case dengan langkah "TBD" (dicek sebagian): 14

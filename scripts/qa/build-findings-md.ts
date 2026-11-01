@@ -21,7 +21,7 @@ import { recheckOf } from './blocker-recheck';
 import { BLOCKER_TITLE_ID } from './blocker-titles-id';
 import { CHAIN_NAME_ID } from './chain-names-id';
 import { reviewCase, reviewDeviation, type Verdict } from './deviation-review';
-import { BLOCKER_PROBLEM_ID } from './id/blocker-detail-id';
+import { BLOCKER_PROBLEM_ID, blockerKind } from './id/blocker-detail-id';
 import { statusId } from './report-language';
 import { partId, reasonId, titleId, wordId } from './summary-id';
 
@@ -112,11 +112,13 @@ function blockerMd(): string {
     '',
     `Saat ini **${active.length} blocker** masih menghentikan **${blockedCases} test case** dan **${s.totals.chains.Blocked ?? 0} rantai E2E**; ${quiet.length} blocker lainnya sudah selesai atau tidak lagi menghentikan test.`,
     '',
+    'Kolom **Jenis** menunjukkan siapa yang harus bergerak: **Bug situs** (fiturnya ada tetapi gagal; Development), **Fitur belum ada** (situs belum punya fiturnya; product owner memutuskan, lalu Development), atau **Set-up & data uji** (data, akun, atau konfigurasi yang belum ada di situs bersama; administrator situs atau tester).',
+    '',
     'Blocker 1–16 berasal dari checklist `reference/00-blockers-checklist-linked.xlsx`; blocker 17 dan seterusnya ditemukan oleh otomasi. Kolom **Cek ulang** menyebut kapan dan bagaimana blocker terakhir diperiksa di situs (pengawas blocker `tests/modules/00-access/blocker-watch.spec.ts` berjalan di setiap run).',
   ]);
-  out.push('## Ringkasan blocker yang masih aktif', '', '| No | Blocker | Test case | Rantai | Modul | Penanggung jawab |', '|---:|---|---:|---|---|---|');
+  out.push('## Ringkasan blocker yang masih aktif', '', '| No | Blocker | Jenis | Test case | Rantai | Modul | Penanggung jawab |', '|---:|---|---|---:|---|---|---|');
   for (const b of [...active].sort((x, y) => (y.stops!.testCases + y.stops!.chains.length) - (x.stops!.testCases + x.stops!.chains.length))) {
-    out.push(`| [${b.no}](#blocker-${b.no}) | ${cell(b.title)} | ${b.stops!.testCases} | ${b.stops!.chains.join(', ')} | ${cell(b.stops!.modules.map(wordId).join(', '))} | ${cell(b.who)} |`);
+    out.push(`| [${b.no}](#blocker-${b.no}) | ${cell(b.title)} | ${blockerKind(b.no)} | ${b.stops!.testCases} | ${b.stops!.chains.join(', ')} | ${cell(b.stops!.modules.map(wordId).join(', '))} | ${cell(b.who)} |`);
   }
   out.push('', '## Rincian blocker yang masih aktif', '');
   for (const b of active) {
@@ -126,6 +128,7 @@ function blockerMd(): string {
       '',
       `**${b.title}**`,
       '',
+      `- **Jenis:** ${blockerKind(b.no) || '—'}`,
       `- **Masalah:** ${b.problem || '—'}`,
       `- **Dampak:** ${b.stops!.testCases} test case${b.stops!.chains.length ? ` dan rantai ${b.stops!.chains.join(', ')}` : ''} terhenti (${b.stops!.modules.map(wordId).join(', ')}).`,
       `- **Perbaikan:** ${cell(b.fix) || '—'}`,

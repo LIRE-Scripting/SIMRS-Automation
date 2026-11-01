@@ -29,6 +29,7 @@ export interface Review { verdict: Verdict; note: string; fix?: string }
  * anything) is left for one that counts as passed. A note without an entry gets the default of its verdict.
  */
 const FIX: Record<string, string> = {
+  'Hanya beda bahasa: fungsinya berjalan, tetapi sebagian teks belum diterjemahkan.': 'Dihitung lulus. Catatan untuk Development: lengkapi terjemahan teks yang disebut (judul, deskripsi, breadcrumb, kolom, tombol, pesan error) seperti modul yang sudah lengkap, misalnya Rawat Inap.',
   'Server error (HTTP 500/SQL) alih-alih pesan validasi.': 'Tangani input ini di server dan kembalikan pesan validasi yang jelas; jangan biarkan server menjawab error 500.',
   'User tanpa hak (U3) bisa membuka/membaca/menyimpan: hak akses tidak ditegakkan.': 'Tegakkan hak akses di server untuk baca dan tulis; sembunyikan kartu aplikasi dan tombol dari peran tanpa hak.',
   'Waktu ditampilkan dalam UTC, bukan WIB.': 'Tampilkan dan simpan waktu dalam zona waktu cabang (WIB).',
@@ -75,6 +76,9 @@ const has = (re: RegExp) => (_e: string, s: string) => re.test(s);
 const expectsRefusal = (e: string) => /^(Refused|Toast "|A message|The text "|A warning|Not possible|Access refused|No "|The button "New order" is not offered)/i.test(e);
 
 const RULES: Rule[] = [
+  // Only the language differs (English left on /id, or Indonesian on /en): the function works, the translation is incomplete.
+  // A page crash (React error) or a server error is not a matter of language and keeps its own verdict.
+  { test: (e, s) => (/\bIndonesian\b/.test(e) || /Indonesian on the English screen/.test(s)) && !/React error|HTTP 5\d\d/.test(s), verdict: 'Bisa dianggap lulus', note: 'Hanya beda bahasa: fungsinya berjalan, tetapi sebagian teks belum diterjemahkan.' },
   // Defects first: a check that is missing, a double, a user without the right, a server error, wrong figures.
   { test: has(/HTTP 500|SQLSTATE|numeric field overflow|Minified React/i), verdict: 'Deviasi nyata', note: 'Server error (HTTP 500/SQL) alih-alih pesan validasi.' },
   { test: has(/U3 \(no (right|privilege)|for U3|to U3|gives U3|U3 opens|saved by U3|accepted for U3/), verdict: 'Deviasi nyata', note: 'User tanpa hak (U3) bisa membuka/membaca/menyimpan: hak akses tidak ditegakkan.' },

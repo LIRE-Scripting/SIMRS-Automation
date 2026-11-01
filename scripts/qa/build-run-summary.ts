@@ -25,7 +25,7 @@
  *
  * Usage: npm run qa:run-summary
  */
-import { BLOCKER_PROBLEM_ID } from './id/blocker-detail-id';
+import { BLOCKER_PROBLEM_ID, blockerKind } from './id/blocker-detail-id';
 import { recheckOf } from './blocker-recheck';
 import { reviewCase, reviewDeviation } from './deviation-review';
 import { execFileSync } from 'node:child_process';
@@ -468,6 +468,27 @@ function thumbnail(png: string): { file: string; width: number; height: number }
   return { file, width, height };
 }
 
+/**
+ * Puts a picture inside one cell: anchored at both corners to that cell ("move and size with cells"), with a
+ * margin of 4 px, the row made tall enough and the column wide enough. Offsets are in EMU (9525 per pixel):
+ * ExcelJS's fractional anchors use another unit.
+ */
+function pictureInCell(wb: ExcelJS.Workbook, ws: ExcelJS.Worksheet, t: { file: string; width: number; height: number }, col: number, row: number, maxWidth = t.width): void {
+  const EMU = 9525;
+  const pad = 4;
+  const width = Math.min(t.width, maxWidth);
+  const height = Math.round((t.height * width) / t.width);
+  const column = ws.getColumn(col + 1);
+  // Column width in characters to pixels (Calibri 11): 7 px a character plus 5.
+  if (((column.width ?? 8.43) * 7 + 5) < width + 2 * pad) column.width = Math.ceil((width + 2 * pad - 5) / 7) + 1;
+  ws.getRow(row + 1).height = Math.max(40, Math.ceil(((height + 2 * pad) * 72) / 96) + 1);
+  ws.addImage(wb.addImage({ filename: t.file, extension: 'jpeg' }), {
+    tl: { nativeCol: col, nativeColOff: pad * EMU, nativeRow: row, nativeRowOff: pad * EMU },
+    br: { nativeCol: col, nativeColOff: (pad + width) * EMU, nativeRow: row, nativeRowOff: (pad + height) * EMU },
+    editAs: 'twoCell',
+  } as unknown as ExcelJS.ImageRange);
+}
+
 /** A small JPEG of a screenshot (at most 300 x 220) for the module sheets, which show one per test case. */
 function smallThumbnail(png: string): { file: string; width: number; height: number } {
   const file = path.join(THUMBS, `s-${createHash('sha1').update(png).digest('hex').slice(0, 16)}.jpg`);
@@ -497,9 +518,6 @@ function simpleLine(o: TestOutcome): string {
   return `Belum dijalankan: ${cut(idText(o.reason), 240)}`;
 }
 
-/** The picture a link opens: the copy the test keeps in reports/screenshots (its run folder under .qa-state is temporary). */
-const keptShot = (o: TestOutcome): string => [`reports/screenshots/${o.id}.png`, `reports/screenshots/blocked/${o.id}.png`].find((f) => f === o.screenshot || (!o.screenshotStart && f.endsWith(`/${o.id}.png`) && !f.includes('/blocked/') && fs.existsSync(f))) ?? o.screenshot!;
-
 /** A sheet name of a module ("01 Rawat Jalan"): at most 31 characters, without the characters Excel refuses. */
 const moduleSheetName = (group: string): string => wordId(group).replace(/[\\/?*[\]:]/g, ' ').slice(0, 31);
 
@@ -527,16 +545,11 @@ function moduleSheets(wb: ExcelJS.Workbook, s: Summary): void {
       id: o.id,
       title: idTitle(o),
       status: o.passedWithNotes ? WITH_NOTES : statusId(o.status),
-      line: simpleLine(o),
-      shot: o.screenshot ? { text: o.screenshotStart ? 'layar awal (tidak dijalankan) – buka' : 'buka gambar penuh', hyperlink: path.relative(OUT_DIR, keptShot(o)) } : 'tidak ada',
+      line: `${simpleLine(o)}${o.screenshot && o.screenshotStart ? ' (Gambar: layar awal, kasus uji ini belum dijalankan.)' : ''}`,
+      shot: o.screenshot ? '' : 'tidak ada',
     })), 'status');
     rows.forEach((o, i) => {
-      if (!o.screenshot) return;
-      const t = smallThumbnail(o.screenshot);
-      const row = ws.getRow(i + 2);
-      row.height = Math.max(40, t.height * 0.75 + 16);
-      row.getCell('shot').alignment = { vertical: 'bottom', wrapText: true };
-      ws.addImage(wb.addImage({ filename: t.file, extension: 'jpeg' }), { tl: { col: 6, row: i + 1 }, ext: { width: t.width, height: t.height }, editAs: 'oneCell' });
+      if (o.screenshot) pictureInCell(wb, ws, smallThumbnail(o.screenshot), 6, i + 1);
     });
     ws.eachRow((row, i) => {
       const fill = REVIEW_FILL[String(row.getCell('review').value).split(':')[0]];
@@ -664,11 +677,7 @@ function overview(wb: ExcelJS.Workbook, s: Summary): void {
       row.getCell(5).value = 'tidak ada';
       continue;
     }
-    const t = thumbnail(pic);
-    const width = Math.min(340, t.width);
-    const height = Math.round((t.height * width) / t.width);
-    row.height = Math.max(40, height * 0.75 + 6);
-    ws.addImage(wb.addImage({ filename: t.file, extension: 'jpeg' }), { tl: { col: 4, row: row.number - 1 }, ext: { width, height }, editAs: 'oneCell' });
+    pictureInCell(wb, ws, thumbnail(pic), 4, row.number - 1, 340);
   }
   ws.addRow([]);
 
@@ -733,9 +742,7 @@ async function writeWorkbook(s: Summary): Promise<void> {
   chainRows.forEach((o, i) => {
     const pic = chainPicture(o);
     if (!pic) return;
-    const t = smallThumbnail(pic);
-    chains.getRow(i + 2).height = Math.max(40, t.height * 0.75 + 6);
-    chains.addImage(wb.addImage({ filename: t.file, extension: 'jpeg' }), { tl: { col: 4, row: i + 1 }, ext: { width: t.width, height: t.height }, editAs: 'oneCell' });
+    pictureInCell(wb, chains, smallThumbnail(pic), 4, i + 1);
   });
   moduleSheets(wb, s);
   // The module names of sheet Modul lead to their sheets.
@@ -747,6 +754,7 @@ async function writeWorkbook(s: Summary): Promise<void> {
   sheet(wb, SHEET.blockers, [
     { header: 'No', key: 'no', width: 6 },
     { header: 'Blocker', key: 'title', width: 60 },
+    { header: 'Jenis', key: 'kind', width: 16 },
     { header: 'Masalah', key: 'problem', width: 80 },
     { header: 'Kategori', key: 'category', width: 14 },
     { header: 'Didefinisikan di', key: 'source', width: 26 },
@@ -757,7 +765,7 @@ async function writeWorkbook(s: Summary): Promise<void> {
     { header: 'Perbaikan (tindak lanjut)', key: 'fix', width: 70 },
     { header: 'Siapa', key: 'who', width: 24 },
     { header: 'Cek ulang', key: 'recheck', width: 60 },
-  ], s.perBlocker.map((b) => ({ ...b, category: wordId(b.category), fix: wordId(b.fix), who: wordId(b.who), chains: b.chains.join(', '), modules: b.modules.map(wordId).join('\n'), seen: b.seenHttp5xx ? 'Ya' : '', recheck: recheckOf(b.no, b.source), problem: BLOCKER_PROBLEM_ID[b.no] ?? '' })));
+  ], s.perBlocker.map((b) => ({ ...b, kind: blockerKind(b.no), category: wordId(b.category), fix: wordId(b.fix), who: wordId(b.who), chains: b.chains.join(', '), modules: b.modules.map(wordId).join('\n'), seen: b.seenHttp5xx ? 'Ya' : '', recheck: recheckOf(b.no, b.source), problem: BLOCKER_PROBLEM_ID[b.no] ?? '' })));
   sheet(wb, SHEET.http5xx, [
     { header: 'Waktu', key: 'at', width: 22 },
     { header: 'Test', key: 'test', width: 50 },

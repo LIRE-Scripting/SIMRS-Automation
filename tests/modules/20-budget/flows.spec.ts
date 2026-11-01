@@ -5,16 +5,41 @@ import { addDays, todayWib } from '../../../lib/dates';
 import { toastsAfter } from '../18-settings/helpers';
 import { Processes, restoreChain } from '../18-settings/process-cases';
 import { menuScreens, rowCount, screenRefuses, userPage } from '../shared/access';
-import { approvedCircular, book, cellOf, choose, draftNo, rowAction } from './cases';
+import {
+  allocationLineBalance,
+  approvedAllocation,
+  approvedCircular,
+  book,
+  cellOf,
+  choose,
+  draftNo,
+  editSanction,
+  ensurePostingRules,
+  file,
+  headOf,
+  linesOf,
+  postingOf,
+  postingRuleStatus,
+  releaseDialog,
+  removePostingRule,
+  rowAction,
+  rowActionRead,
+  sanctionDialog,
+  saveForm,
+  restorePostingRule,
+  closeOpenDialogs,
+  saveSanction,
+  shows,
+  upload,
+} from './cases';
 
 /**
- * 20-budget.xlsx, the spending side (sanction proposals, utilisation,
- * transfers), the budget position, the states of the documents and the
- * budget rights. A budget line gets its balance from an approved allocation,
- * and no allocation can be made on Podomoro (blocker 13: the allocation,
- * fund release and fund withdrawal set-up is missing on the branch). So the
- * steps that spend, reserve, move or post a balance are blocked by 13; the
- * screens, the dialogs and the states of the circulars are run.
+ * 20-budget.xlsx, the utilisation, the states of the documents, the changes
+ * of documents, Budget and Finance postings and the budget rights. Since
+ * 2026-11-01 an approved budget request is allocated and posted on Podomoro
+ * (checklist blocker 13 no longer stops it), so the tests make their own
+ * chain (cases.ts); a utilisation still needs an approved Finance payment
+ * voucher, which no user can approve (found blocker 46).
  */
 
 test.use({ actionTimeout: 15_000 });
@@ -34,37 +59,11 @@ async function screen(page: Page, link: string, heading: string, buttons: string
   return (await main.getByRole('columnheader').allInnerTexts()).map((c) => c.trim());
 }
 
-const NO_LINE = 'no budget line has a balance: a line is made by an approved allocation, which the branch set-up does not allow (blocker 13)';
+/** Since 2026-11-01 a budget line and an approved sanction can be made; what a utilisation still lacks is an approved payment voucher. */
+const NO_VOUCHER = 'a utilisation is paid by an approved Finance bank or cash payment voucher, and no user can approve finance documents (blocker 46: the tenant has no FINANCE_APPROVE)';
 
-qaTest('TC-APP020-029', async ({ page, qa }) => {
-  await qa.step(1, async () => {
-    qa.note(1, `columns: ${(await screen(page, 'Sanction proposals', 'Sanction proposals', ['Download CSV', 'New proposal'])).join(', ')}`);
-  });
-  await qa.step(2, async () => {
-    await page.getByRole('main').getByRole('button', { name: 'New proposal' }).click();
-    const d = page.getByRole('dialog');
-    for (const f of ['Document date', 'Budget book']) await expect(d.getByLabel(f, { exact: true })).toBeVisible();
-    qa.note(2, `fields: ${(await d.locator('label').allInnerTexts()).map((l) => l.trim().split('\n')[0]).filter(Boolean).join(', ')}`);
-    await page.keyboard.press('Escape');
-  });
-  for (const st of [3, 4, 5, 6]) qa.blocked(st, 13);
-  qa.note(3, NO_LINE);
-});
 
-qaTest('TC-APP020-030', async ({ qa }) => {
-  for (const st of [1, 2, 3, 4, 5, 6, 7]) qa.blocked(st, 13);
-  qa.note(1, `a proposal needs a budget line to save: ${NO_LINE}`);
-});
-
-qaTest('TC-APP020-031', async ({ qa }) => {
-  qa.blocked(1, 13);
-  qa.note(1, NO_LINE);
-});
-
-qaTest('TC-APP020-032', async ({ qa }) => {
-  for (const st of [1, 2, 3]) qa.blocked(st, 13);
-  qa.note(1, `an approved sanction needs a budget line: ${NO_LINE}`);
-});
+// TC-APP020-029 to 032 (sanction proposals) are in sanctions.spec.ts since 2026-11-01: allocations give the lines a balance.
 
 qaTest('TC-APP020-033', async ({ page, qa }) => {
   await qa.step(1, async () => {
@@ -74,79 +73,18 @@ qaTest('TC-APP020-033', async ({ page, qa }) => {
     await page.getByRole('main').getByRole('button', { name: 'New utilisation' }).click();
     const form = page.getByRole('dialog').or(page.getByRole('main')).first();
     qa.note(2, `the new utilisation asks for: ${(await form.locator('label').allInnerTexts()).map((l) => l.trim().split('\n')[0]).filter(Boolean).join(', ')} (TBD in the workbook)`);
-    await page.keyboard.press('Escape');
+    await closeOpenDialogs(page);
   });
-  for (const st of [3, 4, 5]) qa.blocked(st, 13);
-  qa.note(3, `a utilisation needs an approved sanction: ${NO_LINE}`);
+  for (const st of [3, 4, 5]) qa.blocked(st, 46);
+  qa.note(3, NO_VOUCHER);
 });
 
 qaTest('TC-APP020-034', async ({ qa }) => {
-  for (const st of [1, 2, 3, 4, 5, 6, 7]) qa.blocked(st, 13);
-  qa.note(1, `a utilisation needs an approved sanction: ${NO_LINE}`);
+  for (const st of [1, 2, 3, 4, 5, 6, 7]) qa.blocked(st, 46);
+  qa.note(1, NO_VOUCHER);
 });
 
-qaTest('TC-APP020-035', async ({ page, qa }) => {
-  await qa.step(1, async () => {
-    qa.note(1, `columns: ${(await screen(page, 'Budget transfer', 'Budget transfer', ['Download CSV', 'New transfer'])).join(', ')}`);
-  });
-  await qa.step(2, async () => {
-    await page.getByRole('main').getByRole('button', { name: 'New transfer' }).click();
-    const form = page.getByRole('dialog').or(page.getByRole('main')).first();
-    const labels = (await form.locator('label').allInnerTexts()).map((l) => l.trim().split('\n')[0]).filter(Boolean);
-    qa.note(2, `the form asks for: ${labels.join(', ')}`);
-    expect(labels.join(' ')).toMatch(/Document date|Tanggal dokumen/);
-    await page.keyboard.press('Escape');
-  });
-  for (const st of [3, 4, 5]) qa.blocked(st, 13);
-  qa.note(3, `a transfer moves the balance of a line: ${NO_LINE}`);
-});
-
-qaTest('TC-APP020-036', async ({ qa }) => {
-  for (const st of [1, 2, 3, 4, 5, 6]) qa.blocked(st, 13);
-  qa.note(1, `a transfer needs a source line with a balance: ${NO_LINE}`);
-});
-
-qaTest('TC-APP020-037', async ({ page, qa }) => {
-  const main = page.getByRole('main');
-  await qa.step(1, async () => {
-    await page.goto('/id/apps');
-    await page.getByRole('link', { name: /^Budget\b/ }).first().click();
-    await expect(main.getByRole('heading', { level: 1, name: 'Budget' })).toBeVisible();
-    qa.note(1, `the hub reads: "${(await main.innerText()).replace(/\s+/g, ' ').slice(0, 200)}"`);
-  });
-  await qa.step(2, async () => {
-    const lists = main.locator('select');
-    if ((await lists.count()) >= 2) {
-      await lists.nth(0).selectOption({ index: 1 }).catch(() => {});
-      await lists.nth(1).selectOption({ index: 1 }).catch(() => {});
-      await page.waitForLoadState('networkidle').catch(() => {});
-    }
-    const rows = await rowCount(page);
-    qa.note(2, `budget position of the first book and year: ${rows} rows`);
-    if (!rows) qa.blocked(2, 13);
-  });
-  for (const st of [3, 4, 5]) qa.blocked(st, 13);
-  qa.note(3, `a row of the position is a budget line: ${NO_LINE}`);
-});
-
-qaTest('TC-APP020-038', async ({ page, qa }) => {
-  const b = await book(page, qa);
-  const main = page.getByRole('main');
-  await qa.step(1, async () => {
-    await page.goto('/id/budget');
-    await page.waitForLoadState('networkidle').catch(() => {});
-    const bookList = main.locator('select').filter({ has: page.locator('option', { hasText: b.code }) }).first();
-    if (await bookList.count()) await choose(bookList, b.code);
-    await page.waitForLoadState('networkidle').catch(() => {});
-    if (!(await main.getByText('No budget lines yet. A line is created when an allocation is approved.').count())) {
-      qa.deviation(1, 'The text "No budget lines yet. A line is created when an allocation is approved."', `"${(await main.innerText()).replace(/\s+/g, ' ').slice(-200)}"`);
-    }
-  });
-  qa.blocked(2, 13);
-  await qa.step(3, async () => {
-    qa.note(3, `${await main.getByRole('button', { name: /Download CSV|Unduh CSV/ }).or(main.getByRole('link', { name: /Download CSV|Unduh CSV/ })).count()} export(s) on the budget position (TBD in the workbook)`);
-  });
-});
+// TC-APP020-035 to 038 (transfer and budget position) are in transfers.spec.ts since 2026-11-01.
 
 /** A circular of the test, saved as draft; returns its number. */
 async function draftCircular(page: Page, qa: Parameters<Parameters<typeof qaTest>[1]>[0]['qa']): Promise<string> {
@@ -271,22 +209,102 @@ qaTest('TC-APP020-041', async ({ page, qa, browser }) => {
       const dialog = page.getByRole('dialog');
       const text = (await dialog.innerText()).replace(/\s+/g, ' ');
       if (!/left draft|only while it is a draft|hanya dapat diubah selama|sudah tidak draf/i.test(text)) qa.deviation(2, 'The text that the document can be changed only while it is a draft', `the stale "Edit" opens: "${text.slice(0, 160)}"`);
-      await page.keyboard.press('Escape');
+      await closeOpenDialogs(page);
     } finally {
       await second.context().close();
     }
   });
-  qa.blocked(3, 13);
+  await qa.step(3, async () => {
+    // A sanction proposal of the test with a document, first as a draft, then sent (pending).
+    const a = await approvedAllocation(page, qa);
+    const head = await headOf(page, a.request, a.authorities[0]);
+    await sanctionDialog(page, { bookCode: a.book.code, head, authority: a.authorities[0], request: '1000000', sanction: '1000000' });
+    const no = (await saveSanction(page)).no;
+    expect(no, 'a draft proposal of the test').toBeTruthy();
+    const dialog = await editSanction(page, no);
+    expect((await upload(page, file('qa-tor.pdf', 'application/pdf'))).join(' / ')).toContain('qa-tor.pdf attached.');
+    const remove = async () => {
+      const button = dialog.getByRole('button', { name: /^(Remove|Delete)$/ }).first();
+      if (!(await button.count())) return [`(no remove button: ${(await dialog.getByRole('button').allInnerTexts()).join(', ')})`];
+      const mark = await toastMark(page);
+      await button.click();
+      const confirm = page.getByRole('alertdialog');
+      if (await confirm.waitFor({ timeout: 3_000 }).then(() => true, () => false)) await confirm.getByRole('button', { name: /^(Remove|Delete|Confirm|Yes|OK)$/ }).last().click();
+      return toastsAfter(page, mark);
+    };
+    const fromDraft = await remove();
+    qa.note(3, `${no}, draft: "${fromDraft.join(' / ')}"`);
+    await closeOpenDialogs(page);
+    // The document again, then the proposal is sent and its document taken away through the stale view.
+    await editSanction(page, no);
+    await upload(page, file('qa-tor2.pdf', 'application/pdf'));
+    await closeOpenDialogs(page);
+    await rowAction(page, 'sanctions', no, 'Send');
+    await rowAction(page, 'sanctions', no, 'View');
+    const fromPending = await remove();
+    const shown = (await dialog.innerText()).replace(/\s+/g, ' ');
+    qa.note(3, `${no}, pending: "${fromPending.join(' / ')}"`);
+    if (![...fromPending, shown].some((t) => t.includes('Documents can change only while the proposal is a draft.'))) {
+      qa.deviation(3, 'Refused on the pending one with "Documents can change only while the proposal is a draft."', fromPending[0]?.startsWith('(no remove') ? `the pending proposal offers no remove button; it reads "${shown.match(/Supporting documents.{0,120}/)?.[0] ?? ''}"` : `"${fromPending.join(' / ')}"`);
+    }
+  });
 });
 
-qaTest('TC-APP020-043', async ({ qa }) => {
-  for (const st of [1, 2, 3, 4, 5, 6]) qa.blocked(st, 13);
-  qa.note(1, 'a fund release needs an approved allocation, which the branch set-up does not allow (blocker 13)');
+qaTest('TC-APP020-043', async ({ page, qa }) => {
+  const a = await approvedAllocation(page, qa);
+  await ensurePostingRules(page);
+  const line = a.authorities[0];
+  // The allocation balance of the line the release draws on (a release does not change the budget position).
+  const balance = () => allocationLineBalance(page, a.book.code, line);
+  let no = '';
+  await qa.step(1, async () => {
+    await releaseDialog(page, a.book.code, [{ authority: line, requested: '1000000', released: '1000000' }]);
+    const saved = await saveForm(page);
+    no = saved.toasts.map((t) => t.match(/^Fund release (\S+) saved as draft\.$/)?.[1]).find(Boolean) ?? '';
+    expect(no, 'a release of the test').toBeTruthy();
+    await rowAction(page, 'fund-releases', no, 'Send');
+    const before = await balance();
+    // The rule is taken away for this approval only; step 2 saves it again (and finally does so if a check fails).
+    const removed = await removePostingRule(page, 'Fund release');
+    try {
+      const r = await rowActionRead(page, 'fund-releases', no, 'Approve');
+      const status = await cellOf(page, 'fund-releases', no, 'Status');
+      const after = await balance();
+      qa.note(1, `rule removed ("${removed.join(' / ')}"); Approve: "${r.toasts.join(' / ')}"; ${no} reads "${status}"; allocation balance ${before} → ${after}`);
+      if (!r.toasts.some((t) => shows(/Finance cannot post yet: branch .+ has no usable .+ posting rule\./, t))) qa.deviation(1, 'The approval is refused with the text that Finance cannot post yet', `"${r.toasts.join(' / ') || 'no toast'}"`);
+      expect(status.toLowerCase()).not.toMatch(/^approved/);
+      expect(after).toBe(before);
+    } finally {
+      await restorePostingRule(page, 'Fund release');
+    }
+  });
+  await qa.step(2, async () => {
+    expect(await postingRuleStatus(page, 'Fund release')).toBe('Ready');
+    await rowAction(page, 'fund-releases', no, 'Approve');
+    const first = await cellOf(page, 'fund-releases', no, 'Finance posting');
+    const posting = await postingOf(() => cellOf(page, 'fund-releases', no, 'Finance posting'));
+    qa.note(2, `"${first}" right after the approval, then "${posting}"`);
+    expect(posting).toMatch(/^Posted/);
+  });
+  qa.notRun(3, 'TBD in the workbook (the journal of 1000000.00 in Finance, Journals, and who approves it)');
+  await qa.step(4, async () => {
+    const before = await balance();
+    const r = await rowActionRead(page, 'fund-releases', no, 'Cancel');
+    const posting = await postingOf(() => cellOf(page, 'fund-releases', no, 'Finance posting'));
+    const after = await balance();
+    qa.note(4, `"${r.confirm}"; finance posting "${posting}"; allocation balance ${before} → ${after}`);
+    expect(posting).toMatch(/^Revers/);
+    if (!/^Reversed/.test(posting)) qa.deviation(4, '"Finance posting" reads "Reversal waiting", then "Reversed"', `"${posting}"`);
+    expect(after).toBe(before + 1_000_000);
+  });
+  qa.notRun(5, 'a failing posting cannot be made from the screens: Finance posts by itself, so no row offers "Post again"');
+  qa.notRun(6, 'locking the financial year in Finance would stop every other test that saves budget or finance documents this year on the shared site');
 });
 
 qaTest('TC-APP020-044', async ({ qa }) => {
-  for (const st of [1, 2, 3]) qa.blocked(st, 13);
-  qa.note(1, 'the Finance posting of a fund release needs an approved allocation (blocker 13)');
+  qa.notRun(1, 'TBD in the workbook; a posting that waits for minutes cannot be made from the screens (Finance posts allocations and releases at once since 2026-11-01)');
+  qa.notRun(2, 'TBD in the workbook; a reversal that fails in Finance cannot be made from the screens');
+  qa.notRun(3, 'TBD in the workbook; "Post again" is offered only on a failed posting, which cannot be made from the screens');
 });
 
 qaTest('TC-APP020-045', async ({ qa, browser }) => {

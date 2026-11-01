@@ -157,3 +157,59 @@ export const MASTERS = {
   test: { route: 'test-names', heading: 'Test Name', code: 'Code' },
   result: { route: 'result-types', heading: 'Result Type', code: 'Code' },
 } as const;
+
+/** The autoclave the new cycle form takes by default (the first of the list). */
+export const DEFAULT_AUTOCLAVE = 'Autoklaf 1 CSSD';
+
+/** The Bowie Dick form of /cssd/bowie-tests by the order of its fields: its labels wrap the lists, so they do not name them. */
+export function bowieForm(page: Page) {
+  const form = page.getByRole('main').locator('form').first();
+  const lists = form.locator('select');
+  const texts = form.locator('input:not([type=date]):not([type=hidden]):not([type=radio]):not([type=checkbox])');
+  return {
+    form,
+    date: form.locator('input[type=date]').first(),
+    autoclave: lists.nth(0),
+    batch: texts.nth(0),
+    load: texts.nth(1),
+    indicator: lists.nth(1),
+    result: lists.nth(2),
+    save: form.getByRole('button', { name: 'Save', exact: true }),
+  };
+}
+
+/** Saves a Bowie Dick test; returns the toasts and the texts of the form afterwards. */
+export async function saveBowieDick(page: Page, v: { date: string; autoclave: string; result: 'Pass' | 'Fail'; batch?: string; failure?: string }): Promise<{ toasts: string[]; form: string }> {
+  await page.goto('/id/cssd/bowie-tests');
+  await page.waitForLoadState('networkidle').catch(() => {});
+  const f = bowieForm(page);
+  await f.date.fill(v.date);
+  await f.autoclave.selectOption({ label: v.autoclave });
+  await f.batch.fill(v.batch ?? `QA-BD-${Date.now().toString(36).toUpperCase()}`);
+  await f.load.fill('1');
+  await f.indicator.selectOption({ index: 1 });
+  await f.result.selectOption({ label: v.result });
+  if (v.failure !== undefined) {
+    const measure = f.form.getByLabel('Measure of failure').or(f.form.getByRole('textbox').last()).first();
+    await measure.fill(v.failure);
+  }
+  const mark = await toastMark(page);
+  await f.save.click();
+  const toasts = await toastsAfter(page, mark);
+  return { toasts, form: (await f.form.innerText()).replace(/\s+/g, ' ') };
+}
+
+/**
+ * Makes sure an autoclave has a passed Bowie Dick test today: the first cycle of an autoclave on a day waits for
+ * one. Since 2026-11-01 the test can be saved on Podomoro (checklist blocker 13 named it as missing set-up).
+ * Returns what was done.
+ */
+export async function ensurePassedBowieDick(page: Page, day: string, autoclave = DEFAULT_AUTOCLAVE): Promise<string> {
+  await page.goto('/id/cssd/bowie-tests');
+  await page.waitForLoadState('networkidle').catch(() => {});
+  const rows = (await page.getByRole('main').getByRole('table').getByRole('row').allInnerTexts()).map((r) => r.replace(/\s+/g, ' '));
+  if (rows.some((r) => r.startsWith(day) && r.includes(autoclave) && /\bPass\b/.test(r))) return `${autoclave} already has a passed Bowie Dick test on ${day}`;
+  const r = await saveBowieDick(page, { date: day, autoclave, result: 'Pass' });
+  expect(r.toasts.join(' / '), `a passed Bowie Dick test of ${autoclave} on ${day}`).toContain('Bowie Dick test saved.');
+  return `a passed Bowie Dick test of ${autoclave} on ${day} saved`;
+}

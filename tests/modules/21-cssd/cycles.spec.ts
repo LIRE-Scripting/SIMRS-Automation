@@ -1,17 +1,19 @@
+import { ensurePassedBowieDick } from './cases';
 import type { Locator, Page } from '@playwright/test';
 import { expect, qaTest, test, type Qa } from '../../../fixtures/e2e';
 import { installToastRecorder } from '../../../lib/assertions';
 import { addDays, todayWib } from '../../../lib/dates';
 import { PHARMACY } from '../../../lib/pharmacy-data';
 import { stock } from '../05-pharmacy/helpers';
-import { approvedReceipt, CssdForm, gotoPatiently, STORES } from './docs';
+import { approvedReceipt, CycleForm, STORES } from './docs';
 
 /**
  * 21-cssd.xlsx, Sterilization Cycle (/cssd/cycles): a load of the unsterile
  * packs of an approved receipt of the test, its quality check and the
  * approval. The first cycle of an autoclave on a day needs a passed Bowie
- * Dick test, and no Bowie Dick test can be made on Podomoro (blocker 13: the
- * CSSD set-up is missing on the branch); a cycle refused for that is blocked by 13.
+ * Dick test, saved since 2026-11-01 (tests/modules/21-cssd/cases.ts,
+ * ensurePassedBowieDick). A cycle still needs the unsterile packs of an approved
+ * receipt, and a saved receipt does not open (found blocker 48).
  */
 
 test.use({ actionTimeout: 15_000 });
@@ -20,57 +22,11 @@ test.beforeEach(async ({ page }) => {
   // A saved unsterile receipt stalls the site for minutes when it is opened (found blocker 48).
   test.setTimeout(900_000);
   await installToastRecorder(page);
+  // The first cycle of the default autoclave today waits for a passed Bowie Dick test (blocker 13 until 2026-11-01).
+  await ensurePassedBowieDick(page, todayWib());
 });
 
 const BOWIE = 'The first cycle of this autoclave today needs a passed Bowie Dick test.';
-
-class CycleForm extends CssdForm {
-  constructor(page: Page) {
-    super(page, 'receipts');
-  }
-  async openCycle(): Promise<void> {
-    await gotoPatiently(this.page, '/id/cssd/cycles/new');
-    await expect(this.main.getByRole('heading', { level: 1, name: 'New' })).toBeVisible();
-    await this.page.waitForLoadState('networkidle').catch(() => {});
-  }
-  /** "Sterile store of this branch" and "Save store"; returns the toasts. */
-  async saveStore(code: string): Promise<string[]> {
-    await this.pickStore('Sterile store of this branch', code).catch(async () => {
-      // The list beside the type-ahead (it has no name of its own): the one offering the store.
-      const list = this.main.locator('select').filter({ has: this.page.locator('option', { hasText: code }) }).first();
-      await this.pick(list, code);
-    });
-    return this.act('Save store');
-  }
-  /** An input of the load by the text above it (the labels of the form are not tied to their inputs). */
-  input(label: string): Locator {
-    return this.main.locator(`xpath=.//*[normalize-space()="${label}"]/following-sibling::input[1]`).first();
-  }
-  /** The load: dates, batch, expiry, the packs (by packing number) and a quality check with a result. */
-  async load(v: { packs: string[]; start?: string; end?: string; expiry?: string; result?: string }): Promise<{ results: string[]; chosen: boolean }> {
-    const day = todayWib();
-    await this.input('Start').fill(v.start ?? `${day}T08:00`);
-    await this.input('End').fill(v.end ?? `${day}T09:00`);
-    await this.input('Batch code').fill(`B-${day}`);
-    await this.input('Expiry').fill(v.expiry ?? addDays(day, 30));
-    for (const pk of v.packs) {
-      await this.main.getByRole('textbox', { name: 'Packing number' }).last().fill(pk);
-      await this.button('Add set').click();
-    }
-    if (v.result) {
-      await this.button('Add check').click();
-      const lists = this.main.locator('select');
-      const n = await lists.count();
-      // The check line: indicator type, test name, result (the last three lists of the form).
-      for (let i = Math.max(0, n - 3); i < n - 1; i++) await lists.nth(i).selectOption({ index: 1 }, { timeout: 5_000 }).catch(() => {});
-      const result = lists.nth(n - 1);
-      const results = (await result.locator('option').allInnerTexts()).map((o) => o.trim());
-      const chosen = await result.selectOption({ label: v.result }, { timeout: 5_000 }).then(() => true, () => false);
-      return { results, chosen };
-    }
-    return { results: [], chosen: false };
-  }
-}
 
 /** The packs of an approved receipt of the test, in the CSSD store and unsterile. */
 async function unsterilePacks(page: Page, qa: Qa): Promise<string[] | null> {
@@ -160,7 +116,7 @@ qaTest('TC-APP021-019', async ({ page, qa }) => {
   const f = new CycleForm(page);
   if (!packs) {
     qa.blocked(1, 48);
-    qa.blocked(2, 13);
+    qa.blocked(2, 48);
     return;
   }
   await qa.step(1, async () => {
@@ -174,11 +130,11 @@ qaTest('TC-APP021-019', async ({ page, qa }) => {
     const shown = await f.act('Approve');
     if (!shown.some((t) => t.includes('Approve needs at least one quality check.'))) qa.deviation(1, 'The text "Approve needs at least one quality check."', `"${shown.join(' / ') || 'nothing shown'}"`);
   });
-  qa.blocked(2, 13);
+  qa.blocked(2, 48);
   qa.note(2, 'a cycle with a failed check needs a saved cycle, which needs a passed Bowie Dick test of today (blocker 13)');
 });
 
 qaTest('TC-APP021-020', async ({ qa }) => {
-  for (const st of [1, 2, 3]) qa.blocked(st, 13);
+  for (const st of [1, 2, 3]) qa.blocked(st, 48);
   qa.note(1, 'a next cycle needs a saved and failed cycle; a cycle needs a passed Bowie Dick test of today, which the branch set-up does not allow (blocker 13)');
 });

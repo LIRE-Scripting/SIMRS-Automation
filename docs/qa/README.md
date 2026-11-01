@@ -9,6 +9,7 @@ Semua dokumen di folder ini berbahasa Indonesia. Kutipan dari workbook referensi
 | [ringkasan-hasil.md](ringkasan-hasil.md) | Angka terbaru (lulus, deviasi, terblokir, belum dijalankan), masalah utama, dan hasil per modul | Semua |
 | [blocker.md](blocker.md) | Setiap blocker: **masalah**, dampak (test case dan rantai yang terhenti), **perbaikan**, penanggung jawab, dan hasil cek ulang di situs | Development, administrator situs, product owner |
 | [deviations.md](deviations.md) | Setiap deviasi (langkah berjalan tetapi hasilnya beda dari referensi), dikelompokkan: **deviasi nyata** dengan saran perbaikan, **perlu keputusan** dengan keputusan yang dibutuhkan, dan **bisa dianggap lulus** dengan catatannya | Development, product owner |
+| [blocker-best-practice.md](blocker-best-practice.md) | Blocker dibaca ulang sebagai arsitek HMIS dan klinisi: risiko pasien, praktik terbaik, rujukan alur HINAI, prioritas, dan keputusan yang dibutuhkan | Product owner, Development, tim klinis |
 | [http-5xx.md](http-5xx.md) | Error server (HTTP 5xx) yang masih terjadi, dengan masalah dan perbaikannya (yang sudah diperbaiki tidak dicantumkan) | Development |
 
 ## Workbook hasil

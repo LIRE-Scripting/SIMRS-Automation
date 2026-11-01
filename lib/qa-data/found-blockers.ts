@@ -660,6 +660,9 @@ export const FOUND_BLOCKERS: FoundBlocker[] = [
     howFound: 'Seen on the site (TC-APP019-070, written 2026-10-28)',
     testCases: [
       { id: 'TC-APP019-068', steps: [2, 3] },
+      { id: 'TC-APP020-032', steps: [2, 3] },
+      { id: 'TC-APP020-033', steps: [3, 4, 5] },
+      { id: 'TC-APP020-034', steps: [1, 2, 3, 4, 5, 6, 7] },
       { id: 'TC-APP019-069', steps: [3] },
       { id: 'TC-APP019-070', steps: [2, 3, 4] },
       { id: 'TC-APP019-071', steps: [2] },
@@ -709,8 +712,10 @@ export const FOUND_BLOCKERS: FoundBlocker[] = [
       { id: 'TC-APP021-012', steps: [4, 5, 6] },
       { id: 'TC-APP021-014', steps: [1] },
       { id: 'TC-APP021-017', steps: [3, 4, 5, 6, 7] },
-      { id: 'TC-APP021-019', steps: [1] },
-      { id: 'TC-APP021-029', steps: [3] },
+      { id: 'TC-APP021-019', steps: [1, 2] },
+      { id: 'TC-APP021-020', steps: [1, 2, 3] },
+      { id: 'TC-APP021-029', steps: [3, 4, 7] },
+      { id: 'TC-APP021-030', steps: [1] },
     ],
   },
   {

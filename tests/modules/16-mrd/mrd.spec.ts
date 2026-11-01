@@ -219,7 +219,9 @@ qaTest('TC-APP016-008', async ({ page, qa }) => {
     const buttons = (await main.getByRole('button').allInnerTexts()).map((x) => x.trim()).filter(Boolean);
     const cols = (await main.getByRole('columnheader').allInnerTexts()).map((x) => x.trim());
     qa.note(3, `buttons ${[...new Set(buttons)].slice(0, 6).join(', ')}; columns ${cols.join(', ')}`);
-    if (buttons.includes('Issue record') || cols.includes('Status')) qa.deviation(3, 'Column names, buttons, statuses and toasts are Indonesian', `English: ${buttons.includes('Issue record') ? '"Issue record"' : ''} ${cols.join(', ')}`);
+    // "Status" is the same word in Indonesian: only texts that exist in English alone count.
+    const english = [...buttons.filter((b) => ['Issue record', 'Return', 'Movement', 'Open review'].includes(b)), ...cols.filter((c) => ['Doc no.', 'Doc date', 'Patient', 'Actions'].includes(c))];
+    if (english.length) qa.deviation(3, 'Column names, buttons, statuses and toasts are Indonesian', `English: ${english.join(', ')}`);
   }));
 });
 

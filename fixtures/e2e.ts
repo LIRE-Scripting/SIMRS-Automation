@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { test as base, type Page, type TestInfo } from '@playwright/test';
+import { test as base, type Browser, type BrowserContext, type Page, type TestInfo } from '@playwright/test';
 import { authFileOf, SCREENSHOT_DIR } from '../lib/config';
 import { installSiteLanguage } from '../lib/i18n';
 import { blockers, testCaseRef, type TestCaseRef } from '../lib/qa-data';
@@ -179,22 +179,86 @@ const test = base.extend<Fixtures & { qaId: string }, { siteLanguage: void }>({
     { auto: true },
   ],
 
+  // The evidence picture of the test: the page it worked on last, taken when its body ends (before afterEach hooks
+  // move the page, e.g. backToIndonesian), or as late as possible when the body never ends (a timeout).
   finalScreenshot: [
-    async ({ page }, use, testInfo) => {
-      await use();
-      await attachScreenshot(page, testInfo);
+    async ({ page, browser }, use, testInfo) => {
+      const ev = startEvidence(page, browser, testInfo);
+      try {
+        await use();
+      } finally {
+        delete (browser as unknown as Record<string, unknown>).newContext;
+      }
+      await finishEvidence(testInfo);
     },
     { auto: true },
   ],
 });
 
-async function attachScreenshot(page: Page, testInfo: TestInfo): Promise<void> {
+/** The pages a test opened, with the time each last loaded an address (0: never, still about:blank). */
+interface Evidence {
+  file: string;
+  pages: { page: Page; at: number }[];
+  /** The time of the page saved last (a page of a context the test closed). */
+  savedAt: number;
+  done: boolean;
+}
+const EVIDENCE = new WeakMap<TestInfo, Evidence>();
+
+function startEvidence(page: Page, browser: Browser, testInfo: TestInfo): Evidence {
   // A module test case is named by its id (TC-APP001-003), a chain by its id (E2E-003).
   const id = testInfo.title.match(/TC-APP\d{3}-\d{3}|^E2E-\d{3}/)?.[0] ?? testInfo.title.replace(/\W+/g, '-');
-  const file = path.join(SCREENSHOT_DIR, `${id}.png`);
+  const ev: Evidence = { file: path.join(SCREENSHOT_DIR, `${id}.png`), pages: [], savedAt: 0, done: false };
+  const track = (p: Page) => {
+    const entry = { page: p, at: 0 };
+    ev.pages.push(entry);
+    p.on('framenavigated', (frame) => {
+      if (frame === p.mainFrame() && p.url() !== 'about:blank') entry.at = Date.now();
+    });
+  };
+  const watch = (context: BrowserContext) => {
+    context.on('page', track);
+    // A test that works as another user (U2, U3, signed out) closes that context in the end: its last page is saved first.
+    const close = context.close.bind(context);
+    context.close = async (...args: Parameters<BrowserContext['close']>) => {
+      if (!ev.done) await saveLatest(ev, context.pages()).catch(() => {});
+      return close(...args);
+    };
+  };
+  track(page);
+  page.context().on('page', (p) => p !== page && track(p));
+  // The language pin (lib/i18n) sits on the prototype; this per-test wrapper is removed after the test.
+  const newContext = browser.newContext.bind(browser);
+  (browser as unknown as Record<string, unknown>).newContext = async (...args: Parameters<Browser['newContext']>) => {
+    const context = await newContext(...args);
+    watch(context);
+    return context;
+  };
+  EVIDENCE.set(testInfo, ev);
+  return ev;
+}
+
+/** Saves the page that loaded an address last, when it is one of `among` (or any open page). */
+async function saveLatest(ev: Evidence, among?: Page[]): Promise<boolean> {
+  const open = ev.pages.filter((e) => e.at > 0 && !e.page.isClosed());
+  const latest = open.sort((a, b) => b.at - a.at)[0];
+  if (!latest || (among && !among.includes(latest.page)) || latest.at < ev.savedAt) return false;
   fs.mkdirSync(SCREENSHOT_DIR, { recursive: true });
-  await page.screenshot({ path: file, fullPage: true }).catch(() => {});
-  if (fs.existsSync(file)) await testInfo.attach('final screenshot', { path: file, contentType: 'image/png' });
+  await latest.page.screenshot({ path: ev.file, fullPage: true, timeout: 15_000 });
+  ev.savedAt = latest.at;
+  return true;
+}
+
+/** The final picture of the test: once, at the end of its body (qaTest) or in the fixture's teardown. */
+async function finishEvidence(testInfo: TestInfo): Promise<void> {
+  const ev = EVIDENCE.get(testInfo);
+  if (!ev || ev.done) return;
+  ev.done = true;
+  const saved = (await saveLatest(ev).catch(() => false)) || ev.savedAt > 0;
+  // A test that never opened a page (blocked before its first screen) keeps no picture: no blank one, no stale one
+  // of an earlier run. The summary then shows its starting screen (reports/screenshots/blocked).
+  if (!saved) fs.rmSync(ev.file, { force: true });
+  else if (fs.existsSync(ev.file)) await testInfo.attach('final screenshot', { path: ev.file, contentType: 'image/png' });
 }
 
 type Body = Parameters<typeof test>[2];
@@ -242,7 +306,12 @@ export function qaTest(id: string, body: Body): void {
 function notOfferedIsBlocked(id: string, body: Body): Body {
   const wrapped = async (args: Parameters<Body>[0], testInfo: Parameters<Body>[1]) => {
     try {
-      await (body as (a: unknown, t: unknown) => Promise<void>)(args, testInfo);
+      try {
+        await (body as (a: unknown, t: unknown) => Promise<void>)(args, testInfo);
+      } finally {
+        // The picture is taken before afterEach hooks run (they may leave the screen, e.g. backToIndonesian).
+        await finishEvidence(testInfo as TestInfo);
+      }
     } catch (e) {
       if (!(e instanceof NotOffered)) throw e;
       // Inside a step that step; between steps (a precondition of the next ones) the next step.

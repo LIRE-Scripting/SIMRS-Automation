@@ -1,3 +1,4 @@
+import { addDays, todayWib } from '../../../lib/dates';
 import type { Locator, Page } from '@playwright/test';
 import { expect, type Qa } from '../../../fixtures/e2e';
 import { toastMark } from '../../../lib/assertions';
@@ -264,3 +265,53 @@ export async function approvedReceipt(page: Page, itemCode: string, batch: strin
   expect(await f.act('Approve')).toContain('Approved. Items and sets moved to the CSSD store, still unsterile.');
   return { request: r.no, packs: r.packs };
 }
+
+/** The new sterilization cycle form (/cssd/cycles/new). */
+export class CycleForm extends CssdForm {
+  constructor(page: Page) {
+    super(page, 'receipts');
+  }
+  async openCycle(): Promise<void> {
+    await gotoPatiently(this.page, '/id/cssd/cycles/new');
+    await expect(this.main.getByRole('heading', { level: 1, name: 'New' })).toBeVisible();
+    await this.page.waitForLoadState('networkidle').catch(() => {});
+  }
+  /** "Sterile store of this branch" and "Save store"; returns the toasts. */
+  async saveStore(code: string): Promise<string[]> {
+    await this.pickStore('Sterile store of this branch', code).catch(async () => {
+      // The list beside the type-ahead (it has no name of its own): the one offering the store.
+      const list = this.main.locator('select').filter({ has: this.page.locator('option', { hasText: code }) }).first();
+      await this.pick(list, code);
+    });
+    return this.act('Save store');
+  }
+  /** An input of the load by the text above it (the labels of the form are not tied to their inputs). */
+  input(label: string): Locator {
+    return this.main.locator(`xpath=.//*[normalize-space()="${label}"]/following-sibling::input[1]`).first();
+  }
+  /** The load: dates, batch, expiry, the packs (by packing number) and a quality check with a result. */
+  async load(v: { packs: string[]; start?: string; end?: string; expiry?: string; result?: string }): Promise<{ results: string[]; chosen: boolean }> {
+    const day = todayWib();
+    await this.input('Start').fill(v.start ?? `${day}T08:00`);
+    await this.input('End').fill(v.end ?? `${day}T09:00`);
+    await this.input('Batch code').fill(`B-${day}`);
+    await this.input('Expiry').fill(v.expiry ?? addDays(day, 30));
+    for (const pk of v.packs) {
+      await this.main.getByRole('textbox', { name: 'Packing number' }).last().fill(pk);
+      await this.button('Add set').click();
+    }
+    if (v.result) {
+      await this.button('Add check').click();
+      const lists = this.main.locator('select');
+      const n = await lists.count();
+      // The check line: indicator type, test name, result (the last three lists of the form).
+      for (let i = Math.max(0, n - 3); i < n - 1; i++) await lists.nth(i).selectOption({ index: 1 }, { timeout: 5_000 }).catch(() => {});
+      const result = lists.nth(n - 1);
+      const results = (await result.locator('option').allInnerTexts()).map((o) => o.trim());
+      const chosen = await result.selectOption({ label: v.result }, { timeout: 5_000 }).then(() => true, () => false);
+      return { results, chosen };
+    }
+    return { results: [], chosen: false };
+  }
+}
+

@@ -91,6 +91,12 @@ const CHECKLIST_EXTRA: Record<number, string[]> = {
 const CHECKLIST_RESOLVED: Record<string, number[]> = {
   'JRN-APP009-043': [13],
   'JRN-APP010-044': [13],
+  // Budget allocation, fund release, fund withdrawal: an approved request is allocated, approved and posted on Podomoro since 2026-11-01.
+  'JRN-APP020-010': [13],
+  'JRN-APP020-011': [13],
+  'JRN-APP020-012': [13],
+  // Bowie Dick: the daily test of an autoclave is saved on Podomoro since 2026-11-01.
+  'JRN-APP021-006': [13],
 };
 
 export function planFor(ref: TestCaseRef): Plan {

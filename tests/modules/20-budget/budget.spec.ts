@@ -1,3 +1,4 @@
+import { PurchaseOrdersPage } from '../../../pages/procurement/ProcurementPages';
 import type { Page } from '@playwright/test';
 import { expect, qaTest, test } from '../../../fixtures/e2e';
 import { installToastRecorder } from '../../../lib/assertions';
@@ -315,10 +316,22 @@ qaTest('TC-APP020-006', async ({ page, qa }) => {
   qa.notRun(6, 'see step 5');
 });
 
-qaTest('TC-APP020-042', async ({ qa }) => {
-  // A budget line gets its balance from an approved allocation, which the set-up of Podomoro does not allow (checklist blocker 13).
-  qa.note(1, 'no budget line has a balance: a line is made by an approved allocation, which the branch set-up does not allow (blocker 13); what the steps expect is TBD in the workbook');
-  for (const s of [1, 2, 3, 4, 5]) qa.blocked(s, 13);
+qaTest('TC-APP020-042', async ({ page, qa }) => {
+  // Since 2026-11-01 budget lines with a balance can be made (allocations are approved on Podomoro). What the steps
+  // expect is TBD in the workbook; step 1 reads whether the purchase order asks for a budget head at all.
+  await qa.step(1, async () => {
+    const po = new PurchaseOrdersPage(page);
+    await po.open();
+    await po.openNew();
+    const main = page.getByRole('main');
+    const form = page.getByRole('dialog').or(main).first();
+    const labels = (await form.locator('label').allInnerTexts()).map((l) => l.trim().split('\n')[0]).filter(Boolean);
+    const budget = labels.filter((l) => /budget|anggaran/i.test(l));
+    qa.note(1, `the purchase order asks for: ${labels.join(', ').slice(0, 300)}; budget fields: ${budget.join(', ') || 'none'} (TBD in the workbook)`);
+    await page.keyboard.press('Escape');
+  });
+  const why = 'TBD in the workbook, and the purchase order asks for no budget head, so Procurement reserves nothing on a budget line (work orders of 26-maintenance name a budget head)';
+  for (const s of [2, 3, 4, 5]) qa.notRun(s, why);
 });
 
 const SCREENS: [string, string, string][] = [
