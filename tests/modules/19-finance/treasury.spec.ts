@@ -14,9 +14,10 @@ import { firstCode } from '../../../lib/qa-data/names';
  * reconciliation, payment requests, security deposits, bank guarantees,
  * letters of credit, agreements and loans, audit sheets, and the finance
  * rights. The bodies used by the chains are in cases.ts; the desk screens
- * share FinanceDesk (finance-desk.ts). Steps that need a second finance user
- * (not prepared, blocker 38) or a setting of the branch for every user are
- * not run, with that reason.
+ * share FinanceDesk (finance-desk.ts). The second finance user is the role
+ * account qa.finance (FINANCE_WRITE only); its steps stop where a journal of
+ * today cannot be saved (blocker 45) or an approval is needed (blocker 46).
+ * Steps that need a setting of the branch for every user are not run.
  */
 
 test.use({ actionTimeout: 15_000 });
@@ -192,7 +193,8 @@ qaTest('TC-APP019-071', async ({ page, qa }) => {
   });
   qa.notRun(1, 'needs a branch without deposit accounts: the mapping is a setting of the branch configuration for every user');
   qa.notRun(3, 'TBD in the workbook: the list of receipts offered for disposal is read in TC-APP019-070 step 4');
-  qa.notRun(4, 'needs two accountants posting at once (a second finance user is not prepared, blocker 38)');
+  // The second accountant exists (qa.finance); there is no approved receipt to post (blocker 46).
+  qa.blocked(4, 46);
 });
 
 /** An approved bank guarantee of the test; returns its number. */
@@ -424,10 +426,12 @@ qaTest('TC-APP019-079', async ({ page, qa }) => {
 });
 
 qaTest('TC-APP019-084', async ({ qa, browser }) => {
-  qa.notRun(1, 'needs a user with the finance write right only (an account of 00-prerequisites.xlsx that is not prepared, blocker 38)');
-  qa.notRun(2, 'needs a user with the finance approval right only (blocker 38)');
+  // The writer is qa.finance (role finance = FINANCE_WRITE only); its journal cannot be saved for today (blocker 45), and
+  // no role or right gives FINANCE_APPROVE (blocker 46).
+  qa.blocked(1, 45);
+  qa.blocked(2, 46);
   qa.notRun(3, 'U1 holds both rights: TC-APP019-044 saves, sends and approves its own journal');
-  qa.notRun(4, 'needs the writer-only user of step 1 (blocker 38)');
+  qa.blocked(4, 45);
   const staff = await userPage(browser, 'U3');
   try {
     await qa.step(5, async () => {

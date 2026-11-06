@@ -1,7 +1,8 @@
 import type { Browser, Locator, Page } from '@playwright/test';
 import { expect, type Qa } from '../../../fixtures/e2e';
 import { installToastRecorder, toastMark, toastsSince } from '../../../lib/assertions';
-import { authFileOf } from '../../../lib/config';
+import { authFileOf, PASSWORD } from '../../../lib/config';
+import { signInAs } from '../18-settings/helpers';
 import { AppHeader } from '../../../pages/AppHeader';
 import { RegisteredPatientsPage } from '../../../pages/ambulatory/RegisteredPatientsPage';
 
@@ -24,6 +25,19 @@ export async function userPage(browser: Browser, user: 'U1' | 'U2' | 'U3' | 'U4'
   const page = await (await browser.newContext({ storageState: authFileOf(user) })).newPage();
   await installToastRecorder(page);
   return page;
+}
+
+/**
+ * A page signed in as a role account of 00-prerequisites.xlsx (U8, made on 2026-10-20: qa.apoteker, qa.kasir,
+ * qa.finance, …), with the password of .env. Throws when the sign-in is refused.
+ */
+export async function roleAccountPage(browser: Browser, login: string): Promise<Page> {
+  const s = await signInAs(browser, login, PASSWORD);
+  if (!s.ok) {
+    await s.context.close();
+    throw new Error(`${login} cannot sign in: ${s.message}`);
+  }
+  return s.page;
 }
 
 /** Runs body with a page of user, closed at the end. */

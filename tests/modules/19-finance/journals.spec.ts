@@ -264,7 +264,8 @@ qaTest('TC-APP019-048', async ({ page, qa }) => {
 qaTest('TC-APP019-049', async ({ page, qa, browser }) => {
   const j = new Journals(page);
   if (noPeriod(qa, await draft(page, qa), [1, 2, 3])) {
-    qa.notRun(4, 'needs a user with the finance write right only (an account of 00-prerequisites.xlsx that is not prepared, blocker 38)');
+    // The writer-only user exists (qa.finance, role finance = FINANCE_WRITE); the journal it would approve cannot be saved.
+    qa.blocked(4, 45);
     return;
   }
   const second = await userPage(browser, 'U1');
@@ -296,7 +297,7 @@ qaTest('TC-APP019-049', async ({ page, qa, browser }) => {
       const toasts = await clickFor(page, j.row(d.narration).getByRole('button', { name: 'Send', exact: true })).catch(() => ['(no "Send" on the row)']);
       if (!toasts.some((t) => t.includes('This journal is no longer a draft.'))) qa.deviation(3, 'The text "This journal is no longer a draft."', `"${toasts.join(' / ') || 'no toast'}"`);
     });
-    qa.notRun(4, 'needs a user with the finance write right only (an account of 00-prerequisites.xlsx that is not prepared, blocker 38)');
+    qa.notRun(4, 'qa.finance (FINANCE_WRITE only) clicking "Approve" on a sent journal: to be run once journals of today can be saved (blocker 45)');
   } finally {
     await second.context().close();
   }

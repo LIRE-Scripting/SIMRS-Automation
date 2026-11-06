@@ -77,8 +77,8 @@ qaTest('TC-APP014-071', async ({ page, qa, browser }) => {
   const made = await twoHeld(page, qa);
   qa.note(1, `${made.before} row(s) waited before the two discounts of the test; dispenses: "${made.toasts.map((t) => t.join(' / ').slice(0, 60)).join('" and "')}"`);
   if (made.toasts.every(discountNotHeld)) {
-    qa.notRun(1, 'the pharmacist who asked is U1, who is also the cashier: a pharmacist without the cashier role is not prepared (blocker 38)');
-    // Neither dispense is held (found blocker 47): no discount waits.
+    // The pharmacist without the cashier role exists (qa.apoteker), but no discount waits: neither dispense is held (found blocker 47).
+    qa.blocked(1, 47);
     qa.blocked(2, 47);
     qa.blocked(3, 47);
     return;

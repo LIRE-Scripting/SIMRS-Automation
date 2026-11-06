@@ -138,7 +138,20 @@ const BY_HAND: Record<string, Review> = {
   'TC-APP018-020 1': { verdict: 'Deviasi nyata', note: 'Departemen pindah cabang tanpa peringatan; service center-nya tetap di cabang lama (data tidak konsisten).' },
 };
 
+/**
+ * The user's decision of 2026-11-06: "untuk yang deviasi jika keadaan site seperti itu maka as is saja jadikan passed".
+ * A deviation that is only a different behaviour of the site (verdict "Perlu keputusan") is accepted as the site is and
+ * counts as passed with a note; a real defect ("Deviasi nyata") stays a deviation.
+ */
+const ACCEPT_AS_IS = 'Diterima apa adanya (keputusan 2026-11-06): ';
+
 export function reviewDeviation(id: string, text: string): Review {
+  const r = decide(id, text);
+  if (r.verdict !== 'Perlu keputusan') return r;
+  return { verdict: 'Bisa dianggap lulus', note: `${ACCEPT_AS_IS}${r.note}`, fix: 'Dihitung lulus sesuai perilaku situs saat ini; referensi perlu disesuaikan dengan perilaku itu.' };
+}
+
+function decide(id: string, text: string): Review {
   const t = text.replace(/\s+/g, ' ');
   const step = /^Step (\d+):/.exec(t)?.[1];
   const hand = BY_HAND[`${id} ${step}`];

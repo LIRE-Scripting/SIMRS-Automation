@@ -4,7 +4,7 @@ import { installToastRecorder, toastMark } from '../../../lib/assertions';
 import { PROCUREMENT } from '../../../lib/procurement-data';
 import { PurchaseOrdersPage } from '../../../pages/procurement/ProcurementPages';
 import { Vouchers } from '../19-finance/helpers';
-import { signedOutJourney, userPage } from '../shared/access';
+import { roleAccountPage, signedOutJourney, userPage } from '../shared/access';
 import { approvalOf, createOrder, docNo, openOrder, orderAtStep, poToastsAfter as toastsAfter } from './cases';
 
 /**
@@ -119,11 +119,26 @@ qaTest('TC-APP009-009', async ({ page, qa, browser }) => {
   }
 });
 
-qaTest('TC-APP009-017', async ({ qa }) => {
-  // A Pharmacist and a Cashier account with one role each are not prepared: the rights of a new role cannot be saved (blocker 38).
-  qa.note(1, 'the chain has its four steps (since 2026-11-01), but no Pharmacist or Cashier account with one role exists (00-prerequisites.xlsx | Role accounts, blocker 38)');
-  qa.blocked(1, 38);
-  qa.blocked(2, 38);
+qaTest('TC-APP009-017', async ({ page, qa, browser }) => {
+  // The Pharmacist and the Cashier with one role each are the role accounts qa.apoteker and qa.kasir of
+  // 00-prerequisites.xlsx (made 2026-10-20 with the site's roles apoteker and kasir; no new role is needed).
+  const s2 = await orderAtStep(page, qa, 2);
+  const s3 = await orderAtStep(page, qa, 3);
+  qa.note(1, `PO-S2 ${s2} waits at step 2, PO-S3 ${s3} at step 3 of the four-step chain; the chain names its steps only, no role (Process definitions)`);
+  for (const [step, login, doc, persona] of [[1, 'qa.apoteker', s2, 'Pharmacist'], [2, 'qa.kasir', s3, 'Cashier']] as const) {
+    await qa.step(step, async () => {
+      const other = await roleAccountPage(browser, login);
+      try {
+        const before = await approvalOf(page, doc);
+        const toasts = await advance(other, doc).catch((e: Error) => [`(${e.message.split('\n')[0].slice(0, 120)})`]);
+        const after = await approvalOf(page, doc);
+        qa.note(step, `${persona} ${login} advances ${doc}: "${toasts.join(' / ') || 'no toast'}"; approval "${before}" → "${after}"`);
+        if (!toasts.includes('Approval advanced')) qa.deviation(step, `Toast "Approval advanced"; the chain names the ${persona} role for step ${step + 1}`, `${login} (role ${login === 'qa.apoteker' ? 'apoteker' : 'kasir'} only): "${toasts.join(' / ') || 'no toast'}"; the chain has no role per step`);
+      } finally {
+        await other.context().close();
+      }
+    });
+  }
 });
 
 qaTest('TC-APP009-018', async ({ page, qa, browser }) => {

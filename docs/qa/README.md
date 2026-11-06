@@ -7,16 +7,16 @@ Semua dokumen di folder ini berbahasa Indonesia. Kutipan dari workbook referensi
 | Dokumen | Isi | Untuk siapa |
 |---|---|---|
 | [ringkasan-hasil.md](ringkasan-hasil.md) | Angka terbaru (lulus, deviasi, terblokir, belum dijalankan), masalah utama, dan hasil per modul | Semua |
-| [blocker.md](blocker.md) | Setiap blocker: **masalah**, dampak (test case dan rantai yang terhenti), **perbaikan**, penanggung jawab, dan hasil cek ulang di situs | Development, administrator situs, product owner |
+| [blocker.md](blocker.md) | Setiap blocker selain error server: **masalah**, dampak (test case dan rantai yang terhenti), **perbaikan**, penanggung jawab, dan hasil cek ulang di situs | Development, administrator situs, product owner |
 | [deviations.md](deviations.md) | Setiap deviasi (langkah berjalan tetapi hasilnya beda dari referensi), dikelompokkan: **deviasi nyata** dengan saran perbaikan, **perlu keputusan** dengan keputusan yang dibutuhkan, dan **bisa dianggap lulus** dengan catatannya | Development, product owner |
 | [blocker-best-practice.md](blocker-best-practice.md) | Blocker dibaca ulang sebagai arsitek HMIS dan klinisi: risiko pasien, praktik terbaik, rujukan alur HINAI, prioritas, dan keputusan yang dibutuhkan | Product owner, Development, tim klinis |
-| [http-5xx.md](http-5xx.md) | Error server (HTTP 5xx) yang masih terjadi, dengan masalah dan perbaikannya (yang sudah diperbaiki tidak dicantumkan) | Development |
+| [http-5xx.md](http-5xx.md) | Error server: jawaban HTTP 5xx yang masih terjadi, dan blocker yang penyebabnya error server (2, 3, 25, 27, 38, 41, 48, 53, 55; dipindah dari blocker.md pada 2026-11-06), dengan masalah dan perbaikannya | Development |
 
 ## Workbook hasil
 
 | File | Isi |
 |---|---|
-| `reports/summary/simrs-run-summary.xlsx` | Ringkasan: sheet Ringkasan, Modul, Rantai E2E, **satu sheet per modul** (status, keterangan, tinjauan deviasi, tangkapan layar setiap test case), Blocker (dengan kolom Cek ulang), HTTP 5xx |
+| `reports/summary/simrs-run-summary.xlsx` | Ringkasan: sheet Ringkasan, Modul, Rantai E2E, **satu sheet per modul** (status, keterangan, tinjauan deviasi, tangkapan layar setiap test case), Blocker (dengan kolom Cek ulang), HTTP 5xx, Error server (blocker karena error server) |
 | `reports/e2e/<NN-modul>.xlsx` | Salinan workbook referensi per modul dengan hasil setiap langkah (Execution Status, Actual Result, catatan otomasi) |
 | `reports/e2e-chains/e2e-journeys.xlsx` | Hasil 50 rantai end-to-end per langkah |
 

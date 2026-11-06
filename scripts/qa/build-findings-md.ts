@@ -21,7 +21,7 @@ import { recheckOf } from './blocker-recheck';
 import { BLOCKER_TITLE_ID } from './blocker-titles-id';
 import { CHAIN_NAME_ID } from './chain-names-id';
 import { reviewCase, reviewDeviation, type Verdict } from './deviation-review';
-import { BLOCKER_PROBLEM_ID, blockerKind } from './id/blocker-detail-id';
+import { BLOCKER_PROBLEM_ID, blockerKind, blockerLink, isServerError, SERVER_ERROR_BLOCKERS } from './id/blocker-detail-id';
 import { statusId } from './report-language';
 import { partId, reasonId, titleId, wordId } from './summary-id';
 
@@ -102,15 +102,41 @@ function allBlockers(): BlockerInfo[] {
 /** The test cases a blocker stops (newest results), by id. */
 const stoppedBy = (no: number) => s.outcomes.filter((o) => o.status === 'Blocked' && o.blockers.includes(no)).map((o) => o.id).sort();
 
+/** The paragraphs of one blocker (blocker.md, or http-5xx.md for a server error). */
+function blockerDetail(b: BlockerInfo, kind: string): string[] {
+  const ids = stoppedBy(b.no);
+  return [
+    `### Blocker ${b.no}`,
+    '',
+    `**${b.title}**`,
+    '',
+    `- **Jenis:** ${kind || '—'}`,
+    `- **Masalah:** ${b.problem || '—'}`,
+    ...(b.stops ? [`- **Dampak:** ${b.stops.testCases} test case${b.stops.chains.length ? ` dan rantai ${b.stops.chains.join(', ')}` : ''} terhenti (${b.stops.modules.map(wordId).join(', ')}).`] : ['- **Dampak:** tidak ada test yang terhenti olehnya di hasil terbaru.']),
+    `- **Perbaikan:** ${cell(b.fix) || '—'}`,
+    `- **Penanggung jawab:** ${b.who || '—'}`,
+    `- **Cek ulang:** ${recheckOf(b.no, b.source.startsWith('ditemukan') ? 'docs/' : b.source) || '—'}`,
+    `- **Sumber:** ${b.source}`,
+    ...(ids.length ? [`- **Test case terhenti:** ${ids.length > 40 ? `${ids.slice(0, 40).join(', ')} … (+${ids.length - 40})` : ids.join(', ')}`] : []),
+    '',
+  ];
+}
+
+/** The test cases stopped by a blocker that is not a server error. */
+const blockedByBlockers = () => s.outcomes.filter((o) => o.kind === 'module' && o.status === 'Blocked' && o.blockers.some((n) => !isServerError(n))).length;
+const blockedByServer = () => s.outcomes.filter((o) => o.kind === 'module' && o.status === 'Blocked' && o.blockers.some(isServerError)).length;
+
 function blockerMd(): string {
-  const all = allBlockers();
+  const all = allBlockers().filter((b) => !isServerError(b.no));
   const active = all.filter((b) => b.stops);
   const quiet = all.filter((b) => !b.stops);
-  const blockedCases = s.outcomes.filter((o) => o.kind === 'module' && o.status === 'Blocked').length;
+  const blockedCases = blockedByBlockers();
   const out = header('Blocker: masalah yang menghentikan pengujian', [
     'Blocker = masalah di situs (atau data/set-up yang belum ada) yang membuat sebuah langkah **tidak bisa dijalankan sama sekali**. Langkah itu dan langkah sesudahnya berstatus **Terblokir**, tidak dihitung lulus maupun gagal. Perbedaan hasil pada langkah yang bisa dijalankan ada di [deviations.md](deviations.md); error server ada di [http-5xx.md](http-5xx.md).',
     '',
-    `Saat ini **${active.length} blocker** masih menghentikan **${blockedCases} test case** dan **${s.totals.chains.Blocked ?? 0} rantai E2E**; ${quiet.length} blocker lainnya sudah selesai atau tidak lagi menghentikan test.`,
+    `Saat ini **${active.length} blocker** masih menghentikan **${blockedCases} test case**; ${quiet.length} blocker lainnya sudah selesai atau tidak lagi menghentikan test.`,
+    '',
+    `Blocker yang penyebabnya **error server** (${SERVER_ERROR_BLOCKERS.join(', ')}) dipindah ke [http-5xx.md](http-5xx.md#error-server-yang-menghentikan-test) (keputusan 2026-11-06); test case-nya tetap berstatus Terblokir.`,
     '',
     'Kolom **Jenis** menunjukkan siapa yang harus bergerak: **Bug situs** (fiturnya ada tetapi gagal; Development), **Fitur belum ada** (situs belum punya fiturnya; product owner memutuskan, lalu Development), atau **Set-up & data uji** (data, akun, atau konfigurasi yang belum ada di situs bersama; administrator situs atau tester).',
     '',
@@ -121,24 +147,7 @@ function blockerMd(): string {
     out.push(`| [${b.no}](#blocker-${b.no}) | ${cell(b.title)} | ${blockerKind(b.no)} | ${b.stops!.testCases} | ${b.stops!.chains.join(', ')} | ${cell(b.stops!.modules.map(wordId).join(', '))} | ${cell(b.who)} |`);
   }
   out.push('', '## Rincian blocker yang masih aktif', '');
-  for (const b of active) {
-    const ids = stoppedBy(b.no);
-    out.push(
-      `### Blocker ${b.no}`,
-      '',
-      `**${b.title}**`,
-      '',
-      `- **Jenis:** ${blockerKind(b.no) || '—'}`,
-      `- **Masalah:** ${b.problem || '—'}`,
-      `- **Dampak:** ${b.stops!.testCases} test case${b.stops!.chains.length ? ` dan rantai ${b.stops!.chains.join(', ')}` : ''} terhenti (${b.stops!.modules.map(wordId).join(', ')}).`,
-      `- **Perbaikan:** ${cell(b.fix) || '—'}`,
-      `- **Penanggung jawab:** ${b.who || '—'}`,
-      `- **Cek ulang:** ${recheckOf(b.no, b.source.startsWith('ditemukan') ? 'docs/' : b.source) || '—'}`,
-      `- **Sumber:** ${b.source}`,
-      ...(ids.length ? [`- **Test case terhenti:** ${ids.length > 40 ? `${ids.slice(0, 40).join(', ')} … (+${ids.length - 40})` : ids.join(', ')}`] : []),
-      '',
-    );
-  }
+  for (const b of active) out.push(...blockerDetail(b, blockerKind(b.no)));
   out.push('## Blocker yang sudah selesai atau tidak lagi menghentikan test', '', '| No | Blocker | Keterangan |', '|---:|---|---|');
   for (const b of quiet) out.push(`| ${b.no} | ${cell(b.title)} | ${cell(b.problem || (b.resolved ? 'Selesai.' : 'Tidak ada test yang terhenti olehnya di hasil terbaru.'))} |`);
   out.push('');
@@ -149,7 +158,7 @@ function blockerMd(): string {
 
 const VERDICTS: { v: Verdict; title: string; what: string; col: string }[] = [
   { v: 'Deviasi nyata', title: 'Deviasi nyata: perlu diperbaiki', what: 'cacat di situs: validasi tidak ada, data ganda tersimpan, hak akses tidak ditegakkan, error server, atau angka/waktu salah.', col: 'Perbaikan yang disarankan' },
-  { v: 'Perlu keputusan', title: 'Perlu keputusan product owner', what: 'situs bekerja dengan cara lain atau fiturnya belum ada; perlu diputuskan apakah situs diubah atau referensi disesuaikan.', col: 'Keputusan yang dibutuhkan' },
+  { v: 'Perlu keputusan', title: 'Perlu keputusan product owner', what: 'situs bekerja dengan cara lain atau fiturnya belum ada. Sejak keputusan 2026-11-06 ("jika keadaan site seperti itu maka as is saja jadikan passed") deviasi seperti ini diterima apa adanya dan masuk kelompok Bisa dianggap lulus dengan catatan "Diterima apa adanya"; kelompok ini kosong.', col: 'Keputusan yang dibutuhkan' },
   { v: 'Bisa dianggap lulus', title: 'Bisa dianggap lulus (Lulus dengan catatan)', what: 'tujuan langkah tercapai; hanya bentuk atau teksnya yang beda dari referensi. Test case yang semua deviasinya masuk kelompok ini dihitung **Lulus (dengan catatan)** di ringkasan.', col: 'Catatan' },
 ];
 
@@ -257,20 +266,42 @@ function http5xxMd(): string {
     '',
     `**${errs.length} jawaban 5xx** masih terjadi, dari ${new Set(errs.map((e) => e.id)).size} test.`,
   ]);
-  if (!errs.length) {
-    out.push('Tidak ada HTTP 5xx dalam hasil terbaru semua test.', '');
-    return out.join('\n');
-  }
+  if (!errs.length) out.push('Tidak ada HTTP 5xx dalam hasil terbaru semua test.', '');
+  else out.push(...http5xxRows(errs, all));
+  out.push(...serverErrorBlockers());
+  return out.join('\n');
+}
+
+/** Server errors that stop test steps: the blockers moved here from blocker.md (the user's decision of 2026-11-06). */
+function serverErrorBlockers(): string[] {
+  const list = allBlockers().filter((b) => isServerError(b.no));
+  const active = list.filter((b) => b.stops).sort((x, y) => (y.stops!.testCases + y.stops!.chains.length) - (x.stops!.testCases + x.stops!.chains.length));
+  const out = [
+    '## Error server yang menghentikan test',
+    '',
+    `Blocker yang penyebabnya error server: situs menjawab HTTP 500/504 (sampai 2026-10-30) atau error server untuk permintaan yang benar. Langkahnya tidak bisa dijalankan, jadi test case-nya berstatus **Terblokir**; sekarang **${active.length}** masih menghentikan **${blockedByServer()} test case**. Dipindah dari [blocker.md](blocker.md) atas keputusan 2026-11-06.`,
+    '',
+    '| No | Masalah | Test case | Rantai | Modul | Penanggung jawab |',
+    '|---:|---|---:|---|---|---|',
+    ...active.map((b) => `| [${b.no}](#blocker-${b.no}) | ${cell(b.title)} | ${b.stops!.testCases} | ${b.stops!.chains.join(', ')} | ${cell(b.stops!.modules.map(wordId).join(', '))} | ${cell(b.who)} |`),
+    '',
+  ];
+  for (const b of list) out.push(...blockerDetail(b, 'Error server'));
+  return out;
+}
+
+function http5xxRows(errs: typeof s.errors, all: ReturnType<typeof history>): string[] {
+  const out: string[] = [];
   out.push('| Endpoint | Test | Terlihat pertama | Terakhir (WIB) | Digest | Masalah | Perbaikan yang disarankan | Blocker terkait |', '|---|---|---|---|---|---|---|---|');
   for (const e of [...errs].sort((x, y) => x.id.localeCompare(y.id))) {
     const r = route(e.url);
     const k = STILL[r];
     const same = all.filter((x) => route(x.url) === r && x.method === e.method);
     const first = same.reduce((m, x) => (x.at < m ? x.at : m), e.at);
-    out.push(`| \`${e.method} ${r}\` | ${e.id} (${statusId(e.testStatus)}) | ${wib(first).slice(0, 10)} | ${wib(e.at)} | ${e.digest ?? ''} | ${cell(k?.problem ?? 'Server menjawab 500 untuk permintaan ini.')} | ${cell(k?.fix ?? 'Tangani permintaan ini tanpa error server; kembalikan pesan yang jelas bila input ditolak.')} | ${blockersOfRoute(r).map((n) => `[${n}](blocker.md#blocker-${n})`).join(', ') || '—'} |`);
+    out.push(`| \`${e.method} ${r}\` | ${e.id} (${statusId(e.testStatus)}) | ${wib(first).slice(0, 10)} | ${wib(e.at)} | ${e.digest ?? ''} | ${cell(k?.problem ?? 'Server menjawab 500 untuk permintaan ini.')} | ${cell(k?.fix ?? 'Tangani permintaan ini tanpa error server; kembalikan pesan yang jelas bila input ditolak.')} | ${blockersOfRoute(r).map((n) => `[${n}](${blockerLink(n).replace('http-5xx.md', '')})`).join(', ') || '—'} |`);
   }
   out.push('');
-  return out.join('\n');
+  return out;
 }
 
 // ------------------------------------------------------------------ summary
@@ -281,7 +312,7 @@ function summaryMd(): string {
   const withNotes = s.outcomes.filter((o) => o.kind === 'module' && o.passedWithNotes).length;
   const devCases = s.outcomes.filter((o) => o.kind === 'module' && (o.status === 'Deviation' || o.passedWithNotes));
   const verdict = (v: Verdict) => devCases.filter((o) => reviewCase(o.id, o.deviations) === v).length;
-  const top = allBlockers().filter((b) => b.stops).sort((x, y) => y.stops!.testCases - x.stops!.testCases).slice(0, 8);
+  const top = allBlockers().filter((b) => b.stops && !isServerError(b.no)).sort((x, y) => y.stops!.testCases - x.stops!.testCases).slice(0, 8);
   const out = header('Ringkasan hasil pengujian SIMRS', [
     `Situs ${s.run.site}/id (bahasa Indonesia), cabang uji ${s.run.branch}. Setiap test case dan rantai dihitung dengan hasil terbarunya dari semua run. Rincian per test case, dengan tangkapan layar, ada di \`reports/summary/simrs-run-summary.xlsx\` (satu sheet per modul).`,
   ]);
@@ -299,10 +330,10 @@ function summaryMd(): string {
     '',
     '## Masalah utama',
     '',
-    `1. **Blocker** ([blocker.md](blocker.md)): ${allBlockers().filter((b) => b.stops).length} blocker masih menghentikan ${m.Blocked ?? 0} test case. Yang terbesar:`,
+    `1. **Blocker** ([blocker.md](blocker.md)): ${allBlockers().filter((b) => b.stops && !isServerError(b.no)).length} blocker masih menghentikan ${blockedByBlockers()} test case. Yang terbesar:`,
     ...top.map((b) => `   - Blocker ${b.no}: ${b.title} (${b.stops!.testCases} test case). Perbaikan: ${cell(b.fix).slice(0, 220)}`),
     `2. **Deviasi** ([deviations.md](deviations.md)): dari ${devCases.length} test case dengan deviasi, ${verdict('Deviasi nyata')} berisi **deviasi nyata** (perlu diperbaiki), ${verdict('Perlu keputusan')} **perlu keputusan** product owner, dan ${verdict('Bisa dianggap lulus')} **bisa dianggap lulus**.`,
-    `3. **HTTP 5xx** ([http-5xx.md](http-5xx.md)): ${s.totals.http5xx} masih terjadi; sebagian besar sudah hilang setelah perbaikan situs 2026-10-30.`,
+    `3. **HTTP 5xx dan error server** ([http-5xx.md](http-5xx.md)): ${s.totals.http5xx} jawaban HTTP 5xx masih terjadi; ${allBlockers().filter((b) => b.stops && isServerError(b.no)).length} blocker karena error server (${SERVER_ERROR_BLOCKERS.join(', ')}) menghentikan ${blockedByServer()} test case.`,
     `4. **Belum dijalankan:** ${m['Not run'] ?? 0} test case yang terikat jam atau hari kerja, dijadwalkan di run pagi (\`.qa-state/morning-run-*.sh\`).`,
     '',
     '## Per modul',

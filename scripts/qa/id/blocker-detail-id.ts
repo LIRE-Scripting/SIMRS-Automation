@@ -78,3 +78,14 @@ const KIND_OF: Record<BlockerKind, number[]> = {
 };
 export const blockerKind = (no: number): BlockerKind | '' =>
   (Object.keys(KIND_OF) as BlockerKind[]).find((k) => KIND_OF[k].includes(no)) ?? '';
+
+/**
+ * Blockers whose cause is a server error: the site answers HTTP 500/504 (until 2026-10-30) or an error of the server
+ * for a request that is correct ("failed to list donors", "500 stock update failed", time-out, "bad_request").
+ * The user's decision of 2026-11-06 ("yang di blocker semisal ada http 500 move ke http 500"): they are reported in
+ * docs/qa/http-5xx.md and the summary sheet "HTTP 5xx", not among the blockers. Their test cases stay Blocked.
+ */
+export const SERVER_ERROR_BLOCKERS = [2, 3, 25, 27, 38, 41, 48, 53, 55];
+export const isServerError = (no: number): boolean => SERVER_ERROR_BLOCKERS.includes(no);
+/** Where a blocker is described: blocker.md, or http-5xx.md for a server error. */
+export const blockerLink = (no: number): string => `${isServerError(no) ? 'http-5xx.md' : 'blocker.md'}#blocker-${no}`;

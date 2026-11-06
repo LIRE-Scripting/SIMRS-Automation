@@ -25,7 +25,7 @@
  *
  * Usage: npm run qa:run-summary
  */
-import { BLOCKER_PROBLEM_ID, blockerKind } from './id/blocker-detail-id';
+import { BLOCKER_PROBLEM_ID, blockerKind, isServerError } from './id/blocker-detail-id';
 import { recheckOf } from './blocker-recheck';
 import { reviewCase, reviewDeviation } from './deviation-review';
 import { execFileSync } from 'node:child_process';
@@ -575,6 +575,7 @@ const SHEET = {
   chains: 'Rantai E2E',
   blockers: 'Blocker',
   http5xx: 'HTTP 5xx',
+  serverErrors: 'Error server',
 };
 
 /** The evidence picture of a chain: a screenshot it saved itself (reports/screenshots/E2E-001-receipt.png), else its last screenshot. */
@@ -693,7 +694,7 @@ function overview(wb: ExcelJS.Workbook, s: Summary): void {
 
   bold(ws.addRow(['Blocker yang paling banyak menghentikan pengujian']), 13);
   header(ws.addRow(['Blocker', 'Masalah', 'Kasus uji terblokir', 'Perbaikan', 'Rantai yang berhenti']));
-  for (const b of [...s.perBlocker].sort((x, y) => y.testCases + y.chains.length - (x.testCases + x.chains.length)).slice(0, 10)) {
+  for (const b of [...s.perBlocker].filter((b) => !isServerError(b.no)).sort((x, y) => y.testCases + y.chains.length - (x.testCases + x.chains.length)).slice(0, 10)) {
     ws.addRow([`Blocker ${b.no}`, b.title, b.testCases, wordId(b.fix), b.chains.join(', ')]).alignment = { vertical: 'top', wrapText: true };
   }
   ws.addRow([]);
@@ -765,7 +766,7 @@ async function writeWorkbook(s: Summary): Promise<void> {
     { header: 'Perbaikan (tindak lanjut)', key: 'fix', width: 70 },
     { header: 'Siapa', key: 'who', width: 24 },
     { header: 'Cek ulang', key: 'recheck', width: 60 },
-  ], s.perBlocker.map((b) => ({ ...b, kind: blockerKind(b.no), category: wordId(b.category), fix: wordId(b.fix), who: wordId(b.who), chains: b.chains.join(', '), modules: b.modules.map(wordId).join('\n'), seen: b.seenHttp5xx ? 'Ya' : '', recheck: recheckOf(b.no, b.source), problem: BLOCKER_PROBLEM_ID[b.no] ?? '' })));
+  ], s.perBlocker.filter((b) => !isServerError(b.no)).map((b) => ({ ...b, kind: blockerKind(b.no), category: wordId(b.category), fix: wordId(b.fix), who: wordId(b.who), chains: b.chains.join(', '), modules: b.modules.map(wordId).join('\n'), seen: b.seenHttp5xx ? 'Ya' : '', recheck: recheckOf(b.no, b.source), problem: BLOCKER_PROBLEM_ID[b.no] ?? '' })));
   sheet(wb, SHEET.http5xx, [
     { header: 'Waktu', key: 'at', width: 22 },
     { header: 'Test', key: 'test', width: 50 },
@@ -780,6 +781,22 @@ async function writeWorkbook(s: Summary): Promise<void> {
     { header: 'Isi request', key: 'request', width: 70 },
     { header: 'Respons', key: 'response', width: 50 },
   ], s.errors.map((e) => ({ ...e, test: `${e.id} ${e.id.startsWith('E2E') ? (CHAIN_NAME_ID[e.id] ?? '') : titleId(e.test.replace(/ \[[^\]]+\].*$/, '').replace(/^\S+ /, ''))}`, testType: TEST_TYPE_ID[e.testType] ?? e.testType, path: new URL(e.url).pathname, testStatus: e.testStatus ? statusId(e.testStatus) : '', kind: sentenceId(e.kind), counted: sentenceId(e.counted) })));
+  // Blockers whose cause is a server error (the user's decision of 2026-11-06): out of sheet Blocker, here instead.
+  sheet(wb, SHEET.serverErrors, [
+    { header: 'No', key: 'no', width: 6 },
+    { header: 'Blocker', key: 'title', width: 60 },
+    { header: 'Jenis', key: 'kind', width: 16 },
+    { header: 'Masalah', key: 'problem', width: 80 },
+    { header: 'Kategori', key: 'category', width: 14 },
+    { header: 'Didefinisikan di', key: 'source', width: 26 },
+    { header: 'Kasus uji terblokir', key: 'testCases', width: 10 },
+    { header: 'Rantai berhenti', key: 'chains', width: 22 },
+    { header: 'Modul', key: 'modules', width: 40 },
+    { header: 'HTTP 5xx terlihat di run ini', key: 'seen', width: 10 },
+    { header: 'Perbaikan (tindak lanjut)', key: 'fix', width: 70 },
+    { header: 'Siapa', key: 'who', width: 24 },
+    { header: 'Cek ulang', key: 'recheck', width: 60 },
+  ], s.perBlocker.filter((b) => isServerError(b.no)).map((b) => ({ ...b, kind: blockerKind(b.no), category: wordId(b.category), fix: wordId(b.fix), who: wordId(b.who), chains: b.chains.join(', '), modules: b.modules.map(wordId).join('\n'), seen: b.seenHttp5xx ? 'Ya' : '', recheck: recheckOf(b.no, b.source), problem: BLOCKER_PROBLEM_ID[b.no] ?? '' })));
   await wb.xlsx.writeFile(path.join(OUT_DIR, 'simrs-run-summary.xlsx'));
 }
 
