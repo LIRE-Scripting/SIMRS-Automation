@@ -25,7 +25,7 @@
  *
  * Usage: npm run qa:run-summary
  */
-import { BLOCKER_PROBLEM_ID, blockerKind, isServerError } from './id/blocker-detail-id';
+import { BLOCKER_PROBLEM_ID, blockerBranch, blockerKind, isServerError } from './id/blocker-detail-id';
 import { recheckOf } from './blocker-recheck';
 import { reviewCase, reviewDeviation } from './deviation-review';
 import { execFileSync } from 'node:child_process';
@@ -756,6 +756,7 @@ async function writeWorkbook(s: Summary): Promise<void> {
     { header: 'No', key: 'no', width: 6 },
     { header: 'Blocker', key: 'title', width: 60 },
     { header: 'Jenis', key: 'kind', width: 16 },
+    { header: 'Cabang', key: 'branch', width: 24 },
     { header: 'Masalah', key: 'problem', width: 80 },
     { header: 'Kategori', key: 'category', width: 14 },
     { header: 'Didefinisikan di', key: 'source', width: 26 },
@@ -766,7 +767,7 @@ async function writeWorkbook(s: Summary): Promise<void> {
     { header: 'Perbaikan (tindak lanjut)', key: 'fix', width: 70 },
     { header: 'Siapa', key: 'who', width: 24 },
     { header: 'Cek ulang', key: 'recheck', width: 60 },
-  ], s.perBlocker.filter((b) => !isServerError(b.no)).map((b) => ({ ...b, kind: blockerKind(b.no), category: wordId(b.category), fix: wordId(b.fix), who: wordId(b.who), chains: b.chains.join(', '), modules: b.modules.map(wordId).join('\n'), seen: b.seenHttp5xx ? 'Ya' : '', recheck: recheckOf(b.no, b.source), problem: BLOCKER_PROBLEM_ID[b.no] ?? '' })));
+  ], s.perBlocker.filter((b) => !isServerError(b.no)).map((b) => ({ ...b, kind: blockerKind(b.no), branch: blockerBranch(b.no), category: wordId(b.category), fix: wordId(b.fix), who: wordId(b.who), chains: b.chains.join(', '), modules: b.modules.map(wordId).join('\n'), seen: b.seenHttp5xx ? 'Ya' : '', recheck: recheckOf(b.no, b.source), problem: BLOCKER_PROBLEM_ID[b.no] ?? '' })));
   sheet(wb, SHEET.http5xx, [
     { header: 'Waktu', key: 'at', width: 22 },
     { header: 'Test', key: 'test', width: 50 },
@@ -786,6 +787,7 @@ async function writeWorkbook(s: Summary): Promise<void> {
     { header: 'No', key: 'no', width: 6 },
     { header: 'Blocker', key: 'title', width: 60 },
     { header: 'Jenis', key: 'kind', width: 16 },
+    { header: 'Cabang', key: 'branch', width: 24 },
     { header: 'Masalah', key: 'problem', width: 80 },
     { header: 'Kategori', key: 'category', width: 14 },
     { header: 'Didefinisikan di', key: 'source', width: 26 },
@@ -796,7 +798,7 @@ async function writeWorkbook(s: Summary): Promise<void> {
     { header: 'Perbaikan (tindak lanjut)', key: 'fix', width: 70 },
     { header: 'Siapa', key: 'who', width: 24 },
     { header: 'Cek ulang', key: 'recheck', width: 60 },
-  ], s.perBlocker.filter((b) => isServerError(b.no)).map((b) => ({ ...b, kind: blockerKind(b.no), category: wordId(b.category), fix: wordId(b.fix), who: wordId(b.who), chains: b.chains.join(', '), modules: b.modules.map(wordId).join('\n'), seen: b.seenHttp5xx ? 'Ya' : '', recheck: recheckOf(b.no, b.source), problem: BLOCKER_PROBLEM_ID[b.no] ?? '' })));
+  ], s.perBlocker.filter((b) => isServerError(b.no)).map((b) => ({ ...b, kind: blockerKind(b.no), branch: blockerBranch(b.no), category: wordId(b.category), fix: wordId(b.fix), who: wordId(b.who), chains: b.chains.join(', '), modules: b.modules.map(wordId).join('\n'), seen: b.seenHttp5xx ? 'Ya' : '', recheck: recheckOf(b.no, b.source), problem: BLOCKER_PROBLEM_ID[b.no] ?? '' })));
   await wb.xlsx.writeFile(path.join(OUT_DIR, 'simrs-run-summary.xlsx'));
 }
 

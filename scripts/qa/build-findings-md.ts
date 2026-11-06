@@ -21,7 +21,7 @@ import { recheckOf } from './blocker-recheck';
 import { BLOCKER_TITLE_ID } from './blocker-titles-id';
 import { CHAIN_NAME_ID } from './chain-names-id';
 import { reviewCase, reviewDeviation, type Verdict } from './deviation-review';
-import { BLOCKER_PROBLEM_ID, blockerKind, blockerLink, isServerError, SERVER_ERROR_BLOCKERS } from './id/blocker-detail-id';
+import { BLOCKER_PROBLEM_ID, blockerBranch, blockerKind, blockerLink, isServerError, SERVER_ERROR_BLOCKERS } from './id/blocker-detail-id';
 import { statusId } from './report-language';
 import { partId, reasonId, titleId, wordId } from './summary-id';
 
@@ -111,6 +111,7 @@ function blockerDetail(b: BlockerInfo, kind: string): string[] {
     `**${b.title}**`,
     '',
     `- **Jenis:** ${kind || '—'}`,
+    `- **Cabang:** ${blockerBranch(b.no)}`,
     `- **Masalah:** ${b.problem || '—'}`,
     ...(b.stops ? [`- **Dampak:** ${b.stops.testCases} test case${b.stops.chains.length ? ` dan rantai ${b.stops.chains.join(', ')}` : ''} terhenti (${b.stops.modules.map(wordId).join(', ')}).`] : ['- **Dampak:** tidak ada test yang terhenti olehnya di hasil terbaru.']),
     `- **Perbaikan:** ${cell(b.fix) || '—'}`,
@@ -138,13 +139,15 @@ function blockerMd(): string {
     '',
     `Blocker yang penyebabnya **error server** (${SERVER_ERROR_BLOCKERS.join(', ')}) dipindah ke [http-5xx.md](http-5xx.md#error-server-yang-menghentikan-test) (keputusan 2026-11-06); test case-nya tetap berstatus Terblokir.`,
     '',
+    'Semua test berjalan sebagai U1 di cabang **Podomoro** (cabang dengan data terlengkap), kecuali yang memang diminta workbook di konteks lain: "Semua cabang" (U2), Kemayoran (U6), atau level tenant. Kolom **Cabang** menyebut di mana blocker itu terlihat.',
+    '',
     'Kolom **Jenis** menunjukkan siapa yang harus bergerak: **Bug situs** (fiturnya ada tetapi gagal; Development), **Fitur belum ada** (situs belum punya fiturnya; product owner memutuskan, lalu Development), atau **Set-up & data uji** (data, akun, atau konfigurasi yang belum ada di situs bersama; administrator situs atau tester).',
     '',
     'Blocker 1–16 berasal dari checklist `reference/00-blockers-checklist-linked.xlsx`; blocker 17 dan seterusnya ditemukan oleh otomasi. Kolom **Cek ulang** menyebut kapan dan bagaimana blocker terakhir diperiksa di situs (pengawas blocker `tests/modules/00-access/blocker-watch.spec.ts` berjalan di setiap run).',
   ]);
-  out.push('## Ringkasan blocker yang masih aktif', '', '| No | Blocker | Jenis | Test case | Rantai | Modul | Penanggung jawab |', '|---:|---|---|---:|---|---|---|');
+  out.push('## Ringkasan blocker yang masih aktif', '', '| No | Blocker | Jenis | Cabang | Test case | Rantai | Modul | Penanggung jawab |', '|---:|---|---|---|---:|---|---|---|');
   for (const b of [...active].sort((x, y) => (y.stops!.testCases + y.stops!.chains.length) - (x.stops!.testCases + x.stops!.chains.length))) {
-    out.push(`| [${b.no}](#blocker-${b.no}) | ${cell(b.title)} | ${blockerKind(b.no)} | ${b.stops!.testCases} | ${b.stops!.chains.join(', ')} | ${cell(b.stops!.modules.map(wordId).join(', '))} | ${cell(b.who)} |`);
+    out.push(`| [${b.no}](#blocker-${b.no}) | ${cell(b.title)} | ${blockerKind(b.no)} | ${blockerBranch(b.no)} | ${b.stops!.testCases} | ${b.stops!.chains.join(', ')} | ${cell(b.stops!.modules.map(wordId).join(', '))} | ${cell(b.who)} |`);
   }
   out.push('', '## Rincian blocker yang masih aktif', '');
   for (const b of active) out.push(...blockerDetail(b, blockerKind(b.no)));
@@ -281,9 +284,9 @@ function serverErrorBlockers(): string[] {
     '',
     `Blocker yang penyebabnya error server: situs menjawab HTTP 500/504 (sampai 2026-10-30) atau error server untuk permintaan yang benar. Langkahnya tidak bisa dijalankan, jadi test case-nya berstatus **Terblokir**; sekarang **${active.length}** masih menghentikan **${blockedByServer()} test case**. Dipindah dari [blocker.md](blocker.md) atas keputusan 2026-11-06.`,
     '',
-    '| No | Masalah | Test case | Rantai | Modul | Penanggung jawab |',
-    '|---:|---|---:|---|---|---|',
-    ...active.map((b) => `| [${b.no}](#blocker-${b.no}) | ${cell(b.title)} | ${b.stops!.testCases} | ${b.stops!.chains.join(', ')} | ${cell(b.stops!.modules.map(wordId).join(', '))} | ${cell(b.who)} |`),
+    '| No | Masalah | Cabang | Test case | Rantai | Modul | Penanggung jawab |',
+    '|---:|---|---|---:|---|---|---|',
+    ...active.map((b) => `| [${b.no}](#blocker-${b.no}) | ${cell(b.title)} | ${blockerBranch(b.no)} | ${b.stops!.testCases} | ${b.stops!.chains.join(', ')} | ${cell(b.stops!.modules.map(wordId).join(', '))} | ${cell(b.who)} |`),
     '',
   ];
   for (const b of list) out.push(...blockerDetail(b, 'Error server'));

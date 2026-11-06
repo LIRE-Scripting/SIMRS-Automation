@@ -1,6 +1,6 @@
 # Ringkasan hasil pengujian SIMRS
 
-Dibangun 2026-11-06 14:53 WIB dari `reports/summary/run-summary.json` (hasil terbaru setiap test case dan rantai). Bangun ulang: `npm run qa:run-summary && npm run qa:findings-md`.
+Dibangun 2026-11-06 15:00 WIB dari `reports/summary/run-summary.json` (hasil terbaru setiap test case dan rantai). Bangun ulang: `npm run qa:run-summary && npm run qa:findings-md`.
 
 Situs https://rs.showcase.atklik.xyz/id (bahasa Indonesia), cabang uji Podomoro. Setiap test case dan rantai dihitung dengan hasil terbarunya dari semua run. Rincian per test case, dengan tangkapan layar, ada di `reports/summary/simrs-run-summary.xlsx` (satu sheet per modul).
 

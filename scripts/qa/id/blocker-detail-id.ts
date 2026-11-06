@@ -89,3 +89,16 @@ export const SERVER_ERROR_BLOCKERS = [2, 3, 25, 27, 38, 41, 48, 53, 55];
 export const isServerError = (no: number): boolean => SERVER_ERROR_BLOCKERS.includes(no);
 /** Where a blocker is described: blocker.md, or http-5xx.md for a server error. */
 export const blockerLink = (no: number): string => `${isServerError(no) ? 'http-5xx.md' : 'blocker.md'}#blocker-${no}`;
+
+/**
+ * Where a blocker was seen: the tests run as U1 on Podomoro, the branch with the fullest data, unless the workbook
+ * asks for another context (U2 "All branches", U6 Kemayoran, the tenant level).
+ */
+const BRANCH_OF: Record<number, string> = {
+  4: 'Level tenant (semua cabang)',
+  5: 'Semua cabang (U2)',
+  6: 'Semua cabang (U2)',
+  13: 'Podomoro; konfigurasi IGD juga tidak ada di cabang lain',
+  41: 'Kemayoran (U6)',
+};
+export const blockerBranch = (no: number): string => BRANCH_OF[no] ?? 'Podomoro';
