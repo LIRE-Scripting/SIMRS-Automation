@@ -91,6 +91,9 @@ function checkCause(chain: Chain, k: number, cause: string): string {
   throw new Error(`Unknown chain stop cause "${cause}"`);
 }
 
+/** QA_CHAIN_CONTINUE=1: run the steps after a stop too (a probe; see ChainRun.step). */
+const CONTINUE = process.env.QA_CHAIN_CONTINUE === '1';
+
 const test = e2e.extend<{ chain: ChainRun; chainId: string }>({
   chainId: ['', { option: true }],
 
@@ -135,14 +138,27 @@ const test = e2e.extend<{ chain: ChainRun; chainId: string }>({
     await use({
       chain,
       step: async (k, body) => {
-        // Steps after a stop are not run: the workbook reports them Blocked by the cause of the stop.
-        if (stoppedAt) return undefined as never;
+        // Steps after a stop are not run: the workbook reports them Blocked by the cause of the stop. With
+        // QA_CHAIN_CONTINUE=1 (a probe: what the chain would do if its blockers were ignored) they run anyway,
+        // each with its own records; what each did is noted "after-stop", and an error there does not fail the chain.
+        const probing = !!stoppedAt && CONTINUE;
+        if (stoppedAt && !CONTINUE) return undefined as never;
         const cs = chain.steps[k - 1];
         if (!cs) throw new Error(`${chain.id} has no step ${k}`);
+        const stopsBefore = testInfo.annotations.filter((a) => a.type === 'chain-stop').length;
         return base.step(`Chain step ${k} ${traceTag(testCaseRef(cs.tc))}: ${cs.role}`, async () => {
           try {
-            return await body(qaOf(k));
+            const out = await body(qaOf(k));
+            if (probing) {
+              const stops = testInfo.annotations.filter((a) => a.type === 'chain-stop').slice(stopsBefore).map((a) => a.description ?? '');
+              note('after-stop', k, stops.length ? `${cs.tc}: stopped again (${stops.map((x) => x.replace(/^Step \d+: /, '').slice(0, 120)).join('; ')})` : `${cs.tc}: ran to its end`);
+            }
+            return out;
           } catch (e) {
+            if (probing) {
+              note('after-stop', k, `${cs.tc}: error (${String((e as Error).message ?? e).split('\n')[0].slice(0, 160)})`);
+              return undefined as never;
+            }
             // A record no list or picker offers (found blocker 40, or the one the NotOffered names) stops the chain here, as it blocks the module test.
             if (!(e instanceof NotOffered)) throw e;
             stoppedAt ||= k;
@@ -186,7 +202,7 @@ export function chainTest(id: string, body: Parameters<typeof test>[2]): void {
   test.describe(() => {
     test.use({ chainId: id, storageState: authFileOf('U1'), actionTimeout: 15_000 });
     // A chain runs several test cases in a row: two minutes for the set-up, one and a half for each step.
-    test.describe.configure({ timeout: 120_000 + chain.steps.length * 90_000 });
+    test.describe.configure({ timeout: (120_000 + chain.steps.length * 90_000) * (CONTINUE ? 2 : 1) });
     if (process.env.QA_ALLOW_WRITES !== '1') {
       return test.skip(title, details, body);
     }
