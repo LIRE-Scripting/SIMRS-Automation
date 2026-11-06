@@ -1,22 +1,22 @@
 # Deviasi: langkah yang berjalan tetapi hasilnya berbeda dari referensi
 
-Dibangun 2026-11-01 22:49 WIB dari `reports/summary/run-summary.json` (hasil terbaru setiap test case dan rantai). Bangun ulang: `npm run qa:run-summary && npm run qa:findings-md`.
+Dibangun 2026-11-02 07:35 WIB dari `reports/summary/run-summary.json` (hasil terbaru setiap test case dan rantai). Bangun ulang: `npm run qa:run-summary && npm run qa:findings-md`.
 
 Deviasi = langkah **bisa dijalankan**, tetapi hasil di situs tidak sama dengan *Expected Result* di workbook referensi. Setiap deviasi sudah ditinjau (scripts/qa/deviation-review.ts, 2026-11-01) dan diberi saran: perbaikan, keputusan yang dibutuhkan, atau catatan.
 
-**756 deviasi** di **380 test case** dan **17 rantai E2E**.
+**768 deviasi** di **387 test case** dan **19 rantai E2E**.
 
 | Tinjauan | Deviasi | Test case / rantai (menurut deviasi terberatnya) | Arti |
 |---|---:|---:|---|
-| [Deviasi nyata](#deviasi-nyata-perlu-diperbaiki) | 171 | 102 | cacat di situs: validasi tidak ada, data ganda tersimpan, hak akses tidak ditegakkan, error server, atau angka/waktu salah. |
-| [Perlu keputusan](#perlu-keputusan-product-owner) | 466 | 237 | situs bekerja dengan cara lain atau fiturnya belum ada; perlu diputuskan apakah situs diubah atau referensi disesuaikan. |
-| [Bisa dianggap lulus](#bisa-dianggap-lulus-lulus-dengan-catatan) | 119 | 58 | tujuan langkah tercapai; hanya bentuk atau teksnya yang beda dari referensi. Test case yang semua deviasinya masuk kelompok ini dihitung **Lulus (dengan catatan)** di ringkasan. |
+| [Deviasi nyata](#deviasi-nyata-perlu-diperbaiki) | 173 | 103 | cacat di situs: validasi tidak ada, data ganda tersimpan, hak akses tidak ditegakkan, error server, atau angka/waktu salah. |
+| [Perlu keputusan](#perlu-keputusan-product-owner) | 475 | 244 | situs bekerja dengan cara lain atau fiturnya belum ada; perlu diputuskan apakah situs diubah atau referensi disesuaikan. |
+| [Bisa dianggap lulus](#bisa-dianggap-lulus-lulus-dengan-catatan) | 120 | 59 | tujuan langkah tercapai; hanya bentuk atau teksnya yang beda dari referensi. Test case yang semua deviasinya masuk kelompok ini dihitung **Lulus (dengan catatan)** di ringkasan. |
 
 ## Per modul
 
 | Modul | Nyata | Perlu keputusan | Bisa dianggap lulus |
 |---|---:|---:|---:|
-| 01 Rawat Jalan | 22 | 35 | 13 |
+| 01 Rawat Jalan | 22 | 38 | 14 |
 | 02 Janji Temu | 6 | 10 | 7 |
 | 03 Pelayanan Pasien | 5 | 21 | 4 |
 | 04 Rawat Inap | 10 | 27 | 7 |
@@ -29,7 +29,7 @@ Deviasi = langkah **bisa dijalankan**, tetapi hasil di situs tidak sama dengan *
 | 11 Laboratorium | 5 | 25 | 1 |
 | 12 Radiologi (RIS) | 9 | 9 | 3 |
 | 13 Diet | 12 | 37 | 6 |
-| 14 Kasir & Tagihan | 3 | 18 | 0 |
+| 14 Kasir & Tagihan | 3 | 19 | 0 |
 | 15 IGD | 10 | 26 | 1 |
 | 16 Rekam Medis (MRD) | 5 | 33 | 10 |
 | 17 Penggajian | 3 | 5 | 1 |
@@ -40,7 +40,9 @@ Deviasi = langkah **bisa dijalankan**, tetapi hasil di situs tidak sama dengan *
 | 22 Layanan Jasa | 1 | 0 | 0 |
 | 23 Tender & Kontrak | 0 | 0 | 1 |
 | 24 Tata Graha | 1 | 1 | 0 |
-| Rantai E2E | 0 | 22 | 8 |
+| 25 Linen | 0 | 1 | 0 |
+| 27 Aset Tetap | 2 | 1 | 0 |
+| Rantai E2E | 0 | 25 | 8 |
 
 ## Deviasi nyata: perlu diperbaiki
 
@@ -332,6 +334,13 @@ Arti: cacat di situs: validasi tidak ada, data ganda tersimpan, hak akses tidak 
 |---|---|---:|---|---|---|
 | TC-APP024-002 | Lokasi yang ditolak | 5 | Ditolak (teks server berakhir dengan "location is missing") | tersimpan ("Saved.") | Seharusnya ditolak/diperingatkan, tetapi tersimpan: validasi tidak ada. Tambahkan validasi di server untuk input ini, dengan pesan yang menyebut alasannya. |
 
+### 27 Aset Tetap (deviasi nyata)
+
+| Test case | Judul | Langkah | Referensi mengharapkan | Di situs | Perbaikan yang disarankan |
+|---|---|---:|---|---|---|
+| TC-APP027-004 | Entri register yang ditolak | 5 | Ditolak (teks server berakhir dengan "Please Add the Serial Nos Up to the install Quantity") | tersimpan ("Saved.") | Seharusnya ditolak/diperingatkan, tetapi tersimpan: validasi tidak ada. Tambahkan validasi di server untuk input ini, dengan pesan yang menyebut alasannya. |
+| TC-APP027-004 | Entri register yang ditolak | 6 | Ditolak (teks server berakhir dengan "The Available Stock Qty is Only") | tersimpan ("Saved.") | Seharusnya ditolak/diperingatkan, tetapi tersimpan: validasi tidak ada. Tambahkan validasi di server untuk input ini, dengan pesan yang menyebut alasannya. |
+
 ## Perlu keputusan product owner
 
 Arti: situs bekerja dengan cara lain atau fiturnya belum ada; perlu diputuskan apakah situs diubah atau referensi disesuaikan.
@@ -369,8 +378,11 @@ Arti: situs bekerja dengan cara lain atau fiturnya belum ada; perlu diputuskan a
 | TC-APP001-052 | Blokir yang salah atau harus dicabut | 2 | Peringatan bahwa PT-1 sudah dibooking di waktu itu | diblokir tanpa peringatan; PT-1 tetap terbooking | Perilaku situs berbeda dari referensi; perlu keputusan apakah diterima. Putuskan apakah perilaku situs diterima (lalu sesuaikan referensi) atau situs perlu diubah. |
 | TC-APP001-052 | Blokir yang salah atau harus dicabut | 3 | Blokir tercantum dan bisa dihapus | tidak ada daftar blokir dan tidak ada cara menghapusnya | Fitur yang diminta referensi tidak ada di situs. Putuskan apakah fitur ini dibuat, atau referensi disesuaikan dengan situs. |
 | TC-APP001-054 | Rentang tanggal terlalu panjang atau terbalik | 3 | Pesan bahwa tanggal From setelah tanggal To | tidak ada pesan; daftar kosong ("No appointments in this view.") | Fitur yang diminta referensi tidak ada di situs. Putuskan apakah fitur ini dibuat, atau referensi disesuaikan dengan situs. |
+| TC-APP001-055 | Janji temu yang menjadi kunjungan | 1 | Janji temu PT-1 ditawarkan untuk check-in | Kedatangan tidak menampilkan janji temu; pasien dicari dan departemen dipilih lagi | Perilaku situs berbeda dari referensi; perlu keputusan apakah diterima. Putuskan apakah perilaku situs diterima (lalu sesuaikan referensi) atau situs perlu diubah. |
+| TC-APP001-055 | Janji temu yang menjadi kunjungan | 3 | Baris PT-1 tidak lagi berstatus "Menunggu" | janji temu masih berstatus "Menunggu" | Perilaku situs berbeda dari referensi; perlu keputusan apakah diterima. Putuskan apakah perilaku situs diterima (lalu sesuaikan referensi) atau situs perlu diubah. |
 | TC-APP001-057 | Memanggil dua kali, di luar giliran, atau karena salah | 2 | Peringatan bahwa 002 sebelum 003, atau panggilan tidak ditawarkan | 003 dipanggil tanpa peringatan | Perilaku situs berbeda dari referensi; perlu keputusan apakah diterima. Putuskan apakah perilaku situs diterima (lalu sesuaikan referensi) atau situs perlu diubah. |
 | TC-APP001-057 | Memanggil dua kali, di luar giliran, atau karena salah | 3 | Ada: panggil lagi, tandai tidak hadir, akhiri kunjungan, batalkan panggilan | baris menawarkan Start encounter, Set MLC, Record document, Call | Perilaku situs berbeda dari referensi; perlu keputusan apakah diterima. Putuskan apakah perilaku situs diterima (lalu sesuaikan referensi) atau situs perlu diubah. |
+| TC-APP001-058 | Daftar kedatangan dan nomor saat pergantian hari | 1 | No. "001", nomor pertama pagi itu | No. "004" pukul 06:50 WIB: daftar masih menghitung 4 baris QA Poli Umum (hari situs belum berganti: berganti pukul 07:00 WIB, tengah malam UTC) | Perilaku situs berbeda dari referensi; perlu keputusan apakah diterima. Putuskan apakah perilaku situs diterima (lalu sesuaikan referensi) atau situs perlu diubah. |
 | TC-APP001-060 | Yang ditampilkan papan antrean umum | 3 | Papan tidak berubah | baris untuk booking 2026-11-09 langsung muncul, dengan token, nama, dan MRN | Aksi langsung dijalankan tanpa konfirmasi. Putuskan apakah aksi ini perlu dialog konfirmasi (dan alasan) sebelum dijalankan. |
 | TC-APP001-065 | Membuka register tanpa login | 3 | Halaman yang diminta | setelah login: /id/login | Perilaku situs berbeda dari referensi; perlu keputusan apakah diterima. Putuskan apakah perilaku situs diterima (lalu sesuaikan referensi) atau situs perlu diubah. |
 | TC-APP001-068 | Klik ganda, dua petugas sekaligus, dan muat ulang | 2 | Satu tersimpan; yang lain mendapat "MRN already exists for this tenant" | 0 tersimpan | Perilaku situs berbeda dari referensi; perlu keputusan apakah diterima. Putuskan apakah perilaku situs diterima (lalu sesuaikan referensi) atau situs perlu diubah. |
@@ -700,6 +712,7 @@ Arti: situs bekerja dengan cara lain atau fiturnya belum ada; perlu diputuskan a
 | TC-APP014-034 | Tagihan dengan sen | 1 | Jumlah tagihan ditampilkan sampai sen, atau dibulatkan menurut aturan cabang | Rp 9.000 | Perilaku situs berbeda dari referensi; perlu keputusan apakah diterima. Putuskan apakah perilaku situs diterima (lalu sesuaikan referensi) atau situs perlu diubah. |
 | TC-APP014-034 | Tagihan dengan sen | 2 | Jumlah yang diterima sama dengan jumlah tagihan (12.487,50) | diterima Rp 9.000 (terisi otomatis 9000) | Perilaku situs berbeda dari referensi; perlu keputusan apakah diterima. Putuskan apakah perilaku situs diterima (lalu sesuaikan referensi) atau situs perlu diubah. |
 | TC-APP014-037 | Menutup hari dengan jumlah yang dilaporkan kosong | 1 | Layar menanyakan jumlahnya, atau meminta konfirmasi | hari kasir U4 langsung ditutup tanpa nilai yang dideklarasikan (Selisih "Rp 0") | Aksi langsung dijalankan tanpa konfirmasi. Putuskan apakah aksi ini perlu dialog konfirmasi (dan alasan) sebelum dijalankan. |
+| TC-APP014-038 | Kapan hari kerja berakhir | 1 | Hari baru: tidak ada spanduk tutup | pukul 06:30 WIB loket masih menampilkan tutup hari sebelumnya (hari loket berganti pukul 07:00 WIB, tengah malam UTC) | Perilaku situs berbeda dari referensi; perlu keputusan apakah diterima. Putuskan apakah perilaku situs diterima (lalu sesuaikan referensi) atau situs perlu diubah. |
 | TC-APP014-040 | Memberi pasien struk | 2 | Tombol Print atau halaman yang bisa dicetak | tidak ada kontrol cetak atau unduh | Fitur yang diminta referensi tidak ada di situs. Putuskan apakah fitur ini dibuat, atau referensi disesuaikan dengan situs. |
 | TC-APP014-040 | Memberi pasien struk | 3 | Struk bisa ditampilkan lagi | struk tidak ditampilkan saat penjualan yang sudah dibayar dicari lagi | Perilaku situs berbeda dari referensi; perlu keputusan apakah diterima. Putuskan apakah perilaku situs diterima (lalu sesuaikan referensi) atau situs perlu diubah. |
 | TC-APP014-046 | Menyiapkan pasien asuransi dari layar | 1 | Formulir atau tombol untuk meminta pra-otorisasi | tidak ada: panel hanya mencari yang sudah ada | Fitur yang diminta referensi tidak ada di situs. Putuskan apakah fitur ini dibuat, atau referensi disesuaikan dengan situs. |
@@ -890,6 +903,18 @@ Arti: situs bekerja dengan cara lain atau fiturnya belum ada; perlu diputuskan a
 |---|---|---:|---|---|---|
 | TC-APP024-007 | Log harian: siapa membersihkan di mana, dan persetujuannya | 3 | baris dengan status "draft" | log baru bertuliskan "sent" | Perilaku situs berbeda dari referensi; perlu keputusan apakah diterima. Putuskan apakah perilaku situs diterima (lalu sesuaikan referensi) atau situs perlu diubah. |
 
+### 25 Linen (perlu keputusan)
+
+| Test case | Judul | Langkah | Referensi mengharapkan | Di situs | Keputusan yang dibutuhkan |
+|---|---|---:|---|---|---|
+| TC-APP025-001 | Gudang dan resep: tiga gudang linen dan bahan barang jadi | 4 | Baris untuk resep | toast "Tersimpan."; tidak ada baris daftar yang menyebut QA-0D41XP4VA-SPREI01 | Perilaku situs berbeda dari referensi; perlu keputusan apakah diterima. Putuskan apakah perilaku situs diterima (lalu sesuaikan referensi) atau situs perlu diubah. |
+
+### 27 Aset Tetap (perlu keputusan)
+
+| Test case | Judul | Langkah | Referensi mengharapkan | Di situs | Keputusan yang dibutuhkan |
+|---|---|---:|---|---|---|
+| TC-APP027-009 | Perpindahan: pindah, transfer, serahkan ke pemegang, kembali, gate pass, dan sewa | 5 | Kolom "Pemegang" kosong lagi | kolom menampilkan lokasi terakhir "QA-Poli Kandungan" | Perilaku situs berbeda dari referensi; perlu keputusan apakah diterima. Putuskan apakah perilaku situs diterima (lalu sesuaikan referensi) atau situs perlu diubah. |
+
 ### Rantai E2E (perlu keputusan)
 
 | Test case | Judul | Langkah | Referensi mengharapkan | Di situs | Keputusan yang dibutuhkan |
@@ -899,6 +924,7 @@ Arti: situs bekerja dengan cara lain atau fiturnya belum ada; perlu diputuskan a
 | E2E-001 | Rawat jalan: pasien daftar sampai invoice dibayar, struk dicetak, dan masuk Finance | 9 (TC-APP014-040 langkah 2) | Tombol Print atau halaman yang bisa dicetak | no print or download control on the receipt; the printout is the browser print of the screen | Fitur yang diminta referensi tidak ada di situs. Putuskan apakah fitur ini dibuat, atau referensi disesuaikan dengan situs. |
 | E2E-001 | Rawat jalan: pasien daftar sampai invoice dibayar, struk dicetak, dan masuk Finance | 9 (TC-APP014-040 langkah 3) | Struk bisa ditampilkan lagi | struk tidak ditampilkan saat penjualan yang sudah dibayar dicari lagi | Perilaku situs berbeda dari referensi; perlu keputusan apakah diterima. Putuskan apakah perilaku situs diterima (lalu sesuaikan referensi) atau situs perlu diubah. |
 | E2E-013 | Housekeeping: rencana kebersihan sampai tagihan vendor | 3 (TC-APP024-007 langkah 3) | baris dengan status "draft" | log baru bertuliskan "sent" | Perilaku situs berbeda dari referensi; perlu keputusan apakah diterima. Putuskan apakah perilaku situs diterima (lalu sesuaikan referensi) atau situs perlu diubah. |
+| E2E-016 | Linen: pembuatan linen dan sirkulasinya | 1 (TC-APP025-001 langkah 4) | Baris untuk resep | toast "Tersimpan."; tidak ada baris daftar yang menyebut QA-0D41XB10Q-SPREI01 | Perilaku situs berbeda dari referensi; perlu keputusan apakah diterima. Putuskan apakah perilaku situs diterima (lalu sesuaikan referensi) atau situs perlu diubah. |
 | E2E-017 | Farmasi: terima stok, jual di kasir, retur, bayar, dan Finance | 4 (TC-APP005-009 langkah 6) | Wizard kosong | item dikosongkan tetapi pasien tetap terpilih | Perilaku situs berbeda dari referensi; perlu keputusan apakah diterima. Putuskan apakah perilaku situs diterima (lalu sesuaikan referensi) atau situs perlu diubah. |
 | E2E-021 | Order klinis (CPOE) dari satu konsultasi | 1 (TC-APP003-001 langkah 3) | Panel kiri: nama, MRN, dan "DOB" | nama dan MRN; tanpa tanggal lahir | Perilaku situs berbeda dari referensi; perlu keputusan apakah diterima. Putuskan apakah perilaku situs diterima (lalu sesuaikan referensi) atau situs perlu diubah. |
 | E2E-022 | IGD kasus ringan: triase, penunjang, pulang | 3 (TC-APP015-003 langkah 3) | Prioritas 4 | Prioritas 2 | Perilaku situs berbeda dari referensi; perlu keputusan apakah diterima. Putuskan apakah perilaku situs diterima (lalu sesuaikan referensi) atau situs perlu diubah. |
@@ -915,6 +941,8 @@ Arti: situs bekerja dengan cara lain atau fiturnya belum ada; perlu diputuskan a
 | E2E-039 | Onboarding staf dengan akses | 4 (TC-APP010-004 langkah 3) | Berkas karyawan yang ditautkan terbuka sendiri sebagai "Edit employee" | daftar terbuka; tidak ada berkas sendiri | Perilaku situs berbeda dari referensi; perlu keputusan apakah diterima. Putuskan apakah perilaku situs diterima (lalu sesuaikan referensi) atau situs perlu diubah. |
 | E2E-039 | Onboarding staf dengan akses | 4 (TC-APP010-004 langkah 3) | Pemberitahuan "Configuration is missed" tidak ditampilkan | pemberitahuan ditampilkan ke akun yang ditautkan | Perilaku situs berbeda dari referensi; perlu keputusan apakah diterima. Putuskan apakah perilaku situs diterima (lalu sesuaikan referensi) atau situs perlu diubah. |
 | E2E-039 | Onboarding staf dengan akses | 5 (TC-APP018-031 langkah 3) | baris dengan role "perawat" | "Roles" bertuliskan "—" | Perilaku situs berbeda dari referensi; perlu keputusan apakah diterima. Putuskan apakah perilaku situs diterima (lalu sesuaikan referensi) atau situs perlu diubah. |
+| E2E-047 | Linen dan kebersihan satu ruangan | 1 (TC-APP025-001 langkah 4) | Baris untuk resep | toast "Tersimpan."; tidak ada baris daftar yang menyebut QA-0D41X5K11-SPREI01 | Perilaku situs berbeda dari referensi; perlu keputusan apakah diterima. Putuskan apakah perilaku situs diterima (lalu sesuaikan referensi) atau situs perlu diubah. |
+| E2E-047 | Linen dan kebersihan satu ruangan | 4 (TC-APP024-007 langkah 3) | baris dengan status "draft" | log baru bertuliskan "sent" | Perilaku situs berbeda dari referensi; perlu keputusan apakah diterima. Putuskan apakah perilaku situs diterima (lalu sesuaikan referensi) atau situs perlu diubah. |
 | E2E-048 | Tata kelola identitas pasien | 4 (TC-APP005-060 langkah 2) | Blok mencantumkan nama item dengan jumlah yang dikeluarkan | tidak ada yang tercantum untuk nama atau MRN | Perilaku situs berbeda dari referensi; perlu keputusan apakah diterima. Putuskan apakah perilaku situs diterima (lalu sesuaikan referensi) atau situs perlu diubah. |
 
 ## Bisa dianggap lulus (Lulus dengan catatan)
@@ -937,6 +965,7 @@ Arti: tujuan langkah tercapai; hanya bentuk atau teksnya yang beda dari referens
 | TC-APP001-052 | Blokir yang salah atau harus dicabut | 1 | Ditolak dengan pesan tentang waktu | ditolak dengan toast "Booking failed" | Penolakannya benar; pesannya umum dan tidak menyebut alasan seperti di referensi. |
 | TC-APP001-056 | Formulir kedatangan: pasien sudah menunggu, departemen belum dipilih | 1 | Toast "This patient is already waiting in that department". Tidak ada nomor baru | toast "Arrival failed" | Penolakannya benar; pesannya umum dan tidak menyebut alasan seperti di referensi. |
 | TC-APP001-056 | Formulir kedatangan: pasien sudah menunggu, departemen belum dipilih | 3 | Tombol nonaktif sampai departemen dipilih | "Arrive" aktif; kolom yang kosong sudah berisi departemen (id terisi) | Departemen sudah terisi otomatis, jadi tombol aktif wajar. |
+| TC-APP001-059 | "Keep counting" dengan pasien yang masih menunggu | 2 | Toast "Arrival number issued" dengan nomor berikutnya (hitungan berlanjut) | toast "Arrival failed": pasien masih punya baris terbuka tanggal 2026-11-01 (No. 001), dan tidak ada nomor baru yang terbit | Penolakannya benar; pesannya umum dan tidak menyebut alasan seperti di referensi. |
 | TC-APP001-060 | Yang ditampilkan papan antrean umum | 2 | Kata seperti "Waiting" | Status "A" | Status tampil sebagai kode singkat "A"; artinya sama (menunggu). |
 
 ### 02 Janji Temu (bisa dianggap lulus)

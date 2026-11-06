@@ -47,6 +47,13 @@ export const SHARED = {
   unit1: { name: unit1, code: 'QA-UNIT-1' },
   dr1: { name: dr1, login: 'qa.dr1' },
   dr2: { name: dr2, login: 'qa.dr2' },
+  /**
+   * Not in the workbook: a consultant of the automation for found blocker 18. The shared Book settings give a daily
+   * quota to DR-1 (3) only, so no day holds the more than 10 bookings (paging) and the more than 4 in a calendar box
+   * that TC-APP001-014/015 (and 02-004/005) need. DR-3 gets a quota of 12 and afternoon hours on every weekday;
+   * DR-1 and DR-2 keep the workbook's settings.
+   */
+  dr3: { name: 'QA dr. Kuota Besar', login: 'qa.dr3' },
   /** Patients are made per test with qa.name(); these are the workbook names. */
   pt1: { name: pt1, dateOfBirth: catalogueRow('PT-1').what.match(/\d{4}-\d{2}-\d{2}/)![0] },
   pt2: { name: pt2 },
@@ -120,8 +127,19 @@ export function bookSettings(): BookSettings {
  */
 export function storableBookSettings(): BookSettings {
   const s = bookSettings();
-  return { ...s, quota: s.quota.filter((q) => q.kind === 'Consultant'), hours: s.hours.filter((h) => h.kind === 'Consultant') };
+  const weekdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+  return {
+    ...s,
+    quota: [...s.quota.filter((q) => q.kind === 'Consultant'), { kind: 'Consultant', resource: SHARED.dr3.name, max: 12 }],
+    hours: [
+      ...s.hours.filter((h) => h.kind === 'Consultant'),
+      ...weekdays.map((weekday) => ({ kind: 'Consultant' as const, resource: SHARED.dr3.name, weekday, from: '13:00', to: '17:00' })),
+    ],
+  };
 }
+
+/** The afternoon times of DR-3 (found blocker 18), one per booking of a day. */
+export const DR3_TIMES = ['13:00', '13:30', '14:00', '14:30', '15:00', '15:30', '16:00', '16:30'];
 
 /** Picks a suggestion of a type-ahead field ("HO · Podomoro", "QA-DEP-1 · QA Poli Umum"). */
 export async function pickOption(field: Locator, typed: string, choose: string | RegExp): Promise<void> {
@@ -155,7 +173,7 @@ export async function ensureMasterData(page: Page): Promise<void> {
 
   const users = MasterListPage.users(page);
   await users.open();
-  for (const dr of [SHARED.dr1, SHARED.dr2]) {
+  for (const dr of [SHARED.dr1, SHARED.dr2, SHARED.dr3]) {
     if ((await (await users.rowsWith('Login', dr.login)).count()) > 0) continue;
     const d = await users.openAdd();
     await d.getByRole('textbox', { name: 'Login' }).fill(dr.login);

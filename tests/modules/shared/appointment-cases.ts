@@ -10,6 +10,7 @@ import {
   releaseWeek,
   SHARED,
   storableBookSettings,
+  DR3_TIMES,
   UNIT1_TIMES,
 } from '../../../lib/ambulatory-data';
 import { installToastRecorder, toastLocator, toastMark, toastsSince } from '../../../lib/assertions';
@@ -51,6 +52,12 @@ async function claim(page: Page, need?: DDayNeed): Promise<string> {
 type Patient = { mrn: string; fullName: string };
 
 /** Books a patient with DR-1 (DEP-1 unless given) and returns to the list. */
+/** A booking with DR-3, the consultant of found blocker 18 (quota 12, weekday afternoons). */
+async function bookDr3(appts: AppointmentsPage, p: Patient, date: string, time: string, department: string = SHARED.dep1.name) {
+  await appts.open();
+  await appts.book({ patient: p.fullName, department, resource: SHARED.dr3.name, type: TYPE, date, time });
+}
+
 async function bookDr1(appts: AppointmentsPage, p: Patient, date: string, time?: string, department: string = SHARED.dep1.name) {
   await appts.open();
   await appts.book({ patient: p.fullName, department, resource: SHARED.dr1.name, type: TYPE, date, time });
@@ -316,6 +323,13 @@ export const CASES = {
     const dDay = await claim(page);
     for (const [i, p] of pts.entries()) await bookDr1(appts, p, dDay, DR1_TIMES[i]);
     await bookDr1(appts, later, addDays(dDay, 1));
+    // Eight more on D-day with DR-3 (found blocker 18): more than 10 rows, so the list pages.
+    const extra: Patient[] = [];
+    for (const time of DR3_TIMES) {
+      const p = await registerPatient(page, SHARED.pt2.name, qa.token());
+      await bookDr3(appts, p, dDay, time);
+      extra.push(p);
+    }
 
     await qa.step(1, async () => {
       await appts.open();
@@ -332,7 +346,14 @@ export const CASES = {
       // allRowTexts ends on the last page (the day may hold more than one page of rows): the summary of the first page is read.
       await appts.firstPage();
       await expect(appts.pagingSummary).toHaveText(/^Showing 1–\d+ of \d+$/);
-      qa.blocked(2, 18);
+      const summary = await appts.pagingSummary.innerText();
+      const total = Number(summary.match(/of (\d+)$/)?.[1] ?? 0);
+      qa.note(2, `${summary}; the test booked ${pts.length + extra.length} on ${dDay}`);
+      expect(summary).toMatch(/^Showing 1–10 of \d+$/);
+      expect(total).toBeGreaterThan(10);
+      const first = (await appts.rowTexts()).map((r) => r.When);
+      expect(first).toHaveLength(10);
+      expect([...first].sort().reverse(), 'latest time first').toEqual(first);
     });
 
     await qa.step(3, async () => {
@@ -361,7 +382,16 @@ export const CASES = {
       for (const c of await appts.rows().getByRole('checkbox').all()) await expect(c).toBeChecked();
     });
 
-    qa.blocked(6, 18);
+    await qa.step(6, async () => {
+      // Page 1 is ticked (step 5); page 2 shows the next rows, none ticked.
+      const firstPage = (await appts.rowTexts()).map((r) => `${r.Patient}|${r.When}`);
+      expect(await appts.nextPage(), 'a page 2').toBe(true);
+      await expect(appts.pagingSummary).toHaveText(/^Showing 11–\d+ of \d+$/);
+      const second = (await appts.rowTexts()).map((r) => `${r.Patient}|${r.When}`);
+      expect(second.length).toBeGreaterThan(0);
+      expect(second.some((r) => firstPage.includes(r))).toBe(false);
+      for (const c of await appts.rows().getByRole('checkbox').all()) await expect(c).not.toBeChecked();
+    });
   },
 
   calendars: async ({ page, qa }, route) => {
@@ -376,6 +406,10 @@ export const CASES = {
     await bookDr1(appts, pts[0], dDay, '08:00');
     await bookDr1(appts, pts[1], dDay, '08:30');
     await bookDr1(appts, pts[2], dDay, '09:00', SHARED.dep2.name);
+    // Two more for DEP-1 with DR-3 (found blocker 18): five on D-day (a box shows four, then "+1") and four for DEP-1
+    // (a line shows three, then "+1").
+    const more = [await registerPatient(page, SHARED.pt2.name, qa.token()), await registerPatient(page, SHARED.pt3.name, qa.token())];
+    for (const [i, p] of more.entries()) await bookDr3(appts, p, dDay, DR3_TIMES[i]);
     await appts.open();
     // D-day here is the first weekday with no booking at all (lib/ambulatory-data.ts, "fresh").
   const dayIndex = weekdayOf(dDay);
@@ -401,9 +435,14 @@ export const CASES = {
       for (const [p, time] of [[pts[0], '08:00'], [pts[1], '08:30'], [pts[2], '09:00']] as const) {
         const item = appts.dayItems(box).filter({ hasText: p.fullName });
         await expect(item).toHaveCount(1);
-        expect(to24h(await item.locator('p').first().innerText())).toBe(time);
+        const shown = await item.count();
+        if (shown) expect(to24h(await item.locator('p').first().innerText())).toBe(time);
       }
-      qa.blocked(2, 18);
+      const items = await appts.dayItems(box).count();
+      const plus = (await box.getByText(/^\+\s*\d+/).allInnerTexts()).join(' ');
+      qa.note(2, `D-day's box: ${items} bookings shown, then "${plus}" (the test booked 5)`);
+      expect(items).toBe(4);
+      expect(plus.replace(/\s+/g, '')).toBe('+1');
     });
 
     await qa.step(3, async () => {
@@ -420,10 +459,13 @@ export const CASES = {
       const dep1 = appts.opdCells(appts.opdLine(SHARED.dep1.name));
       const dep2 = appts.opdCells(appts.opdLine(SHARED.dep2.name));
       await expect(dep1).toHaveCount(7);
-      await expect(appts.dayItems(dep1.nth(dayIndex))).toHaveCount(2);
       await expect(appts.dayItems(dep2.nth(dayIndex))).toHaveCount(1);
       await expect(dep2.nth(dayIndex)).toContainText(pts[2].fullName);
-      qa.blocked(4, 18);
+      const dep1Day = dep1.nth(dayIndex);
+      const plus = (await dep1Day.getByText(/^\+\s*\d+/).allInnerTexts()).join(' ');
+      qa.note(4, `DEP-1 on D-day: ${await appts.dayItems(dep1Day).count()} bookings shown, then "${plus}" (the test booked 4)`);
+      expect(await appts.dayItems(dep1Day).count()).toBe(3);
+      expect(plus.replace(/\s+/g, '')).toBe('+1');
     });
 
     await qa.step(5, async () => {

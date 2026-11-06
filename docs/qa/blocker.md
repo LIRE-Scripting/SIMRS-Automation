@@ -1,10 +1,10 @@
 # Blocker: masalah yang menghentikan pengujian
 
-Dibangun 2026-11-01 22:49 WIB dari `reports/summary/run-summary.json` (hasil terbaru setiap test case dan rantai). Bangun ulang: `npm run qa:run-summary && npm run qa:findings-md`.
+Dibangun 2026-11-02 07:35 WIB dari `reports/summary/run-summary.json` (hasil terbaru setiap test case dan rantai). Bangun ulang: `npm run qa:run-summary && npm run qa:findings-md`.
 
 Blocker = masalah di situs (atau data/set-up yang belum ada) yang membuat sebuah langkah **tidak bisa dijalankan sama sekali**. Langkah itu dan langkah sesudahnya berstatus **Terblokir**, tidak dihitung lulus maupun gagal. Perbedaan hasil pada langkah yang bisa dijalankan ada di [deviations.md](deviations.md); error server ada di [http-5xx.md](http-5xx.md).
 
-Saat ini **44 blocker** masih menghentikan **425 test case** dan **38 rantai E2E**; 13 blocker lainnya sudah selesai atau tidak lagi menghentikan test.
+Saat ini **42 blocker** masih menghentikan **400 test case** dan **36 rantai E2E**; 15 blocker lainnya sudah selesai atau tidak lagi menghentikan test.
 
 Kolom **Jenis** menunjukkan siapa yang harus bergerak: **Bug situs** (fiturnya ada tetapi gagal; Development), **Fitur belum ada** (situs belum punya fiturnya; product owner memutuskan, lalu Development), atau **Set-up & data uji** (data, akun, atau konfigurasi yang belum ada di situs bersama; administrator situs atau tester).
 
@@ -14,12 +14,11 @@ Blocker 1–16 berasal dari checklist `reference/00-blockers-checklist-linked.xl
 
 | No | Blocker | Jenis | Test case | Rantai | Modul | Penanggung jawab |
 |---:|---|---|---:|---|---|---|
-| [40](#blocker-40) | Picker dan daftar hanya menjangkau data awal: data di luarnya tidak bisa dipilih atau ditemukan | Bug situs | 67 | E2E-003, E2E-010, E2E-012, E2E-014, E2E-027, E2E-032, E2E-039, E2E-044 | 01 Rawat Jalan, 02 Janji Temu, 04 Rawat Inap, 05 Farmasi, 07 Persediaan, 10 SDM, 12 Radiologi (RIS), 14 Kasir & Tagihan, 15 IGD, 17 Penggajian, 19 Keuangan, 22 Layanan Jasa, 24 Tata Graha, 26 Pemeliharaan, 27 Aset Tetap | Development |
+| [40](#blocker-40) | Picker dan daftar hanya menjangkau data awal: data di luarnya tidak bisa dipilih atau ditemukan | Bug situs | 66 | E2E-003, E2E-010, E2E-012, E2E-014, E2E-027, E2E-032, E2E-039, E2E-044 | 01 Rawat Jalan, 02 Janji Temu, 04 Rawat Inap, 05 Farmasi, 07 Persediaan, 10 SDM, 12 Radiologi (RIS), 14 Kasir & Tagihan, 15 IGD, 17 Penggajian, 19 Keuangan, 22 Layanan Jasa, 24 Tata Graha, 26 Pemeliharaan | Development |
 | [2](#blocker-2) | Halaman Donor tidak memuat daftar donor ("failed to list donors"; sampai 2026-10-30 HTTP 500) | Bug situs | 58 | E2E-007, E2E-030, E2E-031 | 06 Transfusi Darah | Development |
 | [4](#blocker-4) | Tenants dan Entitlements menolak administrator rumah sakit ("missing required privilege"; sampai 2026-10-30 HTTP 500) | Set-up & data uji | 50 |  | 01 Rawat Jalan, 02 Janji Temu, 03 Pelayanan Pasien, 04 Rawat Inap, 05 Farmasi, 06 Transfusi Darah, 07 Persediaan, 08 Kamar Operasi, 09 Pengadaan, 10 SDM, 11 Laboratorium, 12 Radiologi (RIS), 13 Diet, 14 Kasir & Tagihan, 15 IGD, 16 Rekam Medis (MRD), 17 Penggajian, 18 Pengaturan, 19 Keuangan, 20 Anggaran, 21 Sterilisasi (CSSD), 22 Layanan Jasa, 23 Tender & Kontrak, 24 Tata Graha, 25 Linen, 26 Pemeliharaan, 27 Aset Tetap | Development; peminta untuk akunnya |
 | [13](#blocker-13) | Set-up cabang belum ada | Set-up & data uji | 28 | E2E-001, E2E-005, E2E-015, E2E-036, E2E-037 | 05 Farmasi, 15 IGD, 19 Keuangan, 21 Sterilisasi (CSSD) | Tester, dengan persetujuan blocker 15 |
 | [5](#blocker-5) | 28 daftar tidak termuat dengan "Semua cabang" | Bug situs | 29 |  | 06 Transfusi Darah, 07 Persediaan, 09 Pengadaan, 10 SDM, 14 Kasir & Tagihan, 17 Penggajian, 22 Layanan Jasa, 23 Tender & Kontrak | Development; tester untuk solusi sementara |
-| [14](#blocker-14) | 34 journey butuh data yang dibuat di aplikasi lain | Set-up & data uji | 21 | E2E-016, E2E-047 | 25 Linen, 27 Aset Tetap | Tester, dengan persetujuan blocker 15 |
 | [10](#blocker-10) | Item yang disimpan tidak tampil di daftar mana pun | Bug situs | 14 |  | 17 Penggajian | Development |
 | [23](#blocker-23) | Ward care tidak menampilkan pasien rawat inap cabang | Bug situs | 12 | E2E-004 | 04 Rawat Inap | Development |
 | [45](#blocker-45) | Tahun buku 2026 tidak punya periode, dan periodenya tidak bisa dibuat lewat layar: jurnal, voucher, atau pembayaran bertanggal hari ini tidak bisa disimpan | Fitur belum ada | 11 |  | 19 Keuangan | Development |
@@ -41,15 +40,14 @@ Blocker 1–16 berasal dari checklist `reference/00-blockers-checklist-linked.xl
 | [6](#blocker-6) | "Record code" tidak bisa disimpan dengan "Semua cabang" | Bug situs | 4 |  | 16 Rekam Medis (MRD) | Development |
 | [7](#blocker-7) | "Hitung jasa" tidak pernah berhasil | Bug situs | 3 | E2E-038 | 10 SDM | Development |
 | [9](#blocker-9) | Kunjungan IGD yang sudah ditutup tidak bisa diterima lagi; "Tandai hidup" tidak bisa dicapai | Fitur belum ada | 4 |  | 15 IGD | Product owner, lalu Development |
-| [18](#blocker-18) | Lebih dari 3 booking dalam satu hari tidak bisa dibuat dengan pengaturan buku bersama | Set-up & data uji | 4 |  | 01 Rawat Jalan, 02 Janji Temu | Peminta (data uji), lalu tester |
 | [29](#blocker-29) | Penyerahan obat dari order tidak bisa mengubah Diserahkan, Diminta, atau Generik | Fitur belum ada | 3 |  | 05 Farmasi | Development |
+| [34](#blocker-34) | Diskon di atas batas kasir tidak bisa menunggu persetujuan: rantai persetujuan diskon billing belum diatur | Fitur belum ada | 3 |  | 14 Kasir & Tagihan | Development (prosesnya), lalu administrator site (langkahnya) |
 | [38](#blocker-38) | Menyimpan hak akses role gagal ("Failed to save rights.") | Bug situs | 2 | E2E-019 | 09 Pengadaan, 18 Pengaturan | Development |
 | [42](#blocker-42) | Uang muka (imprest) tidak bisa diajukan: kelayakan imprest cabang tidak bisa diatur | Bug situs | 2 | E2E-042 | 19 Keuangan | Administrator site, lalu Development |
 | [51](#blocker-51) | Daftar lama menampilkan data baru: item baru di Master Item, dan baris penyerahan baru di Issue Lines farmasi | Bug situs | 1 | E2E-008, E2E-035 | 07 Persediaan | Development |
 | [25](#blocker-25) | Menyimpan kantong darah luar atau catatan kontrol mutu gagal ("failed to receive external unit", "failed to save quality control") | Bug situs | 2 |  | 06 Transfusi Darah | Development |
 | [26](#blocker-26) | Gudang tidak bisa dibuat di situs (Gudang tidak punya tombol "Tambah") | Fitur belum ada | 2 |  | 05 Farmasi, 07 Persediaan | Development; administrator site untuk gudangnya |
 | [27](#blocker-27) | Menyimpan kit gagal ("saveKitComponents: 500 stock update failed") | Bug situs | 2 |  | 05 Farmasi, 07 Persediaan | Development |
-| [34](#blocker-34) | Diskon di atas batas kasir tidak bisa menunggu persetujuan: rantai persetujuan diskon billing belum diatur | Fitur belum ada | 2 |  | 14 Kasir & Tagihan | Development (prosesnya), lalu administrator site (langkahnya) |
 | [37](#blocker-37) | 12 komponen gaji dari workbook tidak ada di situs, dan tidak ada layar untuk membuatnya | Fitur belum ada | 2 |  | 17 Penggajian | Development / Product owner |
 | [41](#blocker-41) | Pasien tidak bisa didaftarkan di Kemayoran (BR-B): "Register" menjawab "Registration failed" | Bug situs | 2 |  | 01 Rawat Jalan | Development |
 | [56](#blocker-56) | "Bayar" saat tidak ada lagi yang ditagih gagal dengan error database | Bug situs | 2 |  | 14 Kasir & Tagihan | Development |
@@ -217,19 +215,6 @@ Blocker 1–16 berasal dari checklist `reference/00-blockers-checklist-linked.xl
 - **Sumber:** 00-blockers-checklist-linked.xlsx baris 17
 - **Test case terhenti:** E2E-001, E2E-005, E2E-015, E2E-036, E2E-037, TC-APP005-039, TC-APP005-040, TC-APP015-027, TC-APP015-028, TC-APP015-029, TC-APP015-030, TC-APP015-031, TC-APP015-032, TC-APP015-034, TC-APP015-037, TC-APP015-040, TC-APP015-041, TC-APP015-042, TC-APP015-052, TC-APP015-053, TC-APP015-056, TC-APP015-057, TC-APP019-010, TC-APP019-058, TC-APP019-059, TC-APP019-060, TC-APP019-061, TC-APP019-080, TC-APP019-081, TC-APP019-082, TC-APP021-005, TC-APP021-006, TC-APP021-007
 
-### Blocker 14
-
-**34 journey butuh data yang dibuat di aplikasi lain**
-
-- **Jenis:** Set-up & data uji
-- **Masalah:** 34 journey dimulai dari data yang dibuat aplikasi lain (pegawai, item stok, PR/PO yang disetujui, voucher, rawat inap). Situs tidak menyediakan data uji itu, dan di layar desk data dirujuk dengan id internal yang diketik manual. Dijalankan lewat rantai E2E dan data buatan test.
-- **Dampak:** 21 test case dan rantai E2E-016, E2E-047 terhenti (25 Linen, 27 Aset Tetap).
-- **Perbaikan:** Jalankan dulu alur pengisi data, di cabang yang sama, dan catat id-nya: Settings, lalu SDM, Persediaan, Pengadaan, dan Finance, lalu yang lain. ID alurnya ada di baris "Needs data or a step of another application" di setiap sheet 00-conditions-and-blockers.xlsx.
-- **Penanggung jawab:** Tester, dengan persetujuan blocker 15
-- **Cek ulang:** Bukan cacat situs: journey butuh data dari aplikasi lain; dijalankan lewat rantai E2E dan data buatan test.
-- **Sumber:** 00-blockers-checklist-linked.xlsx baris 18
-- **Test case terhenti:** E2E-016, E2E-047, TC-APP025-001, TC-APP025-002, TC-APP025-004, TC-APP025-005, TC-APP025-006, TC-APP025-008, TC-APP025-009, TC-APP025-010, TC-APP025-012, TC-APP025-013, TC-APP025-014, TC-APP027-002, TC-APP027-004, TC-APP027-005, TC-APP027-006, TC-APP027-007, TC-APP027-008, TC-APP027-009, TC-APP027-010, TC-APP027-011, TC-APP027-012
-
 ### Blocker 17
 
 **Pengaturan buku: baris kuota atau jam buka tidak bisa diubah ke "Unit"**
@@ -242,19 +227,6 @@ Blocker 1–16 berasal dari checklist `reference/00-blockers-checklist-linked.xl
 - **Cek ulang:** Dicek otomatis oleh test-nya di setiap run (langkah dicoba, ditandai blocker hanya bila gejalanya muncul).
 - **Sumber:** ditemukan otomasi (lib/qa-data/found-blockers.ts)
 - **Test case terhenti:** TC-APP001-011, TC-APP001-013, TC-APP001-018, TC-APP001-044, TC-APP001-049, TC-APP002-001, TC-APP002-003, TC-APP002-008, TC-APP002-013
-
-### Blocker 18
-
-**Lebih dari 3 booking dalam satu hari tidak bisa dibuat dengan pengaturan buku bersama**
-
-- **Jenis:** Set-up & data uji
-- **Masalah:** Pengaturan buku bersama hanya memberi kuota harian ke DR-1 (3) dan UNIT-1 (2), jadi satu hari paling banyak 3 booking; test yang butuh lebih dari 3 booking sehari tidak bisa disiapkan.
-- **Dampak:** 4 test case terhenti (01 Rawat Jalan, 02 Janji Temu).
-- **Perbaikan:** 1. Tambahkan ke data bersama kuota yang mengizinkan lebih dari 10 booking sehari (misalnya DR-2 = 10), atau sebutkan hari yang dipakai. 2. Jalankan lagi TC-APP001-014 dan 015.
-- **Penanggung jawab:** Peminta (data uji), lalu tester
-- **Cek ulang:** Sebagian test menandainya tanpa mencoba langkahnya dan belum ada pengawas: belum dicek ulang sejak ditemukan.
-- **Sumber:** ditemukan otomasi (lib/qa-data/found-blockers.ts)
-- **Test case terhenti:** TC-APP001-014, TC-APP001-015, TC-APP002-004, TC-APP002-005
 
 ### Blocker 19
 
@@ -418,12 +390,12 @@ Blocker 1–16 berasal dari checklist `reference/00-blockers-checklist-linked.xl
 
 - **Jenis:** Fitur belum ada
 - **Masalah:** Diskon di atas batas kasir tidak bisa menunggu persetujuan: rantai persetujuan diskon tagihan (billingdiscount) tidak ada dan tidak bisa dibuat di Workflow (hanya discharge dan purchase_order). Penjualan tidak pernah berstatus "Menunggu persetujuan".
-- **Dampak:** 2 test case terhenti (14 Kasir & Tagihan).
+- **Dampak:** 3 test case terhenti (14 Kasir & Tagihan).
 - **Perbaikan:** 1. Tambahkan proses "billingdiscount" ke Workflow (Development: layar hanya menawarkan discharge dan purchase_order), lalu beri satu langkah dengan penyetuju Head cashier. 2. Jalankan lagi TC-APP014-007, 028, dan 029.
 - **Penanggung jawab:** Development (prosesnya), lalu administrator site (langkahnya)
 - **Cek ulang:** Dicek otomatis oleh test-nya di setiap run (langkah dicoba, ditandai blocker hanya bila gejalanya muncul).
 - **Sumber:** ditemukan otomasi (lib/qa-data/found-blockers.ts)
-- **Test case terhenti:** TC-APP014-009, TC-APP014-029
+- **Test case terhenti:** TC-APP014-009, TC-APP014-028, TC-APP014-029
 
 ### Blocker 36
 
@@ -470,12 +442,12 @@ Blocker 1–16 berasal dari checklist `reference/00-blockers-checklist-linked.xl
 
 - **Jenis:** Bug situs
 - **Masalah:** Picker dan daftar hanya menjangkau data awal: picker menyaring data yang dimuat sekali (50 pertama menurut nama) dan daftar desk hanya 22 baris tanpa halaman. Data baru di luar itu tidak bisa dipilih atau ditemukan. Test menyiasatinya dengan kode yang terurut paling awal bila memungkinkan.
-- **Dampak:** 67 test case dan rantai E2E-003, E2E-010, E2E-012, E2E-014, E2E-027, E2E-032, E2E-039, E2E-044 terhenti (01 Rawat Jalan, 02 Janji Temu, 04 Rawat Inap, 05 Farmasi, 07 Persediaan, 10 SDM, 12 Radiologi (RIS), 14 Kasir & Tagihan, 15 IGD, 17 Penggajian, 19 Keuangan, 22 Layanan Jasa, 24 Tata Graha, 26 Pemeliharaan, 27 Aset Tetap).
+- **Dampak:** 66 test case dan rantai E2E-003, E2E-010, E2E-012, E2E-014, E2E-027, E2E-032, E2E-039, E2E-044 terhenti (01 Rawat Jalan, 02 Janji Temu, 04 Rawat Inap, 05 Farmasi, 07 Persediaan, 10 SDM, 12 Radiologi (RIS), 14 Kasir & Tagihan, 15 IGD, 17 Penggajian, 19 Keuangan, 22 Layanan Jasa, 24 Tata Graha, 26 Pemeliharaan).
 - **Perbaikan:** 1. Cari di picker dan daftar lewat server (atau muat semua record); beri daftar desk halaman atau pencarian, terbaru di atas. 2. Jalankan lagi test case yang tercantum dan rantai E2E-001, 003, 008, 010, 012, 013, 014, 018, 025, 026, 027, 029, 032, 035, 044, dan 048.
 - **Penanggung jawab:** Development
 - **Cek ulang:** Dicek otomatis oleh test-nya di setiap run (langkah dicoba, ditandai blocker hanya bila gejalanya muncul).
 - **Sumber:** ditemukan otomasi (lib/qa-data/found-blockers.ts)
-- **Test case terhenti:** E2E-003, E2E-010, E2E-012, E2E-014, E2E-027, E2E-032, E2E-039, E2E-044, TC-APP001-023, TC-APP001-053, TC-APP002-017, TC-APP004-006, TC-APP004-017, TC-APP004-018, TC-APP004-022, TC-APP004-023, TC-APP004-034, TC-APP004-039, TC-APP004-047, TC-APP005-018, TC-APP005-042, TC-APP007-008, TC-APP010-008, TC-APP010-009, TC-APP010-010, TC-APP010-011, TC-APP010-012, TC-APP010-013, TC-APP010-016, TC-APP010-017, TC-APP010-018, TC-APP010-019, TC-APP010-020, TC-APP010-021, TC-APP010-022, TC-APP010-023, TC-APP010-032, TC-APP010-033, TC-APP010-039, TC-APP012-029 … (+35)
+- **Test case terhenti:** E2E-003, E2E-010, E2E-012, E2E-014, E2E-027, E2E-032, E2E-039, E2E-044, TC-APP001-023, TC-APP001-053, TC-APP002-017, TC-APP004-006, TC-APP004-017, TC-APP004-018, TC-APP004-022, TC-APP004-023, TC-APP004-034, TC-APP004-039, TC-APP004-047, TC-APP005-018, TC-APP005-042, TC-APP007-008, TC-APP010-008, TC-APP010-009, TC-APP010-010, TC-APP010-011, TC-APP010-012, TC-APP010-013, TC-APP010-016, TC-APP010-017, TC-APP010-018, TC-APP010-019, TC-APP010-020, TC-APP010-021, TC-APP010-022, TC-APP010-023, TC-APP010-032, TC-APP010-033, TC-APP010-039, TC-APP012-029 … (+34)
 
 ### Blocker 41
 
@@ -638,8 +610,10 @@ Blocker 1–16 berasal dari checklist `reference/00-blockers-checklist-linked.xl
 | No | Blocker | Keterangan |
 |---:|---|---|
 | 1 | Login tetap di halaman login | Login dari alamat bawaan tidak berlanjut ke halaman awal walaupun server menerima login dan cookie sudah terpasang; dengan tujuan /apps langsung berhasil. Test memakai /apps sebagai jalan keluar. |
+| 14 | 34 journey butuh data yang dibuat di aplikasi lain | 34 journey dimulai dari data yang dibuat aplikasi lain (pegawai, item stok, PR/PO yang disetujui, voucher, rawat inap). Situs tidak menyediakan data uji itu, dan di layar desk data dirujuk dengan id internal yang diketik manual. Sejak 2026-11-01 test Linen dan Aset Tetap membuat sendiri item Inventory-nya (X-SPREI/X-KAIN dengan stok di gudang linen GLB, X-USG-01 dengan batch di gudang umum GU05-00-00), sehingga perintah kerja, sirkulasi, pemasangan, aktivasi, penyusutan, dan perpindahan aset dijalankan. |
 | 15 | Belum ada izin membuat data; pasien belum dipastikan fiktif | Belum ada izin membuat data di situs bersama, dan belum dipastikan data pasien di situs adalah data rekaan. Sudah dijawab: izin menulis diberikan 2026-10-21 (QA_ALLOW_WRITES). |
 | 16 | Hanya akun administrator yang dipakai | Hanya akun administrator yang diizinkan, jadi pembatasan per peran tidak bisa diuji. Sudah dijawab: akun per peran (U3–U8) dibuat 2026-10-20. |
+| 18 | Lebih dari 3 booking dalam satu hari tidak bisa dibuat dengan pengaturan buku bersama | Pengaturan buku bersama hanya memberi kuota harian ke DR-1 (3) dan UNIT-1 (2), jadi satu hari paling banyak 3 booking; test yang butuh lebih dari 10 booking sehari (halaman daftar) atau lebih dari 4 dalam satu kotak kalender tidak bisa disiapkan. Sejak 2026-11-01 otomasi menambah konsultan uji DR-3 (qa.dr3, "QA dr. Kuota Besar") dengan kuota 12 per hari dan jam buka Senin–Jumat 13:00–17:00; DR-1 dan DR-2 tetap sesuai workbook. |
 | 30 | Rantai persetujuan purchase order hanya satu langkah, bukan empat seperti data bersama (selesai 2026-11-01) | Rantai persetujuan PO hanya satu langkah, bukan empat seperti data bersama. Selesai 2026-11-01: rantai diatur menjadi empat langkah sesuai workbook (editor hanya memberi nama langkah, tanpa peran). |
 | 32 | Menggeser slot kamar operasi satu jam menjawab HTTP 500 (selesai 2026-10-31) | Menggeser jadwal kamar operasi satu jam menjawab HTTP 500. Selesai 2026-10-31: untuk permintaan yang sudah divalidasi, jadwal bergeser ("Saved"). |
 | 35 | Harga item cabang (margin dan pajak) tidak bisa disimpan (selesai 2026-10-31) | Harga item cabang (margin dan pajak) tidak bisa disimpan. Selesai 2026-10-31: tersimpan bila margin diketik sebagai pecahan. |

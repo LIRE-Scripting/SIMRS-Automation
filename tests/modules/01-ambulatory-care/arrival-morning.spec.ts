@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import { expect, qaTest, test } from '../../../fixtures/e2e';
 import { ensureMasterData, registerPatient, SHARED } from '../../../lib/ambulatory-data';
-import { installToastRecorder, toastLocator } from '../../../lib/assertions';
+import { installToastRecorder, toastLocator, toastMark, toastsSince } from '../../../lib/assertions';
 import { authFileOf } from '../../../lib/config';
 import { addDays, todayWib } from '../../../lib/dates';
 import { ArrivalPage } from '../../../pages/ambulatory/ArrivalPage';
@@ -72,7 +72,8 @@ if (process.env.QA_TWO_DAY === 'prepare') {
 
 if (process.env.QA_MORNING === '1') {
   qaTest('TC-APP001-058', async ({ page, qa }) => {
-    test.setTimeout(40 * 60_000);
+    // The test waits for 06:50 and 07:05 WIB: its time runs until 07:05 plus 20 minutes, whenever it starts.
+    test.setTimeout(Math.max(0, untilWib('07:05')) + 20 * 60_000);
     if (untilWib('06:50') < -5 * 60_000) throw new Error(`TC-APP001-058 runs at 06:50 and 07:05 WIB; it is ${clockWib()}`);
     const arrival = new ArrivalPage(page);
     const t = qa.token();
@@ -145,13 +146,22 @@ if (process.env.QA_MORNING === '1') {
       await qa.step(2, async () => {
         const last = await arrival.lastNumber(day1.department);
         await arrival.open();
-        await arrival.arrive(day1.patient.fullName, day1.department);
-        await expect(toastLocator(page, /^Arrival number issued$/)).toBeVisible();
+        // The site may answer without a toast: it hands back the open row of yesterday instead of a new number.
+        const d = await arrival.openArrive();
+        await arrival.pickPatient(d, day1.patient.fullName);
+        await arrival.pickDepartment(d, day1.department);
+        const mark = await toastMark(page);
+        await arrival.submit(d).click();
+        await expect(d).toBeHidden({ timeout: 15_000 }).catch(() => {});
+        const toasts = await toastsSince(page, mark);
+        qa.note(2, `"Arrive" for ${day1.patient.fullName}: ${toasts.length ? `toast "${toasts.join(' / ')}"` : 'no toast; the dialog closes'}`);
+        const issued = toasts.includes('Arrival number issued');
+        if (!issued) qa.deviation(2, 'Toast "Arrival number issued" with the next number (the count goes on)', `${toasts.length ? `toast "${toasts.join(' / ')}"` : 'no toast'}: the patient still has the open row of ${day1.date} (No. ${day1.number}), and no new number is issued`);
         await arrival.open();
         const rows = arrival.row(day1.patient.fullName, day1.department);
         const n = (await (await arrival.cell(rows.last(), 'No.')).innerText()).trim();
         qa.note(2, `No. ${n} today (yesterday ${day1.number}; the last number on today's list before: ${last ? pad(last) : 'none'})`);
-        if (n === '001' && day1.number !== '000') qa.deviation(2, 'Toast "Arrival number issued" with the next number (the count goes on)', `No. "001": the count restarted although the rule is "Keep counting" (yesterday ${day1.number})`);
+        if (issued && n === '001' && day1.number !== '000') qa.deviation(2, 'Toast "Arrival number issued" with the next number (the count goes on)', `No. "001": the count restarted although the rule is "Keep counting" (yesterday ${day1.number})`);
       });
     } finally {
       await arrival.open();
