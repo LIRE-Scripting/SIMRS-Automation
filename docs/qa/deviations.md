@@ -1,6 +1,6 @@
 # Deviasi: langkah yang berjalan tetapi hasilnya berbeda dari referensi
 
-Dibangun 2026-11-09 09:59 WIB dari `reports/summary/run-summary.json` (hasil terbaru setiap test case dan rantai). Bangun ulang: `npm run qa:run-summary && npm run qa:findings-md`.
+Dibangun 2026-11-09 10:41 WIB dari `reports/summary/run-summary.json` (hasil terbaru setiap test case dan rantai). Bangun ulang: `npm run qa:run-summary && npm run qa:findings-md`.
 
 Deviasi = langkah **bisa dijalankan**, tetapi hasil di situs tidak sama dengan *Expected Result* di workbook referensi. Setiap deviasi sudah ditinjau (scripts/qa/deviation-review.ts, 2026-11-01) dan diberi saran: perbaikan, keputusan yang dibutuhkan, atau catatan.
 

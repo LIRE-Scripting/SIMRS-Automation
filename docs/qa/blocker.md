@@ -1,6 +1,6 @@
 # Blocker: masalah yang menghentikan pengujian
 
-Dibangun 2026-11-09 09:59 WIB dari `reports/summary/run-summary.json` (hasil terbaru setiap test case dan rantai). Bangun ulang: `npm run qa:run-summary && npm run qa:findings-md`.
+Dibangun 2026-11-09 10:41 WIB dari `reports/summary/run-summary.json` (hasil terbaru setiap test case dan rantai). Bangun ulang: `npm run qa:run-summary && npm run qa:findings-md`.
 
 Blocker = masalah di situs (atau data/set-up yang belum ada) yang membuat sebuah langkah **tidak bisa dijalankan sama sekali**. Langkah itu dan langkah sesudahnya berstatus **Terblokir**, tidak dihitung lulus maupun gagal. Perbedaan hasil pada langkah yang bisa dijalankan ada di [deviations.md](deviations.md); error server ada di [http-5xx.md](http-5xx.md).
 
@@ -134,7 +134,7 @@ Blocker 1–16 berasal dari checklist `reference/00-blockers-checklist-linked.xl
 - **Dampak:** 4 test case terhenti (15 IGD).
 - **Perbaikan:** a) Putuskan bagaimana pasien yang sudah dikenal datang lagi; izinkan encounter baru untuk record yang sama. b) Tawarkan "Mark as alive" pada baris tertutup pasien yang datang sudah meninggal.
 - **Penanggung jawab:** Product owner, lalu Development
-- **Cek ulang:** Masih berlaku (pengawas blocker, 2026-11-09): QA-Pasien Walk-in MW8NCYO9001: discharged, not offered by Registration
+- **Cek ulang:** Masih berlaku (pengawas blocker, 2026-11-09): QA-Pasien Walk-in MW8PIFT5001: discharged, not offered by Registration
 - **Sumber:** 00-blockers-checklist-linked.xlsx baris 13
 - **Test case terhenti:** TC-APP015-030, TC-APP015-046, TC-APP015-047, TC-APP015-048
 
@@ -232,7 +232,7 @@ Blocker 1–16 berasal dari checklist `reference/00-blockers-checklist-linked.xl
 - **Dampak:** 1 test case terhenti (01 Rawat Jalan).
 - **Perbaikan:** 1. Tambahkan edit di dialog detail (atau sebutkan tempat koreksi dilakukan). 2. Jalankan lagi TC-APP001-039.
 - **Penanggung jawab:** Product owner, lalu Development
-- **Cek ulang:** Sebagian test menandainya tanpa mencoba langkahnya dan belum ada pengawas: belum dicek ulang sejak ditemukan.
+- **Cek ulang:** Masih berlaku (pengawas blocker, 2026-11-09): details buttons: Consent, Renew, Close
 - **Sumber:** ditemukan otomasi (lib/qa-data/found-blockers.ts)
 - **Test case terhenti:** TC-APP001-039
 
@@ -330,7 +330,7 @@ Blocker 1–16 berasal dari checklist `reference/00-blockers-checklist-linked.xl
 - **Dampak:** 5 test case dan rantai E2E-008 terhenti (07 Persediaan, 09 Pengadaan).
 - **Perbaikan:** 1. Perbaiki keempat aksi (atau sebutkan nilai gudang yang diharapkan "Store"). 2. Jalankan lagi TC-APP009-046, 049, dan 051.
 - **Penanggung jawab:** Development
-- **Cek ulang:** Sebagian test menandainya tanpa mencoba langkahnya dan belum ada pengawas: belum dicek ulang sejak ditemukan.
+- **Cek ulang:** Masih berlaku (pengawas blocker, 2026-11-09): grn after a saved gate: "procurement: invalid input: receive at the gate first"
 - **Sumber:** ditemukan otomasi (lib/qa-data/found-blockers.ts)
 - **Test case terhenti:** E2E-008, TC-APP007-024, TC-APP009-021, TC-APP009-046, TC-APP009-049, TC-APP009-051
 
@@ -386,7 +386,7 @@ Blocker 1–16 berasal dari checklist `reference/00-blockers-checklist-linked.xl
 - **Dampak:** 3 test case terhenti (17 Penggajian).
 - **Perbaikan:** 1. Muat 12 komponen workbook ke tenant uji (atau berikan angka untuk GAPOK, POTBPJS, dan TUNJAB). 2. Jalankan lagi TC-APP017-002, 003, dan 011.
 - **Penanggung jawab:** Development / Product owner
-- **Cek ulang:** Sebagian test menandainya tanpa mencoba langkahnya dan belum ada pengawas: belum dicek ulang sejak ditemukan.
+- **Cek ulang:** Masih berlaku (pengawas blocker, 2026-11-09): batch lines: GAPOK, POTBPJS, TUNJAB
 - **Sumber:** ditemukan otomasi (lib/qa-data/found-blockers.ts)
 - **Test case terhenti:** TC-APP017-002, TC-APP017-003, TC-APP017-011
 
@@ -414,7 +414,7 @@ Blocker 1–16 berasal dari checklist `reference/00-blockers-checklist-linked.xl
 - **Dampak:** 2 test case dan rantai E2E-042 terhenti (19 Keuangan).
 - **Perbaikan:** 1. Jadikan baris kelayakan imprest di konfigurasi cabang bisa dipakai (atau atur satu untuk karyawan QA Podomoro). 2. Jalankan lagi TC-APP019-066 dan E2E-042.
 - **Penanggung jawab:** Administrator site, lalu Development
-- **Cek ulang:** Dicek otomatis oleh test-nya di setiap run (langkah dicoba, ditandai blocker hanya bila gejalanya muncul).
+- **Cek ulang:** Masih berlaku (pengawas blocker, 2026-11-09): advance request: "The amount exceeds the employee's imprest eligibility."
 - **Sumber:** ditemukan otomasi (lib/qa-data/found-blockers.ts)
 - **Test case terhenti:** E2E-042, TC-APP019-066, TC-APP019-067
 
@@ -470,7 +470,7 @@ Blocker 1–16 berasal dari checklist `reference/00-blockers-checklist-linked.xl
 - **Dampak:** 5 test case terhenti (05 Farmasi, 14 Kasir & Tagihan).
 - **Perbaikan:** 1. Tambahkan proses "billingdiscount" ke Workflow (Development: layar hanya menawarkan discharge dan purchase_order), beri langkahnya, lalu pastikan baris di atas maksimum menunggu di "Dispense discounts". 2. Jalankan lagi TC-APP005-016, 036, 037 dan TC-APP014-070, 071.
 - **Penanggung jawab:** Development
-- **Cek ulang:** Dicek otomatis oleh test-nya di setiap run (langkah dicoba, ditandai blocker hanya bila gejalanya muncul).
+- **Cek ulang:** Masih berlaku (pengawas blocker, 2026-11-09): discount 20%: "advanceDispense: 400 pharmacy: this discount needs the approval chain: workflow: chain not found: "billin
 - **Sumber:** ditemukan otomasi (lib/qa-data/found-blockers.ts)
 - **Test case terhenti:** TC-APP005-016, TC-APP005-036, TC-APP005-037, TC-APP014-070, TC-APP014-071
 

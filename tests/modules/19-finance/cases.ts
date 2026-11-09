@@ -352,14 +352,14 @@ export async function pickByPrefix(box: import('@playwright/test').Locator, pref
 }
 
 /** A form of the Imprest screen ("Advance request", "Bill submission"); the list under it carries the same heading. */
-const imprestSection = (page: Page, heading: 'Advance request' | 'Bill submission') =>
+export const imprestSection = (page: Page, heading: 'Advance request' | 'Bill submission') =>
   page.getByRole('main').locator('form').filter({ has: page.getByRole('heading', { level: 2, name: heading }) });
 
 /** The selects of a section by their order (their labels wrap the options, so a label is not a usable name). */
-const sectionSelect = (section: ReturnType<typeof imprestSection>, n: number) => section.locator('select').nth(n);
+export const sectionSelect = (section: ReturnType<typeof imprestSection>, n: number) => section.locator('select').nth(n);
 
 /** The rows of the imprest list as [number, amount, status, difference]. */
-async function imprestRows(page: Page): Promise<string[][]> {
+export async function imprestRows(page: Page): Promise<string[][]> {
   await page.goto('/id/finance/imprest');
   await page.waitForLoadState('networkidle').catch(() => {});
   return page.getByRole('main').getByRole('table').first().getByRole('rowgroup').nth(1).getByRole('row')
@@ -376,7 +376,7 @@ async function imprestAction(page: Page, no: string, action: string): Promise<st
 }
 
 /** Picks the first option of a select whose label starts with `start` (the labels as the site shows them). */
-async function pickStarting(select: ReturnType<typeof sectionSelect>, start: string): Promise<string> {
+export async function pickStarting(select: ReturnType<typeof sectionSelect>, start: string): Promise<string> {
   const labels = await select.locator('option').evaluateAll((os) => os.map((o) => (o.textContent ?? '').trim()));
   const label = labels.find((l) => l.startsWith(start));
   expect(label, `an option starting "${start}"`).toBeTruthy();

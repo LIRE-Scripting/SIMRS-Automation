@@ -1,6 +1,6 @@
 # HTTP 5xx: jawaban error dari server situs
 
-Dibangun 2026-11-09 09:59 WIB dari `reports/summary/run-summary.json` (hasil terbaru setiap test case dan rantai). Bangun ulang: `npm run qa:run-summary && npm run qa:findings-md`.
+Dibangun 2026-11-09 10:41 WIB dari `reports/summary/run-summary.json` (hasil terbaru setiap test case dan rantai). Bangun ulang: `npm run qa:run-summary && npm run qa:findings-md`.
 
 HTTP 5xx = server situs gagal memproses permintaan (error di sisi server), bukan penolakan biasa. Setiap jawaban 5xx dicatat oleh `fixtures/e2e.ts` (fixture `serverErrors`) ke `.qa-state/**/http-5xx.jsonl`. Dokumen ini hanya memuat 5xx yang **masih terjadi** di hasil terbaru; yang sudah diperbaiki tidak dicantumkan.
 
@@ -81,7 +81,7 @@ Blocker yang penyebabnya error server: situs menjawab HTTP 500/504 (sampai 2026-
 - **Dampak:** 2 test case terhenti (05 Farmasi, 07 Persediaan).
 - **Perbaikan:** 1. Perbaiki penyimpanan kit. 2. Jalankan lagi TC-APP007-007 dan TC-APP005-010.
 - **Penanggung jawab:** Development
-- **Cek ulang:** Dicek otomatis oleh test-nya di setiap run (langkah dicoba, ditandai blocker hanya bila gejalanya muncul).
+- **Cek ulang:** Masih berlaku (pengawas blocker, 2026-11-09): saveKitComponents: 500 stock update failed
 - **Sumber:** ditemukan otomasi (lib/qa-data/found-blockers.ts)
 - **Test case terhenti:** TC-APP005-010, TC-APP007-007
 

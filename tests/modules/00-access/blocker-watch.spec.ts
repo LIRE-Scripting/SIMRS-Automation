@@ -8,6 +8,35 @@ import { qaName, qaPrefix } from '../../../lib/qa-data/names';
 import type { Qa } from '../../../fixtures/e2e';
 import { Patients, WALKED_IN } from '../15-emergency/helpers';
 import { markForDischarge } from '../15-emergency/patients-cases';
+import { firstCode, qaCode, uniqueToken } from '../../../lib/qa-data/names';
+import { addDays, todayWib } from '../../../lib/dates';
+import { INVENTORY } from '../../../lib/inventory-data';
+import { HR } from '../../../lib/hr-data';
+import { BILLING } from '../../../lib/billing-data';
+import { PHARMACY, PHARMACY_STORE } from '../../../lib/pharmacy-data';
+import { ProcurementDeskPage } from '../../../pages/procurement/ProcurementPages';
+import { ItemMasterPage } from '../../../pages/inventory/InventoryE2EPages';
+import { RegisteredPatientsPage } from '../../../pages/ambulatory/RegisteredPatientsPage';
+import { approvedOrder, press } from '../09-procurement/desk-hub-screens-cases';
+import { unique } from '../07-inventory/cases';
+import { addItem } from '../07-inventory/items-cases';
+import { imprestSection, pickStarting, sectionSelect } from '../19-finance/cases';
+import { clickFor } from '../19-finance/helpers';
+import { Batches, payrollEmployee } from '../17-payroll/helpers';
+import { patient as pharmacyPatient, sell, stock } from '../05-pharmacy/helpers';
+import { discountNotHeld } from '../05-pharmacy/evaluation-cashier-cases';
+
+/** A stand-in for the qa fixture, for the shared helpers a watch reuses: names and codes, notes dropped. */
+function watchQa(): Qa {
+  const noop = () => {};
+  return {
+    code: qaCode, bed: firstCode, name: qaName, prefix: qaPrefix, token: uniqueToken,
+    note: noop, deviation: noop, notRun: noop, blocked: noop,
+    step: async (_n: number, fn: () => Promise<unknown>) => { await fn(); },
+  } as unknown as Qa;
+}
+
+const writes = () => test.skip(process.env.QA_ALLOW_WRITES !== '1', 'this blocker is checked with saves: QA_ALLOW_WRITES=1');
 
 /**
  * Blocker watch (asked 2026-11-01: "untuk blocker apakah semuanya sudah di cek
@@ -117,7 +146,6 @@ const WATCHES: Watch[] = [
     no: 9, title: 'A closed emergency encounter cannot be received again', user: 'U1',
     look: async (p) => {
       test.skip(process.env.QA_ALLOW_WRITES !== '1', 'blocker 9 is checked with a save: QA_ALLOW_WRITES=1');
-      await installToastRecorder(p);
       const pt = new Patients(p);
       const qa = { prefix: qaPrefix } as unknown as Qa;
       const name = qaName('X Pasien Walk-in');
@@ -140,6 +168,123 @@ const WATCHES: Watch[] = [
     },
   },
   {
+    // An approved purchase order of the watch, its gate entry, then the goods receipt.
+    no: 31, title: 'Goods receipt cannot be saved after the gate ("receive at the gate first")', user: 'U1',
+    look: async (p) => {
+      writes();
+      const qa = watchQa();
+      const id = await approvedOrder(p, qa);
+      const desk = new ProcurementDeskPage(p);
+      await desk.open('receipts', 'Receipts and returns');
+      await desk.input('Document').fill(id);
+      await desk.input('Quantity').fill('50');
+      const gate = await press(desk, 'gate');
+      if (!gate.includes('Saved.')) throw new Error(`blocker 31: the gate entry is not saved ("${gate.join(' / ')}"), nothing to judge`);
+      await desk.input('Store').fill(PHARMACY_STORE.code);
+      await desk.input('Batch').fill(qa.code('X-B02'));
+      await desk.input('Expiry').fill(addDays(todayWib(), 365));
+      const grn = await press(desk, 'grn');
+      return { holds: !grn.includes('Saved.'), symptom: `grn after a saved gate: "${grn.join(' / ').slice(0, 120)}"` };
+    },
+  },
+  {
+    // A payroll batch of an employee of the watch: the lines hold only the components already on the site.
+    no: 37, title: 'The salary components of the workbook are not on the site', user: 'U1',
+    look: async (p) => {
+      writes();
+      const e = await payrollEmployee(p, watchQa(), HR.emp2);
+      const b = new Batches(p);
+      await b.runWith({ employee: e.no, base: '8000000' });
+      const r = await b.result();
+      const codes = r.lines.map((l) => /^([A-Z0-9_]+)/.exec(l.trim())?.[1] ?? l).filter(Boolean);
+      const extra = codes.filter((c) => !['GAPOK', 'POTBPJS', 'TUNJAB'].includes(c));
+      return { holds: extra.length === 0, symptom: `batch lines: ${codes.join(', ') || '(none)'}` };
+    },
+  },
+  {
+    // An advance request of a QA employee: refused while no imprest eligibility can be set up for the branch.
+    no: 42, title: 'No imprest advance can be requested (no eligibility for the branch)', user: 'U1',
+    look: async (p) => {
+      writes();
+      await p.goto('/id/finance/imprest');
+      await p.waitForLoadState('networkidle').catch(() => {});
+      const advance = imprestSection(p, 'Advance request');
+      await pickStarting(sectionSelect(advance, 0), 'QA-ATK');
+      await pickStarting(sectionSelect(advance, 1), 'QA-HRM');
+      await advance.getByLabel('Amount', { exact: true }).fill('2000000');
+      await advance.getByLabel('Remarks', { exact: true }).fill(qaPrefix('X Uang muka ATK'));
+      const toasts = await clickFor(p, advance.getByRole('button', { name: 'Save', exact: true }));
+      return { holds: toasts.some((t) => /imprest eligibility/i.test(t)) || !toasts.includes('Saved.'), symptom: `advance request: "${toasts.join(' / ').slice(0, 120)}"` };
+    },
+  },
+  {
+    // A dispense of the watch with a line discount above the maximum: it should wait for the cashier.
+    no: 47, title: 'A dispense discount above the maximum cannot wait ("chain not found: billingdiscount")', user: 'U1',
+    look: async (p) => {
+      writes();
+      const qa = watchQa();
+      await stock(p, qa);
+      const pt = await pharmacyPatient(p, qa);
+      const over = String(Number(BILLING.counter['Maximum line discount (%)']) * 2);
+      const toasts = await sell(p, pt, [{ item: PHARMACY.para, requested: '1', issued: '1', discount: over }]);
+      return { holds: discountNotHeld(toasts), symptom: `discount ${over}%: "${toasts.join(' / ').slice(0, 120)}"` };
+    },
+  },
+  {
+    // A kit of the watch with one component, saved on Item Master.
+    no: 27, title: 'Saving a kit fails ("saveKitComponents: 500")', user: 'U1',
+    look: async (p) => {
+      writes();
+      const qa = watchQa();
+      // The component picker offers the first items in code order (found blocker 40): the component's code sorts first.
+      const kit = unique(qa, INVENTORY.kit);
+      const a = { code: firstCode(INVENTORY.itA.code), name: `${INVENTORY.itA.name} ${uniqueToken()}` };
+      for (const it of [kit, a]) await addItem(p, it);
+      const items = new ItemMasterPage(p);
+      await items.open();
+      // A new item reaches the picker after a while (found blocker 51), and the dialog sometimes opens without the
+      // component row: the whole pick is tried again from a fresh dialog, up to four times.
+      let d = items.dialog('Edit Item');
+      for (let i = 0; ; i++) {
+        try {
+          await items.open();
+          d = await items.openEdit(kit);
+          await d.getByRole('button', { name: 'Add component' }).click();
+          const field = d.getByRole('combobox', { name: 'Component code' }).last();
+          await field.fill(a.code, { timeout: 10_000 });
+          const hit = p.locator(`#${await field.getAttribute('aria-controls', { timeout: 5_000 })}`).getByRole('option').filter({ hasText: a.code }).first().getByRole('button');
+          await hit.click({ timeout: 10_000 });
+          break;
+        } catch (e) {
+          if (i === 3) throw new Error(`blocker 27: the component ${a.code} could not be picked (blockers 40, 51), nothing to judge: ${String(e).slice(0, 120)}`);
+          await p.keyboard.press('Escape').catch(() => {});
+          await p.waitForTimeout(15_000);
+        }
+      }
+      await d.getByRole('spinbutton').last().fill('1');
+      const said: string[] = [];
+      p.on('response', async (r) => { if (r.request().method() === 'POST') said.push((await r.text().catch(() => '')).slice(0, 200)); });
+      await d.getByRole('button', { name: 'Save kit' }).click();
+      await p.waitForTimeout(4_000);
+      const t = said.join(' ');
+      if (!t) throw new Error('blocker 27: no "Save kit" was sent, nothing to judge');
+      return { holds: /saveKitComponents|stock update failed|"error"/i.test(t), symptom: /"error":"([^"]+)"/.exec(t)?.[1] ?? t.slice(0, 120) };
+    },
+  },
+  {
+    // The details of a patient registered by the watch: no way to edit (Consent, Renew, Close only).
+    no: 20, title: 'A registered patient cannot be edited', user: 'U1',
+    look: async (p) => {
+      writes();
+      const reg = new RegisteredPatientsPage(p);
+      await reg.open();
+      const pt = await reg.register({ firstName: 'QA-AMB Salah', lastName: `Ketik ${uniqueToken()}` });
+      const d = await reg.openDetails(pt.fullName);
+      const buttons = (await d.getByRole('button').allInnerTexts()).map((b) => b.trim()).filter(Boolean);
+      return { holds: !buttons.some((b) => /edit|ubah/i.test(b)), symptom: `details buttons: ${buttons.join(', ')}` };
+    },
+  },
+  {
     no: 45, title: 'The financial year 2026 has no periods', user: 'U1',
     look: async (p) => {
       let body = '';
@@ -154,6 +299,7 @@ const WATCHES: Watch[] = [
 for (const w of WATCHES) {
   test(`Blocker watch ${w.no}: ${w.title}`, async ({ browser }) => {
     const page = await (await browser.newContext({ storageState: authFileOf(w.user) })).newPage();
+    await installToastRecorder(page);
     try {
       const r = await w.look(page);
       keep(w.no, { at: new Date().toISOString(), holds: r.holds, symptom: r.symptom });
