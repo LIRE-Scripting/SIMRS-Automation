@@ -3,6 +3,7 @@ import { expect, type Qa } from '../../../fixtures/e2e';
 import { installToastRecorder, toastMark, toastsSince } from '../../../lib/assertions';
 import { authFileOf, PASSWORD } from '../../../lib/config';
 import { signInAs } from '../18-settings/helpers';
+import { SITE_ROLES, type SiteRoleKey } from '../../../lib/site-roles';
 import { AppHeader } from '../../../pages/AppHeader';
 import { RegisteredPatientsPage } from '../../../pages/ambulatory/RegisteredPatientsPage';
 
@@ -38,6 +39,11 @@ export async function roleAccountPage(browser: Browser, login: string): Promise<
     throw new Error(`${login} cannot sign in: ${s.message}`);
   }
   return s.page;
+}
+
+/** A page signed in as a role account of the site (lib/site-roles.ts: rs.igd, rs.gudang, …); close its context after use. */
+export async function siteRolePage(browser: Browser, role: SiteRoleKey): Promise<Page> {
+  return roleAccountPage(browser, SITE_ROLES[role].login);
 }
 
 /** Runs body with a page of user, closed at the end. */
