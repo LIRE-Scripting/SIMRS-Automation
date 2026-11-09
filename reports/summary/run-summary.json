@@ -1,7 +1,7 @@
 {
   "run": {
     "start": "2026-10-30T00:15:07.935Z",
-    "built": "2026-11-09T02:52:24.484Z",
+    "built": "2026-11-09T02:59:38.859Z",
     "site": "https://rs.showcase.atklik.xyz",
     "branch": "Podomoro",
     "serverErrors": ".qa-state/http-5xx.jsonl",
@@ -9,9 +9,9 @@
   },
   "totals": {
     "modules": {
-      "Passed": 1140,
-      "Deviation": 107,
-      "Failed": 2,
+      "Passed": 1141,
+      "Deviation": 108,
+      "Failed": 0,
       "Blocked": 354,
       "Not run": 1
     },
@@ -207,8 +207,8 @@
       "module": "10 HR",
       "total": 68,
       "Passed": 43,
-      "Deviation": 9,
-      "Failed": 1,
+      "Deviation": 10,
+      "Failed": 0,
       "Blocked": 15,
       "Not run": 0,
       "noTest": 0,
@@ -299,9 +299,9 @@
     {
       "module": "15 Emergency",
       "total": 69,
-      "Passed": 41,
+      "Passed": 42,
       "Deviation": 7,
-      "Failed": 1,
+      "Failed": 0,
       "Blocked": 20,
       "Not run": 0,
       "noTest": 0,
@@ -14865,18 +14865,20 @@
       "title": "Double click, two admins at once, and reload",
       "blockers": [],
       "deviations": [
-        "Step 1: Excel expects \"One employee. The button is disabled while it reads \"Saving…\"\"; the site: 0 employees"
+        "Step 1: Excel expects \"One employee. The button is disabled while it reads \"Saving…\"\"; the site: 0 employees",
+        "Step 3: Excel expects \"The second is told that the file was changed in the meantime\"; the site: saved with no warning; the file now holds 0 dependent(s)",
+        "Step 4: Excel expects \"A question before the input is lost\"; the site: the dialog closes and the input is lost"
       ],
       "notRun": [],
       "http5xx": [],
-      "seconds": 33,
-      "screenshot": "/home/atdip/klik/simrs-next/automation/.qa-state/out-bprobe/b40/modules-10-hr-evaluation-T-7e0dc-rows-150-153-TC-APP010-039--e2e-modules/test-failed-1.png",
+      "seconds": 42,
+      "screenshot": "/home/atdip/klik/simrs-next/automation/.qa-state/out-dbg/fix3/modules-10-hr-evaluation-T-7e0dc-rows-150-153-TC-APP010-039--e2e-modules/attachments/final-screenshot-0e5207bd59b99e21ce00048b987140281137c780.png",
       "screenshotStart": false,
-      "failedStep": "Step 3 [10-hr.xlsx | Steps | row 152]: Both admins open EMP-1; the first adds a dependent and saves; the second changes the designation and saves → The second is told that the file was changed in the meantime",
-      "error": "TimeoutError: locator.click: Timeout 15000ms exceeded.",
-      "cause": "check: timeout (slow page or a missing wait)",
-      "reason": "",
-      "status": "Failed",
+      "failedStep": "",
+      "error": "",
+      "cause": "",
+      "reason": "Step 1: Excel expects \"One employee. The button is disabled while it reads \"Saving…\"\"; the site: 0 employees; Step 3: Excel expects \"The second is told that the file was changed in the meantime\"; the site: saved with no warning; the file now holds 0 dependent(s); Step 4: Excel expects \"A question before the input is lost\"; the site: the dialog closes and the input is lost",
+      "status": "Deviation",
       "group": "10 HR",
       "previous": "Not run"
     },
@@ -20533,20 +20535,23 @@
       "title": "Bay that is occupied, switched off or in another branch",
       "blockers": [],
       "deviations": [
-        "Step 3: Excel expects \"Refused: the bay is occupied\"; the site: PT-2 is given BED-1 (QA-IGD-01-MW8KBMS711J, PT-1 lies on it)"
+        "Step 3: Excel expects \"Refused: the bay is occupied\"; the site: PT-2 is given BED-1 (QA-IGD-01-MW8O6GAY00A, PT-1 lies on it)",
+        "Step 4: Excel expects \"Refused: the bed is occupied\"; the site: PT-2 is given BED-OCC (QA-0D3RBRZOK-IGD-OCC0B, an inpatient's bed)",
+        "Step 5: Excel expects \"BED-1 is shown as occupied by the emergency patient\"; the site: the row reads \"QA-IGD-01-MW8O6GAY00A — — QA IGD Tersedia Aktif Edit\""
       ],
       "notRun": [],
       "http5xx": [],
-      "seconds": 66,
-      "screenshot": "/home/atdip/klik/simrs-next/automation/.qa-state/out-bprobe/b40/modules-15-emergency-evalu-0b79b-s-rows-36-40-TC-APP015-011--e2e-modules/test-failed-1.png",
+      "seconds": 76,
+      "screenshot": "/home/atdip/klik/simrs-next/automation/.qa-state/out-dbg/fix3/modules-15-emergency-evalu-0b79b-s-rows-36-40-TC-APP015-011--e2e-modules/attachments/final-screenshot-d241f86d1877b8e1ce9041d129d3534b4cb3e409.png",
       "screenshotStart": false,
-      "failedStep": "Step 4 [15-emergency.xlsx | Steps | row 39]: Types BED-OCC's ID, the bed of an inpatient → Refused: the bed is occupied",
-      "error": "TimeoutError: locator.press: Timeout 15000ms exceeded.",
-      "cause": "check: timeout (slow page or a missing wait)",
-      "reason": "",
-      "status": "Failed",
+      "failedStep": "",
+      "error": "",
+      "cause": "",
+      "reason": "Step 3: Excel expects \"Refused: the bay is occupied\"; the site: PT-2 is given BED-1 (QA-IGD-01-MW8O6GAY00A, PT-1 lies on it); Step 4: Excel expects \"Refused: the bed is occupied\"; the site: PT-2 is given BED-OCC (QA-0D3RBRZOK-IGD-OCC0B, an inpatient's bed); Step 5: Excel expects \"BED-1 is shown as occupied by the emergency patient\"; the site: the row reads \"QA-IGD-01-MW8O6GAY00A — — QA IGD Tersedia Aktif Edit\"",
+      "status": "Passed",
       "group": "15 Emergency",
-      "previous": "Not run"
+      "previous": "Not run",
+      "passedWithNotes": true
     },
     {
       "kind": "module",

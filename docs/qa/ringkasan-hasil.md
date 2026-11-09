@@ -1,6 +1,6 @@
 # Ringkasan hasil pengujian SIMRS
 
-Dibangun 2026-11-09 09:52 WIB dari `reports/summary/run-summary.json` (hasil terbaru setiap test case dan rantai). Bangun ulang: `npm run qa:run-summary && npm run qa:findings-md`.
+Dibangun 2026-11-09 09:59 WIB dari `reports/summary/run-summary.json` (hasil terbaru setiap test case dan rantai). Bangun ulang: `npm run qa:run-summary && npm run qa:findings-md`.
 
 Situs https://rs.showcase.atklik.xyz/id (bahasa Indonesia), cabang uji Podomoro. Setiap test case dan rantai dihitung dengan hasil terbarunya dari semua run. Rincian per test case, dengan tangkapan layar, ada di `reports/summary/simrs-run-summary.xlsx` (satu sheet per modul).
 
@@ -8,14 +8,14 @@ Situs https://rs.showcase.atklik.xyz/id (bahasa Indonesia), cabang uji Podomoro.
 
 | Status | Test case modul | Rantai E2E |
 |---|---:|---:|
-| Lulus | 1140 | 14 |
-| Deviasi | 107 | 0 |
-| Gagal | 2 | 0 |
+| Lulus | 1141 | 14 |
+| Deviasi | 108 | 0 |
+| Gagal | 0 | 0 |
 | Terblokir | 354 | 36 |
 | Belum dijalankan | 1 | 0 |
 | **Total** | **1604** | **50** |
 
-- Tingkat lulus: **71%** (termasuk 281 test case **Lulus dengan catatan**: semua perbedaannya dari referensi bisa diterima).
+- Tingkat lulus: **71%** (termasuk 282 test case **Lulus dengan catatan**: semua perbedaannya dari referensi bisa diterima).
 - Cakupan (test case yang dijalankan): **78%**.
 - HTTP 5xx di hasil terbaru: **4** ([http-5xx.md](http-5xx.md)).
 
@@ -30,7 +30,7 @@ Situs https://rs.showcase.atklik.xyz/id (bahasa Indonesia), cabang uji Podomoro.
    - Blocker 23: Ward care tidak menampilkan pasien rawat inap cabang (12 test case). Perbaikan: 1. Buat daftar memuat rawat inap cabang (atau sebutkan apa yang harus ada lebih dulu). 2. Jalankan lagi TC-APP004-065 sampai 076.
    - Blocker 45: Tahun buku 2026 tidak punya periode, dan periodenya tidak bisa dibuat lewat layar: jurnal, voucher, atau pembayaran bertanggal hari ini tidak bisa disimpan (12 test case). Perbaikan: 1. Buat periode tahun buku 2026 di server (atau sediakan "Generate periods" untuk tahun tanpa periode). 2. Jalankan lagi TC-APP019-037 dan TC-APP019-044 sampai 055.
    - Blocker 46: Tidak ada user yang bisa menyetujui dokumen keuangan: "Approve" menjawab "missing required privilege" (tenant tidak punya FINANCE_APPROVE) (11 test case). Perbaikan: 1. Tambahkan hak persetujuan keuangan ke tenant dan ke role penyetuju (U5 qa.approver). 2. Jalankan lagi TC-APP019-068 sampai 078.
-2. **Deviasi** ([deviations.md](deviations.md)): dari 388 test case dengan deviasi, 107 berisi **deviasi nyata** (perlu diperbaiki), 0 **perlu keputusan** product owner, dan 281 **bisa dianggap lulus**.
+2. **Deviasi** ([deviations.md](deviations.md)): dari 390 test case dengan deviasi, 108 berisi **deviasi nyata** (perlu diperbaiki), 0 **perlu keputusan** product owner, dan 282 **bisa dianggap lulus**.
 3. **HTTP 5xx dan error server** ([http-5xx.md](http-5xx.md)): 4 jawaban HTTP 5xx masih terjadi; 9 blocker karena error server (2, 3, 25, 27, 38, 41, 48, 53, 55) menghentikan 81 test case.
 4. **Belum dijalankan:** 1 test case yang terikat jam atau hari kerja, dijadwalkan di run pagi (`.qa-state/morning-run-*.sh`).
 
@@ -47,12 +47,12 @@ Situs https://rs.showcase.atklik.xyz/id (bahasa Indonesia), cabang uji Podomoro.
 | 07 Persediaan | 67 | 52 | 7 | 0 | 8 | 0 |
 | 08 Kamar Operasi | 53 | 47 | 4 | 0 | 2 | 0 |
 | 09 Pengadaan | 65 | 48 | 8 | 0 | 9 | 0 |
-| 10 SDM | 68 | 43 | 9 | 1 | 15 | 0 |
+| 10 SDM | 68 | 43 | 10 | 0 | 15 | 0 |
 | 11 Laboratorium | 54 | 47 | 4 | 0 | 3 | 0 |
 | 12 Radiologi (RIS) | 35 | 27 | 5 | 0 | 3 | 0 |
 | 13 Diet | 62 | 46 | 6 | 0 | 10 | 0 |
 | 14 Kasir & Tagihan | 85 | 57 | 2 | 0 | 26 | 0 |
-| 15 IGD | 69 | 41 | 7 | 1 | 20 | 0 |
+| 15 IGD | 69 | 42 | 7 | 0 | 20 | 0 |
 | 16 Rekam Medis (MRD) | 49 | 40 | 3 | 0 | 6 | 0 |
 | 17 Penggajian | 69 | 40 | 3 | 0 | 26 | 0 |
 | 18 Pengaturan | 92 | 78 | 7 | 0 | 7 | 0 |

@@ -45,11 +45,25 @@ qaTest('TC-APP015-011', async ({ page, qa, browser }) => {
   }
   qa.note(1, `PT-1 in bay on ${bed1.no}; PT-2 triaged; BED-OCC ${occ.no} holds an inpatient; BED-B ${bedB.no} made by U6 in Kemayoran`);
   const d = page.getByRole('dialog', { name: 'Assign bay' });
+  // A bay the site gives PT-2 although it should refuse (a deviation) leaves PT-2 without "Assign bay": the later
+  // steps then use another triaged patient of the test.
+  let placed = false;
   const tryBed = async (st: number, id: string, what: string, expected: string) => {
     await qa.step(st, async () => {
-      const toasts = await v.assignBay(pt2.id, id);
+      let who = pt2.id;
+      if (placed) {
+        const pt3 = await patient(page, qa, 'QA-EMG Pasien Tiga');
+        expect(await v.create(pt3.id)).toContain('Visit created');
+        expect(await v.act(pt3.id, 'Triage')).toContain('Triage recorded');
+        who = pt3.id;
+        qa.note(st, 'PT-2 was given a bay in an earlier step: a third patient of the test, triaged, stands for PT-2');
+      }
+      const toasts = await v.assignBay(who, id);
       qa.note(st, `${what}: "${toasts.join(' / ')}"`);
-      if (toasts.includes('Bay assigned')) qa.deviation(st, expected, `PT-2 is given ${what}`);
+      if (toasts.includes('Bay assigned')) {
+        placed = true;
+        qa.deviation(st, expected, `PT-2 is given ${what}`);
+      }
       else if (!toasts.some((t) => new RegExp(expected.replace(/^Refused: "?|"$/g, '').split(' ').slice(0, 2).join(' '), 'i').test(t))) qa.note(st, `refused with another text than "${expected}"`);
       if (await d.isVisible()) await d.getByRole('button', { name: /Cancel|Close/ }).first().click().catch(() => page.keyboard.press('Escape'));
     });

@@ -131,9 +131,10 @@ export class EmployeesPage {
     for (const [label, value] of Object.entries(row)) await d.getByLabel(label, { exact: true }).last().fill(value);
   }
 
-  /** Goes from "File" to "Licences" with the given rows per step (none by default). */
+  /** Goes on to "Licences" (from "File", or from the step the dialog is on) with the given rows per step (none by default). */
   async walk(d: Locator, rows: Partial<Record<(typeof STEPS)[number], StepRow>> = {}): Promise<void> {
     for (const step of STEPS.slice(1)) {
+      if (await this.save(d).isVisible()) break;
       await this.next(d).click();
       const row = rows[step];
       if (row) await this.addRow(d, row);

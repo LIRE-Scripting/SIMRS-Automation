@@ -769,6 +769,7 @@ export const FOUND_BLOCKERS: FoundBlocker[] = [
     testCases: [
       { id: 'TC-APP007-001', steps: [4] },
       { id: 'TC-APP005-040', steps: [2, 5] },
+      { id: 'TC-APP005-039', steps: [1] },
       { id: 'TC-APP005-044', steps: [2] },
     ],
   },

@@ -417,13 +417,20 @@ export const TC_APP005_039 = async ({ page, qa }: { page: Page; qa: Qa }): Promi
   const it = await ownItem(page, qa, para.code, para.name, [{ quantity: '10', expiry: addDays(todayWib(), 400) }]);
   const pt = await patient(page, qa);
   expect(await sell(page, pt, [{ item: it, requested: '10', issued: '10', discount: '10' }])).toContain(CONFIRMED);
+  let listed = true;
   await qa.step(1, async () => {
     const { row } = await issueRows(page, it.name);
+    // Issue Lines leaves new lines out for a while (found blocker 51).
+    if (!(await row().count())) {
+      listed = false;
+      return qa.note(1, `Issue Lines does not list the sale of ${it.code} (found blocker 51)`);
+    }
     await row().getByRole('spinbutton').first().fill('10');
     const mark = await toastMark(page);
     await row().getByRole('button', { name: 'Return' }).click();
     expect(await toastsAfter(page, mark)).toContain('Returned.');
   });
+  if (!listed) qa.blocked(1, 51);
   qa.note(2, 'the sales and reversal vouchers of the pharmacy are not posted to Finance on the branch (found blocker 13)');
 };
 

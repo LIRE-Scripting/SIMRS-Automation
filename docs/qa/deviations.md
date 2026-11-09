@@ -1,16 +1,16 @@
 # Deviasi: langkah yang berjalan tetapi hasilnya berbeda dari referensi
 
-Dibangun 2026-11-09 09:52 WIB dari `reports/summary/run-summary.json` (hasil terbaru setiap test case dan rantai). Bangun ulang: `npm run qa:run-summary && npm run qa:findings-md`.
+Dibangun 2026-11-09 09:59 WIB dari `reports/summary/run-summary.json` (hasil terbaru setiap test case dan rantai). Bangun ulang: `npm run qa:run-summary && npm run qa:findings-md`.
 
 Deviasi = langkah **bisa dijalankan**, tetapi hasil di situs tidak sama dengan *Expected Result* di workbook referensi. Setiap deviasi sudah ditinjau (scripts/qa/deviation-review.ts, 2026-11-01) dan diberi saran: perbaikan, keputusan yang dibutuhkan, atau catatan.
 
-**837 deviasi** di **410 test case** dan **21 rantai E2E**.
+**841 deviasi** di **410 test case** dan **21 rantai E2E**.
 
 | Tinjauan | Deviasi | Test case / rantai (menurut deviasi terberatnya) | Arti |
 |---|---:|---:|---|
-| [Deviasi nyata](#deviasi-nyata-perlu-diperbaiki) | 181 | 109 | cacat di situs: validasi tidak ada, data ganda tersimpan, hak akses tidak ditegakkan, error server, atau angka/waktu salah. |
+| [Deviasi nyata](#deviasi-nyata-perlu-diperbaiki) | 183 | 110 | cacat di situs: validasi tidak ada, data ganda tersimpan, hak akses tidak ditegakkan, error server, atau angka/waktu salah. |
 | [Perlu keputusan](#perlu-keputusan-product-owner) | 0 | 0 | situs bekerja dengan cara lain atau fiturnya belum ada. Sejak keputusan 2026-11-06 ("jika keadaan site seperti itu maka as is saja jadikan passed") deviasi seperti ini diterima apa adanya dan masuk kelompok Bisa dianggap lulus dengan catatan "Diterima apa adanya"; kelompok ini kosong. |
-| [Bisa dianggap lulus](#bisa-dianggap-lulus-lulus-dengan-catatan) | 656 | 322 | tujuan langkah tercapai; hanya bentuk atau teksnya yang beda dari referensi. Test case yang semua deviasinya masuk kelompok ini dihitung **Lulus (dengan catatan)** di ringkasan. |
+| [Bisa dianggap lulus](#bisa-dianggap-lulus-lulus-dengan-catatan) | 658 | 321 | tujuan langkah tercapai; hanya bentuk atau teksnya yang beda dari referensi. Test case yang semua deviasinya masuk kelompok ini dihitung **Lulus (dengan catatan)** di ringkasan. |
 
 ## Per modul
 
@@ -25,12 +25,12 @@ Deviasi = langkah **bisa dijalankan**, tetapi hasil di situs tidak sama dengan *
 | 07 Persediaan | 9 | 0 | 29 |
 | 08 Kamar Operasi | 6 | 0 | 27 |
 | 09 Pengadaan | 17 | 0 | 34 |
-| 10 SDM | 16 | 0 | 46 |
+| 10 SDM | 18 | 0 | 46 |
 | 11 Laboratorium | 5 | 0 | 26 |
 | 12 Radiologi (RIS) | 9 | 0 | 12 |
 | 13 Diet | 12 | 0 | 43 |
 | 14 Kasir & Tagihan | 3 | 0 | 20 |
-| 15 IGD | 10 | 0 | 28 |
+| 15 IGD | 10 | 0 | 30 |
 | 16 Rekam Medis (MRD) | 5 | 0 | 43 |
 | 17 Penggajian | 5 | 0 | 40 |
 | 18 Pengaturan | 14 | 0 | 40 |
@@ -195,6 +195,8 @@ Arti: cacat di situs: validasi tidak ada, data ganda tersimpan, hak akses tidak 
 | TC-APP010-034 | User tanpa peran SDM membaca semua berkas karyawan | 3 | Tidak mungkin | U3 membuka QA-EMP-001-MVWK8UBK00C dan menelusuri enam langkah berkasnya | User tanpa hak (U3) bisa membuka/membaca/menyimpan: hak akses tidak ditegakkan. Tegakkan hak akses di server untuk baca dan tulis; sembunyikan kartu aplikasi dan tombol dari peran tanpa hak. |
 | TC-APP010-034 | User tanpa peran SDM membaca semua berkas karyawan | 4 | Tidak mungkin | "Download" memberi U3 file employees.csv | User tanpa hak (U3) bisa membuka/membaca/menyimpan: hak akses tidak ditegakkan. Tegakkan hak akses di server untuk baca dan tulis; sembunyikan kartu aplikasi dan tombol dari peran tanpa hak. |
 | TC-APP010-034 | User tanpa peran SDM membaca semua berkas karyawan | 5 | Akses ditolak | U3 (tanpa hak) membaca /hr/leave-applications ("Leave applications", 10 baris) | User tanpa hak (U3) bisa membuka/membaca/menyimpan: hak akses tidak ditegakkan. Tegakkan hak akses di server untuk baca dan tulis; sembunyikan kartu aplikasi dan tombol dari peran tanpa hak. |
+| TC-APP010-039 | Klik ganda, dua admin sekaligus, dan muat ulang | 3 | The second is told that the file was changed in the meantime | saved with no warning; the file now holds 0 dependent(s) | Input yang seharusnya ditolak tetap tersimpan. Tambahkan validasi di server untuk input ini, dengan pesan yang menyebut alasannya. |
+| TC-APP010-039 | Klik ganda, dua admin sekaligus, dan muat ulang | 4 | A question before the input is lost | the dialog closes and the input is lost | Input yang seharusnya ditolak tetap tersimpan. Tambahkan validasi di server untuk input ini, dengan pesan yang menyebut alasannya. |
 | TC-APP010-045 | Meja SDM, Year balance: comp-off untuk hari libur yang dipakai kerja | 1 | Toast "Saved."; baris comp-off dengan id | "Saved.", tetapi daftar tidak menampilkan baris QA-EMP-01-MVWKC4JR001 | Seharusnya ditolak/diperingatkan, tetapi tersimpan: validasi tidak ada. Tambahkan validasi di server untuk input ini, dengan pesan yang menyebut alasannya. |
 | TC-APP010-051 | Onsite yang harus ditolak | 2 | Ditolak: "employee and location are required" | tersimpan tanpa lokasi | Seharusnya ditolak/diperingatkan, tetapi tersimpan: validasi tidak ada. Tambahkan validasi di server untuk input ini, dengan pesan yang menyebut alasannya. |
 
@@ -845,7 +847,9 @@ Arti: tujuan langkah tercapai; hanya bentuk atau teksnya yang beda dari referens
 | TC-APP015-009 | Triase tanpa level | 2 | Pasien nyeri dada naik di atas pasien cedera pergelangan kaki di daftar | tidak ada tingkat urgensi yang bisa disimpan; pasien cedera pergelangan kaki, yang datang lebih dulu, tetap di atas | Diterima apa adanya (keputusan 2026-11-06): Triase tidak menyimpan tingkat urgensi, jadi urutan tidak berubah: fitur triase perlu diputuskan. |
 | TC-APP015-009 | Triase tanpa level | 3 | Level triase setiap pasien | kolom Priority adalah tahap kunjungan (1 menunggu, 2 sudah triase, 4 di bay) | Diterima apa adanya (keputusan 2026-11-06): Perilaku situs berbeda dari referensi; perlu keputusan apakah diterima. |
 | TC-APP015-010 | Kunjungan untuk ID pasien yang salah atau tidak dikenal | 2 | Ditolak dengan pesan jelas bahwa yang diharapkan adalah ID | toast "patient_id required" | Penolakannya benar; pesannya umum dan tidak menyebut alasan seperti di referensi. |
-| TC-APP015-011 | Bay yang terisi, nonaktif, atau di cabang lain | 3 | Refused: the bay is occupied | PT-2 is given BED-1 (QA-IGD-01-MW8KBMS711J, PT-1 lies on it) | Diterima apa adanya (keputusan 2026-11-06): Perilaku situs berbeda dari referensi; perlu keputusan apakah diterima. |
+| TC-APP015-011 | Bay yang terisi, nonaktif, atau di cabang lain | 3 | Refused: the bay is occupied | PT-2 is given BED-1 (QA-IGD-01-MW8O6GAY00A, PT-1 lies on it) | Diterima apa adanya (keputusan 2026-11-06): Perilaku situs berbeda dari referensi; perlu keputusan apakah diterima. |
+| TC-APP015-011 | Bay yang terisi, nonaktif, atau di cabang lain | 4 | Refused: the bed is occupied | PT-2 is given BED-OCC (QA-0D3RBRZOK-IGD-OCC0B, an inpatient's bed) | Diterima apa adanya (keputusan 2026-11-06): Perilaku situs berbeda dari referensi; perlu keputusan apakah diterima. |
+| TC-APP015-011 | Bay yang terisi, nonaktif, atau di cabang lain | 5 | BED-1 is shown as occupied by the emergency patient | the row reads "QA-IGD-01-MW8O6GAY00A — — QA IGD Tersedia Aktif Edit" | Diterima apa adanya (keputusan 2026-11-06): Perilaku situs berbeda dari referensi; perlu keputusan apakah diterima. |
 | TC-APP015-012 | Bay atau triase yang salah | 1 | Aksi "Change bay" | tidak ada tombol yang tersisa di baris | Diterima apa adanya (keputusan 2026-11-06): Fitur yang diminta referensi tidak ada di situs. |
 | TC-APP015-012 | Bay atau triase yang salah | 2 | Bay dibebaskan saat pasien keluar | tidak ada yang membebaskan bay | Diterima apa adanya (keputusan 2026-11-06): Perilaku situs berbeda dari referensi; perlu keputusan apakah diterima. |
 | TC-APP015-012 | Bay atau triase yang salah | 3 | Membatalkan klik triase | tidak ada | Diterima apa adanya (keputusan 2026-11-06): Fitur yang diminta referensi tidak ada di situs. |
