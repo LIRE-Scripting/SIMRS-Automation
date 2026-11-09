@@ -417,7 +417,7 @@ export const FOUND_BLOCKERS: FoundBlocker[] = [
       '(docs/qa/prereq-users-and-blockers.md). The journeys of those four applications run as U1 (admin): the flows are proven, the limits ' +
       'of a role are not. Steps that need a user with only some rights of an application (a writer-only or an approver-only user, a ' +
       'pharmacist without the cashier role) are not run for the same reason. Seen again on 2026-10-31 after the fixes of 2026-10-30: no HTTP 500 is recorded any more; "Save rights" still shows "Failed to save rights." and the role keeps 0 rights.',
-    fix: '1. Fix the save of role privileges (server log, digest 2696407390, 2026-10-15 and 2026-10-20).\n2. PREREQ_RETRY=blocked npm run test:prereq, then npm run qa:prereq-evidence: the four roles get their rights and the four accounts are made.\n3. Run TC-APP018-039 again (and steps 4 and 5 with the 13 Dietary flow), and the journeys of 04, 18, 22 and 23 with their role accounts.',
+    fix: '1. Fix the save of role rights (server log, digest 2696407390).\n2. Rerun the prerequisites for the four roles (PREREQ_RETRY=blocked npm run test:prereq): the four accounts are then made.\n3. Rerun TC-APP018-039 and the journeys of 04, 18, 22 and 23 with those accounts.',
     who: 'Development',
     howFound: 'Seen on the site (automation of 18 Settings, 2026-10-15; prerequisites run, 2026-10-20)',
     testCases: [{ id: 'TC-APP018-039', steps: [3] }],

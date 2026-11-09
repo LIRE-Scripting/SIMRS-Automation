@@ -37,6 +37,7 @@ Semua dokumen di folder ini berbahasa Indonesia. Kutipan dari workbook referensi
 |---|---|
 | [open-questions.md](open-questions.md) | Keputusan dan pertanyaan terbuka (Q1–Q40) tentang data, user, dan cara pengujian |
 | [prereq-users-and-blockers.md](prereq-users-and-blockers.md) | Hasil penyiapan user test (U1–U10) dan prasyarat pada 2026-10-20 |
+| [akun-uji.md](akun-uji.md) | Akun uji: best practice, akun yang dibutuhkan per role (prereq), hasil uji akun `rs.*`, pengecekan yang bisa dijalankan, dan permintaan ke admin situs (2026-11-09) |
 | [blockers-found.md](blockers-found.md) | Blocker temuan otomasi (17 dan seterusnya) dalam bentuk usulan baris checklist |
 | [test-inventory.md](test-inventory.md) | Inventaris file referensi, user, data uji, dan rencana per test case |
 | [traceability/](traceability/) | Keterlacakan per modul: setiap test case dengan spec, user, disposisi, dan alasannya |

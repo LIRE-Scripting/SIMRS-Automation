@@ -15,6 +15,8 @@ const RECHECKED: Record<number, string> = {
   16: 'Sudah dijawab: akun per peran U3–U8 dibuat 2026-10-20.',
   6: 'Dicek 2026-11-01: masih berlaku. "Record code" dengan "Semua cabang" menjawab "The code could not be recorded".',
   9: 'Belum bisa dicek: registrasi IGD Podomoro butuh konfigurasi registrasi (blocker 13).',
+  38: 'Masih berlaku (2026-11-09): dicek setiap run oleh TC-APP018-039, dan dicoba manual di User Rights; tetap "Failed to save rights.".',
+  22: 'Dicek otomatis oleh test-nya di setiap run: test gagal bila peringatan interaksi obat muncul.',
   14: 'Bukan cacat situs: journey butuh data dari aplikasi lain; dijalankan lewat rantai E2E dan data buatan test.',
 };
 export const recheckOf = (no: number, source: string): string => {
@@ -22,7 +24,7 @@ export const recheckOf = (no: number, source: string): string => {
   if (w) return `${w.holds ? 'Masih berlaku' : 'TAMPAKNYA SUDAH SELESAI'} (pengawas blocker, ${w.at.slice(0, 10)}): ${w.symptom.slice(0, 120)}`;
   if (RECHECKED[no]) return RECHECKED[no];
   // Found blockers that some tests mark without trying the step (no watch yet).
-  if ([18, 20, 22, 26, 29, 31, 36, 37, 38].includes(no)) return 'Sebagian test menandainya tanpa mencoba langkahnya dan belum ada pengawas: belum dicek ulang sejak ditemukan.';
+  if ([18, 26, 29, 36].includes(no)) return 'Sebagian test menandainya tanpa mencoba langkahnya dan belum ada pengawas: belum dicek ulang sejak ditemukan.';
   return source.startsWith('docs/') ? 'Dicek otomatis oleh test-nya di setiap run (langkah dicoba, ditandai blocker hanya bila gejalanya muncul).' : '';
 };
 

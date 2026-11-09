@@ -1,6 +1,6 @@
 # Blocker: masalah yang menghentikan pengujian
 
-Dibangun 2026-11-09 10:41 WIB dari `reports/summary/run-summary.json` (hasil terbaru setiap test case dan rantai). Bangun ulang: `npm run qa:run-summary && npm run qa:findings-md`.
+Dibangun 2026-11-09 11:28 WIB dari `reports/summary/run-summary.json` (hasil terbaru setiap test case dan rantai). Bangun ulang: `npm run qa:run-summary && npm run qa:findings-md`.
 
 Blocker = masalah di situs (atau data/set-up yang belum ada) yang membuat sebuah langkah **tidak bisa dijalankan sama sekali**. Langkah itu dan langkah sesudahnya berstatus **Terblokir**, tidak dihitung lulus maupun gagal. Perbedaan hasil pada langkah yang bisa dijalankan ada di [deviations.md](deviations.md); error server ada di [http-5xx.md](http-5xx.md).
 
@@ -260,7 +260,7 @@ Blocker 1–16 berasal dari checklist `reference/00-blockers-checklist-linked.xl
 - **Dampak:** 5 test case dan rantai E2E-021 terhenti (03 Pelayanan Pasien, 05 Farmasi).
 - **Perbaikan:** 1. Muat kedua pasangan (atau sebutkan layar atau seed yang melakukannya). 2. Jalankan lagi TC-APP003-005, 015, 029 dan TC-APP005-012, 029.
 - **Penanggung jawab:** Administrator site, lalu tester
-- **Cek ulang:** Sebagian test menandainya tanpa mencoba langkahnya dan belum ada pengawas: belum dicek ulang sejak ditemukan.
+- **Cek ulang:** Dicek otomatis oleh test-nya di setiap run: test gagal bila peringatan interaksi obat muncul.
 - **Sumber:** ditemukan otomasi (lib/qa-data/found-blockers.ts)
 - **Test case terhenti:** E2E-021, TC-APP003-005, TC-APP003-015, TC-APP003-029, TC-APP005-012, TC-APP005-029
 

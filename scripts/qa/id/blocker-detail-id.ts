@@ -42,7 +42,7 @@ export const BLOCKER_PROBLEM_ID: Record<number, string> = {
   35: 'Harga item cabang (margin dan pajak) tidak bisa disimpan. Selesai 2026-10-31: tersimpan bila margin diketik sebagai pecahan.',
   36: 'Buku besar pasien tidak bisa menampilkan invoice pilihan: "Cari pasien" mengembalikan data tetapi tabel kosong, dan tanpa pencarian hanya 22 invoice pertama yang tampil.',
   37: '12 komponen gaji dari workbook tidak ada di situs (yang ada GAPOK, POTBPJS, TUNJAB), dan tidak ada layar untuk melihat atau membuat komponen gaji.',
-  38: 'Menyimpan hak akses sebuah peran gagal ("Failed to save rights."), jadi peran uji untuk Rawat Inap, Pengaturan, Layanan Jasa, dan Tender tidak bisa diberi hak.',
+  38: 'Hak akses role tidak bisa disimpan ("Failed to save rights."). Akibatnya 4 akun uji tidak bisa dibuat: Perawat Rawat Inap, Admin Pengaturan, Petugas Layanan Jasa, dan Petugas Tender.',
   39: 'Tender tidak bisa dibuat untuk PR yang sudah disetujui (dulu HTTP 500; sejak 2026-10-29 hanya ditolak bila PR sudah punya tender).',
   40: 'Picker dan daftar hanya menjangkau data awal: picker menyaring data yang dimuat sekali (50 pertama menurut nama) dan daftar desk hanya 22 baris tanpa halaman. Data baru di luar itu tidak bisa dipilih atau ditemukan. Test menyiasatinya dengan kode yang terurut paling awal bila memungkinkan.',
   41: 'Pasien tidak bisa didaftarkan di Kemayoran (BR-B): "Register" menjawab "Registration failed", padahal formulir yang sama di Podomoro berhasil.',

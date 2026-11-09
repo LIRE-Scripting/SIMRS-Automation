@@ -1,6 +1,6 @@
 # HTTP 5xx: jawaban error dari server situs
 
-Dibangun 2026-11-09 10:41 WIB dari `reports/summary/run-summary.json` (hasil terbaru setiap test case dan rantai). Bangun ulang: `npm run qa:run-summary && npm run qa:findings-md`.
+Dibangun 2026-11-09 11:28 WIB dari `reports/summary/run-summary.json` (hasil terbaru setiap test case dan rantai). Bangun ulang: `npm run qa:run-summary && npm run qa:findings-md`.
 
 HTTP 5xx = server situs gagal memproses permintaan (error di sisi server), bukan penolakan biasa. Setiap jawaban 5xx dicatat oleh `fixtures/e2e.ts` (fixture `serverErrors`) ke `.qa-state/**/http-5xx.jsonl`. Dokumen ini hanya memuat 5xx yang **masih terjadi** di hasil terbaru; yang sudah diperbaiki tidak dicantumkan.
 
@@ -91,11 +91,11 @@ Blocker yang penyebabnya error server: situs menjawab HTTP 500/504 (sampai 2026-
 
 - **Jenis:** Error server
 - **Cabang:** Podomoro
-- **Masalah:** Menyimpan hak akses sebuah peran gagal ("Failed to save rights."), jadi peran uji untuk Rawat Inap, Pengaturan, Layanan Jasa, dan Tender tidak bisa diberi hak.
+- **Masalah:** Hak akses role tidak bisa disimpan ("Failed to save rights."). Akibatnya 4 akun uji tidak bisa dibuat: Perawat Rawat Inap, Admin Pengaturan, Petugas Layanan Jasa, dan Petugas Tender.
 - **Dampak:** 1 test case dan rantai E2E-019 terhenti (18 Pengaturan).
-- **Perbaikan:** 1. Perbaiki penyimpanan privilege role (log server, digest 2696407390, 2026-10-15 dan 2026-10-20). 2. PREREQ_RETRY=blocked npm run test:prereq, lalu npm run qa:prereq-evidence: keempat role mendapat haknya dan keempat akun dibuat. 3. Jalankan lagi TC-APP018-039 (serta langkah 4 dan 5 dengan alur 13 Dietary), dan alur 04, 18, 22, dan 23 dengan akun role-nya.
+- **Perbaikan:** 1. Perbaiki penyimpanan hak role (log server, digest 2696407390). 2. Ulangi prereq untuk keempat role (PREREQ_RETRY=blocked npm run test:prereq): keempat akun lalu bisa dibuat. 3. Jalankan lagi TC-APP018-039 dan alur 04, 18, 22, dan 23 dengan akun-akun itu.
 - **Penanggung jawab:** Development
-- **Cek ulang:** Sebagian test menandainya tanpa mencoba langkahnya dan belum ada pengawas: belum dicek ulang sejak ditemukan.
+- **Cek ulang:** Masih berlaku (2026-11-09): dicek setiap run oleh TC-APP018-039, dan dicoba manual di User Rights; tetap "Failed to save rights.".
 - **Sumber:** ditemukan otomasi (lib/qa-data/found-blockers.ts)
 - **Test case terhenti:** E2E-019, TC-APP018-039
 
