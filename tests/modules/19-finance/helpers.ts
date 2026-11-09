@@ -87,7 +87,8 @@ export class Accounts {
 
 /** An account of a test: code "<base>-<token>" (the workbook's code with a token), name with a token. */
 export function account(qa: Qa, base: string, name: string, kind: string, extra: Partial<Account> = {}): Account {
-  return { code: qa.code(base), name: qa.name(name), kind, ...extra };
+  // The account pickers offer the first 50 accounts in code order (found blocker 40): the code sorts first.
+  return { code: qa.bed(base), name: qa.name(name), kind, ...extra };
 }
 
 export async function createAccount(page: Page, a: Account): Promise<Account> {

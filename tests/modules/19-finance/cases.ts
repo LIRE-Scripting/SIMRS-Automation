@@ -484,8 +484,9 @@ export async function agreement(page: Page, qa: Qa, ledger: string): Promise<{ n
 /** TC-APP019-068: a payment request from an approved legal agreement of the test, approved, paid and closed. */
 export const TC_APP019_068 = async ({ page, qa }: CaseArgs): Promise<void> => {
   const d = new FinanceDesk(page, 'payment-requests');
-  // The ledger list offers only the first 50 accounts (found blocker 40): the first offered QA liability account.
-  const ledger = { code: 'QA-2110' };
+  // The ledger list offers only the first 50 accounts in code order (found blocker 40), and the sort-first accounts of
+  // earlier runs push the seeded QA-2110 out of them: a liability account of the test whose code sorts first.
+  const ledger = await createAccount(page, { code: qa.bed('QA-2110'), name: qa.name('QA Hutang Uji'), kind: 'Liability' });
   const ag = await agreement(page, qa, ledger.code);
   qa.note(1, `precondition: agreement ${ag.no || '(not saved)'} "${ag.status}" ("${ag.toasts.join(' / ').slice(0, 120)}")`);
   await qa.step(1, async () => {

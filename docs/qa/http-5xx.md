@@ -1,14 +1,17 @@
 # HTTP 5xx: jawaban error dari server situs
 
-Dibangun 2026-11-09 07:55 WIB dari `reports/summary/run-summary.json` (hasil terbaru setiap test case dan rantai). Bangun ulang: `npm run qa:run-summary && npm run qa:findings-md`.
+Dibangun 2026-11-09 09:52 WIB dari `reports/summary/run-summary.json` (hasil terbaru setiap test case dan rantai). Bangun ulang: `npm run qa:run-summary && npm run qa:findings-md`.
 
 HTTP 5xx = server situs gagal memproses permintaan (error di sisi server), bukan penolakan biasa. Setiap jawaban 5xx dicatat oleh `fixtures/e2e.ts` (fixture `serverErrors`) ke `.qa-state/**/http-5xx.jsonl`. Dokumen ini hanya memuat 5xx yang **masih terjadi** di hasil terbaru; yang sudah diperbaiki tidak dicantumkan.
 
-**1 jawaban 5xx** masih terjadi, dari 1 test.
+**4 jawaban 5xx** masih terjadi, dari 3 test.
 
 | Endpoint | Test | Terlihat pertama | Terakhir (WIB) | Digest | Masalah | Perbaikan yang disarankan | Blocker terkait |
 |---|---|---|---|---|---|---|---|
+| `POST /emergency/patients` | TC-APP015-052 (Terblokir) | 2026-10-21 | 2026-11-09 09:52 | 527308963 | Melampirkan file sekitar 1 MB pada pasien IGD (TC-APP015-052 langkah 1) dijawab HTTP 500; layar hanya menampilkan "Could not save.". Dicek ulang 2026-11-01: masih terjadi (digest 527308963). | Batasi ukuran lampiran di server dan tolak file yang terlalu besar dengan pesan yang menyebut batasnya, alih-alih error server. | [9](blocker.md#blocker-9), [54](blocker.md#blocker-54) |
 | `POST /emergency/patients` | TC-APP015-052 (Terblokir) | 2026-10-21 | 2026-11-08 23:56 | 527308963 | Melampirkan file sekitar 1 MB pada pasien IGD (TC-APP015-052 langkah 1) dijawab HTTP 500; layar hanya menampilkan "Could not save.". Dicek ulang 2026-11-01: masih terjadi (digest 527308963). | Batasi ukuran lampiran di server dan tolak file yang terlalu besar dengan pesan yang menyebut batasnya, alih-alih error server. | [9](blocker.md#blocker-9), [54](blocker.md#blocker-54) |
+| `POST /payroll/batches` | TC-APP017-014 (Deviasi) | 2026-11-09 | 2026-11-09 08:22 | 3677213673 | Server menjawab 500 untuk permintaan ini. | Tangani permintaan ini tanpa error server; kembalikan pesan yang jelas bila input ditolak. | [37](blocker.md#blocker-37) |
+| `POST /payroll/batches` | TC-APP017-015 (Deviasi) | 2026-11-09 | 2026-11-09 08:22 | 2036059728 | Server menjawab 500 untuk permintaan ini. | Tangani permintaan ini tanpa error server; kembalikan pesan yang jelas bila input ditolak. | [37](blocker.md#blocker-37) |
 
 ## Error server yang menghentikan test
 
@@ -36,7 +39,7 @@ Blocker yang penyebabnya error server: situs menjawab HTTP 500/504 (sampai 2026-
 - **Dampak:** 58 test case dan rantai E2E-007, E2E-030, E2E-031 terhenti (06 Transfusi Darah).
 - **Perbaikan:** 1. Cari request daftar donor yang gagal di log server dan perbaiki. 2. Tampilkan layar dengan pesan saat daftar gagal, bukan halaman error. 3. Baca lagi layarnya dan tinjau ke-27 alur.
 - **Penanggung jawab:** Development
-- **Cek ulang:** Masih berlaku (pengawas blocker, 2026-11-07): failed to list donors
+- **Cek ulang:** Masih berlaku (pengawas blocker, 2026-11-09): failed to list donors
 - **Sumber:** 00-blockers-checklist-linked.xlsx baris 6
 - **Test case terhenti:** E2E-007, E2E-030, E2E-031, TC-APP006-001, TC-APP006-002, TC-APP006-003, TC-APP006-004, TC-APP006-005, TC-APP006-006, TC-APP006-007, TC-APP006-008, TC-APP006-009, TC-APP006-010, TC-APP006-011, TC-APP006-012, TC-APP006-013, TC-APP006-014, TC-APP006-015, TC-APP006-022, TC-APP006-023, TC-APP006-024, TC-APP006-025, TC-APP006-026, TC-APP006-027, TC-APP006-028, TC-APP006-030, TC-APP006-032, TC-APP006-033, TC-APP006-034, TC-APP006-035, TC-APP006-036, TC-APP006-037, TC-APP006-038, TC-APP006-039, TC-APP006-040, TC-APP006-041, TC-APP006-042, TC-APP006-043, TC-APP006-044, TC-APP006-045 … (+21)
 
@@ -50,7 +53,7 @@ Blocker yang penyebabnya error server: situs menjawab HTTP 500/504 (sampai 2026-
 - **Dampak:** 9 test case terhenti (21 Sterilisasi (CSSD)).
 - **Perbaikan:** 1. Buka halaman lagi dengan satu cabang dipilih. 2. Kalau masih gagal: cari request yang gagal di log server; perbaiki atau tambahkan fallback. 3. Pastikan sumber pengeluaran dan gudang ada untuk cabang tersebut.
 - **Penanggung jawab:** Tester, lalu Development
-- **Cek ulang:** Masih berlaku (pengawas blocker, 2026-11-07): cssd request failed
+- **Cek ulang:** Masih berlaku (pengawas blocker, 2026-11-09): cssd request failed
 - **Sumber:** 00-blockers-checklist-linked.xlsx baris 7
 - **Test case terhenti:** TC-APP021-021, TC-APP021-022, TC-APP021-023, TC-APP021-024, TC-APP021-025, TC-APP021-026, TC-APP021-029, TC-APP021-030, TC-APP021-043
 

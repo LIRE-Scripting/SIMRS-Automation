@@ -115,7 +115,9 @@ export function planFor(ref: TestCaseRef): Plan {
   } else {
     const extra = Object.entries(CHECKLIST_EXTRA).filter(([, ids]) => ids.includes(testCase.id)).map(([no]) => Number(no));
     const linked = blockersOfJourney(journey.id);
-    const resolved = CHECKLIST_RESOLVED[journey.id] ?? [];
+    // QA_IGNORE_CHECKLIST=13,6 (or "all") probes checklist blockers: the test runs and meets the symptom itself.
+    const ignored = (process.env.QA_IGNORE_CHECKLIST ?? '').split(',').map((x) => x.trim()).filter(Boolean);
+    const resolved = [...(CHECKLIST_RESOLVED[journey.id] ?? []), ...blockers().blockers.filter((x) => ignored.includes('all') || ignored.includes(String(x.no))).map((x) => x.no)];
     for (const b of [...linked, ...blockers().blockers.filter((x) => extra.includes(x.no) && !linked.some((l) => l.no === x.no))].filter((x) => !resolved.includes(x.no))) {
       if (NON_BLOCKING.has(b.no)) continue;
       if (b.no === 5 && needs.branch !== 'All branches') continue;

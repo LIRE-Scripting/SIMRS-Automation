@@ -281,6 +281,8 @@ export const TC_APP019_026: QaBody = async ({ page, qa }) => {
     });
     await qa.step(4, async () => {
       await r.open();
+      // The rule may hold a credit account saved by another test (budget fund withdrawal): it is put on "Choose an account".
+      await r.credit(WITHDRAWAL).selectOption('');
       expect(await r.save(WITHDRAWAL)).toContain('Choose the credit account.');
     });
   } finally {

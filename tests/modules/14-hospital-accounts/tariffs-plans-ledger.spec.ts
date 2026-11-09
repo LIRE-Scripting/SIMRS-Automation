@@ -77,10 +77,10 @@ qaTest('TC-APP014-057', TC_APP014_057);
 qaTest('TC-APP014-058', async ({ page, qa }) => {
   const pl = plans(page);
   const pt = await patientWithId(page, qa);
-  const code = qa.code('X-BPJS-K1');
+  const code = qa.bed('X-BPJS-K1');
   expect(await pl.save({ 'Group / plan code': code, 'Name / destination': qa.code('X-BPJS'), 'Patient / source': pt.id }, 'Plan')).toContain('Saved.');
   const cases: [number, Record<string, string>, string][] = [
-    [1, { 'Group / plan code': qa.code('X-BPJS-K1'), 'Name / destination': qa.code('X-BPJS'), 'Patient / source': pt.name }, 'noPatPlanAvail'],
+    [1, { 'Group / plan code': qa.bed('X-BPJS-K1'), 'Name / destination': qa.code('X-BPJS'), 'Patient / source': pt.name }, 'noPatPlanAvail'],
     [2, { 'Group / plan code': '', 'Name / destination': qa.code('X-BPJS'), 'Patient / source': pt.id }, 'code is required'],
     [3, { 'Group / plan code': code, 'Name / destination': qa.code('X-BPJS'), 'Patient / source': pt.id }, 'DuplicateEntry'],
   ];
@@ -92,7 +92,7 @@ qaTest('TC-APP014-058', async ({ page, qa }) => {
     });
   }
   await qa.step(4, async () => {
-    const toasts = await pl.save({ 'Group / plan code': qa.code('X-BPJS-K1'), 'Name / destination': qa.code('X-BPJS'), 'Patient / source': '00000000-0000-4000-8000-000000000000' }, 'Plan');
+    const toasts = await pl.save({ 'Group / plan code': qa.bed('X-BPJS-K1'), 'Name / destination': qa.code('X-BPJS'), 'Patient / source': '00000000-0000-4000-8000-000000000000' }, 'Plan');
     qa.note(4, `a well-formed id of no patient: "${toasts.join(' / ')}"`);
   });
 });
@@ -106,7 +106,7 @@ qaTest('TC-APP014-059', async ({ page, qa }) => {
     qa.note(1, `text shown: "${toasts.join(' / ') || 'none'}" (the server refuses with "noPatPlanAvail")`);
   });
   await qa.step(2, async () => {
-    expect(await pl.save({ 'Group / plan code': qa.code('X-BPJS-K1'), 'Name / destination': qa.code('X-BPJS'), 'Patient / source': none.id }, 'Plan')).toContain('Saved.');
+    expect(await pl.save({ 'Group / plan code': qa.bed('X-BPJS-K1'), 'Name / destination': qa.code('X-BPJS'), 'Patient / source': none.id }, 'Plan')).toContain('Saved.');
     const toasts = await pl.save({ 'Patient / source': none.id }, 'Check eligibility');
     expect(toasts).not.toContain('Saved.');
     qa.note(2, `text shown: "${toasts.join(' / ') || 'none'}" (the server refuses with "pre-authorization is not approved")`);
@@ -130,7 +130,7 @@ qaTest('TC-APP014-060', async ({ page, qa, browser }) => {
       await pl.open();
       await allBranchesList(u2, qa, 1);
     });
-    await qa.step(2, async () => allBranchesSave(qa, 2, await pl.save({ 'Group / plan code': qa.code('X-BPJS-K1'), 'Name / destination': qa.code('X-BPJS'), 'Patient / source': pt.id }, 'Plan')));
+    await qa.step(2, async () => allBranchesSave(qa, 2, await pl.save({ 'Group / plan code': qa.bed('X-BPJS-K1'), 'Name / destination': qa.code('X-BPJS'), 'Patient / source': pt.id }, 'Plan')));
   });
 });
 

@@ -253,7 +253,7 @@ export const TC_APP019_033: QaBody = async ({ page, qa }) => {
     alerted = true;
     await d.dismiss();
   });
-  const code = qa.code('QA-XSS');
+  const code = qa.bed('QA-XSS');
   try {
     await qa.step(1, async () => {
       expect(await v.create({ value: '1000', party: script, narration: img })).toContain('Voucher created');

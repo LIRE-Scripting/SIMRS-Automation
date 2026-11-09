@@ -9,6 +9,14 @@ import { firstCode, qaCode, qaName, qaPrefix, uniqueMrn, uniqueToken } from '../
 import { journeyTag, planFor, traceTag, type Plan } from '../lib/qa-data/plan';
 import { NotOffered } from '../lib/not-offered';
 
+/** The last look of the blocker watch (.qa-state/blocker-watch.json) at a blocker, when it saw the symptom gone in the last 36 hours. */
+function watchedResolved(no: number): { at: string; symptom: string } | undefined {
+  const file = '.qa-state/blocker-watch.json';
+  if (!fs.existsSync(file)) return undefined;
+  const seen = (JSON.parse(fs.readFileSync(file, 'utf8')) as Record<string, { at: string; holds: boolean; symptom: string }>)[String(no)];
+  return seen && !seen.holds && Date.now() - Date.parse(seen.at) < 36 * 3600_000 ? seen : undefined;
+}
+
 /**
  * Workbook-driven tests. A spec names a test case id; everything else comes
  * from the workbook data (title with traceability tag, tags, user session,
@@ -126,6 +134,9 @@ const test = base.extend<Fixtures & { qaId: string }, { siteLanguage: void }>({
         testInfo.annotations.push({ type: 'note', description: `Step ${step}: ${text}` });
       },
       blocked: (step, blockerNo) => {
+        // A step marked blocked while the blocker watch of the last day saw the symptom gone: the mark hides a fix.
+        const watched = watchedResolved(blockerNo);
+        if (watched) throw new Error(`Step ${step}: blocker ${blockerNo} looks resolved (blocker watch ${watched.at.slice(0, 16)}: ${watched.symptom.slice(0, 120)}); the step is marked blocked without being tried: write or run it`);
         // Checklist blockers (1-16, 00-blockers-checklist-linked.xlsx) may stop steps of journeys the checklist
         // does not link (a precondition made on a blocked screen); found blockers must list the step.
         const listed = blockers().blockers.find((b) => b.no === blockerNo);

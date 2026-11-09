@@ -14,7 +14,7 @@ import type { QaBody } from '../../../fixtures/e2e';
 export const amc = (p: Page) => new Desk(p, '/maintenance/amc', 'AMC', 'AMC indent');
 
 export async function jobCard(page: Page, qa: Qa): Promise<string> {
-  const code = qa.code('X-JC-AC');
+  const code = qa.bed('X-JC-AC');
   expect(await plans(page).save({ [CA]: code, [NE]: qa.name('X Servis AC uji') })).toContain(SAVED);
   return code;
 }
@@ -22,10 +22,10 @@ export async function jobCard(page: Page, qa: Qa): Promise<string> {
 export const TC_APP026_002: QaBody = async ({ page, qa }) => {
   const p = plans(page);
   const card = await jobCard(page, qa);
-  const asset = qa.code('X-AST-AC1');
-  await qa.step(1, async () => refused(qa, 1, await p.save({ [CA]: qa.code('X-JC-AC'), [NE]: '' }), 'code and name are required'));
+  const asset = qa.bed('X-AST-AC1');
+  await qa.step(1, async () => refused(qa, 1, await p.save({ [CA]: qa.bed('X-JC-AC'), [NE]: '' }), 'code and name are required'));
   await qa.step(2, async () => refused(qa, 2, await p.save({ [CA]: asset, [NE]: 'daily', [JB]: '' }, 'Plan'), 'Please enter job card'));
-  await qa.step(3, async () => refused(qa, 3, await p.save({ [CA]: asset, [NE]: 'daily', [JB]: qa.code('X-TIDAK-ADA') }, 'Plan'), 'Please enter job card'));
+  await qa.step(3, async () => refused(qa, 3, await p.save({ [CA]: asset, [NE]: 'daily', [JB]: qa.bed('X-TIDAK-ADA') }, 'Plan'), 'Please enter job card'));
   await qa.step(4, async () => refused(qa, 4, await p.save({ [CA]: '', [JB]: card, Date: todayWib() }, 'Asset schedule'), 'asset is required'));
   await qa.step(5, async () => refused(qa, 5, await p.save({ [CA]: asset, Date: '' }, 'Daily status'), 'asset and date are required'));
   await qa.step(6, async () => {
@@ -39,11 +39,11 @@ export const TC_APP026_003: QaBody = async ({ page, qa }) => {
   const p = plans(page);
   const card = await jobCard(page, qa);
   await qa.step(1, async () => {
-    const toasts = await p.save({ [CA]: qa.code('X-AST-TIDAK-ADA'), [NE]: 'daily', [JB]: card }, 'Plan');
+    const toasts = await p.save({ [CA]: qa.bed('X-AST-TIDAK-ADA'), [NE]: 'daily', [JB]: card }, 'Plan');
     qa.note(1, `an asset code that exists nowhere: "${toasts.join(' / ')}"`);
   });
   await qa.step(2, async () => {
-    const toasts = await p.save({ [CA]: qa.code('X-AST-AC1'), [NE]: 'sometimes', [JB]: card }, 'Plan');
+    const toasts = await p.save({ [CA]: qa.bed('X-AST-AC1'), [NE]: 'sometimes', [JB]: card }, 'Plan');
     qa.note(2, `frequency "sometimes": "${toasts.join(' / ')}"`);
   });
   await qa.step(3, async () => {
@@ -75,7 +75,7 @@ export const TC_APP026_005: QaBody = async ({ page, qa }) => {
     qa.note(6, `approve above the balance: "${toasts.join(' / ').slice(0, 80)}"; the order reads "${status}"`);
     expect(status).toBe('sent');
   });
-  await qa.step(7, async () => refused(qa, 7, await w.save({ [JB]: qa.code('X-FREON'), Store: qa.prefix('X Gudang IPSRS'), Batch: qa.code('X-B'), Quantity: '1', Document: draft.id }, 'Spare'), 'approve the order first'));
+  await qa.step(7, async () => refused(qa, 7, await w.save({ [JB]: qa.bed('X-FREON'), Store: qa.prefix('X Gudang IPSRS'), Batch: qa.bed('X-B'), Quantity: '1', Document: draft.id }, 'Spare'), 'approve the order first'));
   qa.blocked(8, 14);
   qa.note(8, SPARE);
   await qa.step(9, async () => refused(qa, 9, await w.save({ [NV]: '', Document: draft.id }, 'Complete'), 'note is required'));
@@ -102,11 +102,11 @@ export const TC_APP026_006: QaBody = async ({ page, qa }) => {
   });
 };
 
-export const INDENT = (qa: Qa, extra: Record<string, string> = {}) => ({ Number: qa.code('X-IND-001'), [CA]: qa.code('X-AST-CT1'), Amount: '120000000', ...extra });
+export const INDENT = (qa: Qa, extra: Record<string, string> = {}) => ({ Number: qa.bed('X-IND-001'), [CA]: qa.bed('X-AST-CT1'), Amount: '120000000', ...extra });
 
 export const CONTRACT = (qa: Qa, indent: string, extra: Record<string, string> = {}) => ({
-  Number: qa.code('X-AMC-001'),
-  [CA]: qa.code('X-AST-CT1'),
+  Number: qa.bed('X-AMC-001'),
+  [CA]: qa.bed('X-AST-CT1'),
   [NE]: '2027-10-31',
   [NV]: qa.prefix('X PT Servis Uji'),
   Document: indent,
@@ -212,7 +212,7 @@ export const TC_APP026_009: QaBody = async ({ page, qa }) => {
 
 export const TC_APP026_010: QaBody = async ({ page, qa }) => {
   const a = amc(page);
-  const asset = qa.code('X-AST-CT1');
+  const asset = qa.bed('X-AST-CT1');
   await qa.step(1, async () => {
     await a.openDialog();
     await expect(a.dialog).toHaveAccessibleName('AMC');
@@ -234,7 +234,7 @@ export const TC_APP026_010: QaBody = async ({ page, qa }) => {
 
 export const TC_APP026_011: QaBody = async ({ page, qa }) => {
   const a = amc(page);
-  const asset = qa.code('X-AST-CT1');
+  const asset = qa.bed('X-AST-CT1');
   await qa.step(1, async () => refused(qa, 1, await a.save({ [CA]: asset, [NE]: 'renew', Date: '2028-12-31' }, 'Warranty'), 'asset, type and date are required'));
   await qa.step(2, async () => refused(qa, 2, await a.save({ [CA]: asset, Date: '2028-12-31' }, 'Warranty'), 'asset, type and date are required'));
   await qa.step(3, async () => refused(qa, 3, await a.save({ [CA]: '', [NE]: 'released' }, 'Certificate'), 'asset is required'));
@@ -245,7 +245,7 @@ export const TC_APP026_012: QaBody = async ({ page, qa }) => {
   const w = work(page);
   qa.notRun(1, 'needs an asset registered in Fixed assets (27): its asset code is checked there');
   await qa.step(2, async () => {
-    const r = await w.create(BREAKDOWN(qa, qa.code('X-AST-TIDAK-ADA')), 'Breakdown');
+    const r = await w.create(BREAKDOWN(qa, qa.bed('X-AST-TIDAK-ADA')), 'Breakdown');
     qa.note(2, `a code Fixed assets does not have: "${r.toasts.join(' / ')}"`);
   });
   for (const s of [3, 4, 5, 6]) qa.notRun(s, 'needs a completed and invoiced work order (budget hold needs U5; the spare is not in Inventory)');
@@ -269,7 +269,7 @@ export const TC_APP026_013: QaBody = async ({ page, qa, browser }) => {
       qa.note(1, `U3 opens ${(await menuScreens(staff, '/maintenance', ['Plans', 'Work', 'AMC'])).join('; ')} (TBD in the workbook)`);
     });
     await qa.step(2, async () => {
-      const toasts = await work(staff).save(BREAKDOWN(qa, qa.code('X-AST-AC1')), 'Breakdown');
+      const toasts = await work(staff).save(BREAKDOWN(qa, qa.bed('X-AST-AC1')), 'Breakdown');
       qa.note(2, `a breakdown reported by U3: "${toasts.join(' / ') || 'no toast'}" (TBD in the workbook: whether a ward nurse may report one)`);
     });
     if (!sent.id) {

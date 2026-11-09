@@ -22,7 +22,8 @@ export async function toastsAfter(page: Page, mark: number, timeout = 8_000): Pr
 /** EMP-1 (or EMP-2) of the catalogue with a new token in number and name. */
 export function employeeData(qa: Qa, base: { no: string; name: string } = HR.emp1, department = DEP_A_HIT): Required<Pick<Employee, 'no' | 'name'>> & Employee {
   const t = qa.token();
-  return { ...HR.emp1, no: `${base.no}-${t}`, name: `${base.name} ${t}`, department };
+  // The Employee pickers load the first 50 employees in code order (found blocker 40): the number sorts first.
+  return { ...HR.emp1, no: qa.bed(base.no), name: `${base.name} ${t}`, department };
 }
 
 /** Creates an employee through the six steps and returns it (toast "Employee saved"). */

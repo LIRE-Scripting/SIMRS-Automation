@@ -32,7 +32,7 @@ qaTest('TC-APP015-011', async ({ page, qa, browser }) => {
     expect(await v.act(p.id, 'Triage')).toContain('Triage recorded');
   }
   expect(await v.assignBay(pt1.id, bed1.id)).toContain('Bay assigned');
-  const occ = await bedWithId(page, qa.code('X-IGD-OCC'));
+  const occ = await bedWithId(page, qa.bed('X-IGD-OCC'));
   const adm = new AdmissionsPage(page);
   await adm.open();
   await adm.admit(`QA-INP Pasien Satu ${qa.token()}`, occ.no);

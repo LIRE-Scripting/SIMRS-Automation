@@ -69,7 +69,7 @@ export const TC_APP014_053 = async ({ page, qa }: CaseArgs): Promise<void> => {
 export const TC_APP014_057 = async ({ page, qa }: CaseArgs): Promise<void> => {
   const pl = plans(page);
   const pt = await patientWithId(page, qa);
-  const code = qa.code('X-BPJS-K1');
+  const code = qa.bed('X-BPJS-K1');
   const sponsor = qa.code('X-BPJS');
 
   await qa.step(1, async () => {

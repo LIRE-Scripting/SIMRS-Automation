@@ -296,8 +296,9 @@ export const TC_APP019_075: QaBody = async ({ page, qa }) => {
 };
 
 export const TC_APP019_076: QaBody = async ({ page, qa }) => {
-  // The ledger list offers only the first 50 accounts (found blocker 40): the first offered QA liability account.
-  const ledger = { code: 'QA-2110' };
+  // The ledger list offers only the first 50 accounts in code order (found blocker 40), and the sort-first accounts of
+  // earlier runs push the seeded QA-2110 out of them: a liability account of the test whose code sorts first.
+  const ledger = await createAccount(page, { code: qa.bed('QA-2110'), name: qa.name('QA Hutang Uji'), kind: 'Liability' });
   let ag: { no: string; toasts: string[]; status: string; refused?: boolean } = { no: '', toasts: [], status: '' };
   await qa.step(1, async () => {
     const d = new FinanceDesk(page, 'legal-agreements');

@@ -131,7 +131,7 @@ export const HEAD = 'ALKES';
 export const SPARE = 'the spare "X-FREON" with stock in "X Gudang IPSRS" is not in Inventory (07)';
 
 export const ORDER = (qa: Qa, breakdown: string, extra: Record<string, string> = {}) => ({
-  Number: qa.code('X-WO-001'),
+  Number: qa.bed('X-WO-001'),
   [NE]: 'external',
   [NV]: qa.prefix('X Teknisi uji'),
   [JB]: HEAD,
@@ -141,9 +141,9 @@ export const ORDER = (qa: Qa, breakdown: string, extra: Record<string, string> =
 });
 
 export async function breakdown(page: Page, qa: Qa): Promise<string> {
-  const r = await work(page).create(BREAKDOWN(qa, qa.code('X-AST-AC1')), 'Breakdown');
+  const r = await work(page).create(BREAKDOWN(qa, qa.bed('X-AST-AC1')), 'Breakdown');
   expect(r.toasts).toContain(SAVED);
   return r.id;
 }
 
-export const BREAKDOWN = (qa: Qa, asset: string) => ({ Number: qa.code('X-BD-001'), [CA]: asset });
+export const BREAKDOWN = (qa: Qa, asset: string) => ({ Number: qa.bed('X-BD-001'), [CA]: asset });

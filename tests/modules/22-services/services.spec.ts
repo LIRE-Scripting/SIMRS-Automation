@@ -32,17 +32,17 @@ qaTest('TC-APP022-002', async ({ page, qa }) => {
   const d = desk(page, 'categories');
   const code = await category(page, qa);
   await category(page, qa, code);
-  await qa.step(1, async () => refused(qa, 1, await d.save({ Code: qa.code('X-LDR'), Name: qa.name('X Laundry uji'), 'Purchase account': '' }), 'code, name, account and center are required'));
+  await qa.step(1, async () => refused(qa, 1, await d.save({ Code: qa.bed('X-LDR'), Name: qa.name('X Laundry uji'), 'Purchase account': '' }), 'code, name, account and center are required'));
   await qa.step(2, async () => {
-    const own = qa.code('X-LDR');
+    const own = qa.bed('X-LDR');
     refused(qa, 2, await d.save({ Code: own, Name: qa.name('X Laundry uji'), Parent: own }), 'category cannot parent itself');
   });
-  await qa.step(3, async () => refused(qa, 3, await d.save({ Code: qa.code('X-LDR'), Name: qa.name('X Laundry uji'), Parent: qa.code('X-TIDAK-ADA') }), 'parent is missing'));
+  await qa.step(3, async () => refused(qa, 3, await d.save({ Code: qa.bed('X-LDR'), Name: qa.name('X Laundry uji'), Parent: qa.bed('X-TIDAK-ADA') }), 'parent is missing'));
   await qa.step(4, async () => refused(qa, 4, await d.save({ Code: code, Name: qa.name('X Laundry uji') }), 'duplicate'));
   await qa.step(5, async () => refused(qa, 5, await d.save({ Code: code }, 'Delete category'), 'children exist'));
-  await qa.step(6, async () => refused(qa, 6, await d.save({ Code: qa.code('X-TIDAK-ADA') }, 'Deactivate'), 'category is missing'));
+  await qa.step(6, async () => refused(qa, 6, await d.save({ Code: qa.bed('X-TIDAK-ADA') }, 'Deactivate'), 'category is missing'));
   await qa.step(7, async () => {
-    const toasts = await d.save({ Code: qa.code('X-LDR'), Name: qa.name('X Laundry uji'), 'Purchase account': '9999-QA' });
+    const toasts = await d.save({ Code: qa.bed('X-LDR'), Name: qa.name('X Laundry uji'), 'Purchase account': '9999-QA' });
     qa.note(7, `account "9999-QA": toast "${toasts.join(' / ')}"`);
   });
 });
@@ -53,8 +53,8 @@ qaTest('TC-APP022-004', async ({ page, qa }) => {
   const d = desk(page, 'items');
   const cat = await category(page, qa);
   const code = await item(page, qa, cat);
-  await qa.step(1, async () => refused(qa, 1, await d.save({ Code: qa.code('X-CUCI'), Name: qa.name('X Cuci linen uji'), Parent: cat, 'Sales account': '' }), 'accounts are required'));
-  await qa.step(2, async () => refused(qa, 2, await d.save({ Code: qa.code('X-CUCI'), Name: qa.name('X Cuci linen uji') }), 'category is missing'));
+  await qa.step(1, async () => refused(qa, 1, await d.save({ Code: qa.bed('X-CUCI'), Name: qa.name('X Cuci linen uji'), Parent: cat, 'Sales account': '' }), 'accounts are required'));
+  await qa.step(2, async () => refused(qa, 2, await d.save({ Code: qa.bed('X-CUCI'), Name: qa.name('X Cuci linen uji') }), 'category is missing'));
   await qa.step(3, async () => refused(qa, 3, await d.save({ Code: code, Name: qa.name('X Cuci linen uji'), Parent: cat }), 'duplicate'));
   await qa.step(4, async () => {
     await d.open();
@@ -70,7 +70,7 @@ qaTest('TC-APP022-006', async ({ page, qa }) => {
   const d = desk(page, 'requests');
   const cat = await category(page, qa);
   const it = await item(page, qa, cat);
-  const fields = (extra: Record<string, string>) => ({ Number: qa.code('X-SR-001'), Parent: cat, Item: it, Department: qa.prefix('X Bangsal uji'), Description: qa.prefix('X cuci linen'), ...extra });
+  const fields = (extra: Record<string, string>) => ({ Number: qa.bed('X-SR-001'), Parent: cat, Item: it, Department: qa.prefix('X Bangsal uji'), Description: qa.prefix('X cuci linen'), ...extra });
   await qa.step(1, async () => refused(qa, 1, await d.save(fields({ Department: '' })), 'number, category, item, center and department are required'));
   await qa.step(2, async () => refused(qa, 2, await d.save(fields({ Item: 'CUCI' })), 'item is missing'));
   const draft = await request(page, qa, it, cat);
@@ -124,7 +124,7 @@ qaTest('TC-APP022-008', async ({ page, qa, browser }) => {
       await allBranchesList(u2, qa, 1);
     });
     await qa.step(2, async () => {
-      const v = { Number: qa.code('X-SR-001'), Parent: cat, Item: it, Department: qa.prefix('X Bangsal uji'), Description: qa.prefix('X cuci linen') };
+      const v = { Number: qa.bed('X-SR-001'), Parent: cat, Item: it, Department: qa.prefix('X Bangsal uji'), Description: qa.prefix('X cuci linen') };
       allBranchesSave(qa, 2, await d.save(v));
     });
   });
@@ -136,7 +136,7 @@ qaTest('TC-APP022-010', async ({ page, qa }) => {
   const d = desk(page, 'purchase-requests');
   const it = await item(page, qa, await category(page, qa));
   await qa.step(1, async () => refused(qa, 1, await d.save({ Item: it, Store: 'CSSD', Quantity: '0' }), 'item, store and quantity are required'));
-  await qa.step(2, async () => refused(qa, 2, await d.save({ Item: qa.code('X-TIDAK-ADA'), Store: 'CSSD', Quantity: '2' }), 'item is missing'));
+  await qa.step(2, async () => refused(qa, 2, await d.save({ Item: qa.bed('X-TIDAK-ADA'), Store: 'CSSD', Quantity: '2' }), 'item is missing'));
   await qa.step(3, async () => {
     const id = await purchaseRequest(page, it);
     refused(qa, 3, await d.save({ Document: id }, 'Approve purchase request'), 'send the request first');
@@ -180,7 +180,7 @@ qaTest('TC-APP022-013', async ({ page, qa }) => {
     for (const a of ['Send order', 'Approve order']) expect(await act(page, 'orders', approved.Number, a), a).toContain(SAVED);
     refused(qa, 4, await d.save({ Number: '', Document: await d.id(approved.Number) }, 'Amend'), 'a new number is required');
   });
-  await qa.step(5, async () => refused(qa, 5, await d.save({ Number: qa.code('X-SPO-001'), Document: await d.id(draft.Number) }, 'Amend'), 'approve the order first'));
+  await qa.step(5, async () => refused(qa, 5, await d.save({ Number: qa.bed('X-SPO-001'), Document: await d.id(draft.Number) }, 'Amend'), 'approve the order first'));
   await qa.step(6, async () => {
     const toasts = await d.save(ORDER(qa, it, pr, { Rate: '0' }));
     qa.note(6, `rate 0: "${toasts.join(' / ')}"`);
@@ -214,7 +214,7 @@ qaTest('TC-APP022-022', async ({ page, qa, browser }) => {
     });
     await qa.step(2, async () => {
       const cat = await category(page, qa);
-      refused(qa, 2, await desk(staff, 'requests').save({ Number: qa.code('X-SR-001'), Parent: cat, Item: it, Department: qa.prefix('X Bangsal uji'), Description: qa.prefix('X cuci linen') }), 'missing required privilege');
+      refused(qa, 2, await desk(staff, 'requests').save({ Number: qa.bed('X-SR-001'), Parent: cat, Item: it, Department: qa.prefix('X Bangsal uji'), Description: qa.prefix('X cuci linen') }), 'missing required privilege');
     });
     await qa.step(3, async () => {
       refused(qa, 3, await desk(staff, 'orders').save({ Document: await desk(page, 'orders').id(v.Number) }, 'Approve order'), 'missing required privilege');

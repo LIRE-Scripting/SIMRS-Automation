@@ -13,8 +13,8 @@ export type CaseArgs = { page: Page; qa: Qa };
 
 export const TC_APP022_001 = async ({ page, qa }: CaseArgs): Promise<void> => {
   const d = desk(page, 'categories');
-  const code = qa.code('X-LDR');
-  const child = qa.code('X-LDR-CUCI');
+  const code = qa.bed('X-LDR');
+  const child = qa.bed('X-LDR-CUCI');
   await qa.step(1, async () => {
     await page.goto('/id/services');
     await page.getByRole('main').getByRole('link', { name: 'Service category' }).click();
@@ -64,7 +64,7 @@ export const TC_APP022_001 = async ({ page, qa }: CaseArgs): Promise<void> => {
 export const TC_APP022_003 = async ({ page, qa }: CaseArgs): Promise<void> => {
   const d = desk(page, 'items');
   const cat = await category(page, qa);
-  const code = qa.code('X-CUCI');
+  const code = qa.bed('X-CUCI');
   await qa.step(1, async () => {
     await page.goto('/id/services');
     await page.getByRole('main').getByRole('link', { name: 'Service item' }).click();
@@ -187,7 +187,7 @@ export const TC_APP022_012 = async ({ page, qa }: CaseArgs): Promise<void> => {
     expect(await d.status(v.Number)).toBe('approved');
   });
   await qa.step(5, async () => {
-    const amended = qa.code('X-SPO-001');
+    const amended = qa.bed('X-SPO-001');
     const toasts = await d.save({ Number: amended, Document: await d.id(v.Number) }, 'Amend');
     await d.open();
     const rows = (await d.rows().allInnerTexts()).filter((t) => t.includes(v.Number) || t.includes(amended)).map((t) => t.replace(/\s+/g, ' '));
@@ -200,20 +200,20 @@ export const SAVED = 'Saved.';
 export const desk = (page: Page, r: Route) => new Desk(page, r);
 
 export async function category(page: Page, qa: Qa, parent?: string): Promise<string> {
-  const code = qa.code(parent ? 'X-LDR-CUCI' : 'X-LDR');
+  const code = qa.bed(parent ? 'X-LDR-CUCI' : 'X-LDR');
   expect(await desk(page, 'categories').save({ Code: code, Name: qa.name('X Laundry uji'), ...(parent ? { Parent: parent } : {}) })).toContain(SAVED);
   return code;
 }
 
 export async function item(page: Page, qa: Qa, cat: string): Promise<string> {
-  const code = qa.code('X-CUCI');
+  const code = qa.bed('X-CUCI');
   expect(await desk(page, 'items').save({ Code: code, Name: qa.name('X Cuci linen uji'), Parent: cat })).toContain(SAVED);
   return code;
 }
 
 /** A request of the test, saved as a draft; returns its number. */
 export async function request(page: Page, qa: Qa, itemCode: string, cat: string): Promise<string> {
-  const no = qa.code('X-SR-001');
+  const no = qa.bed('X-SR-001');
   expect(await desk(page, 'requests').save({ Number: no, Parent: cat, Item: itemCode, Department: qa.prefix('X Bangsal uji'), Description: qa.prefix('X cuci linen') })).toContain(SAVED);
   return no;
 }
@@ -246,7 +246,7 @@ export async function approvedPr(page: Page, it: string): Promise<string> {
 }
 
 export const ORDER = (qa: Qa, it: string, pr: string, extra: Record<string, string> = {}) => ({
-  Number: qa.code('X-SPO-001'),
+  Number: qa.bed('X-SPO-001'),
   Name: qa.prefix('X Vendor laundry'),
   Tax: 'PPN 11%',
   Terms: '30 hari',
