@@ -1,6 +1,8 @@
 import { chainTest } from '../../../fixtures/chain';
 import { installToastRecorder } from '../../../lib/assertions';
 import { TC_APP010_001 } from '../../modules/10-hr/cases';
+import { TC_APP017_043 } from '../../modules/17-payroll/desk-cases';
+import { TC_APP019_083 } from '../../modules/19-finance/vouchers-cases';
 
 /**
  * E2E-038: Doctor fee: plan to payout. Each step runs its source test case (tests/modules/<NN-module>/cases.ts)
@@ -10,4 +12,6 @@ chainTest('E2E-038', async ({ page, chain }) => {
   await installToastRecorder(page);
   await chain.step(1, (qa) => TC_APP010_001({ page, qa }));
   chain.stopAsPlanned(2);
+  await chain.run(3, TC_APP017_043);
+  await chain.run(4, TC_APP019_083);
 });

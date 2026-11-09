@@ -1,12 +1,13 @@
 import { NotOffered } from '../lib/not-offered';
 import { test as base } from '@playwright/test';
+import { installToastRecorder } from '../lib/assertions';
 import { authFileOf } from '../lib/config';
 import { blockers, prerequisites, testCaseRef } from '../lib/qa-data';
 import { CHAINS, type Chain } from '../lib/qa-data/e2e-chains';
 import { foundBlocker } from '../lib/qa-data/found-blockers';
 import { firstCode, qaCode, qaName, qaPrefix, uniqueMrn, uniqueToken } from '../lib/qa-data/names';
 import { planFor, traceTag } from '../lib/qa-data/plan';
-import { test as e2e, type Qa } from './e2e';
+import { test as e2e, type Qa, type QaBody } from './e2e';
 
 /**
  * End-to-end chains (lib/qa-data/e2e-chains.ts, workbook
@@ -44,6 +45,11 @@ export interface ChainRun {
    * the chain stops there with the first reason as its cause.
    */
   stopAsPlanned(k: number): void;
+  /**
+   * Runs chain step k as its whole module test case (the body passed to qaTest, exported from the module's cases file),
+   * with this chain's page, or with a page of the test case's own user when that is not U1.
+   */
+  run(k: number, body: QaBody): Promise<void>;
   /** A remark on chain step k. */
   note(k: number, text: string): void;
 }
@@ -97,7 +103,7 @@ const CONTINUE = process.env.QA_CHAIN_CONTINUE === '1';
 const test = e2e.extend<{ chain: ChainRun; chainId: string }>({
   chainId: ['', { option: true }],
 
-  chain: async ({ chainId }, use, testInfo) => {
+  chain: async ({ chainId, page, context, browser, request, baseURL }, use, testInfo) => {
     const chain = CHAINS.find((c) => c.id === chainId)!;
     const note = (type: string, k: number, text: string) => testInfo.annotations.push({ type, description: `Step ${k}: ${text}` });
     let stoppedAt = 0;
@@ -135,7 +141,9 @@ const test = e2e.extend<{ chain: ChainRun; chainId: string }>({
       };
     };
 
-    await use({
+    // The module specs record toasts in their beforeEach (installToastRecorder); the chain runs their bodies without those hooks.
+    await installToastRecorder(page);
+    const run: ChainRun = {
       chain,
       step: async (k, body) => {
         // Steps after a stop are not run: the workbook reports them Blocked by the cause of the stop. With
@@ -155,6 +163,19 @@ const test = e2e.extend<{ chain: ChainRun; chainId: string }>({
             }
             return out;
           } catch (e) {
+            // A module test case that skips itself (test.skip with a blocker) stops the chain there, not the whole chain test.
+            if ((e as Error)?.constructor?.name === 'TestSkipError') {
+              testInfo.expectedStatus = 'passed';
+              const i = testInfo.annotations.map((a) => a.type).lastIndexOf('skip');
+              const why = i >= 0 ? (testInfo.annotations.splice(i, 1)[0].description ?? '') : String((e as Error).message);
+              const blocker = why.match(/^Blocker \d+/)?.[0];
+              if (probing) note('after-stop', k, `${cs.tc}: skipped itself (${why.slice(0, 160)})`);
+              else {
+                stoppedAt ||= k;
+                note('chain-stop', k, blocker ? `${blocker}: ${cs.tc}, ${checkCause(chain, k, blocker)}. ${why}` : `STEP-NOT-RUN: ${cs.tc} is not run: ${why}`);
+              }
+              return undefined as never;
+            }
             if (probing) {
               note('after-stop', k, `${cs.tc}: error (${String((e as Error).message ?? e).split('\n')[0].slice(0, 160)})`);
               return undefined as never;
@@ -186,7 +207,19 @@ const test = e2e.extend<{ chain: ChainRun; chainId: string }>({
         note('chain-stop', k, `${causes[0]}: ${checkCause(chain, k, causes[0])}${causes.length > 1 ? `. Also: ${plan.reasons.slice(1).join('; ')}` : ''}`);
       },
       note: (k, text) => note('note', k, text),
-    });
+      run: async (k, body) => {
+        const user = planFor(testCaseRef(chain.steps[k - 1].tc)).user;
+        const own = user && user !== 'U1' ? await browser.newContext({ storageState: authFileOf(user) }) : undefined;
+        const p = own ? await own.newPage() : page;
+        if (own) await installToastRecorder(p);
+        try {
+          await run.step(k, (qa) => (body as (a: unknown, t: unknown) => Promise<void>)({ page: p, context: own ?? context, browser, request, baseURL, qa }, testInfo));
+        } finally {
+          await own?.close();
+        }
+      },
+    };
+    await use(run);
   },
 });
 

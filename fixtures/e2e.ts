@@ -262,6 +262,8 @@ async function finishEvidence(testInfo: TestInfo): Promise<void> {
 }
 
 type Body = Parameters<typeof test>[2];
+/** The body of a module test case (qaTest), also run as a step of an end-to-end chain (chain.run). */
+export type QaBody = Body;
 
 /**
  * Declares the test of one workbook test case. Runs as the journey's user

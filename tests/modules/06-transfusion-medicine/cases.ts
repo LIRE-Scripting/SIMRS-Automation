@@ -98,7 +98,13 @@ export const TC_APP006_022 = async ({ page, qa }: CaseArgs): Promise<void> => {
   });
 
   await qa.step(4, async () => {
-    await d.getByRole('textbox', { name: /Patient group/ }).fill('O Positive');
+    // The dialog renders again once "Accept" is saved, which empties a group typed before it (the save then sends no group).
+    const group = d.getByRole('textbox', { name: /Patient group/ });
+    await expect(async () => {
+      await group.fill('O Positive');
+      await page.waitForTimeout(700);
+      await expect(group).toHaveValue('O Positive', { timeout: 100 });
+    }).toPass({ timeout: 15_000 });
     expect(await save(page, d, 'Save group')).toContain('Group saved');
   });
 

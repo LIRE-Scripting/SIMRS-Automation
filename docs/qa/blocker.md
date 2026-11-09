@@ -1,10 +1,10 @@
 # Blocker: masalah yang menghentikan pengujian
 
-Dibangun 2026-11-06 15:00 WIB dari `reports/summary/run-summary.json` (hasil terbaru setiap test case dan rantai). Bangun ulang: `npm run qa:run-summary && npm run qa:findings-md`.
+Dibangun 2026-11-09 07:55 WIB dari `reports/summary/run-summary.json` (hasil terbaru setiap test case dan rantai). Bangun ulang: `npm run qa:run-summary && npm run qa:findings-md`.
 
 Blocker = masalah di situs (atau data/set-up yang belum ada) yang membuat sebuah langkah **tidak bisa dijalankan sama sekali**. Langkah itu dan langkah sesudahnya berstatus **Terblokir**, tidak dihitung lulus maupun gagal. Perbedaan hasil pada langkah yang bisa dijalankan ada di [deviations.md](deviations.md); error server ada di [http-5xx.md](http-5xx.md).
 
-Saat ini **33 blocker** masih menghentikan **319 test case**; 15 blocker lainnya sudah selesai atau tidak lagi menghentikan test.
+Saat ini **33 blocker** masih menghentikan **310 test case**; 15 blocker lainnya sudah selesai atau tidak lagi menghentikan test.
 
 Blocker yang penyebabnya **error server** (2, 3, 25, 27, 38, 41, 48, 53, 55) dipindah ke [http-5xx.md](http-5xx.md#error-server-yang-menghentikan-test) (keputusan 2026-11-06); test case-nya tetap berstatus Terblokir.
 
@@ -18,16 +18,16 @@ Blocker 1–16 berasal dari checklist `reference/00-blockers-checklist-linked.xl
 
 | No | Blocker | Jenis | Cabang | Test case | Rantai | Modul | Penanggung jawab |
 |---:|---|---|---|---:|---|---|---|
-| [40](#blocker-40) | Picker dan daftar hanya menjangkau data awal: data di luarnya tidak bisa dipilih atau ditemukan | Bug situs | Podomoro | 66 | E2E-003, E2E-010, E2E-012, E2E-014, E2E-027, E2E-032, E2E-039, E2E-044 | 01 Rawat Jalan, 02 Janji Temu, 04 Rawat Inap, 05 Farmasi, 07 Persediaan, 10 SDM, 12 Radiologi (RIS), 14 Kasir & Tagihan, 15 IGD, 17 Penggajian, 19 Keuangan, 22 Layanan Jasa, 24 Tata Graha, 26 Pemeliharaan | Development |
+| [40](#blocker-40) | Picker dan daftar hanya menjangkau data awal: data di luarnya tidak bisa dipilih atau ditemukan | Bug situs | Podomoro | 62 | E2E-003, E2E-010, E2E-012, E2E-014, E2E-027, E2E-032, E2E-039, E2E-044 | 01 Rawat Jalan, 02 Janji Temu, 04 Rawat Inap, 05 Farmasi, 10 SDM, 12 Radiologi (RIS), 14 Kasir & Tagihan, 15 IGD, 17 Penggajian, 19 Keuangan, 22 Layanan Jasa, 24 Tata Graha, 26 Pemeliharaan | Development |
 | [4](#blocker-4) | Tenants dan Entitlements menolak administrator rumah sakit ("missing required privilege"; sampai 2026-10-30 HTTP 500) | Set-up & data uji | Level tenant (semua cabang) | 50 |  | 01 Rawat Jalan, 02 Janji Temu, 03 Pelayanan Pasien, 04 Rawat Inap, 05 Farmasi, 06 Transfusi Darah, 07 Persediaan, 08 Kamar Operasi, 09 Pengadaan, 10 SDM, 11 Laboratorium, 12 Radiologi (RIS), 13 Diet, 14 Kasir & Tagihan, 15 IGD, 16 Rekam Medis (MRD), 17 Penggajian, 18 Pengaturan, 19 Keuangan, 20 Anggaran, 21 Sterilisasi (CSSD), 22 Layanan Jasa, 23 Tender & Kontrak, 24 Tata Graha, 25 Linen, 26 Pemeliharaan, 27 Aset Tetap | Development; peminta untuk akunnya |
-| [13](#blocker-13) | Set-up cabang belum ada | Set-up & data uji | Podomoro; konfigurasi IGD juga tidak ada di cabang lain | 28 | E2E-001, E2E-005, E2E-015, E2E-036, E2E-037 | 05 Farmasi, 15 IGD, 19 Keuangan, 21 Sterilisasi (CSSD) | Tester, dengan persetujuan blocker 15 |
+| [13](#blocker-13) | Set-up cabang belum ada | Set-up & data uji | Podomoro; konfigurasi IGD juga tidak ada di cabang lain | 27 | E2E-001, E2E-005, E2E-015 | 05 Farmasi, 15 IGD, 19 Keuangan, 21 Sterilisasi (CSSD) | Tester, dengan persetujuan blocker 15 |
 | [5](#blocker-5) | 28 daftar tidak termuat dengan "Semua cabang" | Bug situs | Semua cabang (U2) | 29 |  | 06 Transfusi Darah, 07 Persediaan, 09 Pengadaan, 10 SDM, 14 Kasir & Tagihan, 17 Penggajian, 22 Layanan Jasa, 23 Tender & Kontrak | Development; tester untuk solusi sementara |
 | [10](#blocker-10) | Item yang disimpan tidak tampil di daftar mana pun | Bug situs | Podomoro | 14 |  | 17 Penggajian | Development |
 | [23](#blocker-23) | Ward care tidak menampilkan pasien rawat inap cabang | Bug situs | Podomoro | 12 | E2E-004 | 04 Rawat Inap | Development |
 | [45](#blocker-45) | Tahun buku 2026 tidak punya periode, dan periodenya tidak bisa dibuat lewat layar: jurnal, voucher, atau pembayaran bertanggal hari ini tidak bisa disimpan | Fitur belum ada | Podomoro | 12 |  | 19 Keuangan | Development |
-| [46](#blocker-46) | Tidak ada user yang bisa menyetujui dokumen keuangan: "Approve" menjawab "missing required privilege" (tenant tidak punya FINANCE_APPROVE) | Set-up & data uji | Podomoro | 11 |  | 19 Keuangan, 20 Anggaran | Development, lalu administrator site |
 | [8](#blocker-8) | Order diet tidak pernah sampai ke Dapur atau Layanan dan tagihan | Fitur belum ada | Podomoro | 8 | E2E-045 | 13 Diet | Product owner, lalu Development |
 | [17](#blocker-17) | Pengaturan buku: baris kuota atau jam buka tidak bisa diubah ke "Unit" | Bug situs | Podomoro | 9 |  | 01 Rawat Jalan, 02 Janji Temu | Development |
+| [46](#blocker-46) | Tidak ada user yang bisa menyetujui dokumen keuangan: "Approve" menjawab "missing required privilege" (tenant tidak punya FINANCE_APPROVE) | Set-up & data uji | Podomoro | 9 |  | 19 Keuangan, 20 Anggaran | Development, lalu administrator site |
 | [11](#blocker-11) | Penerimaan layanan dan tagihan vendor tidak pernah tampil di daftar | Bug situs | Podomoro | 7 |  | 22 Layanan Jasa | Development |
 | [24](#blocker-24) | Tipe rujukan dan tipe konsul silang hanya menampilkan baris awal, tanpa halaman atau pencarian | Bug situs | Podomoro | 6 | E2E-020 | 02 Janji Temu | Development |
 | [36](#blocker-36) | Buku besar pasien tidak bisa menampilkan invoice pilihan: "Cari pasien" kosong, daftar hanya 22 invoice | Bug situs | Podomoro | 7 |  | 14 Kasir & Tagihan | Development |
@@ -42,10 +42,10 @@ Blocker 1–16 berasal dari checklist `reference/00-blockers-checklist-linked.xl
 | [7](#blocker-7) | "Hitung jasa" tidak pernah berhasil | Bug situs | Podomoro | 3 | E2E-038 | 10 SDM | Development |
 | [9](#blocker-9) | Kunjungan IGD yang sudah ditutup tidak bisa diterima lagi; "Tandai hidup" tidak bisa dicapai | Fitur belum ada | Podomoro | 4 |  | 15 IGD | Product owner, lalu Development |
 | [29](#blocker-29) | Penyerahan obat dari order tidak bisa mengubah Diserahkan, Diminta, atau Generik | Fitur belum ada | Podomoro | 3 |  | 05 Farmasi | Development |
-| [34](#blocker-34) | Diskon di atas batas kasir tidak bisa menunggu persetujuan: rantai persetujuan diskon billing belum diatur | Fitur belum ada | Podomoro | 3 |  | 14 Kasir & Tagihan | Development (prosesnya), lalu administrator site (langkahnya) |
 | [42](#blocker-42) | Uang muka (imprest) tidak bisa diajukan: kelayakan imprest cabang tidak bisa diatur | Bug situs | Podomoro | 2 | E2E-042 | 19 Keuangan | Administrator site, lalu Development |
-| [51](#blocker-51) | Daftar lama menampilkan data baru: item baru di Master Item, dan baris penyerahan baru di Issue Lines farmasi | Bug situs | Podomoro | 1 | E2E-008, E2E-035 | 07 Persediaan | Development |
+| [51](#blocker-51) | Daftar lama menampilkan data baru: item baru di Master Item, dan baris penyerahan baru di Issue Lines farmasi | Bug situs | Podomoro | 1 | E2E-008, E2E-035 | 05 Farmasi | Development |
 | [26](#blocker-26) | Gudang tidak bisa dibuat di situs (Gudang tidak punya tombol "Tambah") | Fitur belum ada | Podomoro | 2 |  | 05 Farmasi, 07 Persediaan | Development; administrator site untuk gudangnya |
+| [34](#blocker-34) | Diskon di atas batas kasir tidak bisa menunggu persetujuan: rantai persetujuan diskon billing belum diatur | Fitur belum ada | Podomoro | 2 |  | 14 Kasir & Tagihan | Development (prosesnya), lalu administrator site (langkahnya) |
 | [37](#blocker-37) | 12 komponen gaji dari workbook tidak ada di situs, dan tidak ada layar untuk membuatnya | Fitur belum ada | Podomoro | 2 |  | 17 Penggajian | Development / Product owner |
 | [56](#blocker-56) | "Bayar" saat tidak ada lagi yang ditagih gagal dengan error database | Bug situs | Podomoro | 2 |  | 14 Kasir & Tagihan | Development |
 | [19](#blocker-19) | Pasien tidak bisa ditandai meninggal | Fitur belum ada | Podomoro | 1 |  | 01 Rawat Jalan | Product owner, lalu Development |
@@ -64,7 +64,7 @@ Blocker 1–16 berasal dari checklist `reference/00-blockers-checklist-linked.xl
 - **Dampak:** 50 test case terhenti (01 Rawat Jalan, 02 Janji Temu, 03 Pelayanan Pasien, 04 Rawat Inap, 05 Farmasi, 06 Transfusi Darah, 07 Persediaan, 08 Kamar Operasi, 09 Pengadaan, 10 SDM, 11 Laboratorium, 12 Radiologi (RIS), 13 Diet, 14 Kasir & Tagihan, 15 IGD, 16 Rekam Medis (MRD), 17 Penggajian, 18 Pengaturan, 19 Keuangan, 20 Anggaran, 21 Sterilisasi (CSSD), 22 Layanan Jasa, 23 Tender & Kontrak, 24 Tata Graha, 25 Linen, 26 Pemeliharaan, 27 Aset Tetap).
 - **Perbaikan:** Fungsi: sembunyikan tautan untuk user tanpa hak, atau tampilkan "no access" alih-alih halaman error. Data: akun dengan LICENSING_WRITE untuk menguji kedua layar.
 - **Penanggung jawab:** Development; peminta untuk akunnya
-- **Cek ulang:** Masih berlaku (pengawas blocker, 2026-11-02): missing required privilege / missing required privilege
+- **Cek ulang:** Masih berlaku (pengawas blocker, 2026-11-07): missing required privilege / missing required privilege
 - **Sumber:** 00-blockers-checklist-linked.xlsx baris 8
 - **Test case terhenti:** TC-APP001-064, TC-APP001-088, TC-APP002-032, TC-APP003-038, TC-APP003-062, TC-APP004-052, TC-APP004-089, TC-APP005-047, TC-APP005-048, TC-APP005-077, TC-APP006-066, TC-APP006-079, TC-APP007-035, TC-APP007-063, TC-APP008-021, TC-APP008-052, TC-APP009-033, TC-APP009-061, TC-APP010-036, TC-APP010-063, TC-APP011-027, TC-APP011-053, TC-APP012-021, TC-APP012-034, TC-APP013-030, TC-APP013-061, TC-APP014-050, TC-APP014-073, TC-APP014-080, TC-APP015-021, TC-APP015-068, TC-APP016-025, TC-APP016-048, TC-APP017-024, TC-APP017-062, TC-APP018-001, TC-APP018-027, TC-APP018-059, TC-APP018-062, TC-APP018-088 … (+10)
 
@@ -78,7 +78,7 @@ Blocker 1–16 berasal dari checklist `reference/00-blockers-checklist-linked.xl
 - **Dampak:** 29 test case terhenti (06 Transfusi Darah, 07 Persediaan, 09 Pengadaan, 10 SDM, 14 Kasir & Tagihan, 17 Penggajian, 22 Layanan Jasa, 23 Tender & Kontrak).
 - **Perbaikan:** 1. Putuskan: layar meminta cabang, atau daftar dimuat untuk semua cabang. 2. Di kedua kasus, tampilkan pesan, bukan HTTP 500 dan tabel kosong. 3. Jalankan lagi delapan alur yang dipertahankan dengan "All branches". Solusi sementara: pilih satu cabang di header (ke-28 daftar termuat dengan Podomoro).
 - **Penanggung jawab:** Development; tester untuk solusi sementara
-- **Cek ulang:** Masih berlaku (pengawas blocker, 2026-11-02): Patient ledger with All branches: Buku pasien Pajak dan diskon tetap di kasir. Klaim sponsor dan BPJS tetap di panel asu
+- **Cek ulang:** Masih berlaku (pengawas blocker, 2026-11-07): Patient ledger with All branches: Buku pasien Pajak dan diskon tetap di kasir. Klaim sponsor dan BPJS tetap di panel asu
 - **Sumber:** 00-blockers-checklist-linked.xlsx baris 9
 - **Test case terhenti:** TC-APP006-081, TC-APP007-065, TC-APP007-066, TC-APP007-067, TC-APP009-063, TC-APP009-064, TC-APP009-065, TC-APP010-065, TC-APP010-066, TC-APP010-067, TC-APP010-068, TC-APP014-018, TC-APP014-082, TC-APP014-083, TC-APP014-084, TC-APP014-085, TC-APP017-064, TC-APP017-065, TC-APP017-066, TC-APP017-067, TC-APP017-068, TC-APP017-069, TC-APP022-034, TC-APP022-035, TC-APP022-036, TC-APP023-031, TC-APP023-032, TC-APP023-033, TC-APP023-034
 
@@ -106,7 +106,8 @@ Blocker 1–16 berasal dari checklist `reference/00-blockers-checklist-linked.xl
 - **Dampak:** 3 test case dan rantai E2E-038 terhenti (10 SDM).
 - **Perbaikan:** Kirim nomor dari dialog, atau hapus syarat itu di server. Lalu jalankan JRN-APP010-045.
 - **Penanggung jawab:** Development
-- **Cek ulang:** Masih berlaku (pengawas blocker, 2026-11-02): number and amount are required
+- **Cek ulang:** TAMPAKNYA SUDAH SELESAI (pengawas blocker, 2026-11-07): 0:{"a":"$@1","f":"","q":"","i":false,"b":"XCU8xnBWQiL19xUx50r3D"}
+1:{"items":[{"id":"231561db-b4f1-582f-873a-bf1dc172044
 - **Sumber:** 00-blockers-checklist-linked.xlsx baris 11
 - **Test case terhenti:** E2E-038, TC-APP010-052, TC-APP010-053, TC-APP010-054
 
@@ -120,7 +121,7 @@ Blocker 1–16 berasal dari checklist `reference/00-blockers-checklist-linked.xl
 - **Dampak:** 8 test case dan rantai E2E-045 terhenti (13 Diet).
 - **Perbaikan:** 1. Putuskan apakah order diet harus muncul di dapur dan di tagihan. 2. Kalau ya: tambahkan. Kalau tidak: tulis ulang JRN-APP013-039 khusus untuk makanan terlambat.
 - **Penanggung jawab:** Product owner, lalu Development
-- **Cek ulang:** Masih berlaku (pengawas blocker, 2026-11-02): Kitchen: Dapur Siti Aminah pagi waiting Setujui Makan terlambat Batalkan makan
+- **Cek ulang:** Masih berlaku (pengawas blocker, 2026-11-07): Kitchen: Dapur Siti Aminah pagi waiting Setujui Makan terlambat Batalkan makan
 - **Sumber:** 00-blockers-checklist-linked.xlsx baris 12
 - **Test case terhenti:** E2E-045, TC-APP013-044, TC-APP013-045, TC-APP013-046, TC-APP013-047, TC-APP013-048, TC-APP013-049, TC-APP013-050, TC-APP013-051
 
@@ -148,7 +149,7 @@ Blocker 1–16 berasal dari checklist `reference/00-blockers-checklist-linked.xl
 - **Dampak:** 14 test case terhenti (17 Penggajian).
 - **Perbaikan:** Tambahkan daftar untuk kelima jenis record, atau tampilkan di layarnya setelah disimpan.
 - **Penanggung jawab:** Development
-- **Cek ulang:** Masih berlaku (pengawas blocker, 2026-11-02): Tax lists: Deklarasi pajak Deklarasi pajak Status Uraian Kode EMP-WULAN emi 500000.00 e6c78b0b-a581-52b1-87df-8
+- **Cek ulang:** Masih berlaku (pengawas blocker, 2026-11-07): Tax lists: Deklarasi pajak Deklarasi pajak Status Uraian Kode EMP-WULAN emi 500000.00 e6c78b0b-a581-52b1-87df-8
 - **Sumber:** 00-blockers-checklist-linked.xlsx baris 14
 - **Test case terhenti:** TC-APP017-028, TC-APP017-029, TC-APP017-030, TC-APP017-031, TC-APP017-032, TC-APP017-033, TC-APP017-034, TC-APP017-035, TC-APP017-036, TC-APP017-037, TC-APP017-038, TC-APP017-048, TC-APP017-049, TC-APP017-050
 
@@ -162,7 +163,7 @@ Blocker 1–16 berasal dari checklist `reference/00-blockers-checklist-linked.xl
 - **Dampak:** 7 test case terhenti (22 Layanan Jasa).
 - **Perbaikan:** Tambahkan route dan daftar untuk penerimaan dan tagihan, dengan id setiap baris. Setelah itu alur end-to-end JRN-APP022-008 bisa dijalankan.
 - **Penanggung jawab:** Development
-- **Cek ulang:** Masih berlaku (pengawas blocker, 2026-11-02): Penerimaan jasa Penerimaan jasa tidak menambah stok. Terima  / Tagihan vendor Tagih Status Uraian Kode Belum ada data. T
+- **Cek ulang:** Masih berlaku (pengawas blocker, 2026-11-07): Penerimaan jasa Penerimaan jasa tidak menambah stok. Terima  / Tagihan vendor Tagih Status Uraian Kode Belum ada data. T
 - **Sumber:** 00-blockers-checklist-linked.xlsx baris 15
 - **Test case terhenti:** TC-APP022-015, TC-APP022-016, TC-APP022-017, TC-APP022-018, TC-APP022-019, TC-APP022-020, TC-APP022-021
 
@@ -176,7 +177,7 @@ Blocker 1–16 berasal dari checklist `reference/00-blockers-checklist-linked.xl
 - **Dampak:** 5 test case terhenti (03 Pelayanan Pasien).
 - **Perbaikan:** Impor dan aktifkan versi kode diagnosis di site (API atau seed; tidak ada layar untuk itu). Lalu jalankan lagi JRN-APP003-047.
 - **Penanggung jawab:** Administrator site
-- **Cek ulang:** Masih berlaku (pengawas blocker, 2026-11-02): I10: Hasil Tidak ada kode yang cocok. Antrean koding Tidak ada ra
+- **Cek ulang:** Masih berlaku (pengawas blocker, 2026-11-07): I10: Hasil Tidak ada kode yang cocok. Antrean koding Tidak ada ra
 - **Sumber:** 00-blockers-checklist-linked.xlsx baris 16
 - **Test case terhenti:** TC-APP003-042, TC-APP003-043, TC-APP003-044, TC-APP003-045, TC-APP003-056
 
@@ -187,12 +188,12 @@ Blocker 1–16 berasal dari checklist `reference/00-blockers-checklist-linked.xl
 - **Jenis:** Set-up & data uji
 - **Cabang:** Podomoro; konfigurasi IGD juga tidak ada di cabang lain
 - **Masalah:** Set-up cabang belum lengkap. Yang masih kurang: konfigurasi registrasi IGD (tipe 6 dan 7) di semua cabang, tanpa layar untuk membuatnya; dan periode tahun buku 2026 untuk tutup tahun serta penerimaan pasien di Keuangan (blocker 45). Sudah dibuka 2026-11-01 oleh tester: Anggaran (alokasi bisa disetujui dan diposting; aturan posting "Pencairan dana" dan "Penarikan dana" Podomoro disimpan dengan akun uji QA), uji Bowie Dick CSSD (disimpan setiap hari untuk autoklaf bawaan), daftar Reorder Podomoro, dan Punch untuk user yang tertaut ke pegawai.
-- **Dampak:** 28 test case dan rantai E2E-001, E2E-005, E2E-015, E2E-036, E2E-037 terhenti (05 Farmasi, 15 IGD, 19 Keuangan, 21 Sterilisasi (CSSD)).
+- **Dampak:** 27 test case dan rantai E2E-001, E2E-005, E2E-015 terhenti (05 Farmasi, 15 IGD, 19 Keuangan, 21 Sterilisasi (CSSD)).
 - **Perbaikan:** 09: item di bawah stok minimum di cabang. 10: "Link me" di My profile untuk user uji. 15 dan 19: buka lagi dengan satu cabang dipilih; kalau masih tidak ada, tambahkan konfigurasi untuk cabang itu. 20: Budget posting rule yang bisa dipakai di Finance untuk cabang, dan penyetuju untuk setiap rantai. 21: uji Bowie Dick yang lulus untuk autoklaf; KIT dan KITS di Persediaan.
 - **Penanggung jawab:** Tester, dengan persetujuan blocker 15
-- **Cek ulang:** Masih berlaku (pengawas blocker, 2026-11-02): Podomoro belum punya konfigurasi registrasi untuk tipe 7.
+- **Cek ulang:** Masih berlaku (pengawas blocker, 2026-11-07): Podomoro belum punya konfigurasi registrasi untuk tipe 7.
 - **Sumber:** 00-blockers-checklist-linked.xlsx baris 17
-- **Test case terhenti:** E2E-001, E2E-005, E2E-015, E2E-036, E2E-037, TC-APP005-039, TC-APP005-040, TC-APP015-027, TC-APP015-028, TC-APP015-029, TC-APP015-030, TC-APP015-031, TC-APP015-032, TC-APP015-034, TC-APP015-037, TC-APP015-040, TC-APP015-041, TC-APP015-042, TC-APP015-052, TC-APP015-053, TC-APP015-056, TC-APP015-057, TC-APP019-010, TC-APP019-058, TC-APP019-059, TC-APP019-060, TC-APP019-061, TC-APP019-080, TC-APP019-081, TC-APP019-082, TC-APP021-005, TC-APP021-006, TC-APP021-007
+- **Test case terhenti:** E2E-001, E2E-005, E2E-015, TC-APP005-039, TC-APP005-040, TC-APP015-027, TC-APP015-028, TC-APP015-029, TC-APP015-030, TC-APP015-031, TC-APP015-032, TC-APP015-034, TC-APP015-037, TC-APP015-040, TC-APP015-041, TC-APP015-042, TC-APP015-052, TC-APP015-053, TC-APP015-056, TC-APP015-057, TC-APP019-058, TC-APP019-059, TC-APP019-060, TC-APP019-061, TC-APP019-080, TC-APP019-081, TC-APP019-082, TC-APP021-005, TC-APP021-006, TC-APP021-007
 
 ### Blocker 17
 
@@ -355,12 +356,12 @@ Blocker 1–16 berasal dari checklist `reference/00-blockers-checklist-linked.xl
 - **Jenis:** Fitur belum ada
 - **Cabang:** Podomoro
 - **Masalah:** Diskon di atas batas kasir tidak bisa menunggu persetujuan: rantai persetujuan diskon tagihan (billingdiscount) tidak ada dan tidak bisa dibuat di Workflow (hanya discharge dan purchase_order). Penjualan tidak pernah berstatus "Menunggu persetujuan".
-- **Dampak:** 3 test case terhenti (14 Kasir & Tagihan).
+- **Dampak:** 2 test case terhenti (14 Kasir & Tagihan).
 - **Perbaikan:** 1. Tambahkan proses "billingdiscount" ke Workflow (Development: layar hanya menawarkan discharge dan purchase_order), lalu beri satu langkah dengan penyetuju Head cashier. 2. Jalankan lagi TC-APP014-007, 028, dan 029.
 - **Penanggung jawab:** Development (prosesnya), lalu administrator site (langkahnya)
 - **Cek ulang:** Dicek otomatis oleh test-nya di setiap run (langkah dicoba, ditandai blocker hanya bila gejalanya muncul).
 - **Sumber:** ditemukan otomasi (lib/qa-data/found-blockers.ts)
-- **Test case terhenti:** TC-APP014-009, TC-APP014-028, TC-APP014-029
+- **Test case terhenti:** TC-APP014-028, TC-APP014-029
 
 ### Blocker 36
 
@@ -397,12 +398,12 @@ Blocker 1–16 berasal dari checklist `reference/00-blockers-checklist-linked.xl
 - **Jenis:** Bug situs
 - **Cabang:** Podomoro
 - **Masalah:** Picker dan daftar hanya menjangkau data awal: picker menyaring data yang dimuat sekali (50 pertama menurut nama) dan daftar desk hanya 22 baris tanpa halaman. Data baru di luar itu tidak bisa dipilih atau ditemukan. Test menyiasatinya dengan kode yang terurut paling awal bila memungkinkan.
-- **Dampak:** 66 test case dan rantai E2E-003, E2E-010, E2E-012, E2E-014, E2E-027, E2E-032, E2E-039, E2E-044 terhenti (01 Rawat Jalan, 02 Janji Temu, 04 Rawat Inap, 05 Farmasi, 07 Persediaan, 10 SDM, 12 Radiologi (RIS), 14 Kasir & Tagihan, 15 IGD, 17 Penggajian, 19 Keuangan, 22 Layanan Jasa, 24 Tata Graha, 26 Pemeliharaan).
+- **Dampak:** 62 test case dan rantai E2E-003, E2E-010, E2E-012, E2E-014, E2E-027, E2E-032, E2E-039, E2E-044 terhenti (01 Rawat Jalan, 02 Janji Temu, 04 Rawat Inap, 05 Farmasi, 10 SDM, 12 Radiologi (RIS), 14 Kasir & Tagihan, 15 IGD, 17 Penggajian, 19 Keuangan, 22 Layanan Jasa, 24 Tata Graha, 26 Pemeliharaan).
 - **Perbaikan:** 1. Cari di picker dan daftar lewat server (atau muat semua record); beri daftar desk halaman atau pencarian, terbaru di atas. 2. Jalankan lagi test case yang tercantum dan rantai E2E-001, 003, 008, 010, 012, 013, 014, 018, 025, 026, 027, 029, 032, 035, 044, dan 048.
 - **Penanggung jawab:** Development
 - **Cek ulang:** Dicek otomatis oleh test-nya di setiap run (langkah dicoba, ditandai blocker hanya bila gejalanya muncul).
 - **Sumber:** ditemukan otomasi (lib/qa-data/found-blockers.ts)
-- **Test case terhenti:** E2E-003, E2E-010, E2E-012, E2E-014, E2E-027, E2E-032, E2E-039, E2E-044, TC-APP001-023, TC-APP001-053, TC-APP002-017, TC-APP004-006, TC-APP004-017, TC-APP004-018, TC-APP004-022, TC-APP004-023, TC-APP004-034, TC-APP004-039, TC-APP004-047, TC-APP005-018, TC-APP005-042, TC-APP007-008, TC-APP010-008, TC-APP010-009, TC-APP010-010, TC-APP010-011, TC-APP010-012, TC-APP010-013, TC-APP010-016, TC-APP010-017, TC-APP010-018, TC-APP010-019, TC-APP010-020, TC-APP010-021, TC-APP010-022, TC-APP010-023, TC-APP010-032, TC-APP010-033, TC-APP010-039, TC-APP012-029 … (+34)
+- **Test case terhenti:** E2E-003, E2E-010, E2E-012, E2E-014, E2E-027, E2E-032, E2E-039, E2E-044, TC-APP001-023, TC-APP001-053, TC-APP002-017, TC-APP004-017, TC-APP004-022, TC-APP004-023, TC-APP004-039, TC-APP004-047, TC-APP005-018, TC-APP005-042, TC-APP010-008, TC-APP010-009, TC-APP010-010, TC-APP010-011, TC-APP010-012, TC-APP010-013, TC-APP010-016, TC-APP010-017, TC-APP010-018, TC-APP010-019, TC-APP010-020, TC-APP010-021, TC-APP010-022, TC-APP010-023, TC-APP010-032, TC-APP010-033, TC-APP010-039, TC-APP012-029, TC-APP014-057, TC-APP015-011, TC-APP017-001, TC-APP017-003 … (+30)
 
 ### Blocker 42
 
@@ -442,7 +443,7 @@ Blocker 1–16 berasal dari checklist `reference/00-blockers-checklist-linked.xl
 - **Dampak:** 12 test case terhenti (19 Keuangan).
 - **Perbaikan:** 1. Buat periode tahun buku 2026 di server (atau sediakan "Generate periods" untuk tahun tanpa periode). 2. Jalankan lagi TC-APP019-037 dan TC-APP019-044 sampai 055.
 - **Penanggung jawab:** Development
-- **Cek ulang:** Masih berlaku (pengawas blocker, 2026-11-02): 2026: periods [] (none)
+- **Cek ulang:** Masih berlaku (pengawas blocker, 2026-11-07): 2026: periods [] (none)
 - **Sumber:** ditemukan otomasi (lib/qa-data/found-blockers.ts)
 - **Test case terhenti:** TC-APP019-037, TC-APP019-044, TC-APP019-045, TC-APP019-046, TC-APP019-047, TC-APP019-048, TC-APP019-049, TC-APP019-050, TC-APP019-051, TC-APP019-052, TC-APP019-054, TC-APP019-084
 
@@ -453,12 +454,12 @@ Blocker 1–16 berasal dari checklist `reference/00-blockers-checklist-linked.xl
 - **Jenis:** Set-up & data uji
 - **Cabang:** Podomoro
 - **Masalah:** Tidak ada user yang bisa menyetujui dokumen keuangan: "Approve" menjawab "missing required privilege" karena hak FINANCE_APPROVE tidak ada di tenant.
-- **Dampak:** 11 test case terhenti (19 Keuangan, 20 Anggaran).
+- **Dampak:** 9 test case terhenti (19 Keuangan, 20 Anggaran).
 - **Perbaikan:** 1. Tambahkan hak persetujuan keuangan ke tenant dan ke role penyetuju (U5 qa.approver). 2. Jalankan lagi TC-APP019-068 sampai 078.
 - **Penanggung jawab:** Development, lalu administrator site
 - **Cek ulang:** Dicek otomatis oleh test-nya di setiap run (langkah dicoba, ditandai blocker hanya bila gejalanya muncul).
 - **Sumber:** ditemukan otomasi (lib/qa-data/found-blockers.ts)
-- **Test case terhenti:** TC-APP019-068, TC-APP019-070, TC-APP019-071, TC-APP019-072, TC-APP019-073, TC-APP019-074, TC-APP019-076, TC-APP019-084, TC-APP020-032, TC-APP020-033, TC-APP020-034
+- **Test case terhenti:** TC-APP019-070, TC-APP019-071, TC-APP019-072, TC-APP019-073, TC-APP019-074, TC-APP019-084, TC-APP020-032, TC-APP020-033, TC-APP020-034
 
 ### Blocker 47
 
@@ -495,12 +496,12 @@ Blocker 1–16 berasal dari checklist `reference/00-blockers-checklist-linked.xl
 - **Jenis:** Bug situs
 - **Cabang:** Podomoro
 - **Masalah:** Daftar kadang tidak memuat data baru untuk sementara: item baru di Master item dan baris penyerahan baru di Issue Lines baru tampil berjam-jam kemudian.
-- **Dampak:** 1 test case dan rantai E2E-008, E2E-035 terhenti (07 Persediaan).
+- **Dampak:** 1 test case dan rantai E2E-008, E2E-035 terhenti (05 Farmasi).
 - **Perbaikan:** 1. Cari tahu kenapa daftar sementara tidak memuat item baru (cache daftar item?) dan perbaiki. 2. Jalankan lagi TC-APP007-001, E2E-008, dan E2E-035.
 - **Penanggung jawab:** Development
 - **Cek ulang:** Dicek otomatis oleh test-nya di setiap run (langkah dicoba, ditandai blocker hanya bila gejalanya muncul).
 - **Sumber:** ditemukan otomasi (lib/qa-data/found-blockers.ts)
-- **Test case terhenti:** E2E-008, E2E-035, TC-APP007-001
+- **Test case terhenti:** E2E-008, E2E-035, TC-APP005-040
 
 ### Blocker 56
 

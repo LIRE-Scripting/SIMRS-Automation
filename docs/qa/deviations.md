@@ -1,22 +1,22 @@
 # Deviasi: langkah yang berjalan tetapi hasilnya berbeda dari referensi
 
-Dibangun 2026-11-06 15:00 WIB dari `reports/summary/run-summary.json` (hasil terbaru setiap test case dan rantai). Bangun ulang: `npm run qa:run-summary && npm run qa:findings-md`.
+Dibangun 2026-11-09 07:55 WIB dari `reports/summary/run-summary.json` (hasil terbaru setiap test case dan rantai). Bangun ulang: `npm run qa:run-summary && npm run qa:findings-md`.
 
 Deviasi = langkah **bisa dijalankan**, tetapi hasil di situs tidak sama dengan *Expected Result* di workbook referensi. Setiap deviasi sudah ditinjau (scripts/qa/deviation-review.ts, 2026-11-01) dan diberi saran: perbaikan, keputusan yang dibutuhkan, atau catatan.
 
-**770 deviasi** di **388 test case** dan **19 rantai E2E**.
+**779 deviasi** di **390 test case** dan **21 rantai E2E**.
 
 | Tinjauan | Deviasi | Test case / rantai (menurut deviasi terberatnya) | Arti |
 |---|---:|---:|---|
 | [Deviasi nyata](#deviasi-nyata-perlu-diperbaiki) | 173 | 103 | cacat di situs: validasi tidak ada, data ganda tersimpan, hak akses tidak ditegakkan, error server, atau angka/waktu salah. |
 | [Perlu keputusan](#perlu-keputusan-product-owner) | 0 | 0 | situs bekerja dengan cara lain atau fiturnya belum ada. Sejak keputusan 2026-11-06 ("jika keadaan site seperti itu maka as is saja jadikan passed") deviasi seperti ini diterima apa adanya dan masuk kelompok Bisa dianggap lulus dengan catatan "Diterima apa adanya"; kelompok ini kosong. |
-| [Bisa dianggap lulus](#bisa-dianggap-lulus-lulus-dengan-catatan) | 597 | 304 | tujuan langkah tercapai; hanya bentuk atau teksnya yang beda dari referensi. Test case yang semua deviasinya masuk kelompok ini dihitung **Lulus (dengan catatan)** di ringkasan. |
+| [Bisa dianggap lulus](#bisa-dianggap-lulus-lulus-dengan-catatan) | 606 | 308 | tujuan langkah tercapai; hanya bentuk atau teksnya yang beda dari referensi. Test case yang semua deviasinya masuk kelompok ini dihitung **Lulus (dengan catatan)** di ringkasan. |
 
 ## Per modul
 
 | Modul | Nyata | Perlu keputusan | Bisa dianggap lulus |
 |---|---:|---:|---:|
-| 01 Rawat Jalan | 22 | 0 | 52 |
+| 01 Rawat Jalan | 22 | 0 | 55 |
 | 02 Janji Temu | 6 | 0 | 17 |
 | 03 Pelayanan Pasien | 5 | 0 | 25 |
 | 04 Rawat Inap | 10 | 0 | 34 |
@@ -29,12 +29,12 @@ Deviasi = langkah **bisa dijalankan**, tetapi hasil di situs tidak sama dengan *
 | 11 Laboratorium | 5 | 0 | 26 |
 | 12 Radiologi (RIS) | 9 | 0 | 12 |
 | 13 Diet | 12 | 0 | 43 |
-| 14 Kasir & Tagihan | 3 | 0 | 19 |
+| 14 Kasir & Tagihan | 3 | 0 | 20 |
 | 15 IGD | 10 | 0 | 27 |
 | 16 Rekam Medis (MRD) | 5 | 0 | 43 |
 | 17 Penggajian | 3 | 0 | 6 |
 | 18 Pengaturan | 14 | 0 | 40 |
-| 19 Keuangan | 8 | 0 | 37 |
+| 19 Keuangan | 8 | 0 | 39 |
 | 20 Anggaran | 3 | 0 | 13 |
 | 21 Sterilisasi (CSSD) | 3 | 0 | 11 |
 | 22 Layanan Jasa | 1 | 0 | 0 |
@@ -42,7 +42,7 @@ Deviasi = langkah **bisa dijalankan**, tetapi hasil di situs tidak sama dengan *
 | 24 Tata Graha | 1 | 0 | 1 |
 | 25 Linen | 0 | 0 | 1 |
 | 27 Aset Tetap | 2 | 0 | 1 |
-| Rantai E2E | 0 | 0 | 33 |
+| Rantai E2E | 0 | 0 | 36 |
 
 ## Deviasi nyata: perlu diperbaiki
 
@@ -398,7 +398,10 @@ Arti: tujuan langkah tercapai; hanya bentuk atau teksnya yang beda dari referens
 | TC-APP001-056 | Formulir kedatangan: pasien sudah menunggu, departemen belum dipilih | 3 | Tombol nonaktif sampai departemen dipilih | "Arrive" aktif; kolom yang kosong sudah berisi departemen (id terisi) | Departemen sudah terisi otomatis, jadi tombol aktif wajar. |
 | TC-APP001-057 | Memanggil dua kali, di luar giliran, atau karena salah | 2 | Peringatan bahwa 002 sebelum 003, atau panggilan tidak ditawarkan | 003 dipanggil tanpa peringatan | Diterima apa adanya (keputusan 2026-11-06): Perilaku situs berbeda dari referensi; perlu keputusan apakah diterima. |
 | TC-APP001-057 | Memanggil dua kali, di luar giliran, atau karena salah | 3 | Ada: panggil lagi, tandai tidak hadir, akhiri kunjungan, batalkan panggilan | baris menawarkan Start encounter, Set MLC, Record document, Call | Diterima apa adanya (keputusan 2026-11-06): Perilaku situs berbeda dari referensi; perlu keputusan apakah diterima. |
-| TC-APP001-058 | Daftar kedatangan dan nomor saat pergantian hari | 1 | No. "001", nomor pertama pagi itu | No. "004" pukul 06:50 WIB: daftar masih menghitung 4 baris QA Poli Umum (hari situs belum berganti: berganti pukul 07:00 WIB, tengah malam UTC) | Diterima apa adanya (keputusan 2026-11-06): Perilaku situs berbeda dari referensi; perlu keputusan apakah diterima. |
+| TC-APP001-058 | Daftar kedatangan dan nomor saat pergantian hari | 1 | No. "001", nomor pertama pagi itu | No. "003" pukul 06:50 WIB: daftar masih menghitung 2 baris QA Poli Umum (hari situs belum berganti: berganti pukul 07:00 WIB, tengah malam UTC) | Diterima apa adanya (keputusan 2026-11-06): Perilaku situs berbeda dari referensi; perlu keputusan apakah diterima. |
+| TC-APP001-058 | Daftar kedatangan dan nomor saat pergantian hari | 2 | No. "002" (the number after PT-1's 003) | No. "001" at 07:05 WIB: the numbers restarted at 07:00 WIB (midnight UTC) | Diterima apa adanya (keputusan 2026-11-06): Perilaku situs berbeda dari referensi; perlu keputusan apakah diterima. |
+| TC-APP001-058 | Daftar kedatangan dan nomor saat pergantian hari | 3 | Both patients, PT-1 still "Waiting" with a "Call" button | PT-1 (arrived at 06:50) is gone from the list at 07:05 WIB: the list turned at 07:00 | Diterima apa adanya (keputusan 2026-11-06): Perilaku situs berbeda dari referensi; perlu keputusan apakah diterima. |
+| TC-APP001-058 | Daftar kedatangan dan nomor saat pergantian hari | 4 | Today's date (2026-11-07) | Registered "2026-11-06" (the date of the site is still yesterday before 07:00 WIB) | Diterima apa adanya (keputusan 2026-11-06): Perilaku situs berbeda dari referensi; perlu keputusan apakah diterima. |
 | TC-APP001-059 | "Keep counting" dengan pasien yang masih menunggu | 2 | Toast "Arrival number issued" dengan nomor berikutnya (hitungan berlanjut) | toast "Arrival failed": pasien masih punya baris terbuka tanggal 2026-11-01 (No. 001), dan tidak ada nomor baru yang terbit | Penolakannya benar; pesannya umum dan tidak menyebut alasan seperti di referensi. |
 | TC-APP001-060 | Yang ditampilkan papan antrean umum | 2 | Kata seperti "Waiting" | Status "A" | Status tampil sebagai kode singkat "A"; artinya sama (menunggu). |
 | TC-APP001-060 | Yang ditampilkan papan antrean umum | 3 | Papan tidak berubah | baris untuk booking 2026-11-09 langsung muncul, dengan token, nama, dan MRN | Diterima apa adanya (keputusan 2026-11-06): Aksi langsung dijalankan tanpa konfirmasi. |
@@ -783,6 +786,7 @@ Arti: tujuan langkah tercapai; hanya bentuk atau teksnya yang beda dari referens
 | Test case | Judul | Langkah | Referensi mengharapkan | Di situs | Catatan |
 |---|---|---:|---|---|---|
 | TC-APP014-007 | Diskon di atas batas: ditahan, disetujui, lalu dibayar | 1 | Badge status "Waiting for approval" | diskon 60.000 di atas batas 50.000 tidak ditahan: status "Draft", "Apply discount" nonaktif, tidak ada yang menunggu persetujuan | Diterima apa adanya (keputusan 2026-11-06): Perilaku situs berbeda dari referensi; perlu keputusan apakah diterima. |
+| TC-APP014-009 | Refund di atas batas: ditahan, lalu disetujui | 1 | Status "Waiting for approval" | the refund of 150,000 above the limit of 100,000 is not held: status "Paid", Available Rp 166.500 | Diterima apa adanya (keputusan 2026-11-06): Perilaku situs berbeda dari referensi; perlu keputusan apakah diterima. |
 | TC-APP014-016 | Pengaturan harga item dan estimasi | 3 | Memilih QA-PARA, jumlah 10 | kartu tidak punya kolom jumlah: setiap baris adalah satu unit | Diterima apa adanya (keputusan 2026-11-06): Perilaku situs berbeda dari referensi; perlu keputusan apakah diterima. |
 | TC-APP014-016 | Pengaturan harga item dan estimasi | 4 | Pasien neto Rp 12.500, pajak Rp 1.375, total Rp 13.875 | estimasi bertuliskan "t. Nothing is saved to stock or to a charge. Patient Item code Add line QA-PARA · Paracetamol 500mg Tablet 1 Estimating…" | Diterima apa adanya (keputusan 2026-11-06): Perilaku situs berbeda dari referensi; perlu keputusan apakah diterima. |
 | TC-APP014-017 | Klaim asuransi dari kelayakan sampai rekonsiliasi | 2 | Baris panel "This charge uses that split: Rp 1.000.000 / Rp 4.000.000" | tidak ada baris pembagian | Diterima apa adanya (keputusan 2026-11-06): Fitur yang diminta referensi tidak ada di situs. |
@@ -800,7 +804,7 @@ Arti: tujuan langkah tercapai; hanya bentuk atau teksnya yang beda dari referens
 | TC-APP014-046 | Menyiapkan pasien asuransi dari layar | 1 | Formulir atau tombol untuk meminta pra-otorisasi | tidak ada: panel hanya mencari yang sudah ada | Diterima apa adanya (keputusan 2026-11-06): Fitur yang diminta referensi tidak ada di situs. |
 | TC-APP014-046 | Menyiapkan pasien asuransi dari layar | 2 | Formulir atau tombol untuk menambah rujukan dan nomor SEP-nya | tidak ada: "Check SEP" mengecek yang sudah ada | Diterima apa adanya (keputusan 2026-11-06): Fitur yang diminta referensi tidak ada di situs. |
 | TC-APP014-052 | Penjualan hilang di layar: Esc, sesi habis, klik ganda | 1 | Layar mempertahankan penjualan, atau bertanya sebelum mengosongkan | Esc langsung mengosongkan seluruh layar, tanpa konfirmasi | Diterima apa adanya (keputusan 2026-11-06): Isian hilang tanpa peringatan saat meninggalkan layar (perlu keputusan UX). |
-| TC-APP014-061 | Buku besar pasien: menagih layanan rawat inap dari tarif | 4 | Baris dengan status "open" dan "QA-RI-0001-MVWJK9A000D deposit 0" | daftar tanpa pencarian tidak menampilkan invoice baru (hanya mencantumkan sebagian invoice) | Diterima apa adanya (keputusan 2026-11-06): Perilaku situs berbeda dari referensi; perlu keputusan apakah diterima. |
+| TC-APP014-061 | Buku besar pasien: menagih layanan rawat inap dari tarif | 4 | Baris dengan status "open" dan "QA-RI-0001-MW82VU4U00M deposit 0" | daftar tanpa pencarian tidak menampilkan invoice baru (hanya mencantumkan sebagian invoice) | Diterima apa adanya (keputusan 2026-11-06): Perilaku situs berbeda dari referensi; perlu keputusan apakah diterima. |
 
 ### 15 IGD (bisa dianggap lulus)
 
@@ -944,6 +948,8 @@ Arti: tujuan langkah tercapai; hanya bentuk atau teksnya yang beda dari referens
 |---|---|---:|---|---|---|
 | TC-APP019-002 | Membaca periode tahun buku | 2 | Setiap baris punya … "Open" | baris tidak menampilkan status; periode terbuka menawarkan "Lock" dan "Mark adjustment" | Periode terbuka dikenali dari tombol "Lock"; statusnya tidak ditulis. |
 | TC-APP019-004 | Bagan akun: grup dan akun daun di bawahnya | 2 | "Branch restriction" ("All branches") | daftar "Branches allowed to use this account" (tidak ada yang dipilih: "Global account") dan daftar "Users allowed to use this account" | Pembatasan cabang ada dengan bentuk lain (daftar cabang dan user yang diizinkan). |
+| TC-APP019-010 | Penjualan dan retur farmasi di register voucher | 1 | Status "Posted" | "SV-c9eab0e1-a584-4ea8-9939-36a20fb2c195 2026-11-08 Sales QA-PHA Pasien Satu MW80K03A00O IDR 2.775,00 Diposting Buka" | Diterima apa adanya (keputusan 2026-11-06): Perilaku situs berbeda dari referensi; perlu keputusan apakah diterima. |
+| TC-APP019-010 | Penjualan dan retur farmasi di register voucher | 3 | Status "Posted · Reversal" | "SR-1202d09d-bdd0-4c09-bca7-b98a250a78aa 2026-11-08 Sales — IDR 1.387,50 Diposting · Pembalikan Buka" | Diterima apa adanya (keputusan 2026-11-06): Perilaku situs berbeda dari referensi; perlu keputusan apakah diterima. |
 | TC-APP019-013 | Jejak audit Finance | 2 | financial_year.create dan financial_year.lock dengan kode tahun, account.create dengan kode, nama dan jenis, posting_rule.save dengan jenis dan kode akun, serta voucher.create dengan nomor dokumen | entri hanya menampilkan Waktu, Aksi, Modul, User dan Hasil: tanpa kode tahun (Rumah sakit, Pasien, RM dan Alasan kosong; entri tidak bisa dibuka) | Diterima apa adanya (keputusan 2026-11-06): Audit Log tidak menyimpan rincian (nomor dokumen/RM/alasan) atau aksinya tidak tercatat. |
 | TC-APP019-014 | Hub, navigasi, dan bahasa Indonesia | 1 | lima ubin: Financial years, Chart of accounts, Budget posting rules, Vouchers, ERP staging | 10 ubin di bawah MASTER, BUKU BESAR: Financial years, Chart of accounts, Branch configuration, Currency, Cost centres, Account maps, Budget posting rules, Vouchers, Journals, ERP staging | Situs menampilkan lebih banyak menu/kolom dari referensi; yang diminta tetap ada. |
 | TC-APP019-015 | Voucher tanpa akun atau baris debit dan kredit | 1 | Formulir menanyakan rekening bank | kolom yang sama untuk setiap jenis: Doc no, Doc date, Doc type 1. Journal 2. Cash Payment 3. Cash Receipt 4. Bank Payment 5. Bank Receipt 6. Contra 7. Credit Memo 8. Debit Memo 9. Opening Balance 10. Purchase 11. Sales 12. Payroll, Currency, Voucher value, Party, Narration | Diterima apa adanya (keputusan 2026-11-06): Perilaku situs berbeda dari referensi; perlu keputusan apakah diterima. |
@@ -968,12 +974,12 @@ Arti: tujuan langkah tercapai; hanya bentuk atau teksnya yang beda dari referens
 | TC-APP019-036 | Konfigurasi yang ditolak | 1 | Teks "A financial year is required." | browser menghentikan klik (Current financial year: Please select an item in the list.) | Input tetap tertolak, hanya lewat validasi browser/tombol nonaktif, bukan teks dari situs. |
 | TC-APP019-036 | Konfigurasi yang ditolak | 3 | Teks bahwa kelayakan imprest butuh jenis, jumlah, akun, dan departemen, karyawan, atau pihak | baris yang hanya berisi jenis tersimpan ("Configuration saved.") | Diterima apa adanya (keputusan 2026-11-06): Perilaku situs berbeda dari referensi; perlu keputusan apakah diterima. |
 | TC-APP019-041 | Pusat biaya yang ditolak | 1 | Teks "The shares must total 100%." | toast "Shares must total 100%." | Ditolak dengan pesan yang setara (teksnya sedikit berbeda). |
-| TC-APP019-045 | Jurnal yang ditolak dialog | 2 | Teks "A journal needs at least two lines." | "lan MVTAC7N060D QA-RJ-MVTGO7QK40F · QA-Rawat Jalan MVTGO7QK40I QA-RJ-MVWLRTBS019 · QA-Rawat Jalan MVWLRTBS01C QA-RJ-MVWLRTBS01H · QA-Rawat Jalan MVWLRTBS01K Debit 1000000.00 · Kredit 0.00 Tutup Simpan" | Diterima apa adanya (keputusan 2026-11-06): Perilaku situs berbeda dari referensi; perlu keputusan apakah diterima. |
-| TC-APP019-045 | Jurnal yang ditolak dialog | 3 | Teks "Narration is required." | "TAC7N060D QA-RJ-MVTGO7QK40F · QA-Rawat Jalan MVTGO7QK40I QA-RJ-MVWLRTBS019 · QA-Rawat Jalan MVWLRTBS01C QA-RJ-MVWLRTBS01H · QA-Rawat Jalan MVWLRTBS01K Debit 1000000.00 · Kredit 1000000.00 Tutup Simpan" | Diterima apa adanya (keputusan 2026-11-06): Perilaku situs berbeda dari referensi; perlu keputusan apakah diterima. |
-| TC-APP019-045 | Jurnal yang ditolak dialog | 4 | Teks "A reversible journal needs a reverse date." | "TAC7N060D QA-RJ-MVTGO7QK40F · QA-Rawat Jalan MVTGO7QK40I QA-RJ-MVWLRTBS019 · QA-Rawat Jalan MVWLRTBS01C QA-RJ-MVWLRTBS01H · QA-Rawat Jalan MVWLRTBS01K Debit 1000000.00 · Kredit 1000000.00 Tutup Simpan" | Diterima apa adanya (keputusan 2026-11-06): Perilaku situs berbeda dari referensi; perlu keputusan apakah diterima. |
-| TC-APP019-051 | Dokumen yang ditolak dialog | 1 | Teks "Instrument number, type, date, and validity are required." | "uaran Uji MV9H0RI460P QA-2110-MVDE6HKD580I · QA PPN Keluaran Uji MVDE6HKD580J QA-2110-MVDE6HKD580O · QA PPN Keluaran Uji MVDE6HKD580P QA-2110-MVDHF9E5710I · QA PPN Keluaran Uji MVDHF9E5710J Close Save" | Diterima apa adanya (keputusan 2026-11-06): Perilaku situs berbeda dari referensi; perlu keputusan apakah diterima. |
-| TC-APP019-051 | Dokumen yang ditolak dialog | 2 | Teks "A cash receipt needs a beneficiary." | "uaran Uji MV9H0RI460P QA-2110-MVDE6HKD580I · QA PPN Keluaran Uji MVDE6HKD580J QA-2110-MVDE6HKD580O · QA PPN Keluaran Uji MVDE6HKD580P QA-2110-MVDHF9E5710I · QA PPN Keluaran Uji MVDHF9E5710J Close Save" | Diterima apa adanya (keputusan 2026-11-06): Perilaku situs berbeda dari referensi; perlu keputusan apakah diterima. |
-| TC-APP019-051 | Dokumen yang ditolak dialog | 3 | Teks "This voucher needs a party and a reference number." | "uaran Uji MV9H0RI460P QA-2110-MVDE6HKD580I · QA PPN Keluaran Uji MVDE6HKD580J QA-2110-MVDE6HKD580O · QA PPN Keluaran Uji MVDE6HKD580P QA-2110-MVDHF9E5710I · QA PPN Keluaran Uji MVDHF9E5710J Close Save" | Diterima apa adanya (keputusan 2026-11-06): Perilaku situs berbeda dari referensi; perlu keputusan apakah diterima. |
+| TC-APP019-045 | Jurnal yang ditolak dialog | 2 | Teks "A journal needs at least two lines." | "lan MVWLRTBS01K QA-RJ-MVX2DCC830T · QA-Rawat Jalan MVX2DCC830W QA-RJ-MW4T12P3008 · QA-Rawat Jalan MW4T12P300B QA-RJ-MW6LMQ5S008 · QA-Rawat Jalan MW6LMQ5S00B Debit 1000000.00 · Kredit 0.00 Tutup Simpan" | Diterima apa adanya (keputusan 2026-11-06): Perilaku situs berbeda dari referensi; perlu keputusan apakah diterima. |
+| TC-APP019-045 | Jurnal yang ditolak dialog | 3 | Teks "Narration is required." | "WLRTBS01K QA-RJ-MVX2DCC830T · QA-Rawat Jalan MVX2DCC830W QA-RJ-MW4T12P3008 · QA-Rawat Jalan MW4T12P300B QA-RJ-MW6LMQ5S008 · QA-Rawat Jalan MW6LMQ5S00B Debit 1000000.00 · Kredit 1000000.00 Tutup Simpan" | Diterima apa adanya (keputusan 2026-11-06): Perilaku situs berbeda dari referensi; perlu keputusan apakah diterima. |
+| TC-APP019-045 | Jurnal yang ditolak dialog | 4 | Teks "A reversible journal needs a reverse date." | "WLRTBS01K QA-RJ-MVX2DCC830T · QA-Rawat Jalan MVX2DCC830W QA-RJ-MW4T12P3008 · QA-Rawat Jalan MW4T12P300B QA-RJ-MW6LMQ5S008 · QA-Rawat Jalan MW6LMQ5S00B Debit 1000000.00 · Kredit 1000000.00 Tutup Simpan" | Diterima apa adanya (keputusan 2026-11-06): Perilaku situs berbeda dari referensi; perlu keputusan apakah diterima. |
+| TC-APP019-051 | Dokumen yang ditolak dialog | 1 | Teks "Instrument number, type, date, and validity are required." | "3 · QA Aset alkes uji MVSTN5X5304 QA-1501-MVSTN5X5507 · QA Aset alkes uji MVSTN5X5508 QA-1501-MVSU1CO3203 · QA Aset alkes uji MVSU1CO3204 QA-1501-MVSU1CO3303 · QA Aset alkes uji MVSU1CO3304 Close Save" | Diterima apa adanya (keputusan 2026-11-06): Perilaku situs berbeda dari referensi; perlu keputusan apakah diterima. |
+| TC-APP019-051 | Dokumen yang ditolak dialog | 2 | Teks "A cash receipt needs a beneficiary." | "3 · QA Aset alkes uji MVSTN5X5304 QA-1501-MVSTN5X5507 · QA Aset alkes uji MVSTN5X5508 QA-1501-MVSU1CO3203 · QA Aset alkes uji MVSU1CO3204 QA-1501-MVSU1CO3303 · QA Aset alkes uji MVSU1CO3304 Close Save" | Diterima apa adanya (keputusan 2026-11-06): Perilaku situs berbeda dari referensi; perlu keputusan apakah diterima. |
+| TC-APP019-051 | Dokumen yang ditolak dialog | 3 | Teks "This voucher needs a party and a reference number." | "3 · QA Aset alkes uji MVSTN5X5304 QA-1501-MVSTN5X5507 · QA Aset alkes uji MVSTN5X5508 QA-1501-MVSU1CO3203 · QA Aset alkes uji MVSU1CO3204 QA-1501-MVSU1CO3303 · QA Aset alkes uji MVSU1CO3304 Close Save" | Diterima apa adanya (keputusan 2026-11-06): Perilaku situs berbeda dari referensi; perlu keputusan apakah diterima. |
 | TC-APP019-055 | Pembayaran yang ditolak | 2 | Teks "A bank instrument is required." | "tidak ada toast" | Diterima apa adanya (keputusan 2026-11-06): Perilaku situs berbeda dari referensi; perlu keputusan apakah diterima. |
 | TC-APP019-069 | Permintaan yang ditolak | 3 | Teks "An approved legal agreement is required." | "tidak ada toast" | Diterima apa adanya (keputusan 2026-11-06): Perilaku situs berbeda dari referensi; perlu keputusan apakah diterima. |
 | TC-APP019-075 | Langkah yang ditolak | 1 | Teks "This letter of credit step is not allowed yet." | "tidak ada toast" | Diterima apa adanya (keputusan 2026-11-06): Perilaku situs berbeda dari referensi; perlu keputusan apakah diterima. |
@@ -1030,7 +1036,7 @@ Arti: tujuan langkah tercapai; hanya bentuk atau teksnya yang beda dari referens
 
 | Test case | Judul | Langkah | Referensi mengharapkan | Di situs | Catatan |
 |---|---|---:|---|---|---|
-| TC-APP025-001 | Gudang dan resep: tiga gudang linen dan bahan barang jadi | 4 | Baris untuk resep | toast "Tersimpan."; tidak ada baris daftar yang menyebut QA-0D41XP4VA-SPREI01 | Diterima apa adanya (keputusan 2026-11-06): Perilaku situs berbeda dari referensi; perlu keputusan apakah diterima. |
+| TC-APP025-001 | Gudang dan resep: tiga gudang linen dan bahan barang jadi | 4 | Baris untuk resep | toast "Tersimpan."; tidak ada baris daftar yang menyebut QA-0D3RGF4M6-SPREI01 | Diterima apa adanya (keputusan 2026-11-06): Perilaku situs berbeda dari referensi; perlu keputusan apakah diterima. |
 
 ### 27 Aset Tetap (bisa dianggap lulus)
 
@@ -1051,8 +1057,9 @@ Arti: tujuan langkah tercapai; hanya bentuk atau teksnya yang beda dari referens
 | E2E-004 | Rawat inap: masuk sampai pulang, tagihan dan koding | 1 (TC-APP004-058 langkah 1) | Kolom "Branch" | tidak ada kolom Branch (U1 bekerja di satu cabang) | Cabang diambil dari sesi (U1 hanya di satu cabang); field cabang tidak diperlukan. |
 | E2E-006 | Kamar operasi: permintaan sampai pemakaian bahan | 1 (TC-APP008-025 langkah 1) | Dialog dengan "Branch", … | tidak ada kolom "Branch" (permintaan memakai cabang sesi) | Cabang diambil dari sesi (U1 hanya di satu cabang); field cabang tidak diperlukan. |
 | E2E-011 | Anggaran: tahun anggaran sampai realisasi | 2 (TC-APP019-004 langkah 2) | "Branch restriction" ("All branches") | daftar "Branches allowed to use this account" (tidak ada yang dipilih: "Global account") dan daftar "Users allowed to use this account" | Pembatasan cabang ada dengan bentuk lain (daftar cabang dan user yang diizinkan). |
+| E2E-012 | Aset: pembelian, pemeliharaan, sampai penghapusan | 3 (TC-APP027-009 langkah 5) | Kolom "Pemegang" kosong lagi | kolom menampilkan lokasi terakhir "QA-Poli Kandungan" | Diterima apa adanya (keputusan 2026-11-06): Perilaku situs berbeda dari referensi; perlu keputusan apakah diterima. |
 | E2E-013 | Housekeeping: rencana kebersihan sampai tagihan vendor | 3 (TC-APP024-007 langkah 3) | baris dengan status "draft" | log baru bertuliskan "sent" | Diterima apa adanya (keputusan 2026-11-06): Perilaku situs berbeda dari referensi; perlu keputusan apakah diterima. |
-| E2E-016 | Linen: pembuatan linen dan sirkulasinya | 1 (TC-APP025-001 langkah 4) | Baris untuk resep | toast "Tersimpan."; tidak ada baris daftar yang menyebut QA-0D41XB10Q-SPREI01 | Diterima apa adanya (keputusan 2026-11-06): Perilaku situs berbeda dari referensi; perlu keputusan apakah diterima. |
+| E2E-016 | Linen: pembuatan linen dan sirkulasinya | 1 (TC-APP025-001 langkah 4) | Baris untuk resep | toast "Tersimpan."; tidak ada baris daftar yang menyebut QA-0D3RGI42S-SPREI01 | Diterima apa adanya (keputusan 2026-11-06): Perilaku situs berbeda dari referensi; perlu keputusan apakah diterima. |
 | E2E-017 | Farmasi: terima stok, jual di kasir, retur, bayar, dan Finance | 4 (TC-APP005-009 langkah 6) | Wizard kosong | item dikosongkan tetapi pasien tetap terpilih | Diterima apa adanya (keputusan 2026-11-06): Perilaku situs berbeda dari referensi; perlu keputusan apakah diterima. |
 | E2E-021 | Order klinis (CPOE) dari satu konsultasi | 1 (TC-APP003-001 langkah 3) | Panel kiri: nama, MRN, dan "DOB" | nama dan MRN; tanpa tanggal lahir | Diterima apa adanya (keputusan 2026-11-06): Perilaku situs berbeda dari referensi; perlu keputusan apakah diterima. |
 | E2E-022 | IGD kasus ringan: triase, penunjang, pulang | 3 (TC-APP015-003 langkah 3) | Prioritas 4 | Prioritas 2 | Diterima apa adanya (keputusan 2026-11-06): Perilaku situs berbeda dari referensi; perlu keputusan apakah diterima. |
@@ -1068,10 +1075,12 @@ Arti: tujuan langkah tercapai; hanya bentuk atau teksnya yang beda dari referens
 | E2E-030 | Operasi dengan darah, instrumen steril, dan bahan | 3 (TC-APP006-020 langkah 4) | Formulir menampilkan nomor permintaan dan status "Approved" | statusnya "Pending" (butuh persetujuan lewat "Approve") | Diterima apa adanya (keputusan 2026-11-06): Perilaku situs berbeda dari referensi; perlu keputusan apakah diterima. |
 | E2E-034 | Estimasi biaya sampai pembayaran | 1 (TC-APP014-016 langkah 3) | Memilih QA-PARA, jumlah 10 | kartu tidak punya kolom jumlah: setiap baris adalah satu unit | Diterima apa adanya (keputusan 2026-11-06): Perilaku situs berbeda dari referensi; perlu keputusan apakah diterima. |
 | E2E-034 | Estimasi biaya sampai pembayaran | 1 (TC-APP014-016 langkah 4) | Pasien neto Rp 12.500, pajak Rp 1.375, total Rp 13.875 | estimasi bertuliskan "t. Nothing is saved to stock or to a charge. Patient Item code Add line QA-PARA · Paracetamol 500mg Tablet 1 Estimating…" | Diterima apa adanya (keputusan 2026-11-06): Perilaku situs berbeda dari referensi; perlu keputusan apakah diterima. |
+| E2E-034 | Estimasi biaya sampai pembayaran | 3 (TC-APP005-007 langkah 8) | Wizard kosong dan siap untuk penjualan berikutnya | item dikosongkan, tetapi pasien tetap terpilih ("QA-PHA Pasien Satu MW6LBSXY005 MRN MRN-2026-83D3D1CB") | Diterima apa adanya (keputusan 2026-11-06): Perilaku situs berbeda dari referensi; perlu keputusan apakah diterima. |
+| E2E-037 | Pembelian dengan kontrol anggaran | 1 (TC-APP020-021 langkah 2) | Tombol "Edit" pada baris konsolidasi yang disetujui | baris menawarkan Alokasikan | Diterima apa adanya (keputusan 2026-11-06): Perilaku situs berbeda dari referensi; perlu keputusan apakah diterima. |
 | E2E-039 | Onboarding staf dengan akses | 4 (TC-APP010-004 langkah 3) | Berkas karyawan yang ditautkan terbuka sendiri sebagai "Edit employee" | daftar terbuka; tidak ada berkas sendiri | Diterima apa adanya (keputusan 2026-11-06): Perilaku situs berbeda dari referensi; perlu keputusan apakah diterima. |
 | E2E-039 | Onboarding staf dengan akses | 4 (TC-APP010-004 langkah 3) | Pemberitahuan "Configuration is missed" tidak ditampilkan | pemberitahuan ditampilkan ke akun yang ditautkan | Diterima apa adanya (keputusan 2026-11-06): Perilaku situs berbeda dari referensi; perlu keputusan apakah diterima. |
 | E2E-039 | Onboarding staf dengan akses | 5 (TC-APP018-031 langkah 3) | baris dengan role "perawat" | "Roles" bertuliskan "—" | Diterima apa adanya (keputusan 2026-11-06): Perilaku situs berbeda dari referensi; perlu keputusan apakah diterima. |
 | E2E-041 | Finance: pencatatan sampai laporan | 2 (TC-APP019-004 langkah 2) | "Branch restriction" ("All branches") | daftar "Branches allowed to use this account" (tidak ada yang dipilih: "Global account") dan daftar "Users allowed to use this account" | Pembatasan cabang ada dengan bentuk lain (daftar cabang dan user yang diizinkan). |
-| E2E-047 | Linen dan kebersihan satu ruangan | 1 (TC-APP025-001 langkah 4) | Baris untuk resep | toast "Tersimpan."; tidak ada baris daftar yang menyebut QA-0D41X5K11-SPREI01 | Diterima apa adanya (keputusan 2026-11-06): Perilaku situs berbeda dari referensi; perlu keputusan apakah diterima. |
+| E2E-047 | Linen dan kebersihan satu ruangan | 1 (TC-APP025-001 langkah 4) | Baris untuk resep | toast "Tersimpan."; tidak ada baris daftar yang menyebut QA-0D3TE312P-SPREI01 | Diterima apa adanya (keputusan 2026-11-06): Perilaku situs berbeda dari referensi; perlu keputusan apakah diterima. |
 | E2E-047 | Linen dan kebersihan satu ruangan | 4 (TC-APP024-007 langkah 3) | baris dengan status "draft" | log baru bertuliskan "sent" | Diterima apa adanya (keputusan 2026-11-06): Perilaku situs berbeda dari referensi; perlu keputusan apakah diterima. |
 | E2E-048 | Tata kelola identitas pasien | 4 (TC-APP005-060 langkah 2) | Blok mencantumkan nama item dengan jumlah yang dikeluarkan | tidak ada yang tercantum untuk nama atau MRN | Diterima apa adanya (keputusan 2026-11-06): Perilaku situs berbeda dari referensi; perlu keputusan apakah diterima. |

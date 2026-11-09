@@ -605,11 +605,17 @@ function patchLookups(proto: Record<string, Fn>): void {
 async function pinSiteLanguage(context: BrowserContext): Promise<void> {
   await context.route('**/api/me/preferences', async (route) => {
     if (route.request().method() !== 'GET') return route.continue();
-    const response = await route.fetch();
-    const body = (await response.json().catch(() => null)) as { preferences?: { locale?: string } } | null;
-    if (!body?.preferences) return route.fulfill({ response });
-    body.preferences.locale = 'id';
-    return route.fulfill({ response, json: body });
+    // A read still in flight when the test or its context ends is dropped: the route throws "Test ended" / "closed".
+    try {
+      const response = await route.fetch();
+      const body = (await response.json().catch(() => null)) as { preferences?: { locale?: string } } | null;
+      if (!body?.preferences) return await route.fulfill({ response });
+      body.preferences.locale = 'id';
+      return await route.fulfill({ response, json: body });
+    } catch (e) {
+      if (/Test ended|closed|disposed/i.test(String(e))) return;
+      throw e;
+    }
   });
 }
 

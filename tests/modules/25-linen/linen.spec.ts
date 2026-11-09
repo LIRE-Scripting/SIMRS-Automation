@@ -62,7 +62,7 @@ qaTest('TC-APP025-003', async ({ qa, browser }) => {
 });
 
 const ORDER = (qa: Qa, extra: Record<string, string> = {}) => ({
-  Number: qa.code('X-WO-001'),
+  Number: qa.bed('X-WO-001'),
   'Contractor / laundry': qa.prefix('X Konveksi uji'),
   'Finished item': qa.code('X-SPREI'),
   Quantity: '10',

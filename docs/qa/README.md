@@ -16,7 +16,7 @@ Semua dokumen di folder ini berbahasa Indonesia. Kutipan dari workbook referensi
 
 | File | Isi |
 |---|---|
-| `reports/summary/simrs-run-summary.xlsx` | Ringkasan: sheet Ringkasan, Modul, Rantai E2E, **satu sheet per modul** (status, keterangan, tinjauan deviasi, tangkapan layar setiap test case), Blocker (dengan kolom Cek ulang), HTTP 5xx, Error server (blocker karena error server) |
+| `reports/summary/simrs-run-summary.xlsx` | Ringkasan: sheet Ringkasan, Modul, Rantai E2E, Blocker (dengan kolom Cek ulang; tanpa blocker karena error server), Error 5xx (blocker karena error server, lalu jawaban HTTP 5xx di run ini), lalu **satu sheet per modul** (status, keterangan, tinjauan deviasi, tangkapan layar setiap test case) |
 | `reports/e2e/<NN-modul>.xlsx` | Salinan workbook referensi per modul dengan hasil setiap langkah (Execution Status, Actual Result, catatan otomasi) |
 | `reports/e2e-chains/e2e-journeys.xlsx` | Hasil 50 rantai end-to-end per langkah |
 

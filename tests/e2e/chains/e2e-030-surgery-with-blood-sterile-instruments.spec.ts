@@ -5,6 +5,10 @@ import { OtRequestsPage } from '../../../pages/ot/OtPages';
 import { TC_APP006_020, TC_APP006_022 } from '../../modules/06-transfusion-medicine/cases';
 import { TC_APP008_002 } from '../../modules/08-operation-theater/cases';
 import { cellsOf, procedure, toastsAfter } from '../../modules/08-operation-theater/helpers';
+import { TC_APP021_029 } from '../../modules/21-cssd/loop-cases';
+import { TC_APP008_003, TC_APP008_004 } from '../../modules/08-operation-theater/requests-cases';
+import { TC_APP008_027, TC_APP008_033 } from '../../modules/08-operation-theater/workflow-cases';
+import { TC_APP008_040 } from '../../modules/08-operation-theater/hub-desk-screens-cases';
 
 /**
  * E2E-030: an operation request is created and its amount blocked; blood is
@@ -45,4 +49,10 @@ chainTest('E2E-030', async ({ page, chain }) => {
   await chain.step(2, (qa) => TC_APP008_002({ page, qa }));
   await chain.step(3, (qa) => TC_APP006_020({ page, qa }));
   await chain.step(4, (qa) => TC_APP006_022({ page, qa }));
+  await chain.run(5, TC_APP021_029);
+  await chain.run(6, TC_APP008_003);
+  await chain.run(7, TC_APP008_027);
+  await chain.run(8, TC_APP008_033);
+  await chain.run(9, TC_APP008_004);
+  await chain.run(10, TC_APP008_040);
 });

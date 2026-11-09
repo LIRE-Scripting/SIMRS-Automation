@@ -32,7 +32,7 @@ const DESK_LIST: Triage = {
 
 const SERVER_500 = (what: string): Triage => ({
   cause: 'site',
-  finding: `${what} answers HTTP 500 (server action error, digest in sheet HTTP 5xx). The request carries well-formed values from the workbook (see the request body in sheet HTTP 5xx).`,
+  finding: `${what} answers HTTP 500 (server action error, digest in sheet Error 5xx). The request carries well-formed values from the workbook (see the request body in sheet Error 5xx).`,
   next: 'Dev: look up the digest in the server log and fix the action; then rerun the test.',
   owner: 'Dev',
 });

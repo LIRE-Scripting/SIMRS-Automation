@@ -5,6 +5,8 @@ import { admitSteps, newBed } from './steps/inpatient-steps';
 import { inpatientOrder } from '../../modules/03-patient-care/cases';
 import { TC_APP005_005 } from '../../modules/05-pharmacy/evaluation-cases';
 import { TC_APP013_040 } from '../../modules/13-dietary/cases';
+import { TC_APP014_061 } from '../../modules/14-hospital-accounts/cases';
+import { TC_APP004_011, TC_APP004_012 } from '../../modules/04-inpatient/admissions-cases';
 
 /**
  * E2E-004: a patient is put on the admission waiting list, the request is
@@ -82,4 +84,8 @@ chainTest('E2E-004', async ({ page, chain }) => {
   await chain.step(6, (qa) => TC_APP005_005({ page, qa }));
   await chain.step(7, (qa) => TC_APP013_040({ page, qa }));
   chain.stopAsPlanned(8);
+  await chain.step(9, (qa) => TC_APP014_061({ page, qa }));
+  await chain.run(10, TC_APP004_011);
+  await chain.run(11, TC_APP004_012);
+  chain.stopAsPlanned(12);
 });

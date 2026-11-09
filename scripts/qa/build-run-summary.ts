@@ -457,6 +457,27 @@ function sheet(wb: ExcelJS.Workbook, name: string, columns: { header: string; ke
   return ws;
 }
 
+type Column = { header: string; key: string; width: number };
+
+/** Sheet "Error 5xx": the blockers caused by a server error, then the HTTP 5xx answers of the run, each table under its own title. */
+function serverErrorSheet(wb: ExcelJS.Workbook, blockerColumns: Column[], blockerRows: Record<string, unknown>[], httpColumns: Column[], httpRows: Record<string, unknown>[]): void {
+  const ws = wb.addWorksheet(SHEET.serverErrors);
+  const width = Math.max(blockerColumns.length, httpColumns.length);
+  for (let i = 0; i < width; i++) ws.getColumn(i + 1).width = Math.max(blockerColumns[i]?.width ?? 10, httpColumns[i]?.width ?? 10);
+  const table = (title: string, columns: Column[], rows: Record<string, unknown>[], empty: string) => {
+    const t = ws.addRow([title]);
+    t.font = { bold: true, size: 13 };
+    const head = ws.addRow(columns.map((c) => c.header));
+    head.font = { bold: true, color: { argb: 'FFFFFFFF' } };
+    head.eachCell((c) => (c.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF34495E' } }));
+    if (!rows.length) ws.addRow([empty]);
+    for (const r of rows) ws.addRow(columns.map((c) => r[c.key] as ExcelJS.CellValue)).alignment = { vertical: 'top', wrapText: true };
+    ws.addRow([]);
+  };
+  table(`Blocker karena error server (${blockerRows.length}): test case-nya tetap Blocked`, blockerColumns, blockerRows, 'Tidak ada');
+  table(`Jawaban HTTP 5xx di run ini (${httpRows.length})`, httpColumns, httpRows, 'Tidak ada jawaban HTTP 5xx di run ini');
+}
+
 /** A JPEG of a screenshot at most 640 x 540 (ImageMagick), so a few hundred fit in the workbook; made once per screenshot. */
 function thumbnail(png: string): { file: string; width: number; height: number } {
   const file = path.join(THUMBS, `${createHash('sha1').update(png).digest('hex').slice(0, 16)}.jpg`);
@@ -574,8 +595,7 @@ const SHEET = {
   modules: 'Modul',
   chains: 'Rantai E2E',
   blockers: 'Blocker',
-  http5xx: 'HTTP 5xx',
-  serverErrors: 'Error server',
+  serverErrors: 'Error 5xx',
 };
 
 /** The evidence picture of a chain: a screenshot it saved itself (reports/screenshots/E2E-001-receipt.png), else its last screenshot. */
@@ -745,14 +765,7 @@ async function writeWorkbook(s: Summary): Promise<void> {
     if (!pic) return;
     pictureInCell(wb, chains, smallThumbnail(pic), 4, i + 1);
   });
-  moduleSheets(wb, s);
-  // The module names of sheet Modul lead to their sheets.
-  modules.eachRow((row, i) => {
-    if (i === 1) return;
-    const name = String(row.getCell('module').value);
-    if (wb.getWorksheet(name)) row.getCell('module').value = { text: name, hyperlink: `#'${name}'!A1` };
-  });
-  sheet(wb, SHEET.blockers, [
+  const blockerColumns: Column[] = [
     { header: 'No', key: 'no', width: 6 },
     { header: 'Blocker', key: 'title', width: 60 },
     { header: 'Jenis', key: 'kind', width: 16 },
@@ -767,8 +780,15 @@ async function writeWorkbook(s: Summary): Promise<void> {
     { header: 'Perbaikan (tindak lanjut)', key: 'fix', width: 70 },
     { header: 'Siapa', key: 'who', width: 24 },
     { header: 'Cek ulang', key: 'recheck', width: 60 },
-  ], s.perBlocker.filter((b) => !isServerError(b.no)).map((b) => ({ ...b, kind: blockerKind(b.no), branch: blockerBranch(b.no), category: wordId(b.category), fix: wordId(b.fix), who: wordId(b.who), chains: b.chains.join(', '), modules: b.modules.map(wordId).join('\n'), seen: b.seenHttp5xx ? 'Ya' : '', recheck: recheckOf(b.no, b.source), problem: BLOCKER_PROBLEM_ID[b.no] ?? '' })));
-  sheet(wb, SHEET.http5xx, [
+  ];
+  const blockerRow = (b: Summary['perBlocker'][number]) => ({ ...b, kind: blockerKind(b.no), branch: blockerBranch(b.no), category: wordId(b.category), fix: wordId(b.fix), who: wordId(b.who), chains: b.chains.join(', '), modules: b.modules.map(wordId).join('\n'), seen: b.seenHttp5xx ? 'Ya' : '', recheck: recheckOf(b.no, b.source), problem: BLOCKER_PROBLEM_ID[b.no] ?? '' });
+  sheet(wb, SHEET.blockers, blockerColumns, s.perBlocker.filter((b) => !isServerError(b.no)).map(blockerRow));
+  // Server errors (the user's decisions of 2026-11-06 and 2026-11-07): the blockers whose cause is a server error, out of
+  // sheet Blocker, and the HTTP 5xx answers of the run, together in one sheet before the module sheets.
+  serverErrorSheet(wb,
+    blockerColumns,
+    s.perBlocker.filter((b) => isServerError(b.no)).map(blockerRow),
+    [
     { header: 'Waktu', key: 'at', width: 22 },
     { header: 'Test', key: 'test', width: 50 },
     { header: 'Jenis test', key: 'testType', width: 10 },
@@ -781,24 +801,15 @@ async function writeWorkbook(s: Summary): Promise<void> {
     { header: 'Digest', key: 'digest', width: 14 },
     { header: 'Isi request', key: 'request', width: 70 },
     { header: 'Respons', key: 'response', width: 50 },
-  ], s.errors.map((e) => ({ ...e, test: `${e.id} ${e.id.startsWith('E2E') ? (CHAIN_NAME_ID[e.id] ?? '') : titleId(e.test.replace(/ \[[^\]]+\].*$/, '').replace(/^\S+ /, ''))}`, testType: TEST_TYPE_ID[e.testType] ?? e.testType, path: new URL(e.url).pathname, testStatus: e.testStatus ? statusId(e.testStatus) : '', kind: sentenceId(e.kind), counted: sentenceId(e.counted) })));
-  // Blockers whose cause is a server error (the user's decision of 2026-11-06): out of sheet Blocker, here instead.
-  sheet(wb, SHEET.serverErrors, [
-    { header: 'No', key: 'no', width: 6 },
-    { header: 'Blocker', key: 'title', width: 60 },
-    { header: 'Jenis', key: 'kind', width: 16 },
-    { header: 'Cabang', key: 'branch', width: 24 },
-    { header: 'Masalah', key: 'problem', width: 80 },
-    { header: 'Kategori', key: 'category', width: 14 },
-    { header: 'Didefinisikan di', key: 'source', width: 26 },
-    { header: 'Kasus uji terblokir', key: 'testCases', width: 10 },
-    { header: 'Rantai berhenti', key: 'chains', width: 22 },
-    { header: 'Modul', key: 'modules', width: 40 },
-    { header: 'HTTP 5xx terlihat di run ini', key: 'seen', width: 10 },
-    { header: 'Perbaikan (tindak lanjut)', key: 'fix', width: 70 },
-    { header: 'Siapa', key: 'who', width: 24 },
-    { header: 'Cek ulang', key: 'recheck', width: 60 },
-  ], s.perBlocker.filter((b) => isServerError(b.no)).map((b) => ({ ...b, kind: blockerKind(b.no), branch: blockerBranch(b.no), category: wordId(b.category), fix: wordId(b.fix), who: wordId(b.who), chains: b.chains.join(', '), modules: b.modules.map(wordId).join('\n'), seen: b.seenHttp5xx ? 'Ya' : '', recheck: recheckOf(b.no, b.source), problem: BLOCKER_PROBLEM_ID[b.no] ?? '' })));
+  ],
+    s.errors.map((e) => ({ ...e, test: `${e.id} ${e.id.startsWith('E2E') ? (CHAIN_NAME_ID[e.id] ?? '') : titleId(e.test.replace(/ \[[^\]]+\].*$/, '').replace(/^\S+ /, ''))}`, testType: TEST_TYPE_ID[e.testType] ?? e.testType, path: new URL(e.url).pathname, testStatus: e.testStatus ? statusId(e.testStatus) : '', kind: sentenceId(e.kind), counted: sentenceId(e.counted) })));
+  moduleSheets(wb, s);
+  // The module names of sheet Modul lead to their sheets.
+  modules.eachRow((row, i) => {
+    if (i === 1) return;
+    const name = String(row.getCell('module').value);
+    if (wb.getWorksheet(name)) row.getCell('module').value = { text: name, hyperlink: `#'${name}'!A1` };
+  });
   await wb.xlsx.writeFile(path.join(OUT_DIR, 'simrs-run-summary.xlsx'));
 }
 

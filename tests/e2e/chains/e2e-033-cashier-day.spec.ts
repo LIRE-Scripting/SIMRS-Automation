@@ -3,6 +3,7 @@ import { installToastRecorder } from '../../../lib/assertions';
 import { CashierPage } from '../../../pages/billing/CashierPage';
 import { TC_APP014_005, TC_APP014_006, TC_APP014_008, TC_APP014_011 } from '../../modules/14-hospital-accounts/cases';
 import { counterClosed, ensureSettings, pay } from '../../modules/14-hospital-accounts/helpers';
+import { TC_APP019_083 } from '../../modules/19-finance/vouchers-cases';
 
 /**
  * E2E-033: a cashier day of U1: a walk-in charge paid in cash, a card payment,
@@ -61,4 +62,6 @@ chainTest('E2E-033', async ({ page, chain }) => {
   await chain.step(3, (qa) => TC_APP014_006({ page, qa }));
   await chain.step(4, (qa) => TC_APP014_008({ page, qa }));
   await chain.step(5, (qa) => TC_APP014_011({ page, qa }));
+  chain.stopAsPlanned(6);
+  await chain.run(7, TC_APP019_083);
 });

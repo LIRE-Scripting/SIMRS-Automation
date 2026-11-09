@@ -20,7 +20,8 @@ export type CaseArgs = { page: Page; qa: Qa };
 /** TC-APP020-001: a budget book made, changed and offered to circulars; returns the book (E2E-011 hands it on). */
 export const TC_APP020_001 = async ({ page, qa }: CaseArgs): Promise<{ code: string; name: string }> => {
   const b = books(page);
-  const code = qa.code('X-OPS');
+  // A code that sorts first: the book picker of circulars lists only the first books in code order (found blocker 40).
+  const code = qa.bed('X-OPS');
   const name = qa.name('X Buku operasional uji');
   await qa.step(1, async () => {
     await page.goto('/id/budget');
@@ -52,8 +53,9 @@ export const TC_APP020_001 = async ({ page, qa }: CaseArgs): Promise<{ code: str
   await qa.step(5, async () => {
     await page.goto('/id/budget/circulars');
     await page.getByRole('main').getByRole('button', { name: /New circular/ }).click();
-    const options = await page.getByRole('dialog').getByRole('combobox', { name: 'Budget book' }).locator('option').allInnerTexts();
-    expect(options.some((o) => o.startsWith(code))).toBe(true);
+    // The options of the books are loaded after the dialog opens.
+    const options = page.getByRole('dialog').getByRole('combobox', { name: 'Budget book' }).locator('option');
+    await expect.poll(async () => (await options.allInnerTexts()).some((o) => o.startsWith(code)), { timeout: 15_000 }).toBe(true);
   });
   return { code, name: qa.name('X Buku operasional uji') };
 };

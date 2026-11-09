@@ -5,6 +5,8 @@ import { CLINICAL, PT1_DATE_OF_BIRTH } from '../../../lib/clinical-data';
 import { ConsultationPage } from '../../../pages/clinical/ConsultationPage';
 import { TC_APP003_005 } from '../../modules/03-patient-care/cases';
 import { consultSteps } from './steps/outpatient-steps';
+import { TC_APP003_008, TC_APP003_009, TC_APP003_048 } from '../../modules/03-patient-care/consultation-cases';
+import { TC_APP003_002, TC_APP003_010 } from '../../modules/03-patient-care/evaluation-cases';
 
 /**
  * E2E-021: the doctor opens the consultation of PT-1 and records an allergy on
@@ -40,4 +42,9 @@ chainTest('E2E-021', async ({ page, chain }) => {
   });
 
   await chain.step(3, (qa) => TC_APP003_005({ page, qa }));
+  await chain.run(4, TC_APP003_008);
+  await chain.run(5, TC_APP003_002);
+  await chain.run(6, TC_APP003_010);
+  await chain.run(7, TC_APP003_048);
+  await chain.run(8, TC_APP003_009);
 });

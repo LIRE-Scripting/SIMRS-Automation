@@ -112,13 +112,14 @@ export async function stockIn(page: Page, code: string): Promise<Map<string, num
   return out;
 }
 
+// The work order list shows only its first ~20 rows by number, with no paging (found blocker 40): order numbers use qa.bed so they sort first.
 export const orders = (p: Page) => new Desk(p, '/linen/orders', 'Work orders', 'Save order');
 export const moves = (p: Page) => new Desk(p, '/linen/moves', 'Circulation', 'Clean issue');
 
 /** A work order of the test for `quantity` finished pieces, saved, sent, approved (on the component batch) and received; returns its ids. */
 export async function finishedLinen(page: Page, qa: Qa, it: LinenItems, quantity = '10'): Promise<{ order: string; receipt: string; batch: string }> {
   const o = orders(page);
-  const order = (await o.create({ Number: qa.code('X-WO-001'), 'Contractor / laundry': qa.prefix('X Konveksi uji'), 'Finished item': it.finished, Quantity: quantity })).id;
+  const order = (await o.create({ Number: qa.bed('X-WO-001'), 'Contractor / laundry': qa.prefix('X Konveksi uji'), 'Finished item': it.finished, Quantity: quantity })).id;
   expect(order, 'the work order of the test is saved').toBeTruthy();
   expect(await o.save({ Document: order }, 'Send order')).toContain(SAVED);
   expect(await o.save({ Batch: it.componentBatch, Document: order }, 'Approve order')).toContain(SAVED);
@@ -131,7 +132,7 @@ export async function finishedLinen(page: Page, qa: Qa, it: LinenItems, quantity
 // ------------------------------------------------------------------ cases the chains run too (E2E-016, E2E-047)
 
 export const ORDER = (qa: Qa, extra: Record<string, string> = {}) => ({
-  Number: qa.code('X-WO-001'),
+  Number: qa.bed('X-WO-001'),
   'Contractor / laundry': qa.prefix('X Konveksi uji'),
   'Finished item': qa.code('X-SPREI'),
   Quantity: '10',
@@ -198,7 +199,7 @@ export const TC_APP025_004 = async ({ page, qa }: CaseArgs): Promise<void> => {
   let receipt = '';
   const batch = qa.code('X-SPREI-B');
   await qa.step(3, async () => {
-    const r = await o.create({ Number: qa.code('X-WO-001'), 'Contractor / laundry': qa.prefix('X Konveksi uji'), 'Finished item': it.finished, Quantity: '10' });
+    const r = await o.create({ Number: qa.bed('X-WO-001'), 'Contractor / laundry': qa.prefix('X Konveksi uji'), 'Finished item': it.finished, Quantity: '10' });
     order = r.id;
     expect(r.toasts).toContain(SAVED);
     expect(await o.status(order)).toMatch(/draft/i);

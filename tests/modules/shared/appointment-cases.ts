@@ -41,6 +41,11 @@ type Body = (args: { page: Page; qa: Qa; browser?: Browser }, route: string) => 
 /** Mondays claimed by the running test; their QA bookings are cancelled after it (releaseWeek). */
 const claimed: string[] = [];
 
+/** Cancels the QA bookings on the Mondays claimed so far (after a test, or after a chain step that ran a case). */
+export async function releaseClaimed(page: Page): Promise<void> {
+  for (const monday of new Set(claimed.splice(0))) await releaseWeek(page, monday);
+}
+
 async function claim(page: Page, need?: DDayNeed): Promise<string> {
   const monday = await claimDDay(page, need);
   claimed.push(monday);
@@ -1123,7 +1128,7 @@ export function defineAppointmentCases(route: string, ids: Partial<Record<Appoin
   test.afterEach(async ({ page }, testInfo) => {
     // Frees DR-1's quota on the test's Mondays so later tests can use them again; this gets its own time.
     testInfo.setTimeout(testInfo.timeout + 180_000);
-    for (const monday of new Set(claimed.splice(0))) await releaseWeek(page, monday);
+    await releaseClaimed(page);
   });
 
   for (const [key, id] of Object.entries(ids) as [AppointmentCase, string][]) {

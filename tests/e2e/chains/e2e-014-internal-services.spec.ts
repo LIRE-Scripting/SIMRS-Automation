@@ -14,4 +14,5 @@ chainTest('E2E-014', async ({ page, chain }) => {
   await chain.step(4, (qa) => TC_APP022_009({ page, qa }));
   await chain.step(5, (qa) => TC_APP022_012({ page, qa }));
   chain.stopAsPlanned(6);
+  chain.stopAsPlanned(7);
 });
